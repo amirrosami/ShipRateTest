@@ -1,0 +1,68 @@
+﻿@model BlackListReasonUpdateDto
+
+
+
+<form hx-post="@Url.Action("Edit", "BlackListReason")"
+      hx-target="#modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header bg-primary">
+        <h5 class="modal-title text-white"><i class="bi bi-pencil-square me-2"></i>Edit BlackListReason</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+
+    <div class="modal-body">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@Model.Id" />
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            var allErrors = ViewData.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            if (allErrors.Any())
+            {
+                <div class="alert alert-danger py-2 mb-3">
+                    <ul class="mb-0 small">
+                        @foreach (var err in allErrors)
+                        {
+                            <li>@err</li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+
+        <!-- Title -->
+        <div class="mb-3">
+            <label class="form-label fw-medium">
+                Title <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="BlackListReasonName"
+                   value="@Model.BlackListReasonName"
+                   class="form-control @(ViewData.ModelState.ContainsKey("BlackListReasonName") && ViewData.ModelState["BlackListReasonName"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="100"  />
+        </div>
+
+
+        <!-- IsActive -->
+        <div class="form-check form-switch">
+            <input type="checkbox"
+                   class="form-check-input"
+                   name="IsActive"
+                   value="true"
+                   id="editIsActive"
+                   @(Model.IsActive ? "checked" : "") />
+            <label class="form-check-label" for="editIsActive">Active</label>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-warning">
+            <i class="bi bi-check-lg me-1"></i> Update
+        </button>
+    </div>
+</form>
+
+

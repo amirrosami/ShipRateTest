@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<AssemblyName>ShipRate.WebApp</AssemblyName>
+		<RootNamespace>ShipRate.WebApp</RootNamespace>
+		<NoWarn>$(NoWarn);NU1608</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Folder Include="App_Data\" />
+		<Folder Include="wwwroot\css\NewFolder\" />
+		<Folder Include="wwwroot\fonts\" />
+		<Folder Include="wwwroot\lib\signalR\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Dapper" Version="2.1.79" />
+		<PackageReference Include="FastReport.OpenSource" Version="2026.2.1" />
+		<PackageReference Include="FastReport.OpenSource.Export.PdfSimple" Version="2026.2.1" />
+		<PackageReference Include="FluentValidation" Version="12.1.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.3">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="System.Linq.Dynamic.Core" Version="1.7.2" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Common\ShipRate.Common.csproj" />
+		<ProjectReference Include="..\ShipRate.Application\ShipRate.Application.csproj" />
+		<ProjectReference Include="..\ShipRate.Domain\ShipRate.Domain.csproj" />
+		<ProjectReference Include="..\ShipRate.Infrastructure\ShipRate.Infrastructure.csproj" />
+	</ItemGroup>
+</Project>

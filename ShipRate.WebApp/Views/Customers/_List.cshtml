@@ -1,0 +1,154 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.WebApp.ViewModels.CustomersVms
+@model PaginatedList<CustomerListViewModel>
+
+<div class="table-responsive">
+    <table class="table table-hover table-sm align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>#</th>
+                <th>Customer Name</th>
+                <th>Local Name</th>
+                <th>Industry</th>
+                <th>Trade Types</th>
+                <th>Sales User</th>
+                <th>Status</th>
+                <th class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{ int row = (Model.PageIndex - 1) * Model.PageSize + 1; }
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@(row++)</td>
+                    <td>@item.PersonName</td>
+                    <td>@item.LocalName</td>
+                    <td>@item.IndustryName</td>
+                    <td>
+                        @foreach (var tt in item.TradeTypeNames)
+                        {
+                            <span class="badge bg-secondary me-1">@tt</span>
+                        }
+                    </td>
+                    <td>@item.SalesUserName</td>
+                    <td>
+                        @if (item.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Inactive</span>
+                        }
+                    </td>
+                    <td class="text-center">
+                        <!-- Edit Customer → Modal بزرگ -->
+                        <button class="btn btn-sm btn-outline-primary"
+                                hx-get="/Customers/Edit?id=@item.Id"
+                                hx-target="#modal-content"
+                                hx-swap="innerHTML">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+
+                        <!-- Edit Person → Modal بزرگ -->
+                        <button class="btn btn-sm btn-outline-secondary"
+                                hx-get="/Persons/Edit?id=@item.Id"
+                                hx-target="#modal-content"
+                                hx-swap="innerHTML">
+                            <i class="bi bi-person-gear"></i>
+                        </button>
+
+                        <!-- Assign Sales → Modal کوچک -->
+                        <button class="btn btn-sm btn-outline-info"
+                                hx-get="/Customers/AssignSalesUser?id=@item.Id"
+                                hx-target="#modal-content2"
+                                hx-swap="innerHTML">
+                            <i class="bi bi-person-plus"></i>
+                        </button>
+
+                        <!-- Delete → Modal کوچک -->
+                        <button class="btn btn-sm btn-outline-danger"
+                                hx-get="/Customers/Delete?id=@item.Id"
+                                hx-target="#modal-content2"
+                                hx-swap="innerHTML">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+@if (Model.TotalPages > 1)
+{
+    var currentPage = Model.PageIndex;
+    var totalPages = Model.TotalPages;
+    var delta = 2; // تعداد صفحات اطراف صفحه فعلی
+
+    var startPage = Math.Max(1, currentPage - delta);
+    var endPage = Math.Min(totalPages, currentPage + delta);
+
+    <nav>
+        <ul class="pagination pagination-sm justify-content-center mb-0">
+
+            <!-- Previous -->
+            <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                <a class="page-link" href="javascript:void(0)"
+                   onclick="goToPage(@(currentPage - 1))">«</a>
+            </li>
+
+            <!-- Page 1 -->
+            @if (startPage > 1)
+            {
+                <li class="page-item @(currentPage == 1 ? "active" : "")">
+                    <a class="page-link" href="javascript:void(0)"
+                       onclick="goToPage(1)">1</a>
+                </li>
+
+                @if (startPage > 2)
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                }
+            }
+
+            <!-- Middle Pages -->
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                if (i != 1 && i != totalPages)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" href="javascript:void(0)"
+                           onclick="goToPage(@i)">@i</a>
+                    </li>
+                }
+            }
+
+            <!-- Last Page -->
+            @if (endPage < totalPages)
+            {
+                @if (endPage < totalPages - 1)
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                }
+
+                <li class="page-item @(currentPage == totalPages ? "active" : "")">
+                    <a class="page-link" href="javascript:void(0)"
+                       onclick="goToPage(@totalPages)">@totalPages</a>
+                </li>
+            }
+
+            <!-- Next -->
+            <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                <a class="page-link" href="javascript:void(0)"
+                   onclick="goToPage(@(currentPage + 1))">»</a>
+            </li>
+        </ul>
+    </nav>
+}

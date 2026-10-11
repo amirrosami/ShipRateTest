@@ -1,0 +1,37 @@
+﻿<div class="modal-header bg-danger text-white">
+    <h5 class="modal-title">
+        <i class="bi bi-trash"></i> Delete Request
+    </h5>
+    <button type="button" class="btn-close btn-close-white" onclick="closeModal()"></button>
+</div>
+
+<form hx-post="/CustomerConfirmation/DeleteConfirmed"
+      hx-target="#listContainer"
+      hx-swap="innerHTML">
+
+    @Html.AntiForgeryToken()
+
+    <div class="modal-body text-center">
+
+        <input type="hidden" name="id" value="@ViewBag.EntityId" />
+
+        <p class="mb-0">
+            Are you sure you want to delete request for
+            <strong>@ViewBag.PersonName</strong> ?
+        </p>
+
+    </div>
+
+    <div class="modal-footer py-2">
+
+        <button type="button" class="btn btn-secondary btn-sm"
+                onclick="closeModal()">
+            Cancel
+        </button>
+
+        <button type="submit" class="btn btn-danger btn-sm">
+            <i class="bi bi-trash"></i> Delete
+        </button>
+
+    </div>
+</form>

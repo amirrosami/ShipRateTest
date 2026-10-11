@@ -1,0 +1,127 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model TreasuryDocumentIndexVm
+
+@{
+    ViewData["Title"] = "Treasury Documents";
+}
+
+<div class="container-fluid" dir="ltr">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Treasury Documents</h4>
+
+        <button type="button"
+                class="btn btn-primary"
+                hx-get="@Url.Action("Create", "TreasuryDocuments")"
+                hx-target="#modalBody"
+                hx-swap="innerHTML"
+                data-bs-toggle="modal"
+                data-bs-target="#mainModal">
+            New
+        </button>
+    </div>
+
+    <form id="searchForm"
+          class="border rounded p-3 mb-3"
+          hx-get="@Url.Action("Index", "TreasuryDocuments")"
+          hx-target="#listContainer"
+          hx-swap="innerHTML">
+
+        <input type="hidden" name="PageNumber" value="1" />
+
+        <div class="row g-3 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label">Receipt No</label>
+                <input type="text"
+                       name="DocumentNo"
+                       value="@Model.Search.DocumentNo"
+                       class="form-control" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">From Date</label>
+                <input type="date"
+                       name="FromDocumentDate"
+                       value="@(Model.Search.FromDocumentDate?.ToString("yyyy-MM-dd"))"
+                       class="form-control" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">To Date</label>
+                <input type="date"
+                       name="ToDocumentDate"
+                       value="@(Model.Search.ToDocumentDate?.ToString("yyyy-MM-dd"))"
+                       class="form-control" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Party</label>
+                <input type="text"
+                       name="PartyName"
+                       value="@Model.Search.PartyName"
+                       class="form-control" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Status</label>
+                <select name="TreasuryDocumentStatusId" class="form-select">
+                    <option value="">All</option>
+                    @foreach (var status in Model.Statuses)
+                    {
+                        <option value="@status.Value"
+                                selected="@(status.Value == Model.Search.TreasuryDocumentStatusId?.ToString() ? "selected" : null)">
+                            @status.Text
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-1">
+                <label class="form-label">Rows</label>
+                <select name="PageSize" class="form-select">
+                    <option value="10" selected="@(Model.Search.PageSize == 10 ? "selected" : null)">10</option>
+                    <option value="20" selected="@(Model.Search.PageSize == 20 ? "selected" : null)">20</option>
+                    <option value="50" selected="@(Model.Search.PageSize == 50 ? "selected" : null)">50</option>
+                </select>
+            </div>
+
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-success w-100">Search</button>
+            </div>
+        </div>
+    </form>
+
+    <div id="listMessage" class="mb-2"></div>
+
+
+    <div id="listContainer">
+        @await Html.PartialAsync("_List", Model.Result)
+    </div>
+
+    <div hx-get="@Url.Action("Index", "TreasuryDocuments")"
+         hx-trigger="treasuryDocumentChanged from:body"
+         hx-target="#listContainer"
+         hx-include="#searchForm"
+         hx-swap="innerHTML">
+    </div>
+</div>
+
+<div class="modal fade" id="mainModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" dir="ltr">
+            <div class="modal-header">
+                <h5 class="modal-title">Treasury Document</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.body.addEventListener('treasuryDocumentChanged', function () {
+        var modalEl = document.getElementById('mainModal');
+        var modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+    });
+</script>

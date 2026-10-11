@@ -1,0 +1,125 @@
+﻿@{
+    Guid attorneyId = (Guid)ViewBag.AttorneyId;
+    string docNo = ViewBag.AttorneyDocNo;
+}
+
+<form id="addLawyerForm"
+      hx-post="@Url.Action("AddLawyer")"
+      hx-swap="none">
+
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="attorneyId" value="@attorneyId" />
+
+    <!-- Modal Header -->
+    <div class="modal-header bg-success bg-gradient text-white">
+        <h5 class="modal-title">
+            <i class="bi bi-person-plus me-2"></i>
+            Add Lawyer to <strong>@docNo</strong>
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+        <div class="mb-3">
+            <label class="form-label fw-semibold">
+                <i class="bi bi-search text-success me-1"></i> Search Lawyer
+            </label>
+            <div class="position-relative">
+                <input type="text"
+                       id="lawyerSearch"
+                       class="form-control"
+                       placeholder="Type lawyer name…"
+                       autocomplete="off" />
+                <input type="hidden" name="lawyerId" id="lawyerId" />
+                <div id="lawyerResults"
+                     class="list-group position-absolute w-100 shadow"
+                     style="z-index:9999; max-height:200px; overflow-y:auto; display:none;">
+                </div>
+            </div>
+        </div>
+
+        <div id="selectedLawyerBadge" style="display:none;" class="mb-2">
+            <span class="badge bg-success fs-6 px-3 py-2">
+                <i class="bi bi-person-check me-1"></i>
+                <span id="selectedLawyerName"></span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-lg me-1"></i> Cancel
+        </button>
+        <button type="submit" class="btn btn-success" id="btnSubmitLawyer" disabled>
+            <i class="bi bi-plus-lg me-1"></i> Add Lawyer
+        </button>
+    </div>
+</form>
+
+<script>
+    (function () {
+        const input = document.getElementById('lawyerSearch');
+        const hidden = document.getElementById('lawyerId');
+        const results = document.getElementById('lawyerResults');
+        const badge = document.getElementById('selectedLawyerBadge');
+        const nameSpan = document.getElementById('selectedLawyerName');
+        const submitBtn = document.getElementById('btnSubmitLawyer');
+        let debounce;
+
+        // ── Autocomplete ──
+        input.addEventListener('input', function () {
+            clearTimeout(debounce);
+            hidden.value = '';
+            submitBtn.disabled = true;
+            badge.style.display = 'none';
+
+            const term = this.value.trim();
+            if (term.length < 2) {
+                results.style.display = 'none';
+                return;
+            }
+            debounce = setTimeout(() => {
+                fetch('/Attorney/SearchPersons?term=' + encodeURIComponent(term))
+                    .then(r => r.json())
+                    .then(data => {
+                        results.innerHTML = '';
+                        if (data.length === 0) {
+                            results.style.display = 'none';
+                            return;
+                        }
+                        data.forEach(p => {
+                            const a = document.createElement('a');
+                            a.href = '#';
+                            a.className = 'list-group-item list-group-item-action';
+                            a.textContent = p.personName;
+                            a.addEventListener('click', function (e) {
+                                e.preventDefault();
+                                input.value = p.personName;
+                                hidden.value = p.id;
+                                results.style.display = 'none';
+                                nameSpan.textContent = p.personName;
+                                badge.style.display = 'block';
+                                submitBtn.disabled = false;
+                            });
+                            results.appendChild(a);
+                        });
+                        results.style.display = 'block';
+                    });
+            }, 300);
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!results.contains(e.target) && e.target !== input) {
+                results.style.display = 'none';
+            }
+        });
+
+        // ── بستن مودال بعد از موفقیت ──
+        document.body.addEventListener('lawyerListChanged', function () {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('appModal'));
+            if (modal) modal.hide();
+        });
+    })();
+</script>

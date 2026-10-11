@@ -1,0 +1,204 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model InvoiceListPageVm
+
+@{
+    ViewData["Title"] = "Invoices";
+}
+
+<style>
+    .invoice-grid-scroll {
+        max-height: 65vh;
+        overflow-y: auto;
+        overflow-x: auto;
+    }
+
+        .invoice-grid-scroll table {
+            margin-bottom: 0;
+            font-size: 0.85rem; /* فونت فشرده‌تر */
+            border-collapse: collapse;
+        }
+
+        .invoice-grid-scroll thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: #fff;
+            font-size: 0.8rem; /* فونت هدر کوچکتر */
+            padding: 4px 6px; /* پدینگ فشرده */
+            white-space: nowrap;
+        }
+
+        .invoice-grid-scroll tbody td {
+            padding: 4px 6px; /* پدینگ فشرده */
+            white-space: nowrap;
+        }
+
+            /* اولویت فشرده‌کردن ستون‌های تاریخ/ساعت */
+            .invoice-grid-scroll tbody td.datetime-cell {
+                font-variant-numeric: tabular-nums;
+            }
+</style>
+
+<div class="container-fluid py-3" dir="ltr">
+    <div class="card-header d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">Invoices Management</h3>
+        <div class="d-flex justify-content-between align-items-center gap-2">
+            <button type="button"
+                    class="btn btn-info btn-sm"
+                    id="btnOpenInvoicesSettlement"
+                    onclick="triggerInvoicesSettlement()">
+                <i class="bi bi-wallet2 me-1"></i> Settle Selected (<span id="selectedInvoicesCount">0</span>)
+            </button>
+            <a href="@Url.Action("Index", "Settlements")"
+               class="btn btn-warning btn-sm">
+                <i class="bi bi-receipt-cutoff me-1"></i> Settlements
+            </a>
+            <button type="button"
+                    class="btn btn-primary"
+                    hx-get="@Url.Action("CreateModal", "Invoices")"
+                    hx-target="#invoice-modal-content"
+                    hx-swap="innerHTML"
+                    onclick="openInvoiceModal()">
+                + New Invoice
+            </button>
+        </div>
+    </div>
+
+    <div id="invoice-list-container"
+         hx-get="@Url.Action("List", "Invoices", new { PageNumber = 1, PageSize = 10 })"
+         hx-trigger="invoice-list-refresh from:body"
+         hx-swap="innerHTML">
+        @await Html.PartialAsync("_InvoiceList", Model)
+    </div>
+</div>
+
+<div id="invoiceitems-list-container">
+</div>
+
+
+<div class="modal fade" id="invoiceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="invoice-modal-content"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="partyLookupModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content" id="party-lookup-modal-content"></div>
+    </div>
+</div>
+
+<div id="settlementModalContainer"></div>
+
+<div class="modal fade" id="documentManagerModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="document-manager-content">
+        </div>
+    </div>
+</div>
+
+
+
+
+@section Scripts {
+    <script src="~/js/invoices.js"></script>
+    <script>
+        // مدیریت انتخاب همه (Select All)
+        $(document).on('change', '#chkSelectAllInvoices', function () {
+            const isChecked = $(this).is(':checked');
+            $('.chk-invoice-item').prop('checked', isChecked);
+            updateSelectedCount();
+        });
+
+        // مدیریت انتخاب تک‌تک آیتم‌ها
+        $(document).on('change', '.chk-invoice-item', function () {
+            const allChecked = $('.chk-invoice-item').length === $('.chk-invoice-item:checked').length;
+            $('#chkSelectAllInvoices').prop('checked', allChecked);
+            updateSelectedCount();
+        });
+
+        // بروزرسانی کانتر تعداد فاکتورهای انتخاب‌شده
+        function updateSelectedCount() {
+            const count = $('.chk-invoice-item:checked').length;
+            $('#selectedInvoicesCount').text(count);
+        }
+
+        // تابع کلیک روی دکمه تسویه
+        function triggerInvoicesSettlement() {
+            const selectedCheckboxes = $('.chk-invoice-item:checked');
+
+            if (selectedCheckboxes.length === 0) {
+                alert('Please select at least one invoice to settle.');
+                return;
+            }
+
+            const selectedIds = [];
+            const partyIds = new Set();
+
+            selectedCheckboxes.each(function () {
+                selectedIds.push($(this).val());
+                const partyId = $(this).data('party-id');
+                if (partyId) {
+                    partyIds.add(partyId);
+                }
+            });
+
+            // هشدار اختیاری: در صورت انتخاب فاکتورهای چند طرف‌حساب مختلف
+            if (partyIds.size > 1) {
+                if (!confirm('You have selected invoices belonging to different parties. Do you still want to proceed?')) {
+                    return;
+                }
+            }
+
+            const firstPartyId = partyIds.size > 0 ? Array.from(partyIds)[0] : null;
+
+            // ارسال به کنترلر و باز کردن مدال
+            $.ajax({
+                url: '@Url.Action("OpenSettlementModal", "Settlements")', // مسیر اکشن کنترلر تسویه
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    invoiceIds: selectedIds,
+                    detentionIds: [],
+                    partyId: firstPartyId
+                }),
+                beforeSend: function () {
+                    $('#btnOpenInvoicesSettlement').prop('disabled', true);
+                },
+                success: function (html) {
+                    $('#settlementModalContainer').html(html);
+                    // باز کردن مدال رندر شده
+                    $('#settlementModal, #genericSettlementModal, #blSettlementModal').modal('show');
+                },
+                error: function (xhr) {
+                    alert('Failed to load Settlement Modal: ' + (xhr.responseText || xhr.statusText));
+                },
+                complete: function () {
+                    $('#btnOpenInvoicesSettlement').prop('disabled', false);
+                }
+            });
+        }
+    </script>
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

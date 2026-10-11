@@ -1,0 +1,77 @@
+﻿@using ShipRate.WebApp.ViewModels.Documents
+@model DocumentIndexViewModel
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Documents</h5>
+        <span class="badge bg-secondary">Total: @Model.Result.TotalCount</span>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-bordered mb-0" dir="ltr">
+                <thead class="table-light">
+                    <tr>
+                        <th>Title</th>
+                        <th>Document No</th>
+                        <th>Company</th>
+                        <th>Document Type</th>
+                        <th>Object Type</th>
+                        <th>Object</th>
+                        <th>Document Date</th>
+                        <th>Expiry Date</th>
+                        <th>Status</th>
+                        <th style="width:120px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Result.Items != null && Model.Result.Items.Any())
+                    {
+                        foreach (var item in Model.Result.Items)
+                        {
+                            <tr>
+                                <td>@item.DocumentTitle</td>
+                                <td>@item.DocumentNo</td>
+                                <td>@item.CompanyName</td>
+                                <td>@item.DocumentTypeName</td>
+                                <td>@item.ObjectTypeName</td>
+                                <td>@item.ObjectDisplayText</td>
+                                <td>@item.DocumentDate.ToString("yyyy-MM-dd")</td>
+                                <td>@(item.ExpiryDate?.ToString("yyyy-MM-dd") ?? "-")</td>
+                                <td>
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    <button type="button"
+                                            class="btn btn-sm btn-info"
+                                            hx-get="@Url.Action("DetailsSection", "Documents", new { documentId = item.Id })"
+                                            hx-target="#documentDetailsContainer"
+                                            hx-swap="innerHTML">
+                                        Details
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="10" class="text-center py-4">No records found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card-footer">
+        @await Html.PartialAsync("_HtmxPagerPartial.cshtml", Model)
+    </div>
+</div>

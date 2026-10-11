@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Name="OfficialInvoice" ReportInfo.Author="ShipRate System" ReportInfo.Created="08/13/2026 15:22:15" ReportInfo.Modified="08/15/2026 07:43:44" ReportInfo.CreatorVersion="2026.1.0.0">
+  <Dictionary>
+    <BusinessObjectDataSource Name="Header" ReferenceName="Header" DataType="System.Int32" Enabled="true"/>
+    <BusinessObjectDataSource Name="Items" ReferenceName="Items" DataType="System.Int32" Enabled="true"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="1047.06" Height="136.7">
+      <TextObject Name="Text1" Left="398.45" Top="20" Width="300" Height="30" Fill.Color="Turquoise" Text="صورتحساب رسمی فروش کالا و خدمات" HorzAlign="Center" Font="Tahoma, 16pt, style=Bold"/>
+      <TextObject Name="Text2" Left="18.05" Top="21.65" Width="150" Height="20" Text="[Header.InvoiceNo]" Font="Tahoma, 10pt"/>
+      <PictureObject Name="CompanyLogo" Left="869.4" Top="28.35" Width="151.2" Height="94.5" Image=""/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="140.7" Width="1047.06" Height="147.25" Border.Lines="All">
+      <TextObject Name="TextSeller" Left="331.3" Top="10" Width="300" Height="40" Text="فروشنده: [Header.SellerName]&#13;&#10;شناسه ملی: [Header.SellerNationalId]" Font="Tahoma, 9pt"/>
+      <TextObject Name="TextBuyer" Left="721.3" Top="10" Width="300" Height="40" Text="خریدار: [Header.BuyerName]&#13;&#10;شناسه ملی: [Header.BuyerNationalId]" Font="Tahoma, 9pt"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="291.95" Width="1047.06" Height="30" DataSource="Items">
+      <TableObject Name="TableItems" Left="321.3" Width="520" Height="30" Border.Lines="All">
+        <TableColumn Name="Column1" Width="40"/>
+        <TableColumn Name="Column2" Width="200"/>
+        <TableColumn Name="Column3" Width="80"/>
+        <TableColumn Name="Column4" Width="100"/>
+        <TableColumn Name="Column5" Width="100"/>
+        <TableRow Name="Row1" Height="30">
+          <TableCell Name="Cell1" Border.Lines="All" Text="[Items.Row]" Font="Tahoma, 9pt"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="[Items.ChargeTitle]" Font="Tahoma, 9pt"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="[Items.Qty]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" Font="Tahoma, 9pt"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="[Items.UnitPrice]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="0" Font="Tahoma, 9pt"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="[Items.Total]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="0" Font="Tahoma, 9pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="325.95" Width="1047.06" Height="150" Border.Lines="All">
+      <TextObject Name="TextTotal" Left="721.3" Top="10" Width="300" Height="60" Text="جمع کل: [Header.TotalFirst]&#13;&#10;تخفیف: [Header.TotalDiscount]&#13;&#10;مالیات: [Header.TotalTax]&#13;&#10;مبلغ قابل پرداخت: [Header.FinalAmount]" Font="Tahoma, 10pt, style=Bold"/>
+      <TextObject Name="TextSign" Left="815.45" Top="100" Width="200" Height="30" Text="مهر و امضای فروشنده" Font="Tahoma, 9pt"/>
+    </ReportSummaryBand>
+  </ReportPage>
+</Report>

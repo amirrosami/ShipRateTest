@@ -1,0 +1,81 @@
+﻿@using ShipRate.WebApp.ViewModels
+@model List<BuyQuoteListViewModel>
+@Html.AntiForgeryToken()
+<div class="card">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">
+            <i class="bi bi-list-ul"></i> Quotations in respond for Request:@ViewBag.RequestNo
+        </h5>
+    </div>
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Quotation No</th>
+                            <th>Quotation Date</th>
+                            <th>Carrier</th>
+                            <th>Vendor</th>
+                            <th>TransportationBy</th>
+                            <th>ETA</th>
+                            <th>ETD</th>
+                            <th>Valid Until</th>
+                            <th>Create User</th>
+                            <th>Last Edit User</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var q in Model)
+                        {
+                            <tr>
+                                <td>@q.QuotationNo</td>
+                                <td>@q.QuotationDate?.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>@q.CarrierName</td>
+                                <td>@q.VendorName</td>
+                                <td>@q.TransportMovementNo</td>
+                                <td>@q.ETA</td>
+                                <td>@q.ETD</td>
+                                <td>@q.ValidUntil</td>
+                                <td>@q.CreateUserName</td>
+                                <td>@q.UpdateUserName</td>
+                                <td>
+                                    <div class="d-flex gap-1 flex-nowrap">
+                                        <button class="btn btn-sm btn-outline-primary"
+                                                hx-get="/RateRequests/GetRespondItems?quoteId=@q.Id"
+                                                hx-target="#respondItemsListContainer"
+                                                hx-swap="innerHTML">
+                                            <i class="bi bi-dollar"></i>Charges List
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary"
+                                                hx-get="/RateRequests/GetRespondDetails?quoteId=@q.Id"
+                                                hx-target="#modal-content"
+                                                hx-swap="innerHTML">
+                                            <i class="bi bi-list-ul"></i>Details
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info mb-0">
+                <i class="bi bi-info-circle"></i> No Responds found for this rate request.
+            </div>
+        }
+    </div>
+    <div class="card-footer text-end">
+        <button class="btn btn-sm btn-secondary" onclick="document.getElementById('respondsListContainer').innerHTML = ''">
+            <i class="bi bi-x-circle"></i> Close
+        </button>
+    </div>
+</div>
+
+<script>
+</script>

@@ -1,0 +1,8 @@
+﻿@using ShipRate.Application.JobsViewModels
+@model CreateBookingVm
+<div class="col-md-3" id="load-type-wrapper">
+    <select asp-for="LoadTypeId" asp-items="Model.LoadTypes" class="form-select form-select-sm">
+        <option value="">Load Type...</option>
+    </select>
+    <span asp-validation-for="LoadTypeId" class="text-danger small"></span>
+</div>

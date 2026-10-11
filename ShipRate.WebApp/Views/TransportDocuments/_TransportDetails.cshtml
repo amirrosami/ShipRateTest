@@ -1,0 +1,113 @@
+﻿@* @using ShipRate.Application.ViewModels
+@model TransportDocumentUpsertVm
+
+<div class="row g-3">
+
+    <div class="col-12">
+        <div class="alert alert-light border mb-3">
+            This Section's Data is displayed based on Transport Mode
+        </div>
+    </div>
+
+    <div class="col-12" data-transport-mode="1">
+        <div class="card">
+            <div class="card-header fw-semibold">Sea Transport</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="VesselName" class="form-label"></label>
+                        <input asp-for="VesselName" class="form-control" />
+                        <span asp-validation-for="VesselName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="VoyageNo" class="form-label"></label>
+                        <input asp-for="VoyageNo" class="form-control" />
+                        <span asp-validation-for="VoyageNo" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 d-none" data-transport-mode="4">
+        <div class="card">
+            <div class="card-header fw-semibold">Air Transport</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label asp-for="AirlineId" class="form-label"></label>
+                        <select asp-for="AirlineId"
+                                asp-items="Model.Airlines"
+                                class="form-select">
+                            <option value="">-- Select --</option>
+                        </select>
+                        <span asp-validation-for="AirlineId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="FlightNo" class="form-label"></label>
+                        <input asp-for="FlightNo" class="form-control" />
+                        <span asp-validation-for="FlightNo" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="FlightDate" class="form-label"></label>
+                        <input asp-for="FlightDate" type="date" class="form-control" />
+                        <span asp-validation-for="FlightDate" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 d-none" data-transport-mode="2">
+        <div class="card">
+            <div class="card-header fw-semibold">Road Transport</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label asp-for="TruckNo" class="form-label"></label>
+                        <input asp-for="TruckNo" class="form-control" />
+                        <span asp-validation-for="TruckNo" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="TrailerNo" class="form-label"></label>
+                        <input asp-for="TrailerNo" class="form-control" />
+                        <span asp-validation-for="TrailerNo" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="DriverName" class="form-label"></label>
+                        <input asp-for="DriverName" class="form-control" />
+                        <span asp-validation-for="DriverName" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 d-none" data-transport-mode="3">
+        <div class="card">
+            <div class="card-header fw-semibold">Rail Transport</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="TrainNo" class="form-label"></label>
+                        <input asp-for="TrainNo" class="form-control" />
+                        <span asp-validation-for="TrainNo" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="WagonNo" class="form-label"></label>
+                        <input asp-for="WagonNo" class="form-control" />
+                        <span asp-validation-for="WagonNo" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+ *@

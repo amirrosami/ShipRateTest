@@ -1,0 +1,72 @@
+﻿@using ShipRate.Application.DTOs.UserTeams
+@model CreateUserTeamDto
+
+
+<form hx-post="/UserTeams/CreateTeam"
+      hx-target="#app-modal-content"
+      hx-swap="innerHTML">
+
+    <div class="mb-3">
+
+        <label>Company</label>
+
+        <select asp-for="CompanyId"
+                asp-items="ViewBag.Companies"
+                class="form-select"
+                hx-get="/UserTeams/ManagersByCompany"
+                hx-target="#managerContainer"
+                hx-trigger="change">
+        </select>
+
+        <span asp-validation-for="CompanyId" class="text-danger"></span>
+
+    </div>
+
+
+    <div class="mb-3">
+
+        <label>Team Name</label>
+
+        <input asp-for="TeamName" class="form-control" />
+
+        <span asp-validation-for="TeamName" class="text-danger"></span>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label>Team Local Name</label>
+
+        <input asp-for="TeamLocalName" class="form-control" />
+
+        <span asp-validation-for="TeamLocalName" class="text-danger"></span>
+
+    </div>
+
+
+
+    <div class="mb-3">
+        <label>Team Type</label>
+        <select asp-for="TeamTypeId" asp-items="Model.TeamTypes" class="form-select">
+            <option value="">Select Team Type...</option>
+        </select>
+        <span asp-validation-for="TeamTypeId" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+
+        <label>Manager</label>
+
+        <div id="managerContainer">
+
+            <select asp-for="ManagerId" class="form-select">
+                <option value="">Select manager...</option>
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <button class="btn btn-success">Save</button>
+
+</form>

@@ -1,0 +1,46 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model List<SettlementItemDto>
+
+<table class="table table-sm table-bordered align-middle">
+    <thead class="table-light">
+        <tr>
+            <th>Invoice No</th>
+            <th>Charge</th>
+            <th class="text-end">Amount</th>
+            <th class="text-end">Base Amount</th>
+            <th>Remarks</th>
+            <th style="width:80px;"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="6" class="text-center text-muted py-3">
+                    No settlement items.
+                </td>
+            </tr>
+        }
+        else
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.InvoiceNo</td>
+                    <td>@item.ChargeDescription</td>
+                    <td class="text-end">@item.Amount.ToString("N2")</td>
+                    <td class="text-end">@item.AmountInBaseCurrency?.ToString("N2")</td>
+                    <td>@item.Remarks</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-danger"
+                                hx-post="@Url.Action("DeleteItem", "Settlements", new { id = item.Id, settlementId = item.SettlementId })"
+                                hx-target="#itemsPanel"
+                                hx-confirm="Delete this item?">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

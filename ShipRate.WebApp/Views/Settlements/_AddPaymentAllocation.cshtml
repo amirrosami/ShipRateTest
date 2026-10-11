@@ -1,0 +1,135 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model PaymentAllocationFormDto
+
+<div class="modal-header d-flex justify-content-between align-items-center mb-2">
+    <h5 class="modal-title">Add Payment Allocation</h5>
+
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <a href="@Url.Action("Index", "PaymentDocuments")"
+           class="btn btn-sm btn-outline-secondary"
+           target="_blank"
+           rel="noopener noreferrer">
+            <i class="bi bi-letter me-1"></i>
+            Payment Documents List
+        </a>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+
+
+    
+</div>
+
+<form hx-post="/Settlements/AddPaymentAllocation"
+      hx-target="#paymentsPanel"
+      hx-swap="innerHTML">
+
+    <input type="hidden" name="SettlementId" value="@Model.SettlementId" />
+
+    <div class="modal-body">
+
+        <div class="row g-3">
+
+            <div class="col-md-12">
+                <label class="form-label">Settlement Item</label>
+
+                <select name="SettlementItemId" class="form-select">
+
+                    <option value="">Select Item</option>
+
+                    @foreach (var item in Model.SettlementItems)
+                    {
+                        <option value="@item.Id">
+
+                            @item.Description
+                            | Amount: @item.ItemAmount
+                            | Remaining: @item.RemainingAmount
+
+                        </option>
+                    }
+
+                </select>
+
+            </div>
+
+
+            <div class="col-md-12">
+
+                <label class="form-label">Payment Document</label>
+
+                <input type="hidden" name="PaymentDocumentId" id="PaymentDocumentId" />
+
+                <input type="text"
+                       name="pdocsearchtext"
+                       class="form-control"
+                       autocomplete="off"
+                       hx-get="/Lookup/PaymentDocuments"
+                       hx-trigger="keyup changed delay:400ms"
+                       hx-target="#paymentDocResult"
+                       hx-vals='{"targetId":"PaymentDocumentId","targetText":"PaymentDocumentText"}'
+                       id="PaymentDocumentText" />
+
+                <div id="paymentDocResult"></div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <label class="form-label">Allocated Amount</label>
+
+                <input name="AllocatedAmount"
+                       class="form-control text-end" />
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <label class="form-label">Settled Amount</label>
+
+                <input name="SettledAmountInItemCurrency"
+                       class="form-control text-end" />
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <label class="form-label">Exchange Rate</label>
+
+                <input name="ExchangeRateValue"
+                       value="1"
+                       class="form-control text-end" />
+
+            </div>
+
+
+            <div class="col-md-12">
+
+                <label class="form-label">Remarks</label>
+
+<textarea name="Remarks" class="form-control"></textarea>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+
+        <button type="button"
+                class="btn btn-light"
+                data-bs-dismiss="modal">
+            Close
+        </button>
+
+        <button type="submit"
+                class="btn btn-primary">
+            Save Allocation
+        </button>
+
+    </div>
+
+</form>

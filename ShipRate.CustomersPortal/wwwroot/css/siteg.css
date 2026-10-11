@@ -1,0 +1,397 @@
+﻿/* ── General ── */
+:root {
+    --sneat-sidebar-bg: #ffffff;
+    --sneat-primary: #696cff;
+}
+
+
+
+body {
+    background-color: #f5f7fa;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* ── Sortable table headers ── */
+th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.15s;
+}
+
+    th.sortable:hover {
+        background-color: #e9ecef;
+    }
+
+/* ── Table row hover ── */
+.table-hover tbody tr {
+    transition: background-color 0.15s;
+}
+
+/* ── Code badge ── */
+code {
+    background-color: #e8f0fe;
+    color: #1a73e8;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+/* ── Form switch cursor ── */
+.form-check.form-switch {
+    cursor: pointer;
+}
+
+/* ── Card shadow ── */
+.card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e0e4e8;
+}
+
+/* ── Toast styling ── */
+.toast {
+    min-width: 280px;
+}
+
+/* ── Modal animation boost ── */
+.modal.fade .modal-dialog {
+    transition: transform 0.2s ease-out;
+}
+
+/* ── HTMX loading indicator ── */
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+    display: inline-block !important;
+}
+
+.htmx-indicator {
+    display: none;
+}
+
+.form-caption-bg {
+    background: var(--sneat-primary) !important;
+}
+
+/* ── Pagination active ── */
+.pagination .page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+/* ── Smooth swap transitions ── */
+#table-container {
+    transition: opacity 0.15s;
+}
+
+.htmx-swapping #table-container {
+    opacity: 0.5;
+}
+
+#secondModal {
+    z-index: 1070;
+}
+
+.modal-backdrop.show:nth-of-type(2) {
+    z-index: 1065;
+}
+
+/* ── Button group in table ── */
+.btn-group-sm > .btn {
+    padding: 0.25rem 0.5rem;
+}
+
+/* ── Search input focus ── */
+.input-group:focus-within {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    border-radius: 0.375rem;
+}
+
+    .input-group:focus-within .input-group-text,
+    .input-group:focus-within .form-control {
+        border-color: #86b7fe;
+    }
+
+
+
+/* ───────── Role Chips ───────── */
+.roles-section {
+    padding: 10px 0;
+}
+
+.role-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 10px;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+    border: 1.5px solid transparent;
+}
+
+    .role-chip:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    }
+
+/* ── فعال (تیک سبز) ── */
+.role-active {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border-color: #86efac;
+}
+
+/* ── غیرفعال (ضربدر قرمز) ── */
+.role-inactive {
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    border-color: #fca5a5;
+}
+
+/* ── بدنه چیپ ── */
+.role-chip-body {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.role-name {
+    font-weight: 600;
+    color: #374151;
+    letter-spacing: 0.3px;
+}
+
+.role-chip-body .bi-check-circle-fill {
+    font-size: 0.95rem;
+}
+
+.role-chip-body .bi-x-circle-fill {
+    font-size: 0.95rem;
+}
+
+/* ── دکمه‌ها ── */
+.role-chip-btn {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.role-chip-btn-info {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+    border: 1px solid #93c5fd;
+}
+
+    .role-chip-btn-info:hover {
+        background-color: #bfdbfe;
+        color: #1e40af;
+        border-color: #60a5fa;
+    }
+
+.role-chip-btn-set {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+}
+
+    .role-chip-btn-set:hover {
+        background-color: #fde68a;
+        color: #78350f;
+        border-color: #f59e0b;
+    }
+
+/* ── انیمیشن HTMX ── */
+.role-chip.htmx-swapping {
+    opacity: 0.5;
+}
+
+.role-chip.htmx-settling {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* wwwroot/css/site.css */
+/* Select2 با Bootstrap 5 */
+.select2-container--bootstrap-5 .select2-selection {
+    min-height: 38px;
+}
+
+.select2-container--bootstrap-5 .select2-dropdown {
+    border-color: #dee2e6;
+}
+
+/* نمایش بهتر نتایج */
+.select2-results__option {
+    padding: 8px 12px;
+}
+
+.select2-results__option--highlighted {
+    background-color: #0d6efd !important;
+    color: white !important;
+}
+
+
+
+
+
+
+.charge-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+}
+
+.charge-title {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 16px;
+    color: #111827;
+}
+
+.charge-table {
+    min-width: 1100px; /* چون ستون‌ها زیاد هستند */
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+    overflow-x: auto;
+}
+
+    .charge-table th {
+        font-weight: 600;
+        color: #6b7280;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 14px;
+    }
+
+    .charge-table td {
+        padding: 10px 0;
+        border: 1px solid #f3f4f6;
+        font-size: 15px;
+    }
+
+.charge-total {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.profit-box {
+    display: inline-block;
+    padding: 10px 16px;
+    background: #f9fafb;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    border: 1px solid #e5e7eb;
+}
+
+.profit-label {
+    color: #6b7280;
+    margin-right: 6px;
+}
+
+.profit-value {
+    color: #111827;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* حذف transition و انیمیشن از همه کارت‌ها، پنل‌ها و گریدهای بوت‌استرپ */
+.card, .panel, .table, .grid, .list-group-item {
+    transition: none !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+    /* در حالت hover هم هیچ تغییری نکند */
+    .card:hover, .panel:hover, .table:hover, .grid:hover, .list-group-item:hover {
+        transition: none !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+
+
+.table-hover tbody tr:hover {
+    background-color: inherit !important;
+    transform: none !important;
+}
+
+.table-responsive {
+    overflow-x: hidden;
+}
+.table td, .table th {
+    white-space: nowrap;
+}
+
+
+.table-hover tbody tr:hover,
+.table-striped tbody tr:hover {
+    transform: none !important;
+}
+
+
+
+/*Job Statues*/
+
+.grad-total {
+    background: linear-gradient(135deg, #0f172a, #334155);
+}
+
+.grad-draft {
+    background: linear-gradient(135deg, #6b7280, #9ca3af);
+}
+
+.grad-confirmed {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+
+.grad-progress {
+    background: linear-gradient(135deg, #ca8a04, #facc15);
+}
+
+.grad-completed {
+    background: linear-gradient(135deg, #059669, #34d399);
+}
+
+.grad-closed {
+    background: linear-gradient(135deg, #374151, #6b7280);
+}
+
+.grad-canceled {
+    background: linear-gradient(135deg, #dc2626, #f87171);
+}
+
+.grad-hold {
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
+}
+
+

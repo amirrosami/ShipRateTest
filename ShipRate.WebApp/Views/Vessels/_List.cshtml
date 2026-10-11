@@ -1,0 +1,56 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.Base_Info
+@using ShipRate.Application.DTOs.Cargo
+@using ShipRate.WebApp.ViewModels
+@using ShipRate.WebApp.ViewModels.Location
+@model GridViewModel
+
+@if (!Model.Data.Items.Any())
+{
+    <tr>
+        <td colspan="6" class="text-center py-5 text-muted">
+            <i class="bi bi-inbox display-4 d-block mb-2"></i>
+            No Records found.
+        </td>
+    </tr>
+}
+else
+{
+    int counter = (Model.Data.Page - 1) * Model.Data.PageSize;
+    @foreach (var item in Model.Data.Items)
+    {
+        var vm = (VesselDto)item;
+        counter++;
+        <tr>
+            <td>@counter</td>
+            <td class="fw-medium">@vm.VesselCode</td>
+            <td class="fw-medium">@vm.VesselName</td>
+            <td class="fw-medium">@vm.VesselTypeName</td>
+            <td class="fw-medium">@vm.OwnTypeName</td>
+            <td class="text-center">
+                <div class="btn-group btn-group-sm">
+
+                    <button type="button"
+                            class="btn btn-outline-primary"
+                            title="Edit"
+                            hx-get="@Url.Action("Edit", "Vessels", new { id = vm.Id })"
+                            hx-target="#app-modal-content"
+                            hx-swap="innerHTML">
+                        <i class="bi bi-pencil"></i>
+
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline-danger"
+                            title="Delete"
+                            hx-get="@Url.Action("Delete", "Vessels", new { id = vm.Id })"
+                            hx-target="#app-modal-content"
+                            hx-swap="innerHTML">
+                        <i class="bi bi-trash"></i>
+                    </button>
+
+                </div>
+            </td>
+        </tr>
+    }
+}
+

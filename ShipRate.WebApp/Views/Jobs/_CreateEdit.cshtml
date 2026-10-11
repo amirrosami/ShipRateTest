@@ -1,0 +1,420 @@
+﻿@using ShipRate.Application.JobsViewModels
+@model CreateJobVm
+<div dir="ltr">
+
+
+    <h4 id="modal-title"
+        class="modal-title"
+        hx-swap-oob="true">
+        @ViewBag.DialogTitle
+    </h4>
+
+    <form hx-post="@Url.Action("SaveJob", "Jobs")"
+          hx-target="#app-modal-content"
+          hx-swap="innerHTML"
+          novalidate>
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+        <input type="hidden" value="@Model.JobId" name="JobId" />
+        <div class="mb-3">
+            <div class="card-header py-2 bg-primary-subtle text-primary-emphasis fw-semibold mb-1 d-flex justify-content-between align-items-center">
+                <span title="مشخصات کلی پرونده">General</span>
+                <a href="@Url.Action("Index", "Persons")"
+                   class="btn btn-sm btn-light py-0 px-2"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    Manage Clients
+                </a>
+            </div>
+            <div class="row g-2  align-items-center">
+                <div class="col-md-1">
+                    <label asp-for="CompanyId" class="form-label small fw-semibold" title="شرکت">Company:</label>
+                </div>
+                <div class="col-md-3">
+                    <select asp-for="CompanyId" asp-items="Model.Companies" class="form-select form-select-sm">
+                        <option value="">...</option>
+                    </select>
+                    <span asp-validation-for="CompanyId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-1">
+                    <label asp-for="JobNumber" class="form-label small fw-semibold" title="شماره پرونده">Job No:</label>
+                </div>
+                <div class="col-md-3">
+                    <input asp-for="JobNumber" class="form-control form-control-sm" placeholder="" readonly />
+                    <span asp-validation-for="JobNumber" class="text-danger small"></span>
+                </div>
+                <div class="col-md-1">
+                    <label asp-for="JobSourceTypeId" class="form-label small fw-semibold" title="منبع ایجاد">Source:</label>
+                </div>
+
+                <div class="col-md-3">
+                    <select asp-for="JobSourceTypeId" asp-items="Model.JobSourceTypes" class="form-select form-select-sm" readonly>
+                        <option value="">...</option>
+                    </select>
+                    <span asp-validation-for="JobSourceTypeId" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-1">
+                    <label asp-for="SalesUserId" class="form-label small fw-semibold" title="کاربر فروش">Sales User:</label>
+                </div>
+
+                <div class="col-md-3">
+                    <select asp-for="SalesUserId" asp-items="Model.SalesUsers" class="form-select form-select-sm">
+                        <option value="">...</option>
+                    </select>
+                    <span asp-validation-for="SalesUserId" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-1">
+                    <label asp-for="JobFileNumber" class="form-label small fw-semibold" title="شماره پرونده">File No:</label>
+                </div>
+                <div class="col-md-3">
+                    <input asp-for="JobFileNumber" class="form-control form-control-sm" placeholder="" />
+                    <span asp-validation-for="JobFileNumber" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-1">
+                    <label asp-for="TransportTypeId" class="form-label small fw-semibold" title="مد حمل ">T.Mode:</label>
+                </div>
+                <div class="col-md-3">
+                    <select asp-for="TransportTypeId" asp-items="Model.TransportTypes" class="form-select form-select-sm"
+                            hx-get="@Url.Action("GetLoadTypes", "Jobs")"
+                            hx-trigger="change"
+                            hx-target="#load-type-wrapper"
+                            hx-swap="outerHTML"
+                            hx-include="[name='TransportTypeId']">
+                        <option value="">...</option>
+                    </select>
+                    <span asp-validation-for="TransportTypeId" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-1">
+                    <label asp-for="TradeTypeId" class="form-label small fw-semibold" title="">Shipment T.:</label>
+                </div>
+                <div class="col-md-3">
+                    <select asp-for="TradeTypeId" asp-items="Model.TradeTypes" class="form-select form-select-sm">
+                        <option value="">...</option>
+                    </select>
+                    <span asp-validation-for="TradeTypeId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-1">
+                    <label asp-for="LoadTypeId" class="form-label small fw-semibold" title="نوع بارگیری">Load Type:</label>
+                </div>
+
+                <div class="col-md-3" id="load-type-wrapper">
+                    <select asp-for="LoadTypeId" asp-items="Model.LoadTypes" class="form-select form-select-sm">
+                        <option value="">...</option>
+                    </select>
+                    <span asp-validation-for="LoadTypeId" class="text-danger small"></span>
+                </div>
+                @*                 <div class="col-md-4">
+                    <select asp-for="JobStatusId" asp-items="Model.JobStatuses" class="form-select form-select-sm">
+                        <option value="">Job Status...</option>
+                    </select>
+                    <span asp-validation-for="JobStatusId" class="text-danger small"></span>
+                </div> *@
+                <div class="col-md-1">
+                    <label asp-for="JobDate" class="form-label small fw-semibold" title="تاریخ پرونده">Job Date:</label>
+                </div>
+                <div class="col-md-3">
+                    <input asp-for="JobDate" type="date" class="form-control form-control-sm" />
+                    <span asp-validation-for="JobDate" class="text-danger small"></span>
+                </div>
+
+
+
+                <div class="col-md-1">
+                    <label asp-for="CustomerId" class="form-label small fw-semibold" title="مشتری اصلی">Customer:</label>
+                </div>
+                <div class="col-md-5">
+                    <select id="CustomerSelect2" name="CustomerId" class="form-select form-select-sm">
+                        @if (Model.CustomerId.HasValue && Model.CustomerId != Guid.Empty)
+                        {
+                            <option value="@Model.CustomerId" selected>@Model.CustomerName</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-1">
+                    <label asp-for="BookerClientId" class="form-label small fw-semibold" title="مشتری بوک کننده">Booker C.:</label>
+                </div>
+                <div class="col-md-5">
+                    <select id="BookerClientSelect2" name="BookerClientId" class="form-select form-select-sm">
+                        @if (Model.BookerClientId.HasValue && Model.BookerClientId != Guid.Empty)
+                        {
+                            <option value="@Model.BookerClientId" selected>@Model.BookerClientName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="card-header py-2 bg-primary-subtle text-primary-emphasis fw-semibold mb-1 d-flex justify-content-between align-items-center">
+                <span title="نقش هر کدام از شرکتهای ما در این پرونده">Company Role Types</span>
+                <button type="button"
+                        class="btn btn-sm btn-light py-0 px-2"
+                        hx-get="@Url.Action("AddCompanyRoleTypeRow", "Jobs")"
+                        hx-target="#companyroles-wrapper"
+                        hx-swap="beforeend"
+                        hx-vals='js:{ index: window.companyroleIndex++ }'>
+                    + Add
+                </button>
+            </div>
+            <div id="companyroles-wrapper" class="mb-1">
+                @for (int i = 0; i < Model.JobCompanyRoles.Count; i++)
+                {
+                    @await Html.PartialAsync("_JobCompanyRoleRow", Model.JobCompanyRoles[i])
+                }
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="card-header py-2 bg-primary-subtle text-primary-emphasis fw-semibold mb-1" title="مشخصات کلی و بازرگانی حمل">Cargo  / Commercial</div>
+            <div class="row g-2">
+                <div class="col-md-1">
+                    <label asp-for="CargoHandlingTypeId" class="form-label small fw-semibold" title="نحوه هندلینگ">Handling Type:</label>
+                </div>
+                <div class="col-md-3">
+                    <select asp-for="CargoHandlingTypeId" asp-items="Model.CargoHandlingTypes" class="form-select form-select-sm">
+                        <option value="">...</option>
+                    </select>
+                    <span asp-validation-for="CargoHandlingTypeId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-1">
+                    <label asp-for="CargoNatureId" class="form-label small fw-semibold" title="ماهیت کالا">C. Nature:</label>
+                </div>
+                <div class="col-md-3">
+                    <select asp-for="CargoNatureId" asp-items="Model.CargoNatures" class="form-select form-select-sm">
+                        <option value="">...</option>
+                    </select>
+                    <span asp-validation-for="CargoNatureId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-1">
+                    <label asp-for="CargoNatureId" class="form-label small fw-semibold" title="اینوترم">Incoterm:</label>
+                </div>
+                <div class="col-md-3">
+                    <select asp-for="IncotermId" asp-items="Model.Incoterms" class="form-select form-select-sm">
+                        <option value="">...</option>
+                    </select>
+                    <span asp-validation-for="IncotermId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-1">
+                    <label asp-for="IncotermsLocationName" class="form-label small fw-semibold" title="مکان اینکوترم">Inco. Loc:</label>
+                </div>
+                <div class="col-md-3">
+                    <input asp-for="IncotermsLocationName" class="form-control form-control-sm" placeholder="" />
+                    <span asp-validation-for="IncotermsLocationName" class="text-danger small"></span>
+                </div>
+                <div class="col-md-1">
+                    <label asp-for="FreightPaymentTypeId" class="form-label small fw-semibold" title="نحوه پرداخت کرایه حمل">Payment Type:</label>
+                </div>
+                <div class="col-md-3">
+                    <select asp-for="FreightPaymentTypeId" asp-items="Model.PaymentTypes" class="form-select form-select-sm">
+                        <option value="">...</option>
+                    </select>
+                    <span asp-validation-for="FreightPaymentTypeId" class="text-danger small"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="card-header py-2 bg-primary-subtle text-primary-emphasis fw-semibold mb-1">Routing</div>
+            <div class="row g-2 align-items-center">
+                <div class="col-md-1">
+                    <label asp-for="OriginLocationId" class="form-label small fw-semibold" title="مبدا حمل">Origin:</label>
+                </div>
+                <div class="col-md-5">
+                    <select id="OriginSelect2" name="OriginLocationId" class="form-select form-select-sm">
+                        @if (Model.OriginLocationId != Guid.Empty)
+                        {
+                            <option value="@Model.OriginLocationId" selected>@Model.OriginName</option>
+                        }
+                    </select>
+                </div>
+
+
+                <div class="col-md-1">
+                    <label asp-for="DestinationLocationId" class="form-label small fw-semibold" title="مقصد حمل">Destination:</label>
+                </div>
+
+                <div class="col-md-5">
+                    <select id="DestinationSelect2" name="DestinationLocationId" class="form-select form-select-sm">
+                        @if (Model.DestinationLocationId != Guid.Empty)
+                        {
+                            <option value="@Model.DestinationLocationId" selected>@Model.DestinationName</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label asp-for="MovementTypeId" class="form-label small fw-semibold" title="نوع جابجائی">Move Type:</label>
+                </div>
+                <div class="col-md-3">
+                    <select asp-for="MovementTypeId" asp-items="Model.MovementTypes" class="form-select form-select-sm">
+                        <option value="">...</option>
+                    </select>
+                    <span asp-validation-for="MovementTypeId" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-1">
+                    <label asp-for="CargoReadyDate" class="form-label small fw-semibold" title="تاریخ آماده شده کالا جهت حمل">Cargo Ready Date:</label>
+                </div>
+                <div class="col-md-3">
+                    <input asp-for="CargoReadyDate" type="date" class="form-control form-control-sm" />
+                    <span asp-validation-for="CargoReadyDate" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-1">
+                    <label asp-for="ETD" class="form-label small fw-semibold" title="تاریخ تخمینی خروج محموله از مبدا">ETD:</label>
+                </div>
+                <div class="col-md-3">
+                    <input asp-for="ETD" type="date" class="form-control form-control-sm" title="ETD" />
+                    <span asp-validation-for="ETD" class="text-danger small"></span>
+                </div>
+                <div class="col-md-1">
+                    <label asp-for="ETA" class="form-label small fw-semibold" title="تاریخ تخمینی رسیدن محموله به مقصد">ETA:</label>
+                </div>
+                <div class="col-md-3">
+                    <input asp-for="ETA" type="date" class="form-control form-control-sm" title="ETA" />
+                    <span asp-validation-for="ETA" class="text-danger small"></span>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="card-header py-2 bg-primary-subtle text-primary-emphasis fw-semibold mb-1 d-flex justify-content-between align-items-center">
+                <span>Containers</span>
+                <button type="button"
+                        class="btn btn-sm btn-light py-0 px-2"
+                        hx-get="@Url.Action("AddContainerRow", "Jobs")"
+                        hx-target="#containers-wrapper"
+                        hx-swap="beforeend"
+                        hx-vals='js:{ index: window.containerIndex++ }'>
+                    + Add
+                </button>
+            </div>
+            <div id="containers-wrapper" class="mb-3">
+                @for (int i = 0; i < Model.Containers.Count; i++)
+                {
+                    @await Html.PartialAsync("_JobContainerRow", Model.Containers[i])
+                }
+            </div>
+        </div>
+
+        @*         <div class="mb-3">
+            <div class="card-header py-2 bg-primary-subtle text-primary-emphasis fw-semibold mb-1 d-flex justify-content-between align-items-center">
+                <span>Packages</span>
+
+                <button type="button"
+                        class="btn btn-sm btn-light py-0 px-2"
+                        hx-get="@Url.Action("AddPackageRow", "Jobs")"
+                        hx-target="#packages-wrapper"
+                        hx-swap="beforeend"
+                        hx-vals='js:{ index: window.packageindex++ }'>
+                    + Add
+                </button>
+            </div>
+            <div id="packages-wrapper" class="mb-3">
+                @for (int i = 0; i < Model.Packages.Count; i++)
+                {
+                    @await Html.PartialAsync("_JobPackageRow", Model.Packages[i])
+                }
+            </div>
+        </div>
+ *@
+        <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+            <button type="submit" class="btn btn-outline-primary btn-sm" id="btnSaveJob">Save</button>
+            <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    window.containerIndex = @(Model.Containers?.Count ?? 0);
+    window.packageIndex = @(Model.Packages?.Count ?? 0);
+    window.companyroleIndex = @(Model.JobCompanyRoles?.Count ?? 0);
+    window.partyIndex = @(Model.JobParties?.Count ?? 0);
+</script>
+<script>
+    document.querySelector('form')?.addEventListener('submit', function () {
+        const btn = document.getElementById('btnSaveJob');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerText = 'Creating...';
+        }
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        function initDynamicSelect2(options) {
+            var $select = $(options.selectId);
+            var $targetInput = options.targetTextId ? $(options.targetTextId) : null;
+
+            var $parentModal = $select.closest('.modal');
+
+            $select.select2({
+                theme: 'bootstrap-5',
+                placeholder: options.placeholder || 'Select...',
+                allowClear: true,
+                minimumInputLength: options.minInput || 1,
+                width: '100%',
+                dropdownParent: $parentModal.length ? $parentModal : $(document.body),
+                ajax: {
+                    url: options.url,
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return { q: params.term };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.results || $.map(data, function (item) {
+                                return { id: item.id, text: item.text };
+                            })
+                        };
+                    }
+                }
+            });
+
+            // اگر فیلد متنی هدف داشت، مقداردهی خودکار انجام شود
+            if ($targetInput && $targetInput.length) {
+                $select.on('select2:select', function (e) {
+                    var fullText = (e.params.data.text || '').trim();
+
+                    // اگر تابع تبدیل متن (مثل حذف ۸ کاراکتر) پاس داده شده بود، اجرا شود؛ در غیر این صورت کل متن
+                    var finalText = options.textTransform ? options.textTransform(fullText) : fullText;
+
+                    if (!$targetInput.val().trim()) {
+                        $targetInput.val(finalText).trigger('change');
+                    }
+                });
+            }
+        }
+        // -------------------------------------------------------------
+        // ۱. استفاده برای پورت‌ها (با حذف ۸ کاراکتر اول)
+        // -------------------------------------------------------------
+
+        // var stripPortCode = function(t) { return t.length > 8 ? t.substring(8).trim() : t; };
+
+        initDynamicSelect2({
+            selectId: '#OriginSelect2',
+            placeholder: 'Search Origin...',
+            url: '/Locations/GetPortsJson',
+        });
+
+        initDynamicSelect2({
+            selectId: '#DestinationSelect2',
+            placeholder: 'Search Destination...',
+            url: '/Locations/GetPortsJson',
+        });
+
+        initDynamicSelect2({
+            selectId: '#CustomerSelect2',
+            placeholder: 'Search Customer...',
+            url: '/Persons/GetPersonsJson'
+        });
+        initDynamicSelect2({
+            selectId: '#BookerClientSelect2',
+            placeholder: 'Search Booker Client...',
+            url: '/Persons/GetPersonsJson'
+        });
+    });
+</script>

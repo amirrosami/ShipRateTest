@@ -1,0 +1,336 @@
+﻿@using ShipRate.Application.ViewModels.BookingConsoleVms
+@model BookingInvoicesVm
+
+@{
+    // خواندن نوع فیلتر انتخابی از مدل یا کوئری‌استرینگ (پیش‌فرض All)
+    var currentFilter = Model.FilterType ?? "All";
+}
+
+<style>
+    /* تنظیمات اسکرول افقی محفظه */
+    #booking-invoices-container .bl-invoices-grid-scroll {
+        overflow-x: auto !important;
+        overflow-y: hidden;
+        min-height: 180px;
+    }
+
+    /* حداقل عرض جدول برای فعال نگه داشتن اسکرول در تمام رزولوشن‌ها */
+    #blInvoicesGridTable {
+        min-width: 1750px;
+        margin-bottom: 0;
+    }
+
+        #blInvoicesGridTable th,
+        #blInvoicesGridTable td {
+            white-space: nowrap !important;
+            vertical-align: middle;
+            padding: 0.45rem 0.6rem;
+        }
+
+            /* چسبنده کردن ستون Actions در سمت راست گرید */
+            #blInvoicesGridTable th:last-child,
+            #blInvoicesGridTable td:last-child {
+                position: sticky;
+                right: 0;
+                background-color: #fff;
+                z-index: 2;
+                box-shadow: -2px 0 5px rgba(0, 0, 0, 0.06);
+                min-width: 165px;
+                width: 165px;
+            }
+
+        /* هدر ستون Sticky */
+        #blInvoicesGridTable thead th:last-child {
+            background-color: #f8f9fa;
+            z-index: 3;
+        }
+
+        /* حفظ رنگ ردیف‌ها در حالت راه‌راه و هاور */
+        #blInvoicesGridTable tbody tr:nth-of-type(odd) td:last-child {
+            background-color: #fcfcfc;
+        }
+
+        #blInvoicesGridTable tbody tr:hover td:last-child {
+            background-color: #f2f5f8;
+        }
+
+    /* استایل اختصاصی اسکرول‌بار */
+    #booking-invoices-container .bl-invoices-grid-scroll::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    #booking-invoices-container .bl-invoices-grid-scroll::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    #booking-invoices-container .bl-invoices-grid-scroll::-webkit-scrollbar-thumb {
+        background: #b0bec5;
+        border-radius: 4px;
+    }
+
+        #booking-invoices-container .bl-invoices-grid-scroll::-webkit-scrollbar-thumb:hover {
+            background: #90a4ae;
+        }
+</style>
+
+<div id="booking-invoices-container" class="card border shadow-sm mt-1">
+    <div class="bg-light py-2 px-3 d-flex flex-wrap justify-content-between align-items-center gap-2 border-bottom">
+
+        <!-- عنوان و دکمه‌های رادیویی فیلتر -->
+        <div class="d-flex align-items-center gap-3">
+            <span class="fw-bold small text-dark text-uppercase">
+                <i class="bi bi-file-earmark-spreadsheet me-1 text-success"></i>
+                Invoices
+            </span>
+
+            <!-- گروه دکمه‌های رادیویی فیلتر -->
+            <div class="btn-group btn-group-sm" role="group" aria-label="Invoice Filters">
+                <!-- All -->
+                <input type="radio" class="btn-check" name="invoiceFilter" id="filter-all" value="All" autocomplete="off"
+                       @(currentFilter == "All" ? "checked" : "")
+                       hx-get="@Url.Action("GetBookingInvoices", "Booking", new { bookingId = Model.BookingId, jobId = Model.JobId, filterType = "All" })"
+                       hx-target="#booking-invoices-container"
+                       hx-swap="outerHTML">
+                <label class="btn btn-outline-secondary py-0 px-2" for="filter-all">All</label>
+
+                <!-- Buy (F) -->
+                <input type="radio" class="btn-check" name="invoiceFilter" id="filter-buy-f" value="BuyF" autocomplete="off"
+                       @(currentFilter == "BuyF" ? "checked" : "")
+                       hx-get="@Url.Action("GetBookingInvoices", "Booking", new { bookingId = Model.BookingId, jobId = Model.JobId, filterType = "BuyF" })"
+                       hx-target="#booking-invoices-container"
+                       hx-swap="outerHTML">
+                <label class="btn btn-outline-secondary py-0 px-2" for="filter-buy-f">Buy(F)</label>
+
+                <!-- Buy (NF) -->
+                <input type="radio" class="btn-check" name="invoiceFilter" id="filter-buy-nf" value="BuyNF" autocomplete="off"
+                       @(currentFilter == "BuyNF" ? "checked" : "")
+                       hx-get="@Url.Action("GetBookingInvoices", "Booking", new { bookingId = Model.BookingId, jobId = Model.JobId, filterType = "BuyNF" })"
+                       hx-target="#booking-invoices-container"
+                       hx-swap="outerHTML">
+                <label class="btn btn-outline-secondary py-0 px-2" for="filter-buy-nf">Buy(NF)</label>
+
+                <!-- Sell (F) -->
+                <input type="radio" class="btn-check" name="invoiceFilter" id="filter-sell-f" value="SellF" autocomplete="off"
+                       @(currentFilter == "SellF" ? "checked" : "")
+                       hx-get="@Url.Action("GetBookingInvoices", "Booking", new { bookingId = Model.BookingId, jobId = Model.JobId, filterType = "SellF" })"
+                       hx-target="#booking-invoices-container"
+                       hx-swap="outerHTML">
+                <label class="btn btn-outline-secondary py-0 px-2" for="filter-sell-f">Sell(F)</label>
+
+                <!-- Sell (NF) -->
+                <input type="radio" class="btn-check" name="invoiceFilter" id="filter-sell-nf" value="SellNF" autocomplete="off"
+                       @(currentFilter == "SellNF" ? "checked" : "")
+                       hx-get="@Url.Action("GetBookingInvoices", "Booking", new { bookingId = Model.BookingId, jobId = Model.JobId, filterType = "SellNF" })"
+                       hx-target="#booking-invoices-container"
+                       hx-swap="outerHTML">
+                <label class="btn btn-outline-secondary py-0 px-2" for="filter-sell-nf">Sell(NF)</label>
+
+                <!-- PreInvoices -->
+                <input type="radio" class="btn-check" name="invoiceFilter" id="filter-pre" value="PreInvoices" autocomplete="off"
+                       @(currentFilter == "PreInvoices" ? "checked" : "")
+                       hx-get="@Url.Action("GetBookingInvoices", "BookingManagement", new { bookingId = Model.BookingId, jobId = Model.JobId, filterType = "PreInvoices" })"
+                       hx-target="#booking-invoices-container"
+                       hx-swap="outerHTML">
+                <label class="btn btn-outline-secondary py-0 px-2" for="filter-pre">PreInvoices</label>
+            </div>
+        </div>
+
+        <!-- دکمه‌ها و Badge تعداد -->
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-secondary-subtle text-dark border">
+                @(Model.Invoices?.Count() ?? 0)
+            </span>
+
+            <button type="button"
+                    class="btn btn-sm btn-outline-success py-1 px-2"
+                    hx-get="@Url.Action("GetBookingInvoices", "Booking", new { bookingId = Model.BookingId, jobId = Model.JobId, filterType = currentFilter })"
+                    hx-target="#booking-invoices-container"
+                    hx-swap="outerHTML"
+                    title="Refresh invoices">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+
+@*             <button type="button"
+                    class="btn btn-sm btn-outline-primary py-1 px-2"
+                    hx-get="@Url.Action("CreateModalDO", "Invoices", new { jobId = Model.JobId, bookingId = Model.BookingId })"
+                    hx-target="#invoice-modal-content"
+                    hx-swap="innerHTML"
+                    onclick="openInvoiceModal()">
+                <i class="bi bi-plus-lg"></i>
+                Add DO Invoice
+            </button>
+ *@
+            <button type="button"
+                    class="btn btn-sm btn-outline-primary py-1 px-2"
+                    hx-get="@Url.Action("CreateModal", "Invoices", new { jobId = Model.JobId, bookingId = Model.BookingId, filterType = Model.FilterType })"
+                    hx-target="#invoice-modal-content"
+                    hx-swap="innerHTML"
+                    onclick="openInvoiceModal()">
+                <i class="bi bi-plus-lg"></i>
+                Add
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive bl-invoices-grid-scroll">
+        <table class="table table-bordered table-hover align-middle mb-0 text-nowrap small text-start border-secondary-subtle" id="blInvoicesGridTable">
+            <thead class="table-light text-uppercase font-monospace align-middle border-bottom border-secondary-subtle">
+                <tr>
+                    <th style="width: 40px;" class="text-center">#</th>
+                    <th>Company</th>
+                    <th>Serial</th>
+                    <th>Date</th>
+                    <th>F/NF</th>
+                    <th>Model</th>
+                    <th>Buy/Sell</th>
+                    <th>Party</th>
+                    <th>Subject</th>
+                    <th class="text-end">Total Amount</th>
+                    <th class="text-end">Settled</th>
+                    <th class="text-end">Remain</th>
+                    <th>Status</th>
+                    <th>Create User</th>
+                    <th>CreatedAt</th>
+                    <th>Update User</th>
+                    <th>UpdatedAt</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model.Invoices == null || !Model.Invoices.Any())
+                {
+                    <tr>
+                        <td colspan="18" class="text-center py-4 text-muted">
+                            <i class="bi bi-exclamation-circle d-block mb-1"></i>
+                            No invoices found for the selected filter.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    int rowNo = 1;
+
+                    foreach (var item in Model.Invoices)
+                    {
+                        <tr>
+                            <td class="text-center text-muted fw-semibold">
+                                @(rowNo++)
+                            </td>
+                            <td>@item.CompanyName</td>
+                            <td class="fw-bold">@item.SerialDisplay</td>
+                            <td>@item.InvoiceDate.ToString("yyyy-MM-dd")</td>
+                            <td>@item.FNFName</td>
+                            <td>@item.InvocieModelName</td>
+                            <td>
+                                <span class="badge @(item.DirectionName == "Buy" ? "bg-warning text-dark" : "bg-success")">
+                                    @item.DirectionName
+                                </span>
+                            </td>
+                            <td>@item.PartyName</td>
+                            <td>@item.SubjectName</td>
+                            <td class="fw-bold text-end">
+                                @item.TotalAmount.ToString("N2")
+                                <span class="text-muted small">@item.CurrencyCode</span>
+                            </td>
+                            <td class="text-end text-success">
+                                @item.SettledAmount.ToString("N2")
+                            </td>
+                            <td class="text-end fw-bold @(item.RemainingAmount > 0 ? "text-danger" : "text-muted")">
+                                @item.RemainingAmount.ToString("N2")
+                            </td>
+
+                            <td>
+                                <span class="badge @(item.StatusId == 2 ? "bg-success" : "bg-warning text-dark")">
+                                    @item.StatusName
+                                </span>
+                            </td>
+                            <td>@item.CreateUserName</td>
+                            <td>
+                                <span title="@item.CreatedAt">@item.CreatedAt?.ToString("yyyy-MM-dd")</span>
+                            </td>
+                            <td>@item.UpdateUserName</td>
+                            <td>
+                                <span title="@item.UpdatedAt">@item.UpdatedAt?.ToString("yyyy-MM-dd")</span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1 justify-content-center align-items-center">
+                                    <!-- Attachments -->
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
+                                            title="Attachments"
+                                            hx-get="/DocumentManager/Index?objectId=@item.InvoiceId&objectTypeId=200"
+                                            hx-target="#document-manager-content"
+                                            hx-swap="innerHTML"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#documentManagerModal">
+                                        <i class="bi bi-folder2-open"></i>
+                                    </button>
+
+                                    <!-- Print Invoice -->
+@*                                     <a asp-action="PrintOfficialTaxInvoice" asp-controller="Invoices" asp-route-id="@item.InvoiceId"
+                                       class="btn btn-sm btn-outline-danger py-0 px-2" target="_blank" title="Print Invoice">
+                                        <i class="bi bi-file-pdf"></i>
+                                    </a> *@
+
+                                    @if (item.DirectionId == 2)
+                                    {
+                                        <a class="btn btn-sm btn-outline-danger py-0 px-2 disabled"
+                                           tabindex="-1"
+                                           aria-disabled="true"
+                                           title="Buy Invoice">
+                                            <i class="bi bi-file-pdf"></i>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="PrintOfficialTaxInvoice"
+                                           asp-controller="Invoices"
+                                           asp-route-id="@item.InvoiceId"
+                                           class="btn btn-sm btn-outline-danger py-0 px-2"
+                                           target="_blank"
+                                           title="Print Invoice">
+                                            <i class="bi bi-file-pdf"></i>
+                                        </a>
+                                    }
+
+
+
+
+                                    <!-- Edit -->
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-primary py-0 px-2"
+                                            title="Edit"
+                                            hx-get="@Url.Action("EditModal", "Invoices", new { id = item.InvoiceId })"
+                                            hx-target="#invoice-modal-content"
+                                            hx-swap="innerHTML"
+                                            onclick="openInvoiceModal()">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger py-0 px-2"
+                                            title="Delete"
+                                            hx-post="@Url.Action("Delete", "Invoices", new { id = item.InvoiceId })"
+                                            hx-swap="none"
+                                            hx-confirm="Are you sure you want to delete this invoice?">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+
+                                    <!-- Activity Log -->
+                                    <button class="btn btn-sm btn-outline-secondary py-0 px-2"
+                                            title="View Event Logs"
+                                            hx-get="@Url.Action("IndexModal", "ActivityLog", new { entityTypeId = 11, entityId = item.InvoiceId, externalReferenceNo = item.InvoiceNo })"
+                                            hx-target="#activityLogModalContainer"
+                                            hx-swap="innerHTML">
+                                        <i class="bi bi-clock-history"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

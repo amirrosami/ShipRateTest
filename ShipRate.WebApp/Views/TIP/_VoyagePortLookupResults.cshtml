@@ -1,0 +1,47 @@
+﻿@using ShipRate.Application.DTOs
+@model PagedResultDto<VoyagePortLookupDto>
+
+@{
+    var targetPrefix = ViewBag.TargetPrefix?.ToString() ?? "tip-voyageport";
+}
+
+<table class="table table-bordered table-hover table-sm">
+    <thead>
+        <tr>
+            <th>Voyage No</th>
+            <th>Vessel Name</th>
+            <th>Port</th>
+            <th style="width:100px;">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Items != null && Model.Items.Any())
+        {
+            foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@item.VoyageNo</td>
+                    <td>@item.VesselName</td>
+                    <td>@item.PortName</td>
+                    <td>
+                        <button type="button"
+                                class="btn btn-sm btn-success"
+                                hx-get="@Url.Action("SelectVoyagePort", "TIP", new { voyagePortId = item.VoyagePortId, targetPrefix = targetPrefix })"
+                                hx-target="#@targetPrefix"
+                                hx-swap="outerHTML"
+                                title="Select">
+                            <i class="bi bi-check-circle"></i>
+                            Select
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4" class="text-center">No records found.</td>
+            </tr>
+        }
+    </tbody>
+</table>

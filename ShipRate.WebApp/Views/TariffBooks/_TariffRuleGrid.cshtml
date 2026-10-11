@@ -1,0 +1,818 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.ViewModels
+@model PagedResultDto<TariffRuleListItemVm>
+
+@{
+    var tariffBookId = ViewBag.TariffBookId as Guid?;
+    var tariffTypeId = ViewBag.TariffTypeId as int?;
+
+    // محاسبه تعداد ستون‌های جدول بر اساس TariffTypeId برای ردیف خالی
+    var emptyColspan = tariffTypeId switch
+    {
+        1 => 9,
+        3 => 5,
+        4 => 8,
+        _ => 9
+    };
+
+    // تابع کمکی برای نرمال کردن مقدار data-filter
+    string F(object? value) => value?.ToString() ?? "";
+}
+
+<div class="card border-0 shadow-sm" dir="ltr">
+    <div class="card-header bg-white py-2 px-3 d-flex justify-content-between align-items-center">
+        <strong class="fs-6">Tariff Rules For Selected Tariff : @ViewBag.TariffTitle</strong>
+        @if (tariffBookId.HasValue && tariffBookId.Value != Guid.Empty)
+        {
+            @if (tariffTypeId == 1)
+            {
+                <button type="button"
+                        class="btn btn-sm btn-outline-primary py-0 px-2"
+                        hx-get="@Url.Action("CreateOceanFreightRules", "TariffBooks", new { tariffBookId = tariffBookId.Value })"
+                        hx-target="#mainModalContent"
+                        hx-swap="innerHTML"
+                        data-bs-toggle="modal"
+                        data-bs-target="#mainModal">
+                    Manage Ocean Freight
+                </button>
+            }
+            @if (tariffTypeId == 2)
+            {
+                <button type="button"
+                        class="btn btn-sm btn-outline-success py-0 px-2 text-light"
+                        hx-get="@Url.Action("CreateLocalCntRules", "TariffBooks", new { tariffBookId = tariffBookId.Value })"
+                        hx-target="#modal-content"
+                        hx-swap="innerHTML"
+                        data-bs-toggle="modal"
+                        data-bs-target="#appModal">
+                    Manage Saoi Tariff
+                </button>
+                <button type="button"
+                        class="btn btn-sm btn-outline-success py-0 px-2 text-light"
+                        hx-get="@Url.Action("CreateRule", "TariffBooks", new { tariffBookId = tariffBookId.Value, TariffTypeId = tariffTypeId })"
+                        hx-target="#mainModalContent"
+                        hx-swap="innerHTML"
+                        data-bs-toggle="modal"
+                        data-bs-target="#mainModal"
+                        data-bs-backdrop="static"
+                        data-bs-bs-backdrop="static"
+                        data-bs-keyboard="false">
+                    Add Item
+                </button>
+            }
+
+            else if (tariffTypeId == 3)
+            {
+                <button type="button"
+                        class="btn btn-sm btn-outline-primary py-0 px-2"
+                        hx-get="@Url.Action("CreateDemurrageRules", "TariffBooks", new { tariffBookId = tariffBookId.Value })"
+                        hx-target="#mainModalContent"
+                        hx-swap="innerHTML"
+                        data-bs-toggle="modal"
+                        data-bs-target="#mainModal"
+                        data-bs-backdrop="static"
+                        data-bs-keyboard="false">
+                    Manage Demurrage
+                </button>
+            }
+            else if (tariffTypeId == 4)
+            {
+                <button type="button"
+                        class="btn btn-sm btn-primary py-0 px-2 text-white"
+                        hx-get="@Url.Action("CreateThcRules", "TariffBooks", new { tariffBookId = tariffBookId.Value })"
+                        hx-target="#mainModalContent"
+                        hx-swap="innerHTML"
+                        data-bs-toggle="modal"
+                        data-bs-target="#mainModal"
+                        data-bs-backdrop="static"
+                        data-bs-keyboard="false">
+                    <i class="bi bi-grid-3x3-gap me-1"></i> Setup THC Rates (Batch)
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-sm btn-outline-primary py-0 px-2"
+                        hx-get="@Url.Action("CreateRule", "TariffBooks", new { tariffBookId = tariffBookId.Value, TariffTypeId = tariffTypeId })"
+                        hx-target="#mainModalContent"
+                        hx-swap="innerHTML"
+                        data-bs-toggle="modal"
+                        data-bs-target="#mainModal"
+                        data-bs-backdrop="static"
+                        data-bs-keyboard="false">
+                    Add Rule
+                </button>
+            }
+        }
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover table-striped mb-0 align-middle">
+                <thead class="table-light">
+                    @if (tariffTypeId == 1)
+                    {
+                        <tr>
+                            <th class="py-2">Charge Type</th>
+                            <th class="py-2">Origin</th>
+                            <th class="py-2">Destination</th>
+                            <th class="py-2">Calculation By</th>
+                            <th class="py-2">Calculation Type</th>
+                            <th class="py-2">Container Size Type</th>
+                            <th class="py-2">Currency</th>
+                            <th class="py-2">Amount</th>
+                            <th class="py-2" style="width: 130px;">Actions</th>
+                        </tr>
+                        <tr class="table-warning">
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"></th>
+                            <th class="p-1"></th>
+                        </tr>
+                    }
+                    else if (tariffTypeId == 3)
+                    {
+                        <tr>
+                            <th class="py-2">Container Size Type</th>
+                            <th class="py-2">From</th>
+                            <th class="py-2">To</th>
+                            <th class="py-2">Amount</th>
+                            <th class="py-2">Currency</th>
+                        </tr>
+                        <tr class="table-warning">
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"></th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                        </tr>
+                    }
+                    else if (tariffTypeId == 4)
+                    {
+                        <tr>
+                            <th class="py-2">Location / Terminal</th>
+                            <th class="py-2">Shipment Type</th>
+                            <th class="py-2">Container Size Type</th>
+                            <th class="py-2">Full/MT</th>
+                            <th class="py-2 text-center">Flags (DG / OOG / OW)</th>
+                            <th class="py-2">Currency</th>
+                            <th class="py-2 text-end">Amount</th>
+                            <th class="py-2 text-center" style="width: 90px;">Actions</th>
+                        </tr>
+                        <tr class="table-warning">
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1 text-center">
+                                <select class="form-select form-select-sm rule-filter">
+                                    <option value="">All</option>
+                                    <option value="dg">DG</option>
+                                    <option value="oog">OOG</option>
+                                    <option value="ow">OW</option>
+                                    <option value="standard">Standard</option>
+                                </select>
+                            </th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"></th>
+                            <th class="p-1"></th>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <th class="py-2">Charge Type</th>
+                            <th class="py-2">Calculation By</th>
+                            <th class="py-2">Calculation Type</th>
+                            <th class="py-2">Container Size Type</th>
+                            <th class="py-2">Currency</th>
+                            <th class="py-2">Min</th>
+                            <th class="py-2">Max</th>
+                            <th class="py-2">Amount</th>
+                            <th class="py-2" style="width: 130px;">Actions</th>
+                        </tr>
+                        <tr class="table-warning">
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"><input type="text" class="form-control form-control-sm rule-filter" placeholder="Filter..."></th>
+                            <th class="p-1"></th>
+                            <th class="p-1"></th>
+                        </tr>
+                    }
+                </thead>
+
+                <tbody>
+                    @if (Model == null || !Model.Items.Any())
+                    {
+                        <tr>
+                            <td colspan="@emptyColspan" class="text-center text-muted py-3">
+                                No tariff rules found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.Items)
+                        {
+                            <tr id="tariff-rule-row-@item.Id">
+                                @if (tariffTypeId == 1)
+                                {
+                                    <td class="py-2" data-filter="@F(item.ChargeTypeName)">
+                                        @item.ChargeTypeName
+                                        @if (item.ChargeTypeId == 555)
+                                        {
+                                            <span class="badge bg-info text-dark ms-1">Coverage</span>
+                                        }
+                                    </td>
+                                    <td class="py-2" data-filter="@F(item.OriginName)">@item.OriginName</td>
+                                    <td class="py-2" data-filter="@F(item.DestinationName)">@item.DestinationName</td>
+                                    <td class="py-2" data-filter="@F(item.CalculationByName)">@item.CalculationByName</td>
+                                    <td class="py-2" data-filter="@F(item.CalculationTypeName)">@item.CalculationTypeName</td>
+                                    <td class="py-2" data-filter="@F(item.ContainerSizeTypeName)">@item.ContainerSizeTypeName</td>
+                                    <td class="py-2" data-filter="@F(item.CurrencyCode)">@item.CurrencyCode</td>
+                                    <td class="py-2">@item.Amount.ToString("N2")</td>
+                                    <td class="py-2">
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button"
+                                                    class="btn btn-outline-primary py-0 px-2"
+                                                    hx-get="@Url.Action("CoveragesGrid", "TariffBooks", new { tariffRuleId = item.Id })"
+                                                    hx-target="#tariffRuleCoveragesGrid"
+                                                    hx-swap="innerHTML">
+                                                Select
+                                            </button>
+
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary py-0 px-2"
+                                                    hx-get="@Url.Action("EditRule", "TariffBooks", new { id = item.Id })"
+                                                    hx-target="#mainModalContent"
+                                                    hx-swap="innerHTML"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#mainModal">
+                                                Edit
+                                            </button>
+
+                                            <button type="button"
+                                                    class="btn btn-outline-danger py-0 px-2"
+                                                    hx-get="@Url.Action("DeleteRule", "TariffBooks", new { id = item.Id, tariffBookId = item.TariffBookId })"
+                                                    hx-target="#mainModalContent"
+                                                    hx-swap="innerHTML"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#mainModal">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                }
+                                else if (tariffTypeId == 3)
+                                {
+                                    <td class="py-2" data-filter="@F(item.ContainerSizeTypeName)">@item.ContainerSizeTypeName</td>
+                                    <td class="py-2" data-filter="@F(item.FromValue?.ToString("N0"))">@(item.FromValue.HasValue? item.FromValue.Value.ToString("N0") : "-")</td>
+                                    <td class="py-2" data-filter="@F(item.ToValue?.ToString("N0"))">@(item.ToValue.HasValue? item.ToValue.Value.ToString("N0") : "-")</td>
+                                    <td class="py-2">@item.Amount.ToString("N0")</td>
+                                    <td class="py-2" data-filter="@F(item.CurrencyCode)">@item.CurrencyCode</td>
+                                }
+                                else if (tariffTypeId == 4)
+                                {
+                                    <td class="py-2" data-filter="@F(item.OriginName ?? item.DestinationName)">@(item.OriginName ?? item.DestinationName ?? "-")</td>
+                                    <td class="py-2" data-filter="@F(item.TradeTypeName)">@item.TradeTypeName</td>
+                                    <td class="py-2 fw-semibold" data-filter="@F(item.ContainerSizeTypeName)">@item.ContainerSizeTypeName</td>
+                                    <td class="py-2 fw data-filter="@F(item.FullMTName)">@item.FullMTName</td>
+                                    <td class="py-2 text-center" data-filter="@(item.IsDG == true ? "DG" : "")@(item.IsOverSized == true ? " OOG" : "")@(item.IsOverWeight == true ? " OW" : "")@(item.IsDG != true && item.IsOverSized != true && item.IsOverWeight != true ? "Standard" : "")">
+                                        @if (item.IsDG == true)
+                                        {
+                                            <span class="badge bg-danger" title="Dangerous Goods">DG</span>
+                                        }
+                                        @if (item.IsOverSized == true)
+                                        {
+                                            <span class="badge bg-warning text-dark" title="Out of Gauge">OOG</span>
+                                        }
+                                        @if (item.IsOverWeight == true)
+                                        {
+                                            <span class="badge bg-secondary" title="Overweight">OW</span>
+                                        }
+                                        @if (item.IsDG != true && item.IsOverSized != true && item.IsOverWeight != true)
+                                        {
+                                            <span class="text-muted small">Standard</span>
+                                        }
+                                    </td>
+                                    <td class="py-2" data-filter="@F(item.CurrencyCode)">@item.CurrencyCode</td>
+                                    <td class="py-2 text-end fw-bold">@item.Amount.ToString("N2")</td>
+                                    <td class="py-2 text-center">
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button"
+                                                    class="btn btn-outline-danger py-0 px-2"
+                                                    hx-get="@Url.Action("DeleteRule", "TariffBooks", new { id = item.Id, tariffBookId = item.TariffBookId })"
+                                                    hx-target="#mainModalContent"
+                                                    hx-swap="innerHTML"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#mainModal">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td class="py-2" data-filter="@F(item.ChargeTypeName)">
+                                        @item.ChargeTypeName
+                                        @if (item.ChargeTypeId == 555)
+                                        {
+                                            <span class="badge bg-info text-dark ms-1">Coverage</span>
+                                        }
+                                    </td>
+                                    <td class="py-2" data-filter="@F(item.CalculationByName)">@item.CalculationByName</td>
+                                    <td class="py-2" data-filter="@F(item.CalculationTypeName)">@item.CalculationTypeName</td>
+                                    <td class="py-2" data-filter="@F(item.ContainerSizeTypeName)">@item.ContainerSizeTypeName</td>
+                                    <td class="py-2" data-filter="@F(item.CurrencyCode)">@item.CurrencyCode</td>
+                                    <td class="py-2" data-filter="@F(item.FromValue?.ToString("N2"))">@(item.FromValue.HasValue? item.FromValue.Value.ToString("N2") : "-")</td>
+                                    <td class="py-2" data-filter="@F(item.ToValue?.ToString("N2"))">@(item.ToValue.HasValue? item.ToValue.Value.ToString("N2") : "-")</td>
+                                    <td class="py-2">@item.Amount.ToString("N2")</td>
+                                    <td class="py-2">
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button"
+                                                    class="btn btn-outline-primary py-0 px-2"
+                                                    hx-get="@Url.Action("CoveragesGrid", "TariffBooks", new { tariffRuleId = item.Id })"
+                                                    hx-target="#tariffRuleCoveragesGrid"
+                                                    hx-swap="innerHTML">
+                                                Select
+                                            </button>
+
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary py-0 px-2"
+                                                    hx-get="@Url.Action("EditRule", "TariffBooks", new { id = item.Id })"
+                                                    hx-target="#mainModalContent"
+                                                    hx-swap="innerHTML"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#mainModal">
+                                                Edit
+                                            </button>
+
+                                            <button type="button"
+                                                    class="btn btn-outline-danger py-0 px-2"
+                                                    hx-get="@Url.Action("DeleteRule", "TariffBooks", new { id = item.Id, tariffBookId = item.TariffBookId })"
+                                                    hx-target="#mainModalContent"
+                                                    hx-swap="innerHTML"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#mainModal">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @if (Model != null && Model.TotalPages > 1 && tariffBookId.HasValue)
+    {
+        <div class="card-footer bg-white py-2 px-3">
+            @await Html.PartialAsync("_Pager", new PagerVm
+            {
+                Page = Model.PageNumber,
+                PageSize = Model.PageSize,
+                TotalPages = Model.TotalPages,
+                Target = "#tariffRulesGrid",
+                Url = Url.Action("RulesGrid", "TariffBooks", new { tariffBookId = tariffBookId.Value })!,
+                IncludeFormSelector = null
+                })
+    </div>
+        }
+</div>
+
+<script>
+    (function () {
+        var card = document.currentScript.previousElementSibling;
+        while (card && !card.classList.contains('card')) {
+            card = card.previousElementSibling;
+        }
+        if (!card) return;
+
+        var table = card.querySelector('table');
+        if (!table) return;
+
+        var inputs = table.querySelectorAll('.rule-filter');
+        var bodyRows = table.querySelectorAll('tbody tr');
+        var dataRows = [];
+        var emptyRow = null;
+
+        bodyRows.forEach(function (row) {
+            if (row.querySelector('td[colspan]')) {
+                emptyRow = row;
+            } else {
+                dataRows.push(row);
+            }
+        });
+
+        // ایندکس ستون هر فیلتر را از موقعیت سلول هدر پیدا کن
+        var headerCells = Array.from(inputs).map(function (input) {
+            return input.closest('th');
+        });
+
+        function applyFilter() {
+            var visibleCount = 0;
+
+            dataRows.forEach(function (row) {
+                var show = true;
+
+                headerCells.forEach(function (th, i) {
+                    var input = inputs[i];
+                    if (!input || !input.value) return;
+
+                    var colIndex = th.cellIndex;
+                    var td = row.cells[colIndex];
+                    if (!td) return;
+
+                    var val = (td.getAttribute('data-filter') || td.textContent || '').trim().toLowerCase();
+                    var term = input.value.trim().toLowerCase();
+                    if (val.indexOf(term) === -1) show = false;
+                });
+
+                row.style.display = show ? '' : 'none';
+                if (show) visibleCount++;
+            });
+
+            if (emptyRow) {
+                if (dataRows.length > 0 && visibleCount === 0) {
+                    emptyRow.style.display = '';
+                    emptyRow.querySelector('td').textContent = 'No rules match your filter.';
+                } else {
+                    emptyRow.style.display = 'none';
+                }
+            }
+        }
+
+        inputs.forEach(function (input) {
+            if (input.tagName === 'SELECT') {
+                input.addEventListener('change', applyFilter);
+            } else {
+                input.addEventListener('input', applyFilter);
+            }
+        });
+    })();
+</script>
+
+
+
+
+
+
+
+
+
+
+@* @using ShipRate.Application.DTOs
+@using ShipRate.Application.ViewModels
+@model PagedResultDto<TariffRuleListItemVm>
+
+@{
+    var tariffBookId = ViewBag.TariffBookId as Guid?;
+    var tariffTypeId = ViewBag.TariffTypeId as int?;
+
+    // محاسبه تعداد ستون‌های جدول بر اساس TariffTypeId برای ردیف خالی
+    var emptyColspan = tariffTypeId switch
+    {
+        1 => 9,
+        3 => 5,
+        4 => 8,
+        _ => 9
+    };
+}
+
+<div class="card border-0 shadow-sm" dir="ltr">
+    <div class="card-header bg-white py-2 px-3 d-flex justify-content-between align-items-center">
+        <strong class="fs-6">Tariff Rules For Selected Tariff : @ViewBag.TariffTitle</strong>
+        @if (tariffBookId.HasValue && tariffBookId.Value != Guid.Empty)
+        {
+            @if (tariffTypeId == 1)
+            {
+                <button type="button"
+                        class="btn btn-sm btn-outline-primary py-0 px-2"
+                        hx-get="@Url.Action("CreateOceanFreightRules", "TariffBooks", new { tariffBookId = tariffBookId.Value })"
+                        hx-target="#mainModalContent"
+                        hx-swap="innerHTML"
+                        data-bs-toggle="modal"
+                        data-bs-target="#mainModal">
+                    Manage Ocean Freight
+                </button>
+            }
+            @if (tariffTypeId == 2)
+            {
+                <button type="button"
+                        class="btn btn-sm btn-outline-success py-0 px-2 text-light"
+                        hx-get="@Url.Action("CreateLocalCntRules", "TariffBooks", new { tariffBookId = tariffBookId.Value })"
+                        hx-target="#modal-content"
+                        hx-swap="innerHTML"
+                        data-bs-toggle="modal"
+                        data-bs-target="#appModal">
+                    Manage Saoi Tariff
+                </button>
+                <button type="button"
+                        class="btn btn-sm btn-outline-success py-0 px-2 text-light"
+                        hx-get="@Url.Action("CreateRule", "TariffBooks", new { tariffBookId = tariffBookId.Value, TariffTypeId = tariffTypeId })"
+                        hx-target="#mainModalContent"
+                        hx-swap="innerHTML"
+                        data-bs-toggle="modal"
+                        data-bs-target="#mainModal"
+                        data-bs-backdrop="static"
+                        data-bs-keyboard="false">
+                    Add Rule
+                </button>
+            }
+
+            else if (tariffTypeId == 3)
+            {
+                <button type="button"
+                        class="btn btn-sm btn-outline-primary py-0 px-2"
+                        hx-get="@Url.Action("CreateDemurrageRules", "TariffBooks", new { tariffBookId = tariffBookId.Value })"
+                        hx-target="#mainModalContent"
+                        hx-swap="innerHTML"
+                        data-bs-toggle="modal"
+                        data-bs-target="#mainModal"
+                        data-bs-backdrop="static"
+                        data-bs-keyboard="false">
+                    Manage Demurrage
+                </button>
+            }
+            else if (tariffTypeId == 4)
+            {
+                <button type="button"
+                        class="btn btn-sm btn-primary py-0 px-2 text-white"
+                        hx-get="@Url.Action("CreateThcRules", "TariffBooks", new { tariffBookId = tariffBookId.Value })"
+                        hx-target="#mainModalContent"
+                        hx-swap="innerHTML"
+                        data-bs-toggle="modal"
+                        data-bs-target="#mainModal"
+                        data-bs-backdrop="static"
+                        data-bs-keyboard="false">
+                    <i class="bi bi-grid-3x3-gap me-1"></i> Setup THC Rates (Batch)
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-sm btn-outline-primary py-0 px-2"
+                        hx-get="@Url.Action("CreateRule", "TariffBooks", new { tariffBookId = tariffBookId.Value, TariffTypeId = tariffTypeId })"
+                        hx-target="#mainModalContent"
+                        hx-swap="innerHTML"
+                        data-bs-toggle="modal"
+                        data-bs-target="#mainModal"
+                        data-bs-backdrop="static"
+                        data-bs-keyboard="false">
+                    Add Rule
+                </button>
+            }
+        }
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover table-striped mb-0 align-middle">
+                <thead class="table-light">
+                    @if (tariffTypeId == 1)
+                    {
+                        <tr>
+                            <th class="py-2">Charge Type</th>
+                            <th class="py-2">Origin</th>
+                            <th class="py-2">Destination</th>
+                            <th class="py-2">Calculation By</th>
+                            <th class="py-2">Calculation Type</th>
+                            <th class="py-2">Container Size Type</th>
+                            <th class="py-2">Currency</th>
+                            <th class="py-2">Amount</th>
+                            <th class="py-2" style="width: 130px;">Actions</th>
+                        </tr>
+                    }
+                    else if (tariffTypeId == 3)
+                    {
+                        <tr>
+                            <th class="py-2">Container Size Type</th>
+                            <th class="py-2">From</th>
+                            <th class="py-2">To</th>
+                            <th class="py-2">Amount</th>
+                            <th class="py-2">Currency</th>
+                        </tr>
+                    }
+                    else if (tariffTypeId == 4)
+                    {
+                        <tr>
+                            <th class="py-2">Location / Terminal</th>
+                            <th class="py-2">Shipment Type</th>
+                            <th class="py-2">Container Size Type</th>
+                            <th class="py-2">Full/MT</th>
+                            <th class="py-2 text-center">Flags (DG / OOG / OW)</th>
+                            <th class="py-2">Currency</th>
+                            <th class="py-2 text-end">Amount</th>
+                            <th class="py-2 text-center" style="width: 90px;">Actions</th>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <th class="py-2">Charge Type</th>
+                            <th class="py-2">Calculation By</th>
+                            <th class="py-2">Calculation Type</th>
+                            <th class="py-2">Container Size Type</th>
+                            <th class="py-2">Currency</th>
+                            <th class="py-2">Min</th>
+                            <th class="py-2">Max</th>
+                            <th class="py-2">Amount</th>
+                            <th class="py-2" style="width: 130px;">Actions</th>
+                        </tr>
+                    }
+                </thead>
+
+                <tbody>
+                    @if (Model == null || !Model.Items.Any())
+                    {
+                        <tr>
+                            <td colspan="@emptyColspan" class="text-center text-muted py-3">
+                                No tariff rules found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.Items)
+                        {
+                            <tr id="tariff-rule-row-@item.Id">
+                                @if (tariffTypeId == 1)
+                                {
+                                    <td class="py-2">
+                                        @item.ChargeTypeName
+                                        @if (item.ChargeTypeId == 555)
+                                        {
+                                            <span class="badge bg-info text-dark ms-1">Coverage</span>
+                                        }
+                                    </td>
+                                    <td class="py-2">@item.OriginName</td>
+                                    <td class="py-2">@item.DestinationName</td>
+                                    <td class="py-2">@item.CalculationByName</td>
+                                    <td class="py-2">@item.CalculationTypeName</td>
+                                    <td class="py-2">@item.ContainerSizeTypeName</td>
+                                    <td class="py-2">@item.CurrencyCode</td>
+                                    <td class="py-2">@item.Amount.ToString("N2")</td>
+                                    <td class="py-2">
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button"
+                                                    class="btn btn-outline-primary py-0 px-2"
+                                                    hx-get="@Url.Action("CoveragesGrid", "TariffBooks", new { tariffRuleId = item.Id })"
+                                                    hx-target="#tariffRuleCoveragesGrid"
+                                                    hx-swap="innerHTML">
+                                                Select
+                                            </button>
+
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary py-0 px-2"
+                                                    hx-get="@Url.Action("EditRule", "TariffBooks", new { id = item.Id })"
+                                                    hx-target="#mainModalContent"
+                                                    hx-swap="innerHTML"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#mainModal">
+                                                Edit
+                                            </button>
+
+                                            <button type="button"
+                                                    class="btn btn-outline-danger py-0 px-2"
+                                                    hx-get="@Url.Action("DeleteRule", "TariffBooks", new { id = item.Id, tariffBookId = item.TariffBookId })"
+                                                    hx-target="#mainModalContent"
+                                                    hx-swap="innerHTML"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#mainModal">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                }
+                                else if (tariffTypeId == 3)
+                                {
+                                    <td class="py-2">@item.ContainerSizeTypeName</td>
+                                    <td class="py-2">@(item.FromValue.HasValue? item.FromValue.Value.ToString("N0") : "-")</td>
+                                    <td class="py-2">@(item.ToValue.HasValue? item.ToValue.Value.ToString("N0") : "-")</td>
+                                    <td class="py-2">@item.Amount.ToString("N0")</td>
+                                    <td class="py-2">@item.CurrencyCode</td>
+                                }
+                                else if (tariffTypeId == 4)
+                                {
+                                    <td class="py-2">@(item.OriginName ?? item.DestinationName ?? "-")</td>
+                                    <td class="py-2">@item.TradeTypeName</td>
+                                    <td class="py-2 fw-semibold">@item.ContainerSizeTypeName</td>
+                                    <td class="py-2 fw-semibold">@item.FullMTName</td>
+                                    <td class="py-2 text-center">
+                                        @if (item.IsDG == true)
+                                        {
+                                            <span class="badge bg-danger" title="Dangerous Goods">DG</span>
+                                        }
+                                        @if (item.IsOverSized == true)
+                                        {
+                                            <span class="badge bg-warning text-dark" title="Out of Gauge">OOG</span>
+                                        }
+                                        @if (item.IsOverWeight == true)
+                                        {
+                                            <span class="badge bg-secondary" title="Overweight">OW</span>
+                                        }
+                                        @if (item.IsDG != true && item.IsOverSized != true && item.IsOverWeight != true)
+                                        {
+                                            <span class="text-muted small">Standard</span>
+                                        }
+                                    </td>
+                                    <td class="py-2">@item.CurrencyCode</td>
+                                    <td class="py-2 text-end fw-bold">@item.Amount.ToString("N2")</td>
+                                    <td class="py-2 text-center">
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button"
+                                                    class="btn btn-outline-danger py-0 px-2"
+                                                    hx-get="@Url.Action("DeleteRule", "TariffBooks", new { id = item.Id, tariffBookId = item.TariffBookId })"
+                                                    hx-target="#mainModalContent"
+                                                    hx-swap="innerHTML"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#mainModal">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td class="py-2">
+                                        @item.ChargeTypeName
+                                        @if (item.ChargeTypeId == 555)
+                                        {
+                                            <span class="badge bg-info text-dark ms-1">Coverage</span>
+                                        }
+                                    </td>
+                                    <td class="py-2">@item.CalculationByName</td>
+                                    <td class="py-2">@item.CalculationTypeName</td>
+                                    <td class="py-2">@item.ContainerSizeTypeName</td>
+                                    <td class="py-2">@item.CurrencyCode</td>
+                                    <td class="py-2">@(item.FromValue.HasValue? item.FromValue.Value.ToString("N2") : "-")</td>
+                                    <td class="py-2">@(item.ToValue.HasValue? item.ToValue.Value.ToString("N2") : "-")</td>
+                                    <td class="py-2">@item.Amount.ToString("N2")</td>
+                                    <td class="py-2">
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button"
+                                                    class="btn btn-outline-primary py-0 px-2"
+                                                    hx-get="@Url.Action("CoveragesGrid", "TariffBooks", new { tariffRuleId = item.Id })"
+                                                    hx-target="#tariffRuleCoveragesGrid"
+                                                    hx-swap="innerHTML">
+                                                Select
+                                            </button>
+
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary py-0 px-2"
+                                                    hx-get="@Url.Action("EditRule", "TariffBooks", new { id = item.Id })"
+                                                    hx-target="#mainModalContent"
+                                                    hx-swap="innerHTML"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#mainModal">
+                                                Edit
+                                            </button>
+
+                                            <button type="button"
+                                                    class="btn btn-outline-danger py-0 px-2"
+                                                    hx-get="@Url.Action("DeleteRule", "TariffBooks", new { id = item.Id, tariffBookId = item.TariffBookId })"
+                                                    hx-target="#mainModalContent"
+                                                    hx-swap="innerHTML"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#mainModal">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @if (Model != null && Model.TotalPages > 1 && tariffBookId.HasValue)
+    {
+        <div class="card-footer bg-white py-2 px-3">
+            @await Html.PartialAsync("_Pager", new PagerVm
+            {
+                Page = Model.PageNumber,
+                PageSize = Model.PageSize,
+                TotalPages = Model.TotalPages,
+                Target = "#tariffRulesGrid",
+                Url = Url.Action("RulesGrid", "TariffBooks", new { tariffBookId = tariffBookId.Value })!,
+                IncludeFormSelector = null
+                })
+    </div>
+        }
+</div>
+ *@

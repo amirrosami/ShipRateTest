@@ -1,0 +1,64 @@
+﻿@model IEnumerable<ShipRate.Application.ViewModels.InvoiceRowVm>
+
+<div class="card border-0 shadow-sm mt-3">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+        <h6 class="mb-0 text-success fw-bold">
+            <i class="bi bi-file-earmark-spreadsheet me-2"></i>Related Invoices
+        </h6>
+        <span class="badge bg-secondary">@Model.Count() Invoices</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 text-nowrap small text-start">
+            <thead class="table-light text-uppercase font-monospace">
+                <tr>
+                    <th class="ps-3">Invoice No</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Party</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th>Accounting</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            <i class="bi bi-exclamation-circle d-block mb-1"></i> No invoices generated for this BL.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-3 fw-bold text-primary">@item.InvoiceNo</td>
+                            <td>@item.InvoiceDate.ToString("yyyy-MM-dd")</td>
+                            <td><span class="badge bg-outline-secondary border text-dark">@item.TypeName</span></td>
+                            <td>@item.PartyName</td>
+                            <td class="fw-bold">@item.TotalAmount.ToString("N2") <span class="text-muted">@item.CurrencyCode</span></td>
+                            <td>
+                                @* رنگ‌بندی بر اساس وضعیت (فرض: ۱=Draft, ۲=Finalized) *@
+                                <span class="badge @(item.StatusId == 2 ? "bg-success" : "bg-warning text-dark")">
+                                    @item.StatusName
+                                </span>
+                            </td>
+                            <td>
+                                @if (item.IsPosted)
+                                {
+                                    <i class="bi bi-cloud-check-fill text-success" title="Posted to Finance"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-cloud-slash text-muted" title="Not Posted"></i>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

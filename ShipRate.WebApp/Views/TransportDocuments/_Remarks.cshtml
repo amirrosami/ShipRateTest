@@ -1,0 +1,76 @@
+﻿@using ShipRate.Application.ViewModels
+@model TransportDocumentUpsertVm
+
+<div class="row g-3">
+
+    <div class="col-md-6">
+        <label asp-for="ClauseRemarks" class="form-label"></label>
+        <textarea asp-for="ClauseRemarks"
+                  class="form-control"
+                  rows="4"></textarea>
+        <span asp-validation-for="ClauseRemarks" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="OnBoardNotation" class="form-label"></label>
+        <textarea asp-for="OnBoardNotation"
+                  class="form-control"
+                  rows="4"></textarea>
+        <span asp-validation-for="OnBoardNotation" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="RemarksInBL" class="form-label"></label>
+        <textarea asp-for="RemarksInBL"
+                  class="form-control"
+                  rows="4"></textarea>
+        <span asp-validation-for="RemarksInBL" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="RemarksInManifest" class="form-label"></label>
+        <textarea asp-for="RemarksInManifest"
+                  class="form-control"
+                  rows="4"></textarea>
+        <span asp-validation-for="RemarksInManifest" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="InternalNotes" class="form-label"></label>
+        <textarea asp-for="InternalNotes"
+                  class="form-control"
+                  rows="4"></textarea>
+        <span asp-validation-for="InternalNotes" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="MRN" class="form-label"></label>
+        <input asp-for="MRN" class="form-control" />
+        <span asp-validation-for="MRN" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="PursuitCode" class="form-label"></label>
+        <input asp-for="PursuitCode" class="form-control" />
+        <span asp-validation-for="PursuitCode" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="LCNo" class="form-label"></label>
+        <input asp-for="LCNo" class="form-control" />
+        <span asp-validation-for="LCNo" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="LCBankName" class="form-label"></label>
+        <input asp-for="LCBankName" class="form-control" />
+        <span asp-validation-for="LCBankName" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="OrderRegistrationNo" class="form-label"></label>
+        <input asp-for="OrderRegistrationNo" class="form-control" />
+        <span asp-validation-for="OrderRegistrationNo" class="text-danger"></span>
+    </div>
+
+</div>

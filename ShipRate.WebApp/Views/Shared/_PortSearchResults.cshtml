@@ -1,0 +1,85 @@
+﻿@model IEnumerable<dynamic>
+
+<ul class="dropdown-menu show w-100"
+    style="max-height: 220px; overflow-y: auto; box-shadow: 0 4px 6px rgba(0,0,0,.1);">
+
+    @if (!Model.Any())
+    {
+        <li>
+            <span class="dropdown-item-text text-muted text-center fs-7">
+                No ports found
+            </span>
+        </li>
+    }
+    else
+    {
+        @foreach (var port in Model)
+        {
+            var displayText = $"{port.LocationName} ({port.LocationCode})";
+
+            <li>
+                <button type="button"
+                        class="dropdown-item py-1 text-start"
+                        data-index="@ViewBag.Index"
+                        data-port-type="@ViewBag.PortType"
+                        data-port-id="@port.Id"
+                        data-port-text="@displayText"
+                        onclick="selectVoyagePort(this)">
+                    <i class="bi bi-geo-alt-fill me-1 text-secondary"></i>
+                    <strong>@port.LocationName</strong> - @port.LocationCode
+                </button>
+            </li>
+        }
+    }
+</ul>
+
+
+
+
+<script>
+    function selectVoyagePort(button) {
+        const index = button.dataset.index;
+        const portType = button.dataset.portType;
+        const portId = button.dataset.portId;
+        const portText = button.dataset.portText;
+
+         var hiddenInput = document.getElementById(
+            `port-${portType}-id-${index}`
+        );
+
+         var textInput = document.getElementById(
+            `port-${portType}-text-${index}`
+        );
+
+        if (!hiddenInput && !textInput) 
+        {
+            hiddenInput = document.getElementById(`road-port-${portType}-id-${index}`);
+            textInput = document.getElementById(`road-port-${portType}-text-${index}`);
+        }
+
+            if (!hiddenInput || !textInput) {
+            console.error("Voyage port inputs not found.", {
+                index,
+                portType,
+                hiddenInput,
+                textInput
+            });
+            return;
+        }
+
+        hiddenInput.value = portId;
+        textInput.value = portText;
+
+        // در صورت وجود validation، تغییر مقدار hidden را اعلام می‌کند.
+        hiddenInput.dispatchEvent(new Event("change", { bubbles: true }));
+
+        const popup = document.getElementById(
+            "global-port-search-popup"
+        );
+
+        if (popup) {
+            popup.innerHTML = "";
+            popup.classList.add("d-none");
+        }
+    }
+</script>

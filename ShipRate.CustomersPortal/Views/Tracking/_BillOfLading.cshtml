@@ -1,0 +1,259 @@
+@using ShipRate.Application.ViewModels
+@model List<BLListItemDto>
+
+<style>
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .table-data {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 13px;
+    }
+
+        .table-data thead th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+            padding: 10px 14px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            white-space: nowrap;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.04em;
+        }
+
+        .table-data tbody td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e293b;
+            vertical-align: middle;
+        }
+
+        .table-data tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-data tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+    /* BL Specific Cell Elements */
+    .bl-cell-no {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .bl-cell-no i {
+            font-size: 18px;
+        }
+
+    .text-danger {
+        color: #ef4444;
+    }
+
+    .bl-route {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+
+    .badge-type {
+        background: #e0f2fe;
+        color: #0369a1;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 6px;
+        text-transform: uppercase;
+        display: inline-block;
+    }
+
+    .badge-count {
+        background: #f1f5f9;
+        color: #334155;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 9999px;
+        font-size: 12px;
+    }
+
+    .table-actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        color: #475569;
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+
+        .btn-icon:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+            border-color: #cbd5e1;
+        }
+
+    .text-end {
+        text-align: right;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 36px 16px;
+        color: #94a3b8;
+    }
+
+        .empty-state i {
+            font-size: 32px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+    /* Mobile Responsive Transformation */
+    media (max-width: 768px) {
+        .table-data thead {
+            display: none;
+        }
+
+        .table-data, .table-data tbody, .table-data tr, .table-data td {
+            display: block;
+            width: 100%;
+        }
+
+            .table-data tr {
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                padding: 12px;
+                margin-bottom: 12px;
+                background: #ffffff;
+            }
+
+            .table-data td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 6px 0;
+                border-bottom: 1px dashed #f1f5f9;
+            }
+
+                .table-data td:last-child {
+                    border-bottom: none;
+                    padding-top: 10px;
+                }
+
+                .table-data td::before {
+                    content: attr(data-label);
+                    color: #64748b;
+                    font-weight: 500;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                }
+    }
+</style>
+
+
+@if (Model != null && Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table-data bl-table">
+            <thead>
+                <tr>
+                    <th>BL Number</th>
+                    <th>Type</th>
+                    <th>Transport Mode</th>
+                    <th>Carrier</th>
+                    <th>Route (POL &rarr; POD)</th>
+                    <th>Containers</th>
+                    <th>Packages</th>
+                    <th>Issue Date</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var bl in Model)
+                {
+                    <tr>
+                        <td data-label="BL Number">
+                            <div class="bl-cell-no">
+                                <i class="ti ti-file-type-pdf text-danger"></i>
+                                <span class="fw-semibold">@(string.IsNullOrWhiteSpace(bl.BLNo) ? "—" : bl.BLNo)</span>
+                            </div>
+                        </td>
+                        <td data-label="Type">
+                            @if (!string.IsNullOrWhiteSpace(bl.BLTypeName))
+                            {
+                                <span class="badge-type">@bl.BLTypeName</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td data-label="Transport Mode">
+                            <span class="text-secondary">@(string.IsNullOrWhiteSpace(bl.TransportTypeName) ? "—" : bl.TransportTypeName)</span>
+                        </td>
+                        <td data-label="Carrier">
+                            @(string.IsNullOrWhiteSpace(bl.CarrierName) ? "—" : bl.CarrierName)
+                        </td>
+                        <td data-label="Route">
+                            <div class="bl-route">
+                                <span>@(string.IsNullOrWhiteSpace(bl.POLText) ? "—" : bl.POLText)</span>
+                                <i class="ti ti-arrow-narrow-right text-muted"></i>
+                                <span>@(string.IsNullOrWhiteSpace(bl.PODText) ? "—" : bl.PODText)</span>
+                            </div>
+                        </td>
+                        <td data-label="Containers">
+                            <span class="badge-count">@bl.TotalContainers</span>
+                        </td>
+                        <td data-label="Packages">
+                            <span class="badge-count">@bl.TotalPackages</span>
+                        </td>
+                        <td data-label="Issue Date">
+                            @(bl.BLIssueDate != default ? bl.BLIssueDate.ToString("yyyy-MM-dd") : "—")
+                        </td>
+                        <td data-label="Actions" class="text-end">
+                            <div class="table-actions">
+                                <a href="@Url.Action("ViewPdf", "Shipment", new { id = bl.Id })"
+                                   target="_blank"
+                                   class="btn-icon"
+                                   title="View PDF">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="@Url.Action("DownloadPdf", "Shipment", new { id = bl.Id })"
+                                   class="btn"
+                                   title="View">
+                                    <i class="bi bi-download"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="empty-state">
+        <i class="ti ti-file-off"></i>
+        <p>No Bill of Lading records found for this shipment.</p>
+    </div>
+}

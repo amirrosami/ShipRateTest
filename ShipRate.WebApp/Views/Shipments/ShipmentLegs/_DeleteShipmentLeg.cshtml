@@ -1,0 +1,33 @@
+﻿@model ShipRate.Application.ViewModels.ShipmentLegDeleteVm
+
+<div class="modal fade" id="shipmentLegModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post"
+                  hx-post="@Url.Action("DeleteShipmentLegConfirmed", "Shipments", new { id = Model.Id })"
+                  hx-target="#modalContainer"
+                  hx-swap="innerHTML">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Shipment Leg</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body text-start" dir="ltr">
+                    <p class="mb-2">Are you sure you want to delete this leg?</p>
+                    <ul class="mb-0">
+                        <li><strong>Sequence No:</strong> @Model.SequenceNo</li>
+                        <li><strong>From:</strong> @Model.FromLocationName</li>
+                        <li><strong>To:</strong> @Model.ToLocationName</li>
+                    </ul>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

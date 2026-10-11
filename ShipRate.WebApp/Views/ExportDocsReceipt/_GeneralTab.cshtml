@@ -1,0 +1,94 @@
+﻿@using ShipRate.Application.ViewModels
+@model ExportDocsReceiptFormVm
+
+<form hx-post="@Url.Action(Model.IsEditMode ? "Edit" : "Create", "ExportDocsReceipt")"
+      hx-target="#receiptModalBody"
+      hx-swap="innerHTML"
+      dir="ltr">
+
+    @Html.AntiForgeryToken()
+
+    @if (Model.Id.HasValue)
+    {
+        <input type="hidden" asp-for="Id" />
+    }
+
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label asp-for="CompanyId" class="form-label">Company</label>
+            <select asp-for="CompanyId" asp-items="Model.Companies" class="form-select">
+                <option value="">Select...</option>
+            </select>
+            <span asp-validation-for="CompanyId" class="text-danger"></span>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="ReceiptDirectionId" class="form-label">Direction</label>
+            <select asp-for="ReceiptDirectionId" asp-items="Model.ReceiptDirections" class="form-select">
+                <option value="">Select...</option>
+            </select>
+            <span asp-validation-for="ReceiptDirectionId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="PartyId" class="form-label">Party</label>
+            <select asp-for="PartyId" asp-items="Model.Parties" class="form-select">
+                <option value="">Select...</option>
+            </select>
+            <span asp-validation-for="PartyId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="BookingId" class="form-label">Booking</label>
+            <select asp-for="BookingId" asp-items="Model.Bookings" class="form-select">
+                <option value="">Select...</option>
+            </select>
+            <span asp-validation-for="BookingId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="ReceiptNo" class="form-label">Receipt No</label>
+            <input asp-for="ReceiptNo" class="form-control" />
+            <span asp-validation-for="ReceiptNo" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="ReceiptDate" class="form-label">Receipt Date</label>
+            <input asp-for="ReceiptDate" type="date" class="form-control" />
+            <span asp-validation-for="ReceiptDate" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="PersonPersonName" class="form-label">Representative</label>
+            <input asp-for="PersonPersonName" class="form-control" />
+            <span asp-validation-for="PersonPersonName" class="text-danger"></span>
+        </div>
+
+        <div class="col-12">
+            <label asp-for="Remarks" class="form-label">Remarks</label>
+            <textarea asp-for="Remarks" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Remarks" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <div class="text-muted small">
+            @if (!Model.HeaderSaved)
+            {
+                <span>Save header first to enable Documents and Containers tabs.</span>
+            }
+            else
+            {
+                <span>Header saved. You can continue with Documents and Containers.</span>
+            }
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+
+            <button type="submit" class="btn btn-primary">
+                @(Model.IsEditMode ? "Save Changes" : "Save Header")
+            </button>
+        </div>
+    </div>
+</form>

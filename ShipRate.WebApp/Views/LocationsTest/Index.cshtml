@@ -1,0 +1,357 @@
+﻿@using ShipRate.WebApp.ViewModels.Location
+@model LocationIndexViewModel
+@{
+    ViewData["Title"] = "Locations";
+}
+
+@await Html.PartialAsync("_LocationStyles")
+
+<div class="container-fluid">
+
+    <!-- ═══ Header ═══ -->
+    <div class="loc-header">
+        <div class="loc-header-left">
+            <div class="loc-header-icon">📍</div>
+            <div>
+                <h1>Locations</h1>
+                <p>Manage all locations, cities, ports, airports, and borders</p>
+            </div>
+        </div>
+        <div class="loc-header-actions">
+            <a asp-action="Create" class="loc-btn loc-btn-primary loc-btn-lg">
+                ➕ Add New Location
+            </a>
+        </div>
+    </div>
+
+    <!-- ═══ Alerts ═══ -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="loc-alert loc-alert-success">
+            ✅ @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="loc-alert loc-alert-danger">
+            ❌ @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <!-- ═══ Filters & Search ═══ -->
+    <div class="loc-card" style="margin-bottom: 20px;">
+        <div class="loc-card-body" style="padding: 16px 24px;">
+            <form asp-action="Index" method="get">
+                <input type="hidden" name="SortColumn" value="@Model.SortColumn" />
+                <input type="hidden" name="SortDirection" value="@Model.SortDirection" />
+                <input type="hidden" name="PageSize" value="@Model.PageSize" />
+
+                <div class="loc-filters">
+                    <div class="loc-search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text"
+                               name="SearchTerm"
+                               value="@Model.SearchTerm"
+                               class="loc-form-control"
+                               placeholder="Search by code, name, IATA, UN/LOCODE..." />
+                    </div>
+
+                    <div class="loc-filter-group">
+                        <label>Type</label>
+                        <select name="FilterLocationTypeId" class="loc-form-control">
+                            <option value="">All Types</option>
+                            @foreach (var t in Model.LocationTypes)
+                            {
+                                <option value="@t.Value"
+                                        selected="@(Model.FilterLocationTypeId == t.Value)">
+                                    @t.Text
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="loc-filter-group">
+                        <label>Country</label>
+                        <select name="FilterCountryId" class="loc-form-control">
+                            <option value="">All Countries</option>
+                            @foreach (var c in Model.Countries)
+                            {
+                                <option value="@c.Value"
+                                        selected="@(Model.FilterCountryId == c.Value)">
+                                    @c.Text
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="loc-filter-group">
+                        <label>Status</label>
+                        <select name="FilterIsActive" class="loc-form-control">
+                            <option value="">All</option>
+                            <option value="true"
+                                    selected="@(Model.FilterIsActive == true)">
+                                Active
+                            </option>
+                            <option value="false"
+                                    selected="@(Model.FilterIsActive == false)">
+                                Inactive
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="loc-filter-group" style="align-self: flex-end;">
+                        <button type="submit" class="loc-btn loc-btn-primary">
+                            🔎 Filter
+                        </button>
+                    </div>
+
+                    <div class="loc-filter-group" style="align-self: flex-end;">
+                        <a asp-action="Index" class="loc-btn loc-btn-outline">
+                            ✖ Clear
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ═══ Table Card ═══ -->
+    <div class="loc-card">
+        <div class="loc-card-header">
+            <h2>📋 Location List (@Model.TotalCount results)</h2>
+        </div>
+
+        @if (Model.Locations.Any())
+        {
+            <div class="loc-table-wrap">
+                <table class="loc-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">#</th>
+                            <th>
+                                @{
+                                    var codeDir = Model.SortColumn == "LocationCode" && Model.SortDirection == "asc" ? "desc" : "asc";
+                                }
+                                <a asp-action="Index"
+                                   asp-route-SortColumn="LocationCode"
+                                   asp-route-SortDirection="@codeDir"
+                                   asp-route-SearchTerm="@Model.SearchTerm"
+                                   asp-route-FilterLocationTypeId="@Model.FilterLocationTypeId"
+                                   asp-route-FilterCountryId="@Model.FilterCountryId"
+                                   asp-route-FilterIsActive="@Model.FilterIsActive"
+                                   asp-route-PageSize="@Model.PageSize">
+                                    Code
+                                    @if (Model.SortColumn == "LocationCode")
+                                    {
+                                        @(Model.SortDirection == "asc" ? "▲" : "▼")
+                                    }
+                                </a>
+                            </th>
+                            <th>
+                                @{
+                                    var nameDir = Model.SortColumn == "LocationName" && Model.SortDirection == "asc" ? "desc" : "asc";
+                                }
+                                <a asp-action="Index"
+                                   asp-route-SortColumn="LocationName"
+                                   asp-route-SortDirection="@nameDir"
+                                   asp-route-SearchTerm="@Model.SearchTerm"
+                                   asp-route-FilterLocationTypeId="@Model.FilterLocationTypeId"
+                                   asp-route-FilterCountryId="@Model.FilterCountryId"
+                                   asp-route-FilterIsActive="@Model.FilterIsActive"
+                                   asp-route-PageSize="@Model.PageSize">
+                                    Name
+                                    @if (Model.SortColumn == "LocationName")
+                                    {
+                                        @(Model.SortDirection == "asc" ? "▲" : "▼")
+                                    }
+                                </a>
+                            </th>
+                            <th>Type</th>
+                            <th>Country</th>
+                            <th>Parent</th>
+                            <th>Status</th>
+                            <th style="width: 120px; text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var rowNum = (Model.PageNumber - 1) * Model.PageSize;
+                        }
+                        @foreach (var loc in Model.Locations)
+                        {
+                            rowNum++;
+                            <tr>
+                                <td style="color: var(--loc-gray-400); font-size: .8rem;">@rowNum</td>
+                                <td>
+                                    <strong style="color: var(--loc-primary);">@loc.LocationCode</strong>
+                                </td>
+                                <td>
+                                    <strong>@loc.LocationName</strong>
+                                    @if (loc.CityTypeName != null)
+                                    {
+                                        <br />
+                            
+                                        <span style="font-size: .75rem; color: var(--loc-gray-400);">@loc.CityTypeName</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="loc-badge loc-badge-primary">
+                                        @loc.LocationTypeName
+                                    </span>
+                                </td>
+                                <td>@(loc.CountryName ?? "—")</td>
+                                <td style="font-size: .8125rem; color: var(--loc-gray-500);">
+                                    @(loc.ParentLocationName ?? "—")
+                                </td>
+                                <td>
+                                    @if (loc.IsActive)
+                                    {
+                                        <span class="loc-badge loc-badge-success">
+                                            <span class="loc-badge-dot"></span> Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="loc-badge loc-badge-danger">
+                                            <span class="loc-badge-dot"></span> Inactive
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="loc-row-actions">
+                                        <a asp-action="Detail" asp-route-id="@loc.LocationId"
+                                           class="action-view" title="View Details">👁</a>
+                                        <a asp-action="Edit" asp-route-id="@loc.LocationId"
+                                           class="action-edit" title="Edit">✏️</a>
+                                        <a asp-action="Delete" asp-route-id="@loc.LocationId"
+                                           class="action-delete" title="Delete">🗑</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <div class="loc-pagination">
+                    <div class="loc-pagination-info">
+                        Showing @((Model.PageNumber - 1) * Model.PageSize + 1)–@Math.Min(Model.PageNumber * Model.PageSize, Model.TotalCount)
+                        of @Model.TotalCount locations
+                    </div>
+                    <div class="loc-pagination-pages">
+                        @if (Model.PageNumber > 1)
+                        {
+                            <a asp-action="Index"
+                               asp-route-PageNumber="@(Model.PageNumber - 1)"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortColumn="@Model.SortColumn"
+                               asp-route-SortDirection="@Model.SortDirection"
+                               asp-route-SearchTerm="@Model.SearchTerm"
+                               asp-route-FilterLocationTypeId="@Model.FilterLocationTypeId"
+                               asp-route-FilterCountryId="@Model.FilterCountryId"
+                               asp-route-FilterIsActive="@Model.FilterIsActive">
+                                ‹ Prev
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="disabled">‹ Prev</span>
+                        }
+
+                        @{
+                            int start = Math.Max(1, Model.PageNumber - 2);
+                            int end = Math.Min(Model.TotalPages, Model.PageNumber + 2);
+                        }
+                        @if (start > 1)
+                        {
+                            <a asp-action="Index"
+                               asp-route-PageNumber="1"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortColumn="@Model.SortColumn"
+                               asp-route-SortDirection="@Model.SortDirection"
+                               asp-route-SearchTerm="@Model.SearchTerm"
+                               asp-route-FilterLocationTypeId="@Model.FilterLocationTypeId"
+                               asp-route-FilterCountryId="@Model.FilterCountryId"
+                               asp-route-FilterIsActive="@Model.FilterIsActive">
+                                1
+                            </a>
+                            @if (start > 2)
+                            {
+                                <span class="disabled">…</span>
+                            }
+                        }
+                        @for (int i = start; i <= end; i++)
+                        {
+                            if (i == Model.PageNumber)
+                            {
+                                <span class="active">@i</span>
+                            }
+                            else
+                            {
+                                <a asp-action="Index"
+                                   asp-route-PageNumber="@i"
+                                   asp-route-PageSize="@Model.PageSize"
+                                   asp-route-SortColumn="@Model.SortColumn"
+                                   asp-route-SortDirection="@Model.SortDirection"
+                                   asp-route-SearchTerm="@Model.SearchTerm"
+                                   asp-route-FilterLocationTypeId="@Model.FilterLocationTypeId"
+                                   asp-route-FilterCountryId="@Model.FilterCountryId"
+                                   asp-route-FilterIsActive="@Model.FilterIsActive">
+                                    @i
+                                </a>
+                            }
+                        }
+                        @if (end < Model.TotalPages)
+                        {
+                            @if (end < Model.TotalPages - 1)
+                            {
+                                <span class="disabled">…</span>
+                            }
+                            <a asp-action="Index"
+                               asp-route-PageNumber="@Model.TotalPages"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortColumn="@Model.SortColumn"
+                               asp-route-SortDirection="@Model.SortDirection"
+                               asp-route-SearchTerm="@Model.SearchTerm"
+                               asp-route-FilterLocationTypeId="@Model.FilterLocationTypeId"
+                               asp-route-FilterCountryId="@Model.FilterCountryId"
+                               asp-route-FilterIsActive="@Model.FilterIsActive">
+                                @Model.TotalPages
+                            </a>
+                        }
+
+                       
+                        @if (Model.PageNumber < Model.TotalPages)
+                        {
+                            <a asp-action="Index"
+                               asp-route-PageNumber="@(Model.PageNumber + 1)"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortColumn="@Model.SortColumn"
+                               asp-route-SortDirection="@Model.SortDirection"
+                               asp-route-SearchTerm="@Model.SearchTerm"
+                               asp-route-FilterLocationTypeId="@Model.FilterLocationTypeId"
+                               asp-route-FilterCountryId="@Model.FilterCountryId"
+                               asp-route-FilterIsActive="@Model.FilterIsActive">
+                                Next ›
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="disabled">Next ›</span>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="loc-empty">
+                <div class="loc-empty-icon">📭</div>
+                <h3>No Locations Found</h3>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,152 @@
+﻿@using ShipRate.Application.DTOs.Messaging
+@model MessagingIndexViewModel
+
+@{
+    ViewData["Title"] = "Messaging";
+
+    var totalCount = Model.Conversations.Count;
+    var unreadCount = Model.Conversations.Sum(x => x.UnreadCount);
+    var openCount = Model.Conversations.Count(x =>
+        !string.Equals(x.StatusTitle, "Closed", StringComparison.OrdinalIgnoreCase));
+}
+
+<div class="container-fluid py-3 messaging-index" dir="ltr">
+    <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-3">
+        <div>
+            <h1 class="h3 mb-1">Messaging</h1>
+            <div class="text-muted">Internal conversations</div>
+        </div>
+
+        <button type="button"
+                class="btn btn-primary"
+                hx-get="@Url.Action("CreateInternal", "Messaging")"
+                hx-target="#messagingModalHost"
+                hx-swap="innerHTML">
+            New Internal Conversation
+        </button>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body py-3">
+                    <div class="text-muted small">Total Conversations</div>
+                    <div class="fs-4 fw-bold">@totalCount</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body py-3">
+                    <div class="text-muted small">Unread Messages</div>
+                    <div class="fs-4 fw-bold text-danger">@unreadCount</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body py-3">
+                    <div class="text-muted small">Open Conversations</div>
+                    <div class="fs-4 fw-bold text-success">@openCount</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+            <div class="row g-2 align-items-center">
+                <div class="col-12 col-lg-8">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input id="conversationSearch"
+                               type="search"
+                               class="form-control"
+                               placeholder="Search by subject, scope, type, status..." />
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-lg-2">
+                    <select id="conversationStatusFilter" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="open" selected>Open</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-sm-6 col-lg-2">
+                    <button type="button"
+                            class="btn btn-outline-secondary w-100"
+                            id="conversationClearFilters">
+                        Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="inboxList"
+         hx-get="@Url.Action("InboxList", "Messaging")"
+         hx-trigger="messaging:inbox-refresh from:body, messagingChanged from:body"
+         hx-swap="innerHTML">
+        @await Html.PartialAsync("_InboxList", Model.Conversations)
+    </div>
+
+    <div id="messagingModalHost"></div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('conversationSearch');
+            const statusFilter = document.getElementById('conversationStatusFilter');
+            const clearButton = document.getElementById('conversationClearFilters');
+
+            function applyConversationFilters() {
+                const query = (searchInput?.value || '').trim().toLowerCase();
+                const status = (statusFilter?.value || '').trim().toLowerCase();
+
+                document.querySelectorAll('[data-conversation-row]').forEach(function (row) {
+                    const text = (row.dataset.search || '').toLowerCase();
+                    const rowStatus = (row.dataset.status || '').toLowerCase();
+
+                    const matchesQuery = !query || text.includes(query);
+                    const matchesStatus = !status || rowStatus === status;
+
+                    row.classList.toggle('d-none', !(matchesQuery && matchesStatus));
+                });
+            }
+
+            searchInput?.addEventListener('input', applyConversationFilters);
+            statusFilter?.addEventListener('change', applyConversationFilters);
+
+            clearButton?.addEventListener('click', function () {
+                if (searchInput) searchInput.value = '';
+                if (statusFilter) statusFilter.value = '';
+                applyConversationFilters();
+            });
+
+            document.body.addEventListener('click', function (event) {
+                const action = event.target.closest('[data-conversation-action]');
+                if (action) {
+                    event.stopPropagation();
+                    return;
+                }
+
+                const row = event.target.closest('[data-conversation-url]');
+                if (!row) return;
+
+                window.location.href = row.dataset.conversationUrl;
+            });
+
+        applyConversationFilters();
+
+
+
+        });
+    </script>
+}

@@ -1,0 +1,69 @@
+﻿@using ShipRate.Application.DTOs
+@model ProductStockTransactionCreateVm
+
+<form asp-action="Create"
+      method="post"
+      hx-post="@Url.Action("Create")"
+      hx-target="#mainModalContent"
+      hx-swap="innerHTML"
+      dir="ltr">
+
+    @Html.AntiForgeryToken()
+
+    <div class="modal-header">
+        <h5 class="modal-title">New Product Stock Transaction</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    <div class="modal-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+        <div class="row g-2">
+            <div class="col-md-6">
+                <label class="form-label">Inventory</label>
+                <select asp-for="Input.InventoryId" asp-items="Model.Inventories" class="form-select">
+                    <option value="">Select...</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Product</label>
+                <select asp-for="Input.ProductId" asp-items="Model.Products" class="form-select">
+                    <option value="">Select...</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Transaction Type</label>
+                <select asp-for="Input.ProductTransactionTypeId" asp-items="Model.TransactionTypes" class="form-select">
+                    <option value="">Select...</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Quantity</label>
+                <input asp-for="Input.Quantity" class="form-control" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Reference</label>
+                <input asp-for="Input.Reference" class="form-control" maxlength="50" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Transaction Date</label>
+                <input asp-for="Input.TransactionDate" type="datetime-local" class="form-control" />
+            </div>
+
+            <div class="col-12">
+                <label class="form-label">Remarks</label>
+                <textarea asp-for="Input.Remarks" class="form-control" rows="3" maxlength="200"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+</form>

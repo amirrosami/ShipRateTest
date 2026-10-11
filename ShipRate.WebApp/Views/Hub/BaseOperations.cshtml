@@ -1,0 +1,131 @@
+﻿@{
+    ViewData["Title"] = "Base Operations Hub";
+}
+
+<div class="container-fluid py-3">
+    <div class="hub-page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="fw-bold mb-1"><i class="bi bi-layers-half text-primary me-2"></i>Base Operations Hub</h5>
+            <span class="text-muted small">Manage voyage schedules, transport loops, tariffs, contracts, and serials</span>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <auth-policy policy="BaseOperations.ServiceAndLoops.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="ShippingRoute" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-arrow-repeat"></i></div>
+                    <div>
+                        <div class="hub-title">Services and Loops</div>
+                        <p class="hub-desc">Shipping rotations, liner services, and recurring loops.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="BaseOperations.Voyages.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Voyage" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-tsunami"></i></div>
+                    <div>
+                        <div class="hub-title">Voyages</div>
+                        <p class="hub-desc">Vessel voyage scheduling, ETA/ETD management, and calls.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="BaseOperations.Flights.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Flight" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-airplane"></i></div>
+                    <div>
+                        <div class="hub-title">Flights</div>
+                        <p class="hub-desc">Air freight scheduling, flight numbers, and airline allocations.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="BaseOperations.Routes.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Routes" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-signpost-split"></i></div>
+                    <div>
+                        <div class="hub-title">Routes</div>
+                        <p class="hub-desc">Multimodal transit routes: Sea, Land, Rail, and Air paths.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="BaseOperations.Distances.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="PortDistance" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-arrows-expand"></i></div>
+                    <div>
+                        <div class="hub-title">Distances</div>
+                        <p class="hub-desc">Nautical and inland distances between major points.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="BaseOperations.AgentsManagement.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Agents" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-person-badge"></i></div>
+                    <div>
+                        <div class="hub-title">Agents Management</div>
+                        <p class="hub-desc">Port agents, handling representatives, and partner networks.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="BaseOperations.SerialsAndHolograms.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="BLSerialSeries" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-upc"></i></div>
+                    <div>
+                        <div class="hub-title">Serials & Holograms</div>
+                        <p class="hub-desc">BL security serial series, sheet allocations, and inventory control.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="BaseOperations.Tariffs.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="TariffBooks" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-journal-bookmark"></i></div>
+                    <div>
+                        <div class="hub-title">Tariffs</div>
+                        <p class="hub-desc">Standard freight tariffs, handling charge books, and seasonal rates.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="BaseOperations.FACContracts.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="FACContracts" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-pen"></i></div>
+                    <div>
+                        <div class="hub-title">FAC Contracts</div>
+                        <p class="hub-desc">Forwarder commission agreements and carrier contract terms.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+    </div>
+</div>

@@ -1,0 +1,80 @@
+﻿@using ShipRate.WebApp.ViewModels.CustomersVms
+@model List<LostReasonCategoryListItem>
+
+@if (Model.Any())
+{
+    <table class="lr-table">
+        <thead>
+            <tr>
+                <th style="width:40px">#</th>
+                <th>Name</th>
+                <th>Local Name</th>
+                <th style="width:70px">Reasons</th>
+                <th style="width:70px">Status</th>
+                <th style="width:100px" class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var idx = 0;
+            }
+            @foreach (var cat in Model)
+            {
+                idx++;
+                <tr class="lr-category-row"
+                    hx-get="/LostReasons/ReasonGrid?categoryId=@cat.Id"
+                    hx-target="#reason-grid"
+                    hx-swap="innerHTML"
+                    hx-on::after-request="
+                    document.querySelectorAll('.lr-category-row').forEach(r=>
+                    r.classList.remove('selected'));
+                    this.classList.add('selected');
+                    var btn = document.getElementById('btn-add-reason');
+                    btn.style.display='inline-flex';
+                    btn.setAttribute('hx-get','/LostReasons/CreateReason?categoryId=@cat.Id');
+                    htmx.process(btn);
+                    document.getElementById('reason-panel-title').textContent='Reasons — @cat.LostReasonCategoryName';
+                    ">
+                    <td class="row-num">@idx</td>
+                    <td class="fw-600">@cat.LostReasonCategoryName</td>
+                    <td>@cat.LostReasonCategoryLocalName</td>
+                    <td class="text-center">
+                        <span class="lr-count-badge">@cat.ReasonsCount</span>
+                    </td>
+                    <td>
+                        @if (cat.IsActive)
+                        {
+                            <span class="lr-badge lr-badge-active">Active</span>
+                        }
+                        else
+                        {
+                            <span class="lr-badge lr-badge-inactive">Inactive</span>
+                        }
+                    </td>
+                    <td class="text-center actions-cell" onclick="event.stopPropagation()">
+                        <button class="lr-action-btn edit"
+                                hx-get="/LostReasons/EditCategory/@cat.Id"
+                                hx-target="#modal-body"
+                                hx-swap="innerHTML"
+                                onclick="document.getElementById('lr-modal').classList.add('active')">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="lr-action-btn delete"
+                                hx-delete="/LostReasons/DeleteCategory/@cat.Id"
+                                hx-confirm="Delete this category and all its reasons?"
+                                hx-swap="none">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="lr-empty-state">
+        <i class="fas fa-folder-plus"></i>
+        <p>No categories yet. Click "New" to add one.</p>
+    </div>
+}

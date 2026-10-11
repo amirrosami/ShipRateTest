@@ -1,0 +1,56 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model List<TreasuryDocumentPaymentSelectorDto>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-sm align-middle mb-0">
+        <thead>
+            <tr>
+                <th style="width: 50px;">Sel</th>
+                <th>Document No</th>
+                <th>Date</th>
+                <th class="text-end">Amount</th>
+                <th>Currency</th>
+                <th>Payment Method</th>
+                <th style="width: 110px;">Source</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="text-center">
+                            <input type="checkbox"
+                                   name="SelectedPaymentDocumentIds"
+                                   value="@item.PaymentDocumentId"
+                                   @(item.IsSelected ? "checked" : null) />
+                        </td>
+                        <td>@item.DocumentNo</td>
+                        <td>@item.DocumentDate.ToString("yyyy-MM-dd")</td>
+                        <td class="text-end">@item.Amount.ToString("N2")</td>
+                        <td>@item.CurrencyCode</td>
+                        <td>@item.PaymentMethodName</td>
+                        <td>
+                            @if (item.IsCurrentDocumentItem)
+                            {
+                                <span class="badge text-bg-info">Current</span>
+                            }
+                            else
+                            {
+                                <span class="badge text-bg-light">Available</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center py-4">No available payment documents.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

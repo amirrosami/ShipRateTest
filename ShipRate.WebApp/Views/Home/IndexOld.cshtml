@@ -1,0 +1,128 @@
+﻿@{
+    ViewData["Title"] = "داشبورد اصلی";
+}
+
+<div class="row">
+    <!-- Statistics Cards -->
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card blue">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="mb-0">تعداد کشورها</p>
+                    <h3 class="number-format">@ViewBag.TotalCountries</h3>
+                </div>
+                <i class="fas fa-flag"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card green">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="mb-0">تعداد شهرها</p>
+                    <h3 class="number-format">@ViewBag.TotalCities</h3>
+                </div>
+                <i class="fas fa-city"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card orange">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="mb-0">جمعیت کل</p>
+                    <h3 class="number-format">@string.Format("{0:N0}", ViewBag.TotalPopulation)</h3>
+                </div>
+                <i class="fas fa-users"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card purple">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="mb-0">مساحت کل (km²)</p>
+                    <h3 class="number-format">@string.Format("{0:N0}", ViewBag.TotalArea)</h3>
+                </div>
+                <i class="fas fa-map"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> درباره سیستم</h5>
+            </div>
+            <div class="card-body">
+                <p>این سیستم یک برنامه جامع برای مدیریت اطلاعات کشورها و شهرهای دنیا است.</p>
+                <ul>
+                    <li>مدیریت کامل CRUD برای کشورها و شهرها</li>
+                    <li>قابلیت جستجوی پیشرفته</li>
+                    <li>صفحه‌بندی و مرتب‌سازی داده‌ها</li>
+                    <li>رابط کاربری زیبا و کاربرپسند</li>
+                    <li>معماری Clean Architecture</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-line"></i> دسترسی سریع</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a asp-controller="Country" asp-action="Index" class="btn btn-primary">
+                        <i class="fas fa-flag"></i> مشاهده لیست کشورها
+                    </a>
+                    <a asp-controller="Country" asp-action="Create" class="btn btn-success">
+                        <i class="fas fa-plus"></i> افزودن کشور جدید
+                    </a>
+                    <a asp-controller="City" asp-action="Index" class="btn btn-info">
+                        <i class="fas fa-city"></i> مشاهده لیست شهرها
+                    </a>
+                    <a asp-controller="City" asp-action="Create" class="btn btn-warning text-white">
+                        <i class="fas fa-plus"></i> افزودن شهر جدید
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-cogs"></i> تکنولوژی‌های استفاده شده</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center mb-3">
+                        <i class="fab fa-microsoft fa-3x text-primary"></i>
+                        <p class="mt-2 mb-0 fw-bold">ASP.NET Core MVC</p>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <i class="fas fa-database fa-3x text-success"></i>
+                        <p class="mt-2 mb-0 fw-bold">SQL Server</p>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <i class="fab fa-bootstrap fa-3x text-info"></i>
+                        <p class="mt-2 mb-0 fw-bold">Bootstrap 5</p>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <i class="fas fa-layer-group fa-3x text-warning"></i>
+                        <p class="mt-2 mb-0 fw-bold">Clean Architecture</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,11 @@
+﻿@using ShipRate.Application.DTOs
+@model CountryDto
+
+<h2>Country Details</h2>
+
+<div class="mb-3"><strong>ID:</strong> @Model.Id</div>
+<div class="mb-3"><strong>Name:</strong> @Model.Name</div>
+<div class="mb-3"><strong>Code:</strong> @Model.Code</div>
+<div class="mb-3"><strong>Active:</strong> @(Model.IsActive ? "Yes" : "No")</div>
+
+<a asp-action="Index" class="btn btn-secondary">Back</a>

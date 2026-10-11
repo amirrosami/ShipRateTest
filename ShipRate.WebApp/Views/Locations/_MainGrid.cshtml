@@ -1,0 +1,69 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.WebApp.ViewModels
+@using ShipRate.WebApp.ViewModels.Location
+@model GridViewModel
+
+@* PagedResultDto<LocationListItemViewModel> *@
+ 
+                @if (!Model.Data.Items.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                            No Records found.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    int counter = (Model.Data.Page - 1) * Model.Data.PageSize;
+                    @foreach (var item in Model.Data.Items)
+                    {
+                        var vm = (LocationListItemViewModel)item;
+                        counter++;
+                        <tr>
+                            <td>@counter</td>
+                            <td class="fw-medium">@vm.LocationCode</td>
+                            <td class="fw-medium">@vm.LocationName</td>
+                            <td class="fw-medium">@vm.LocationTypeName</td>
+                            <td class="fw-medium">@vm.CountryName</td>
+                            <td class="fw-medium">@vm.ParentLocationName</td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm">
+                                    
+                                    <button type="button"
+                                            class="btn btn-outline-info"
+                                            title="Details"
+                                            hx-get="@Url.Action("Details", "Locations", new { id = vm.LocationId })"
+                                            hx-target="#app-modal-content"
+                                            hx-swap="innerHTML">
+                                        <i class="bi bi-card-list"></i>
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn btn-outline-primary"
+                                            title="Edit"
+                                            hx-get="@Url.Action("Edit", "Locations", new { id = vm.LocationId })"
+                                            hx-target="#app-modal-content"
+                                            hx-swap="innerHTML"
+                                            >
+                                        <i class="bi bi-pencil"></i>
+
+                                    </button>
+                                    <button type="button"
+                                            class="btn btn-outline-danger"
+                                            title="Delete"
+                                            hx-get="@Url.Action("Delete", "Locations", new { id = vm.LocationId })"
+                                            hx-target="#app-modal-content"
+                                            hx-swap="innerHTML"
+                                            >
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+        
+

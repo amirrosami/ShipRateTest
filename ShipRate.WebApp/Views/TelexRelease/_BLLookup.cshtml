@@ -1,0 +1,51 @@
+﻿@using ShipRate.Application.ViewModels
+@model BLLookupViewModel
+<div class="mb-3">
+    <form hx-get="@Url.Action("BLLookup","TelexRelease")"
+          hx-target="#lookupModalBody"
+          hx-swap="innerHTML"
+          class="row g-2">
+        <div class="col-md-10">
+            <input type="text" name="searchTerm" value="@Model.SearchTerm" class="form-control" placeholder="Search BL No" />
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-search"></i> Search
+            </button>
+        </div>
+    </form>
+</div>
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>BL No</th>
+                <th style="width:120px;">Select</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Items.Any())
+            {
+                foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.BLNo</td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-sm btn-success"
+                                    onclick="document.body.dispatchEvent(new CustomEvent('blSelected',{detail:{id:'@item.Id',blNo:'@item.BLNo'}}))">
+                                Select
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="2" class="text-center">No BL found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

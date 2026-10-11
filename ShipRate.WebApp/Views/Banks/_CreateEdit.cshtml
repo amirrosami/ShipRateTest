@@ -1,0 +1,117 @@
+﻿@using ShipRate.Application.DTOs.Base_Info
+@using ShipRate.Application.DTOs.Cargo
+@model BankCreateEditDto
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+}
+
+<form hx-post="@Url.Action(isCreateMode?"Create":"Edit", "Banks")"
+      hx-target="#app-modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header form-caption-bg  text-white">
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add Bank</h5>
+        }
+        else
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Edit Bank</h5>
+            <input type="hidden" asp-for="Id" />
+        }
+
+
+        <button type="button"
+                class="btn-close"
+                onclick="AppModal.close()">
+        </button>
+    </div>
+
+
+    <div class="modal-body row">
+        @await Html.PartialAsync("_ModelStateError")
+
+
+
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                Country <span class="text-danger">*</span>
+            </label>
+            <div class="d-flex align-items-center gap-2">
+                <select asp-for="CountryId"
+                        asp-items="@ViewBag.Countries"
+                        class="form-select @(ViewData.ModelState.ContainsKey("CountryId") && ViewData.ModelState["CountryId"]!.Errors.Any() ? "is-invalid" : "")"
+                        placeholder="">
+                    <option value=0>-- Select --</option>
+                </select>
+            </div>
+        </div>
+
+
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                Code <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="BankCode"
+                   value="@Model.BankCode"
+                   class="form-control @(ViewData.ModelState.ContainsKey("BankCode") && ViewData.ModelState["BankCode"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                    />
+        </div>
+        <div class="mb-1 col-md-4">
+        <label class="form-label fw-medium">
+            Name <span class="text-danger">*</span>
+        </label>
+        <input type="text"
+               name="BankName"
+               value="@Model.BankName"
+                   class="form-control @(ViewData.ModelState.ContainsKey("BankName") && ViewData.ModelState["BankName"]!.Errors.Any() ? "is-invalid" : "")"
+               placeholder=""
+                />
+
+        </div>
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">Local Name</label>
+            <input type="text"
+                   name="BankLocalName"
+                   value="@Model.BankLocalName"
+                   class="form-control @(ViewData.ModelState.ContainsKey("BankLocalName") && ViewData.ModelState["BankLocalName"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="45" />
+
+        </div>
+
+
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">Remarks</label>
+            <input type="text"
+                   name="Remarks"
+                   value="@Model.Remarks"
+                   class="form-control @(ViewData.ModelState.ContainsKey("Remarks") && ViewData.ModelState["Remarks"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                    />
+
+        </div>
+        </div>
+
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="AppModal.close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>
+

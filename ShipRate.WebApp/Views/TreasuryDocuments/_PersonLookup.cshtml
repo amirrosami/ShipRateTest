@@ -1,0 +1,16 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model List<PersonLookupDto>
+
+@if (Model.Any())
+{
+    <div class="list-group border">
+        @foreach (var item in Model)
+        {
+            <button type="button"
+                    class="list-group-item list-group-item-action"
+                    onclick="document.getElementById('PartyId').value='@item.Id';document.getElementById('PartySearch').value='@item.Name';document.getElementById('partyLookupContainer').innerHTML='';">
+                @item.Name
+            </button>
+        }
+    </div>
+}

@@ -1,0 +1,90 @@
+﻿@using ShipRate.Application.ViewModels
+@model TransportDocumentUpsertVm
+
+<div class="row g-3">
+
+    <div class="col-md-3">
+        <label asp-for="LoadTypeId" class="form-label"></label>
+        <select asp-for="LoadTypeId"
+                asp-items="Model.LoadTypes"
+                class="form-select">
+            <option value="">-- Select --</option>
+        </select>
+        <span asp-validation-for="LoadTypeId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="MovementTypeId" class="form-label"></label>
+        <select asp-for="MovementTypeId"
+                asp-items="Model.MovementTypes"
+                class="form-select">
+            <option value="">-- Select --</option>
+        </select>
+        <span asp-validation-for="MovementTypeId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="PackageTypeId" class="form-label"></label>
+        <select asp-for="PackageTypeId"
+                asp-items="Model.PackageTypes"
+                class="form-select">
+            <option value="">-- Select --</option>
+        </select>
+        <span asp-validation-for="PackageTypeId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="PackageTypeText" class="form-label"></label>
+        <input asp-for="PackageTypeText" class="form-control" />
+        <span asp-validation-for="PackageTypeText" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-2">
+        <label asp-for="TotalPackages" class="form-label"></label>
+        <input asp-for="TotalPackages" type="number" min="0" class="form-control" />
+        <span asp-validation-for="TotalPackages" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-2">
+        <label asp-for="TotalContainers" class="form-label"></label>
+        <input asp-for="TotalContainers" type="number" min="0" class="form-control" />
+        <span asp-validation-for="TotalContainers" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-2">
+        <label asp-for="GrossWeightKg" class="form-label"></label>
+        <input asp-for="GrossWeightKg" type="number" step="0.001" min="0" class="form-control" />
+        <span asp-validation-for="GrossWeightKg" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-2">
+        <label asp-for="NetWeightKg" class="form-label"></label>
+        <input asp-for="NetWeightKg" type="number" step="0.001" min="0" class="form-control" />
+        <span asp-validation-for="NetWeightKg" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-2">
+        <label asp-for="VolumeCBM" class="form-label"></label>
+        <input asp-for="VolumeCBM" type="number" step="0.001" min="0" class="form-control" />
+        <span asp-validation-for="VolumeCBM" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-2">
+        <label asp-for="ChargeableWeight" class="form-label"></label>
+        <input asp-for="ChargeableWeight" type="number" step="0.001" min="0" class="form-control" />
+        <span asp-validation-for="ChargeableWeight" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-12">
+        <label asp-for="MarksAndNumbers" class="form-label"></label>
+        <textarea asp-for="MarksAndNumbers" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="MarksAndNumbers" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-12">
+        <label asp-for="GoodsDescription" class="form-label"></label>
+        <textarea asp-for="GoodsDescription" class="form-control" rows="6"></textarea>
+        <span asp-validation-for="GoodsDescription" class="text-danger"></span>
+    </div>
+
+</div>

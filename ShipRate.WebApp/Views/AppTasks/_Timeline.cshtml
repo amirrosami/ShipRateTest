@@ -1,0 +1,39 @@
+﻿@using ShipRate.Application.DTOs.AppTasks
+@model List<AppTaskTimelineItemDto>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="text-muted">No timeline event.</div>
+}
+else
+{
+    <div class="vstack gap-3">
+        @foreach (var item in Model)
+        {
+            <div class="d-flex gap-2">
+                <div>
+                    <span class="badge bg-secondary rounded-pill">
+                        @item.EventType
+                    </span>
+                </div>
+
+                <div class="flex-fill">
+                    <div class="fw-semibold">@item.Title</div>
+
+                    @if (!string.IsNullOrWhiteSpace(item.Description))
+                    {
+                        <div class="text-muted small">@item.Description</div>
+                    }
+
+                    <div class="text-muted small">
+                        @item.EventDate.ToString("yyyy/MM/dd HH:mm")
+                        @if (!string.IsNullOrWhiteSpace(item.UserName))
+                        {
+                            <span> by @item.UserName</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

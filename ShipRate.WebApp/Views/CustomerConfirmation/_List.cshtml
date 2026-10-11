@@ -1,0 +1,119 @@
+﻿@using ShipRate.WebApp.ViewModels.CustomersVms
+@model CustomerConfirmationListViewModel
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover table-sm align-middle mb-0"
+           style="font-size: 0.85rem;">
+        <thead class="table-primary">
+            <tr>
+                <th style="width:40px;">#</th>
+                <th>Person Name</th>
+                <th>Remarks</th>
+                <th style="width:120px;">Status</th>
+                <th>Confirm Remarks</th>
+                <th style="width:110px;">Request Date</th>
+                <th style="width:110px;">Confirm Date</th>
+                <th style="width:170px;" class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Items.Any())
+            {
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-3">
+                        <i class="bi bi-inbox"></i> No records found.
+                    </td>
+                </tr>
+            }
+            @{
+                int row = (Model.Page - 1) * Model.PageSize;
+            }
+            @foreach (var item in Model.Items)
+            {
+                row++;
+                <tr>
+                    <td class="text-center text-muted">@row</td>
+                    <td><strong>@item.PersonName</strong></td>
+                    <td>@item.Remarks</td>
+                    <td class="text-center">
+                        @if (item.Status == "In Progress")
+                        {
+                            <span class="badge bg-warning text-dark">
+                                <i class="bi bi-hourglass-split"></i> In Progress
+                            </span>
+                        }
+                        else if (item.Status == "Confirmed")
+                        {
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle"></i> Confirmed
+                            </span>
+                        }
+                        else if (item.Status == "Rejected")
+                        {
+                            <span class="badge bg-danger">
+                                <i class="bi bi-x-circle"></i> Rejected
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">@item.Status</span>
+                        }
+                </td>
+                <td>@item.ConfirmRemarks</td>
+                <td class="text-center">@item.CreatedAt.ToString("yyyy-MM-dd")</td>
+                <td class="text-center">
+                    @(item.ConfirmDate > DateTime.MinValue
+                                        ? item.ConfirmDate.ToString("yyyy-MM-dd")
+                                        : "—")
+                    </td>
+                    <td class="text-center">
+                        @if (item.Status == "In Progress")
+                        {
+                            <!-- Edit -->
+                            <button class="btn btn-outline-primary btn-sm"
+                                    title="Edit"
+                                    onclick="openEditForm('@item.Id')">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <!-- Confirm / Reject -->
+                            <button class="btn btn-outline-success btn-sm"
+                                    title="Confirm / Reject"
+                                    onclick="openConfirmReject('@item.Id')">
+                                <i class="bi bi-clipboard-check"></i>
+                            </button>
+                            <!-- Delete -->
+                            <button class="btn btn-outline-danger btn-sm"
+                                    title="Delete"
+                                    onclick="openDeleteForm('@item.Id')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        }
+                        else
+                        {
+                            <span class="text-muted small">No action</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- amamam Pagination -->
+@if (Model.TotalPages > 1)
+{
+    <nav class="mt-2">
+        <ul class="pagination pagination-sm justify-content-center mb-0">
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.Page ? "active" : "")">
+                    <a class="page-link" href="#"
+                       hx-get="/CustomerConfirmation/List?searchName=@Model.SearchName&searchStatus=@Model.SearchStatus&page=@i"
+                       hx-target="#listContainer">
+                        @i
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

@@ -1,0 +1,115 @@
+﻿@using ShipRate.Application.DTOs.Base_Info
+@using ShipRate.WebApp.ViewModels
+@model PagedResult<PackageTypeDto>
+
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0"><i class="bi bi-box-seam me-2"></i>Locations</h2>
+        <small class="text-muted"></small>
+    </div>
+    <button type="button"
+            class="btn btn-primary"
+            hx-get="@Url.Action("Create", "PackageTypes")"
+            hx-target="#app-modal-content"
+            hx-swap="innerHTML">
+        <i class="bi bi-plus-lg me-1"></i>New
+    </button>
+</div>
+
+@await Html.PartialAsync(
+"_GridFilters",
+    new GridFilterViewModel
+    {
+        Page = Model.Page,
+        PageSize = Model.PageSize,
+        SearchTerm = Model.SearchTerm,
+        SortColumn = Model.SortColumn,
+        SortDirection = Model.SortDirection,
+        ListUrl = Url.Action("List", "PackageTypes"),
+        CustomFilterPartial = "_CustomFilters",
+        CustomFilterValues = Model.CustomFilterValues,
+    }
+)
+
+
+
+
+<div id="table-container"
+     hx-post="@Url.Action("List", "PackageTypes")"
+     hx-trigger="load, GridChanged from:body"
+     hx-swap="innerHTML"
+     hx-include="#grid-filters, #table-sort-info">
+</div>
+
+
+
+
+
+
+
+
+
+@* @using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.Base_Info
+@model PagedResultDto<PackageTypeDto>
+@{
+    ViewData["Title"] = "Package Types";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0"><i class="bi bi-box-seam me-2"></i>Package Types</h2>
+        <small class="text-muted">Manage your package types</small>
+    </div>
+    <button type="button"
+            class="btn btn-primary"
+            hx-get="@Url.Action("Create", "PackageTypes")"
+            hx-target="#modal-content"
+            hx-swap="innerHTML"
+            onclick="showModal()">
+        <i class="bi bi-plus-lg me-1"></i> Add New
+    </button>
+</div>
+
+<!-- Search Bar -->
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                    <input type="search"
+                           class="form-control border-start-0"
+                           placeholder="Search by code, title or description..."
+                           name="searchterm"
+                           hx-get="@Url.Action("List", "PackageTypes")"
+                           hx-target="#table-container"
+                           hx-swap="innerHTML"
+                           hx-trigger="keyup changed delay:400ms, search"
+                           hx-include="[name='pageSize']"
+                           id="searchInput" />
+                </div>
+            </div>
+            <div class="col-md-3 offset-md-3 text-end">
+                <select name="pageSize"
+                        class="form-select form-select-sm d-inline-block w-auto"
+                        hx-get="@Url.Action("List", "PackageTypes")"
+                        hx-target="#table-container"
+                        hx-swap="innerHTML"
+                        hx-include="[name='searchterm']">
+                    <option value="5">5 per page</option>
+                    <option value="10" selected>10 per page</option>
+                    <option value="25">25 per page</option>
+                    <option value="50">50 per page</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table Container — HTMX refreshes this area -->
+<div id="table-container">
+    @await Html.PartialAsync("_List", Model)
+</div>
+ *@

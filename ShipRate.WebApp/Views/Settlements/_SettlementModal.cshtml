@@ -1,0 +1,733 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model SettlementModalViewModel
+@{
+    bool isCompanyLocked = Model.CompanyId > 0;
+}
+
+<style>
+    /* تم آبی ملایم کنسول تسویه */
+    #blSettlementModal .modal-content {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #bae6fd;
+        background-color: #f0f7ff;
+    }
+
+    #blSettlementModal .modal-header {
+        background-color: #e0f2fe;
+        border-bottom: 1px solid #bae6fd;
+    }
+
+    #blSettlementModal .modal-footer {
+        background-color: #e0f2fe !important;
+        border-top: 1px solid #bae6fd !important;
+    }
+
+    #blSettlementModal .section-label {
+        font-size: 0.75rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #0369a1;
+        font-weight: 700;
+        margin-bottom: 0.35rem;
+    }
+
+    #blSettlementModal .panel-box {
+        background: #ffffff;
+        border: 1px solid #bae6fd;
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    #blSettlementModal .item-select-card {
+        cursor: pointer;
+        border: 1px solid #bae6fd;
+        border-radius: 6px;
+        background: #ffffff;
+        transition: all 0.15s ease-in-out;
+    }
+
+        #blSettlementModal .item-select-card:hover {
+            border-color: #7dd3fc;
+            background-color: #f0f9ff;
+        }
+
+        #blSettlementModal .item-select-card.active-selected {
+            border-color: #0284c7 !important;
+            background-color: #dbeafe !important;
+            box-shadow: 0 0 0 1px #0284c7;
+        }
+
+    #blSettlementModal .custom-table thead th {
+        background-color: #e0f2fe;
+        color: #0369a1;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        font-weight: 600;
+        border-bottom: 1px solid #bae6fd;
+    }
+
+    #blSettlementModal .custom-table td {
+        vertical-align: middle;
+        font-size: 0.82rem;
+    }
+
+    #blSettlementModal .badge-invoice {
+        background-color: #dbeafe;
+        color: #1e40af;
+    }
+
+    #blSettlementModal .badge-detention {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    .btn-xs {
+        padding: 0.15rem 0.45rem;
+        font-size: 0.72rem;
+        line-height: 1.2;
+    }
+</style>
+
+<div class="modal fade" id="blSettlementModal" tabindex="-1" aria-labelledby="settlementModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content shadow">
+
+            <div class="modal-header py-2 px-3">
+                <div class="d-flex align-items-center">
+                    <div class="p-2 rounded bg-primary bg-opacity-10 text-primary me-2">
+                        <i class="bi bi-wallet2 fs-6"></i>
+                    </div>
+                    <div>
+                        <h6 class="modal-title fw-bold text-dark mb-0" id="settlementModalLabel">Settlement Console</h6>
+
+                        @if (!string.IsNullOrWhiteSpace(Model.BLNo))
+                        {
+                            <small class="text-muted" style="font-size: 0.78rem;">
+                                B/L Reference:
+                                <span class="fw-bold text-dark">@Model.BLNo</span>
+                            </small>
+                        }
+                        else if (!string.IsNullOrWhiteSpace(Model.BookingNo))
+                        {
+                            <small class="text-muted" style="font-size: 0.78rem;">
+                                Booking Reference:
+                                <span class="fw-bold text-dark">@Model.BookingNo</span>
+                            </small>
+                        }
+                        else
+                        {
+                            <small class="text-muted" style="font-size: 0.78rem;">
+                                <span class="fw-bold text-dark">Direct Settlement</span>
+                            </small>
+                        }
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-3" style="background-color: #f0f7ff;">
+                <form id="settlementConsoleForm" autocomplete="off">
+                    <input type="hidden" id="blId" value="@Model.BLId" />
+                    <input type="hidden" id="bookingId" value="@Model.BookingId" />
+
+                    <!-- Master Meta Header -->
+                    <div class="panel-box p-3 mb-3">
+                        <div class="row g-2 align-items-end">
+                            @*<div class="col-md-3">
+                                <label class="section-label">Company</label>
+                                <select id="companyId" class="form-select form-select-sm" asp-items="Model.Companies">
+                                    <option value="">-- Select Company --</option>
+                                </select>
+                            </div> *@
+
+                            <div class="col-md-3">
+                                <label class="section-label">Company</label>
+
+                                @if (isCompanyLocked)
+                                {
+                                    <!-- سلکت غیرفعال جهت نمایش و جلوگیری از تغییر -->
+                                    <select class="form-select form-select-sm bg-light text-muted"
+                                            asp-for="CompanyId"
+                                            asp-items="Model.Companies"
+                                            disabled
+                                            style="pointer-events: none; cursor: not-allowed;">
+                                        <option value="">-- Select Company --</option>
+                                    </select>
+
+                                    <!-- فیلد مخفی برای اطمینان از ارسال CompanyId به کنترلر هنگام ثبت فرم -->
+                                    <input type="hidden" id="companyId" name="CompanyId" value="@Model.CompanyId" />
+                                }
+                                else
+                                {
+                                    <!-- حالت پیش‌فرض و قابل ویرایش -->
+                                    <select id="companyId"
+                                            name="CompanyId"
+                                            asp-for="CompanyId"
+                                            class="form-select form-select-sm"
+                                            asp-items="Model.Companies">
+                                        <option value="">-- Select Company --</option>
+                                    </select>
+                                }
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <label class="section-label">Party / Customer</label>
+                                <select id="settlementPartyId" class="form-select form-select-sm" asp-items="Model.Parties"></select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="section-label">Base Currency</label>
+                                <select id="settlementCurrencyId" class="form-select form-select-sm" asp-items="Model.Currencies"></select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="section-label">Settlement Date</label>
+                                <input type="date" id="settlementDate" class="form-control form-control-sm" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                            </div>
+                            <div class="col-md-2">
+                                <label class="section-label">Remarks</label>
+                                <input type="text" id="settlementRemarks" class="form-control form-control-sm" placeholder="Optional notes..." />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Steps 1 & 2 Section -->
+                    <div class="row g-3 mb-3">
+                        <!-- Step 1: Debits -->
+                        <div class="col-md-5">
+                            <div class="panel-box h-100 p-2">
+                                <div class="d-flex justify-content-between align-items-center px-2 py-1 mb-2 border-bottom">
+                                    <span class="section-label mb-0">
+                                        <i class="bi bi-card-checklist me-1"></i> 1. Pending Debits
+                                    </span>
+                                    <span class="badge rounded-pill bg-light text-secondary border">@Model.AvailableItems.Count Items</span>
+                                </div>
+
+                                <div class="overflow-auto pe-1" style="max-height: 230px;">
+                                    @if (Model.AvailableItems.Any())
+                                    {
+                                        foreach (var item in Model.AvailableItems)
+                                        {
+                                            <div class="item-select-card p-2 mb-2 item-source-row"
+                                                 data-id="@item.SourceId"
+                                                 data-type="@item.ItemType"
+                                                 data-no="@item.DocumentNo"
+                                                 data-rem="@item.RemainingAmount"
+                                                 data-curr="@item.CurrencyCode"
+                                                 data-currid="@item.CurrencyId">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <span class="badge @(item.ItemType == "Invoice" ? "badge-invoice" : "badge-detention") me-1">@item.ItemType</span>
+                                                        <span class="fw-bold text-dark small">@item.DocumentNo</span>
+                                                    </div>
+                                                    <span class="text-danger fw-bold small">
+                                                        @item.RemainingAmount.ToString("N2")
+                                                        <span class="text-muted" style="font-size: 0.7rem;">@item.CurrencyCode</span>
+                                                    </span>
+                                                </div>
+                                                <div class="d-flex justify-content-between mt-1 text-muted" style="font-size: 0.72rem;">
+                                                    <span>Total: @item.TotalAmount.ToString("N2")</span>
+                                                    <span>Click to select</span>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="text-center text-muted py-4 small">No pending debit items found.</div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Payment Documents -->
+                        <div class="col-md-7">
+                            <div class="panel-box h-100 p-2">
+                                <div class="d-flex justify-content-between align-items-center px-2 py-1 mb-2 border-bottom">
+                                    <span class="section-label mb-0">
+                                        <i class="bi bi-cash-stack me-1"></i> 2. Payment Documents
+                                    </span>
+                                    <div class="d-flex align-items-center gap-1">
+                                        @*                                         <button type="button" class="btn btn-outline-primary btn-xs" id="btnOpenNewPaymentModal" title="Add a new payment document for this party">
+                                            <i class="bi bi-plus-circle me-1"></i> New Payment
+                                        </button> *@
+                                        <a href="@Url.Action("Index", "PaymentDocuments")"
+                                           class="btn btn-sm btn-outline-secondary"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            <i class="bi bi-water me-1"></i>
+                                            Payments List
+                                        </a>
+                                        <button type="button" class="btn btn-outline-secondary btn-xs" id="btnRefreshPayments" title="Reload payment documents">
+                                            <i class="bi bi-arrow-clockwise"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="overflow-auto" style="max-height: 230px;">
+                                    <table class="table table-sm custom-table mb-0 table-bordered  ">
+                                        <thead>
+                                            <tr>
+                                                <th class="ps-2">Doc No</th>
+                                                <th>Method</th>
+                                                <th class="text-end">Available Balance</th>
+                                                <th class="text-center" style="width: 80px;">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="availablePaymentDocsTbody">
+                                            @await Html.PartialAsync("~/Views/PaymentDocuments/_AvailablePaymentDocsPartial.cshtml", Model.AvailablePaymentDocuments)
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Allocation Grid -->
+                    <div class="panel-box p-2">
+                        <div class="d-flex justify-content-between align-items-center px-2 py-1 mb-2 border-bottom">
+                            <span class="section-label mb-0">
+                                <i class="bi bi-check2-square me-1"></i> 3. Allocation Matching Grid
+                            </span>
+                            <span class="badge bg-light text-muted border" id="allocationCountBadge">0 Allocations</span>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-sm custom-table mb-0" id="allocationsTable">
+                                <thead>
+                                    <tr>
+                                        <th class="ps-2" style="width: 25%;">Debit Item</th>
+                                        <th style="width: 25%;">Payment Document</th>
+                                        <th class="text-center" style="width: 22%;">Settled on Item</th>
+                                        <th class="text-center" style="width: 22%;">Deducted from Doc</th>
+                                        <th class="text-center" style="width: 6%;">Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="allocationTbody">
+                                    <tr class="empty-state-row">
+                                        <td colspan="5" class="text-center text-muted py-4 small">
+                                            Select a debit item from step 1, then click <strong>Match</strong> on an open payment document in step 2.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot class="bg-light fw-bold" style="font-size: 0.82rem;">
+                                    <tr>
+                                        <td colspan="2" class="text-end ps-2 text-muted">Total Allocations:</td>
+                                        <td class="text-center text-primary" id="lblTotalItemSettled">0.00</td>
+                                        <td class="text-center text-success" id="lblTotalDocDeducted">0.00</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer py-2 px-3 border-top d-flex justify-content-between">
+                <small class="text-muted" style="font-size: 0.78rem;"></small>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-sm btn-primary px-4" id="btnSaveSettlement">
+                        <i class="bi bi-check2 me-1"></i> Save Settlement
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const ROOT = document.getElementById('blSettlementModal');
+        if (!ROOT) return;
+        if (ROOT.dataset.settlementInit === "1") return;
+        ROOT.dataset.settlementInit = "1";
+
+        let activeDebitItem = null;
+        let allocationsList = [];
+
+        function clampNumber(val, min, max) {
+            val = Number(val);
+            if (Number.isNaN(val)) val = 0;
+            if (min != null) val = Math.max(min, val);
+            if (max != null) val = Math.min(max, val);
+            return val;
+        }
+
+        function parseIntSafe(val) {
+            const parsed = parseInt(val, 10);
+            return Number.isNaN(parsed) ? 0 : parsed;
+        }
+
+        function fmt2(n) {
+            return Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function hideModal() {
+            const el = document.getElementById('blSettlementModal');
+            const instance = bootstrap.Modal.getInstance(el) || new bootstrap.Modal(el);
+            instance.hide();
+        }
+
+        window.refreshAvailablePaymentDocuments = function () {
+            const partyId = $('#settlementPartyId').val();
+            const companyId = $('#companyId').val();
+            const currencyId = parseIntSafe($('#settlementCurrencyId').val());
+            const tbody = $('#availablePaymentDocsTbody');
+
+            if (!partyId || currencyId === 0) {
+                tbody.html('<tr><td colspan="4" class="text-center py-3 text-muted small">Select Party & Currency first.</td></tr>');
+                return;
+            }
+
+            tbody.html('<tr><td colspan="4" class="text-center py-3 text-muted"><span class="spinner-border spinner-border-sm me-1"></span> Loading payments...</td></tr>');
+
+            $.ajax({
+                url: '/PaymentDocuments/GetAvailablePayments',
+                type: 'GET',
+                data: { partyId: partyId, currencyId: currencyId,companyId:companyId },
+                success: function (html) { tbody.html(html); },
+                error: function (xhr) {
+                    tbody.html('<tr><td colspan="4" class="text-center text-danger py-3 small">Failed to load payments.</td></tr>');
+                    console.error('GetAvailablePayments failed', xhr);
+                }
+            });
+        };
+
+        $('#blSettlementModal').on('change', '#settlementPartyId, #settlementCurrencyId, #companyId', function () {
+            refreshAvailablePaymentDocuments();
+        });
+
+        $('#blSettlementModal').on('click', '#btnRefreshPayments, #companyId', function () {
+            refreshAvailablePaymentDocuments();
+        });
+
+    $('#blSettlementModal').on('click', '#btnOpenNewPaymentModal', function () {
+        const partyId = $('#settlementPartyId').val() || '';
+        const companyId = $('#companyId').val() || '';
+        const currencyId = $('#settlementCurrencyId').val() || '';
+
+        if (!partyId) {
+            alert('Please select a Party first.');
+            return;
+        }
+
+        if (!companyId) {
+            alert('Please select a Company first.');
+            return;
+        }
+
+        if (!currencyId) {
+            alert('Please select a Currency first.');
+            return;
+        }
+
+        const createUrl =
+            `/PaymentDocuments/Create?partyId=${encodeURIComponent(partyId)}` +
+            `&companyId=${encodeURIComponent(companyId)}` +
+            `&currencyId=${encodeURIComponent(currencyId)}`;
+
+        const settlementModalEl = document.getElementById('blSettlementModal');
+        const paymentModalEl = document.getElementById('paymentDocumentModal');
+        const paymentContentEl = document.getElementById('paymentDocumentModalContent');
+
+        if (!settlementModalEl || !paymentModalEl || !paymentContentEl) {
+            console.error('Payment modal host was not found in MasterConsole.');
+            alert('Payment modal container is not available.');
+            return;
+        }
+
+        const settlementModal =
+            bootstrap.Modal.getInstance(settlementModalEl) ||
+            bootstrap.Modal.getOrCreateInstance(settlementModalEl);
+
+        // ابتدا Settlement بسته می‌شود تا Bootstrap با stacked modal/backdrop درگیر نشود.
+        settlementModalEl.addEventListener('hidden.bs.modal', function openPaymentAfterSettlementClosed() {
+            settlementModalEl.removeEventListener('hidden.bs.modal', openPaymentAfterSettlementClosed);
+
+            paymentContentEl.innerHTML = `
+                <div class="modal-body text-center py-5 text-muted">
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    Loading payment form...
+                </div>`;
+
+            $.ajax({
+                url: createUrl,
+                type: 'GET',
+                success: function (html) {
+                    paymentContentEl.innerHTML = html;
+
+                    // چون HTML با jQuery وارد شده، باید HTMX عناصر جدید را پردازش کند.
+                    if (window.htmx) {
+                        htmx.process(paymentContentEl);
+                    }
+
+                    bootstrap.Modal.getOrCreateInstance(paymentModalEl).show();
+                },
+                error: function (xhr) {
+                    console.error('Failed to load payment create form.', xhr);
+                    alert('Could not load the payment form.');
+
+                    // اگر فرم باز نشد، Settlement را برگردان.
+                    settlementModal.show();
+                }
+            });
+        }, { once: true });
+
+        settlementModal.hide();
+    });
+
+
+        // Select Debit Item
+        $('#blSettlementModal').on('click', '.item-source-row', function () {
+            $('.item-source-row').removeClass('active-selected');
+            $(this).addClass('active-selected');
+
+            activeDebitItem = {
+                sourceId: String($(this).data('id')),
+                itemType: String($(this).data('type')),
+                documentNo: String($(this).data('no')),
+                remaining: clampNumber($(this).data('rem'), 0, null),
+                currencyCode: String($(this).data('curr')),
+                currencyId: parseIntSafe($(this).data('currid'))
+            };
+        });
+
+        // Match Button Action
+        $('#blSettlementModal').on('click', '.btn-match-doc', function () {
+            if (!activeDebitItem) {
+                alert('Please click to select an Invoice / Detention from step 1 first.');
+                return;
+            }
+
+            const docId = String($(this).data('id'));
+            const docNo = String($(this).data('no'));
+            const docRem = clampNumber($(this).data('rem'), 0, null);
+            const docCurr = String($(this).data('curr'));
+            const docCurrId = parseIntSafe($(this).data('currid'));
+
+            if (docCurrId > 0 && activeDebitItem.currencyId > 0 && docCurrId !== activeDebitItem.currencyId) {
+                alert('Currency mismatch between Debit item and Payment document.');
+                return;
+            }
+
+            const alreadyExists = allocationsList.some(x => x.sourceId === activeDebitItem.sourceId && x.paymentDocumentId === docId);
+            if (alreadyExists) {
+                alert('This item is already matched with this payment document in the grid below.');
+                return;
+            }
+
+            const defaultAmount = Math.min(activeDebitItem.remaining, docRem);
+            if (defaultAmount <= 0) {
+                alert('Remaining balance for this operation is zero.');
+                return;
+            }
+
+            allocationsList.push({
+                sourceId: activeDebitItem.sourceId,
+                itemType: activeDebitItem.itemType,
+                itemDocNo: activeDebitItem.documentNo,
+                itemRemaining: activeDebitItem.remaining,
+                itemCurrency: activeDebitItem.currencyCode,
+
+                paymentDocumentId: docId,
+                paymentDocNo: docNo,
+                paymentDocRemaining: docRem,
+                paymentDocCurrency: docCurr,
+
+                settledAmount: defaultAmount,
+                allocatedFromDoc: defaultAmount,
+                exchangeRate: 1.0
+            });
+
+            renderGrid();
+        });
+
+        function renderGrid() {
+            const tbody = $('#allocationTbody');
+            tbody.empty();
+
+            if (allocationsList.length === 0) {
+                tbody.html(`
+                    <tr class="empty-state-row">
+                        <td colspan="5" class="text-center text-muted py-4 small">
+                            Select a debit item from step 1, then click <strong>Match</strong> on an open payment document in step 2.
+                        </td>
+                    </tr>`);
+                $('#allocationCountBadge').text('0 Allocations');
+                recalculate();
+                return;
+            }
+
+            allocationsList.forEach((row, index) => {
+                const badgeClass = row.itemType === 'Invoice' ? 'badge-invoice' : 'badge-detention';
+
+                tbody.append(`
+                    <tr>
+                        <td class="ps-2">
+                            <span class="badge ${badgeClass} me-1">${row.itemType}</span>
+                            <span class="fw-bold">${row.itemDocNo}</span>
+                            <div class="text-muted" style="font-size: 0.72rem;">Rem: ${fmt2(row.itemRemaining)} ${row.itemCurrency}</div>
+                        </td>
+                        <td>
+                            <i class="bi bi-credit-card me-1 text-muted"></i>
+                            <span class="fw-semibold">${row.paymentDocNo}</span>
+                            <div class="text-muted" style="font-size: 0.72rem;">Rem: ${fmt2(row.paymentDocRemaining)} ${row.paymentDocCurrency}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="input-group input-group-sm mx-auto" style="max-width: 160px;">
+                                <input type="number" step="0.01" min="0" class="form-control form-control-sm text-end fw-bold input-settle-val"
+                                       data-idx="${index}" value="${row.settledAmount}">
+                                <span class="input-group-text bg-white" style="font-size: 0.7rem;">${row.itemCurrency}</span>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="input-group input-group-sm mx-auto" style="max-width: 160px;">
+                                <input type="number" step="0.01" min="0" class="form-control form-control-sm text-end fw-bold input-deduct-val"
+                                       data-idx="${index}" value="${row.allocatedFromDoc}">
+                                <span class="input-group-text bg-white" style="font-size: 0.7rem;">${row.paymentDocCurrency}</span>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-link text-danger p-0 btn-remove-alloc" data-idx="${index}" title="Remove">
+                                <i class="bi bi-x-circle"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `);
+            });
+
+            $('#allocationCountBadge').text(`${allocationsList.length} Allocations`);
+            recalculate();
+        }
+
+        // Input handlers with value clamping
+        $('#blSettlementModal').on('input', '.input-settle-val', function () {
+            const idx = Number($(this).data('idx'));
+            if (!allocationsList[idx]) return;
+
+            const max = allocationsList[idx].itemRemaining;
+            const val = clampNumber($(this).val(), 0, max);
+
+            allocationsList[idx].settledAmount = val;
+            allocationsList[idx].allocatedFromDoc = val;
+            $(`.input-deduct-val[data-idx="${idx}"]`).val(val);
+
+            $(this).val(val);
+            recalculate();
+        });
+
+        $('#blSettlementModal').on('input', '.input-deduct-val', function () {
+            const idx = Number($(this).data('idx'));
+            if (!allocationsList[idx]) return;
+
+            const max = allocationsList[idx].paymentDocRemaining;
+            const val = clampNumber($(this).val(), 0, max);
+
+            allocationsList[idx].allocatedFromDoc = val;
+            $(this).val(val);
+
+            recalculate();
+        });
+
+        // Remove Allocation Row
+        $('#blSettlementModal').on('click', '.btn-remove-alloc', function () {
+            const idx = Number($(this).data('idx'));
+            allocationsList.splice(idx, 1);
+            renderGrid();
+        });
+
+        function recalculate() {
+            let totalSettled = 0;
+            let totalDeducted = 0;
+
+            allocationsList.forEach(a => {
+                totalSettled += Number(a.settledAmount || 0);
+                totalDeducted += Number(a.allocatedFromDoc || 0);
+            });
+
+            $('#lblTotalItemSettled').text(fmt2(totalSettled));
+            $('#lblTotalDocDeducted').text(fmt2(totalDeducted));
+        }
+
+        // Submit Settlement Form
+        $('#blSettlementModal').on('click', '#btnSaveSettlement', function () {
+            if (allocationsList.length === 0) {
+                alert('Please match and allocate at least one debit item with a payment document.');
+                return;
+            }
+
+            const bad = allocationsList.find(a => !(Number(a.settledAmount) > 0) || !(Number(a.allocatedFromDoc) > 0));
+            if (bad) {
+                alert('Invalid allocation amounts detected (zero or negative).');
+                return;
+            }
+
+            const companyIdVal = parseIntSafe($('#companyId').val());
+            const currencyIdVal = parseIntSafe($('#settlementCurrencyId').val());
+
+            if (companyIdVal === 0) {
+                alert('Please select a valid Company.');
+                return;
+            }
+
+            if (currencyIdVal === 0) {
+                alert('Please select a valid Base Currency.');
+                return;
+            }
+
+            const postData = {
+                BLId: $('#blId').val() || null,
+                BookingId: $('#bookingId').val() || null,
+                CompanyId: companyIdVal,
+                PartyId: $('#settlementPartyId').val() || null,
+                CurrencyId: currencyIdVal,
+                SettlementDate: $('#settlementDate').val(),
+                Remarks: $('#settlementRemarks').val(),
+                Allocations: allocationsList.map(x => ({
+                    ItemType: x.itemType,
+                    SourceId: x.sourceId,
+                    PaymentDocumentId: x.paymentDocumentId,
+                    SettledAmountInItemCurrency: Number(x.settledAmount),
+                    AllocatedAmountFromDoc: Number(x.allocatedFromDoc),
+                    ExchangeRateValue: Number(x.exchangeRate || 1)
+                }))
+            };
+
+            const btn = $(this);
+            const originalHtml = btn.html();
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Saving...');
+
+            $.ajax({
+                url: '/Settlements/SaveSettlement',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(postData),
+                success: function (res) {
+                    if (res && res.success) {
+                        hideModal();
+                        location.reload();
+                    } else {
+                        alert('Failed: ' + ((res && res.message) ? res.message : 'Unknown error occurred.'));
+                        btn.prop('disabled', false).html(originalHtml);
+                    }
+                },
+                error: function (xhr) {
+                    alert('Error saving settlement: ' + (xhr.responseText || xhr.statusText));
+                    btn.prop('disabled', false).html(originalHtml);
+                }
+            });
+        });
+
+        $('#blSettlementModal').on('shown.bs.modal', function () {
+            const partyId = $('#settlementPartyId').val();
+            const currencyId = parseIntSafe($('#settlementCurrencyId').val());
+            if (partyId && currencyId > 0) refreshAvailablePaymentDocuments();
+        });
+
+    })();
+</script>

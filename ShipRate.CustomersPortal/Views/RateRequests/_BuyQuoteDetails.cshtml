@@ -1,0 +1,236 @@
+﻿@using ShipRate.WebAppCustomers.ViewModels
+@model BuyQuoteListViewModel
+@{
+    // محاسبه مجموع کل (با فرض اینکه ارزها یکی هستند یا مجموع عددی مد نظر است)
+    var grandTotal = Model.Items?.Sum(x => x.Quantity * x.UnitRate) ?? 0;
+    var mainCurrency = Model.Items?.FirstOrDefault()?.CurrencyCode ?? "USD";
+}
+
+<style>
+    .bg-light-subtle {
+        background-color: #f8f9fa !important;
+    }
+
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .table thead th {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background-color: #f8f9fa;
+        color: #6c757d;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .font-monospace {
+        font-family: 'SFMono-Regular', Consolas, monospace;
+    }
+
+    .info-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    .info-value {
+        font-weight: 600;
+        color: #212529;
+        display: block;
+    }
+
+    .status-badge {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+    }
+
+    .remarks-section {
+        background-color: #fffdf5;
+        border-left: 4px solid #ffc107;
+    }
+</style>
+
+<div class="container-fluid pb-5">
+    <!-- Header & Action Buttons -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-0 text-primary fw-bold">Buy Quote Details</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item small">Inquiry #@Model.InqNo.ToString()</li>
+                    <li class="breadcrumb-item active small" aria-current="page">Quote: @Model.QuotationNo</li>
+                </ol>
+            </nav>
+        </div>
+
+
+        @if (!User.IsInRole("External Party"))
+        {
+            <button class="btn btn-success px-4 shadow-sm"
+                    hx-get="@Url.Action("CreateFromBuy", "RateRequests", new { buyQuoteId = Model.Id })"
+                    hx-target="#modal-content"
+                    hx-trigger="click"
+                    data-bs-toggle="modal"
+                    data-bs-target="#appModal">
+                <i class="bi bi- currency-exchange me-2"></i> Convert to Sell Quote
+            </button>
+        }
+
+        <button type="button" class="btn btn-light border" data-bs-dismiss="modal">
+            <i class="bi bi-arrow-left me-1"></i> Back to List
+        </button>
+    </div>
+
+    <!-- Summary Info Card -->
+    <div class="card border-0 mb-4">
+        <div class="card-header bg-primary bg-gradient text-white py-3">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>General Information</h6>
+                </div>
+                <div class="col-auto">
+                    <span class="badge bg-white text-primary">Ref: @(Model.QuotationNo ?? "N/A")</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body bg-light-subtle">
+            <div class="row g-4">
+                <div class="col-md-3 col-sm-6">
+                    <label class="info-label">Carrier / Vendor</label>
+                    <span class="info-value text-truncate">@Model.CarrierName / @Model.VendorName</span>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <label class="info-label">Service / Vehicle</label>
+                    <span class="info-value">@(Model.OptionsServiceName ?? "-") (@(Model.VehicleName ?? "-"))</span>
+                </div>
+                <div class="col-md-2 col-sm-4">
+                    <label class="info-label">Transit Time</label>
+                    <span class="info-value"><i class="bi bi-clock me-1 text-primary"></i> @Model.TransitDays Days</span>
+                </div>
+                <div class="col-md-2 col-sm-4">
+                    <label class="info-label">Route Type</label>
+                    @if (Model.IsDirect)
+                    {
+                        <span class="badge bg-success-subtle text-success status-badge">DIRECT</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning-subtle text-warning status-badge">INDIRECT</span>
+                    }
+                </div>
+                <div class="col-md-2 col-sm-4 text-md-end">
+                    <label class="info-label">Validity</label>
+                    <span class="info-value text-danger"><i class="bi bi-calendar-check me-1"></i> @Model.ValidUntil?.ToString("yyyy-MM-dd")</span>
+                </div>
+
+                <!-- Second Row of Info -->
+                <div class="col-md-3 col-sm-6">
+                    <label class="info-label">ETD</label>
+                    <span class="info-value">@(Model.ETD?.ToString("yyyy-MM-dd") ?? "-")</span>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <label class="info-label">ETA</label>
+                    <span class="info-value">@(Model.ETA?.ToString("yyyy-MM-dd") ?? "-")</span>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <label class="info-label">Quote Date</label>
+                    <span class="info-value">@(Model.QuotationDate?.ToString("yyyy-MM-dd HH:mm") ?? "-")</span>
+                </div>
+                <div class="col-md-3 col-sm-6 text-md-end">
+                    <label class="info-label text-primary fw-bold">Grand Total</label>
+                    <h4 class="mb-0 text-primary fw-bold">@mainCurrency @grandTotal.ToString("N2")</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Items Table Card -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4 py-3">Charge Description</th>
+                            <th class="py-3">Container / Type</th>
+                            <th class="py-3 text-center">Qty</th>
+                            <th class="py-3 text-end">Unit Rate</th>
+                            <th class="py-3 text-center">Currency</th>
+                            <th class="py-3 text-end pe-4">Total Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Items != null && Model.Items.Any())
+                        {
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-dark">@item.ChargeTypeName</div>
+                                        <small class="text-muted font-monospace">@item.ChargeTypeCode</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border fw-normal">
+                                            @item.SizeTypeShortName
+                                        </span>
+                                    </td>
+                                    <td class="text-center fw-medium">@item.Quantity.ToString("G29")</td>
+                                    <td class="text-end font-monospace">@item.UnitRate.ToString("N2")</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary-subtle text-secondary">@item.CurrencyCode</span>
+                                    </td>
+                                    <td class="text-end fw-bold pe-4 text-primary">
+                                        @item.TotalAmount.ToString("N2")
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">No items available for this quotation.</td>
+                            </tr>
+                        }
+                    </tbody>
+                    @if (Model.Items != null && Model.Items.Any())
+                    {
+                        <tfoot class="table-light">
+                            <tr>
+                                <td colspan="5" class="text-end fw-bold py-3 text-secondary">Summary Sub-Total:</td>
+                                <td class="text-end fw-bold py-3 pe-4 text-primary fs-5">@mainCurrency @grandTotal.ToString("N2")</td>
+                            </tr>
+                        </tfoot>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remarks Section -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-0 remarks-section p-3">
+                <h6 class="fw-bold mb-2 text-dark"><i class="bi bi-chat-left-dots me-2"></i>Agent Remarks & Notes</h6>
+                <p class="mb-0 text-muted small" style="white-space: pre-line;">
+                    @(string.IsNullOrWhiteSpace(Model.Remarks) ? "No additional remarks provided by the agent." : Model.Remarks)
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 bg-light p-3">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="small text-muted">Created By:</span>
+                    <span class="small fw-bold">@Model.CreateUserName</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="small text-muted">Last Updated:</span>
+                    <span class="small fw-bold">@Model.UpdateUserName</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

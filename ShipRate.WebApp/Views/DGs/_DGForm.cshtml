@@ -1,0 +1,342 @@
+﻿@using ShipRate.WebApp.ViewModels
+@using ShipRate.WebApp.ViewModels.Location
+@model DGFormViewModel
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+}
+
+<form hx-post="@Url.Action(isCreateMode?"Create":"Edit", "DGs")"
+      hx-target="#app-modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header form-caption-bg  text-white">
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add DG</h5>
+        }
+        else
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Edit DG</h5>
+            <input type="hidden" asp-for="Id" />
+        }
+
+
+        <button type="button"
+                class="btn-close"
+                onclick="AppModal.close()">
+        </button>
+    </div>
+
+
+    <div class="modal-body row">
+
+        @Html.AntiForgeryToken()
+        @if (!ViewData.ModelState.IsValid)
+        {
+            var allErrors = ViewData.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            if (allErrors.Any())
+            {
+                <div class="alert alert-danger py-2 mb-1">
+                    <ul class="mb-0 small">
+                        @foreach (var err in allErrors)
+                        {
+                            <li>@err</li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+
+
+        <div class="mb-1 col-md-6">
+            <label class="form-label fw-medium">
+                     Un Number <span class="text-danger">*</span>
+                
+            </label>
+            <input type="text"
+                       name="DGUnNumber"
+                       value="@Model.DGUnNumber"
+                       class="form-control @(ViewData.ModelState.ContainsKey("DGUnNumber") && ViewData.ModelState["DGUnNumber"]!.Errors.Any() ? "is-invalid" : "")"
+                       placeholder="" />
+        </div>
+
+
+        <div class="mb-1 col-md-6">
+            <label for="DGClassId">DG Class</label>
+            <select id="DGClassId" name="DGClassId" class="form-control" required>
+                <option value=0>-- Select Class --</option>
+                @foreach (var cls in Model.DGClasses)
+                {
+                    <!option value="@cls.Id" @(Model.DGClassId == cls.Id ? "selected" : "")>
+                    @cls.Display
+                    </!option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-1 col-md-6">
+            <label class="form-label fw-medium">
+                Sub Class No <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="DGSubClassNo"
+                   value="@Model.DGSubClassNo"
+                   class="form-control @(ViewData.ModelState.ContainsKey("DGSubClassNo") && ViewData.ModelState["DGSubClassNo"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder="" />
+        </div>
+
+        <div class="mb-1 col-md-6">
+            <label class="form-label fw-medium">
+                Name <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="DGName"
+                   value="@Model.DGName"
+                   class="form-control @(ViewData.ModelState.ContainsKey("DGName") && ViewData.ModelState["DGName"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder="" />
+        </div>
+
+        <div class="mb-1 col-md-6">
+            <label class="form-label fw-medium">
+                Local Name <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="DGLocalName"
+                   value="@Model.DGLocalName"
+                   class="form-control @(ViewData.ModelState.ContainsKey("DGLocalName") && ViewData.ModelState["DGLocalName"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder="" />
+        </div>
+
+        <div class="mb-1 col-md-6">
+            <label for="DGPackingGroupId">Packing Group</label>
+            <select id="DGPackingGroupId" name="DGPackingGroupId" class="form-control" required>
+                <option value=0>-- Select Packing Group --</option>
+                @foreach (var pg in Model.PackingGroups)
+                {
+                    <!option value="@pg.Id" @(Model.DGPackingGroupId == pg.Id ? "selected" : "")>
+                    @pg.Display
+                    </!option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-1 col-md-6">
+
+            <label for="DGRegulationSetId">Regulation Set</label>
+            <select id="DGRegulationSetId" name="DGRegulationSetId" class="form-control" required>
+                <option value="">-- Select Regulation --</option>
+                @foreach (var reg in Model.RegulationSets)
+                {
+                    <!option value="@reg.Id" @(Model.DGRegulationSetId == reg.Id ? "selected" : "")>
+                    @reg.Display
+                    </!option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-1 col-md-3">
+
+            <label class="checkbox-label">
+                <input type="checkbox" name="IsActive" value="true"
+                       @(Model.IsActive ? "checked" : "") />
+                <span>Active</span>
+            </label>
+        </div>
+    </div>
+
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="AppModal.close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>
+
+
+
+
+
+@* @using ShipRate.WebApp.ViewModels
+@model DGFormViewModel
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+}
+
+<form hx-post="/DGs/@(Model.Id.HasValue ? $"Edit/{Model.Id}" : "Create")"
+      hx-target="#modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header form-caption-bg  text-white">
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add GG</h5>
+        }
+        else
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Edit DG</h5>
+            <input type="hidden" asp-for="Id" />
+        }
+
+    </div>
+
+
+    <div class="modal-body row">
+
+        @Html.AntiForgeryToken()
+        @if (!ViewData.ModelState.IsValid)
+        {
+            var allErrors = ViewData.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            if (allErrors.Any())
+            {
+                <div class="alert alert-danger py-2 mb-1">
+                    <ul class="mb-0 small">
+                        @foreach (var err in allErrors)
+                        {
+                            <li>@err</li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+
+
+
+        @*<div class="mb-1 col-md-6">
+             <label class="form-label fw-medium">
+            //     Un Number <span class="text-danger">*</span>
+            // </label>
+            // <input type="text"
+            //        name="DGUnNumber"
+            //        value="@Model.DGUnNumber"
+            //        class="form-control @(ViewData.ModelState.ContainsKey("DGUnNumber") && ViewData.ModelState["DGUnNumber"]!.Errors.Any() ? "is-invalid" : "")"
+            //        placeholder="" />
+        </div>
+            *@
+            @*
+            @await Html.PartialAsync("_TextField", new TextFieldVm { Name = "DGUnNumber", Label = "UN No", Value = Model.DGUnNumber, Required = true })
+
+           
+
+       
+
+        <div class="mb-1 col-md-6">
+            <label for="DGClassId">DG Class</label>
+            <select id="DGClassId" name="DGClassId" class="form-control" required>
+                <option value=0>-- Select Class --</option>
+                @foreach (var cls in Model.DGClasses)
+                {
+                    <!option value="@cls.Id" @(Model.DGClassId == cls.Id ? "selected" : "")>
+                    @cls.Display
+                    </!option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-1 col-md-6">
+            <label class="form-label fw-medium">
+                Sub Class No <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="DGSubClassNo"
+                   value="@Model.DGSubClassNo"
+                   class="form-control @(ViewData.ModelState.ContainsKey("DGSubClassNo") && ViewData.ModelState["DGSubClassNo"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder="" />
+        </div>
+
+        <div class="mb-1 col-md-6">
+            <label class="form-label fw-medium">
+                Name <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="DGName"
+                   value="@Model.DGName"
+                   class="form-control @(ViewData.ModelState.ContainsKey("DGName") && ViewData.ModelState["DGName"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder="" />
+        </div>
+
+        <div class="mb-1 col-md-6">
+            <label class="form-label fw-medium">
+               Local Name <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="DGLocalName"
+                   value="@Model.DGLocalName"
+                   class="form-control @(ViewData.ModelState.ContainsKey("DGLocalName") && ViewData.ModelState["DGLocalName"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder="" />
+        </div>
+
+        <div class="mb-1 col-md-6">
+            <label for="DGPackingGroupId">Packing Group</label>
+            <select id="DGPackingGroupId" name="DGPackingGroupId" class="form-control" required>
+                <option value=0>-- Select Packing Group --</option>
+                @foreach (var pg in Model.PackingGroups)
+                {
+                    <!option value="@pg.Id" @(Model.DGPackingGroupId == pg.Id ? "selected" : "")>
+                    @pg.Display
+                    </!option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-1 col-md-6">
+
+        <label for="DGRegulationSetId">Regulation Set</label>
+        <select id="DGRegulationSetId" name="DGRegulationSetId" class="form-control" required>
+            <option value="">-- Select Regulation --</option>
+            @foreach (var reg in Model.RegulationSets)
+            {
+                <!option value="@reg.Id" @(Model.DGRegulationSetId == reg.Id ? "selected" : "")>
+                @reg.Display
+                </!option>
+            }
+        </select>
+        </div>
+
+        <div class="mb-1 col-md-3">
+
+        <label class="checkbox-label">
+            <input type="checkbox" name="IsActive" value="true"
+                   @(Model.IsActive ? "checked" : "") />
+            <span>Active</span>
+        </label>
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>
+
+
+
+
+
+
+ *@

@@ -1,0 +1,39 @@
+{
+  "name": "Customer Portal - International Forwarding",
+  "short_name": "CustomerPortal",
+  "description": "Shipment tracking and customer services",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0d6efd",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Application"
+    },
+    {
+      "src": "/icons/icon-320.png",
+      "sizes": "320x320",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "MApplication"
+    }
+  ]
+}

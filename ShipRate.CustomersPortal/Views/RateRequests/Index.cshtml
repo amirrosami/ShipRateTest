@@ -1,0 +1,163 @@
+﻿@using Microsoft.Extensions.Localization
+@using ShipRate.Application.DTOs
+@using ShipRate.WebAppCustomers
+@using ShipRate.WebAppCustomers.ViewModels
+@using System.Globalization
+@model RateRequestListDto
+@inject IStringLocalizer<SharedResource> Localizer
+@{
+    var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isFa = culture == "fa";
+    var lang = isFa ? "fa" : "en";
+    var dir = isFa ? "rtl" : "ltr";
+}
+
+@{
+    ViewData["Title"] = $"{Localizer["RateRequests"]}";
+}
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="mb-0"><i class="bi bi-globe me-2"></i>@Localizer["RateRequests"]</h2>
+            <small class="text-muted"></small>
+        </div>
+        <button class="btn btn-primary"
+                hx-get="/RateRequests/Create"
+                hx-target="#app-modal-content"
+                hx-swap="innerHTML">
+            <i class="bi bi-plus-lg me-1"></i> @Localizer["NewRequest"]
+        </button>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            @Localizer["Search"]
+        </div>
+
+        <div class="card-body">
+
+            <form id="rateRequestSearchForm"
+                  hx-get="/RateRequests/Index"
+                  hx-target="#tableContainer"
+                  hx-push-url="true">
+
+                <div class="row g-1">
+
+                    <div class="col-md-2">
+                        <label class="form-label">@(isFa ? "مشتری" : "Customer")</label>
+                        <input type="text" class="form-control" name="CustomerName" value="@Model.Search.CustomerName">
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">@(isFa ? "مخاطب" : "Contact")</label>
+                        <input type="text" class="form-control" name="ContactName" value="@Model.Search.ContactName">
+                    </div>
+
+                    <div class="col-md-1">
+                        <label class="form-label">@(isFa ? "موبایل" : "Mobile")</label>
+                        <input type="text" class="form-control" name="MobileNo" value="@Model.Search.MobileNo">
+                    </div>
+
+                    <div class="col-md-1">
+                        <label class="form-label">@(isFa ? "ایمیل" : "Email")</label>
+                        <input type="text" class="form-control" name="EmailAddress" value="@Model.Search.EmailAddress">
+                    </div>
+
+
+                    <div class="col-md-1">
+                        <label class="form-label">@(isFa ? "مبدا" : "Origin")</label>
+                        <select class="form-select" name="OriginId">
+                            <option value="">@(isFa ? "همه" : "All")</option>
+                            @foreach (var p in ViewBag.Origins)
+                            {
+                                <option value="@p.Value" selected="@(p.Value == Model.Search.OriginId?.ToString())">@p.Text</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-1">
+                        <label class="form-label">@(isFa ? "مقصد" : "Destination")</label>
+                        <select class="form-select" name="DestinationId">
+                            <option value="">All</option>
+                            @foreach (var p in ViewBag.Destinations)
+                            {
+                                <option value="@p.Value" selected="@(p.Value == Model.Search.DestinationId?.ToString())">@p.Text</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">@(isFa ? "وضعیت" : "Status")</label>
+                        <select class="form-select" name="StatusId">
+                            <option value="">@(isFa ? "همه" : "All")</option>
+                            @foreach (var s in ViewBag.Statuses)
+                            {
+                                <option value="@s.Value" selected="@(s.Value == Model.Search.StatusId?.ToString())">@s.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button class="btn btn-primary me-2" type="submit">@(isFa ? "جستجو" : "Search")</button>
+                        <a href="/RateRequests/Index" class="btn btn-secondary">@(isFa ? "پاک" : "Clear")</a>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+
+    <div id="tableContainer"
+         hx-get="@Url.Action("RateRequests", "Index")"
+         hx-trigger="rateRequestChanged from:body"
+         hx-swap="innerHTML"
+         hx-include="#rateRequestSearchForm">
+        @await Html.PartialAsync("_RateRequestTable", Model)
+    </div>
+
+
+
+</div>
+
+
+
+<div id="inquiryListContainer" class="mt-4"></div>
+
+
+<div id="respondsListContainer" class="mt-4"></div>
+<div id="respondItemsListContainer" class="mt-4"></div>
+<div id="SellQuotesListContainer"  
+     class="mt-4"
+     hx-trigger="rateRequestChanged from:body, sellQuoteUpdated from:body"
+     hx-swap="innerHTML"
+     hx-include="#RateRequestId"
+     hx-get="/RateRequests/GetSellQuotes"
+     hx-target="#SellQuotesListContainer"
+    >
+</div>
+<div id="sellQuoteItemsListContainer" class="mt-4"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,547 @@
+﻿@using ShipRate.Application.DTOs
+@model BookingFormVm
+
+<style>
+    .global-port-search-popup {
+        position: fixed;
+        min-width: 280px;
+        max-width: 360px;
+        z-index: 99999;
+    }
+        .global-port-search-popup .dropdown-menu,
+        .global-port-search-popup .list-group {
+            display: block !important;
+            width: 100%;
+            max-height: 260px;
+            overflow-y: auto;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,.15);
+            border-radius: .375rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,.18);
+        }
+
+
+    .voyage-table {
+        width: 100%;
+        min-width: 1250px;
+        table-layout: fixed;
+    }
+
+        .voyage-table .col-sequence {
+            width: 42px;
+        }
+
+        .voyage-table .col-vessel {
+            width: 170px;
+        }
+
+        .voyage-table .col-voyage {
+            width: 150px;
+        }
+
+        .voyage-table .col-port {
+            width: 260px;
+        }
+
+        .voyage-table .col-date {
+            width: 165px;
+        }
+
+        .voyage-table .col-transshipment {
+            width: 115px;
+        }
+
+        .voyage-table .col-action {
+            width: 52px;
+        }
+
+        .voyage-table th,
+        .voyage-table td {
+            vertical-align: middle;
+        }
+
+        .voyage-table .port-search-input {
+            width: 100%;
+            min-width: 0;
+        }
+
+</style>
+
+
+
+@if (Model.TransportTypeId == 1) // Sea Transport
+{
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-dark text-white d-flex align-items-center">
+            <i class="bi bi-ship me-2"></i>
+            <h6 class="mb-0">Sea Voyage & Vessel Specifications</h6>
+        </div>
+        <div class="card-body bg-light">
+            <div class="row g-3">
+                <input type="hidden" asp-for="SeaDetail.Id" />
+
+                <div class="col-md-3">
+                    <label class="form-label">Shipping Line</label>
+                    <select asp-for="SeaDetail.ShippingLineId" asp-items="ViewBag.Carriers" class="form-select">
+                        <option value="">-- Select Line --</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Service Name</label>
+                    <input asp-for="SeaDetail.ServiceName" class="form-control" placeholder="" />
+                </div>
+
+@*                 <div class="col-md-3">
+                    <label class="form-label">Ocean Booking No</label>
+                    <input asp-for="SeaDetail.LineBookingNo" class="form-control" />
+                </div>
+ *@
+@*                 <div class="col-md-4">
+                    <label class="form-label">Port of Loading (POL)</label>
+                    <select asp-for="SeaDetail.POLId" asp-items="ViewBag.Locations" class="form-select">
+                        <option value="">-- Select Port --</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Port of Discharge (POD)</label>
+                    <select asp-for="SeaDetail.PODId" asp-items="ViewBag.Locations" class="form-select">
+                        <option value="">-- Select Port --</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Final Port of Destination</label>
+                    <select asp-for="SeaDetail.FinalDestinationPortId" asp-items="ViewBag.Locations" class="form-select">
+                        <option value="">-- Select Port --</option>
+                    </select>
+                </div>
+ *@
+
+                <div class="col-md-4">
+                    <label class="form-label">Empty Container Pickup Depot</label>
+                    <select asp-for="SeaDetail.EmptyPickupDepotId" asp-items="ViewBag.Depots" class="form-select">
+                        <option value="">-- Select Depot --</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Empty Container Return Depot</label>
+                    <select asp-for="SeaDetail.EmptyReturnDepotId" asp-items="ViewBag.Depots" class="form-select">
+                        <option value="">-- Select Depot --</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Receiving Terminal</label>
+                    <select asp-for="SeaDetail.ReceivingTerminalId" asp-items="ViewBag.Terminals" class="form-select">
+                        <option value="">-- Select Terminal --</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- جدول داینامیک مدیریت Voyage Route Segments (دریایی) -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center py-2">
+            <h6 class="mb-0 fs-6 text-white"><i class="bi bi-diagram-3 me-2"></i>Voyage Route Segments & Transshipments</h6>
+            <button type="button"
+                    class="btn btn-light btn-sm px-3"
+                    hx-get="@Url.Action("AddVoyageRow", "Booking")"
+                    hx-vals='js:{ index: document.querySelectorAll("#voyage-rows tr").length }'
+                    hx-target="#voyage-rows"
+                    hx-swap="beforeend">
+                <i class="bi bi-plus-circle-fill me-1"></i> Add Voyage Segment
+            </button>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered align-middle voyage-table">
+                    <colgroup>
+                        <col class="col-sequence" />
+                        <col class="col-vessel" />
+                        <col class="col-voyage" />
+                        <col class="col-port" />
+                        <col class="col-port" />
+                        <col class="col-date" />
+                        <col class="col-date" />
+                        <col class="col-transshipment" />
+                        <col class="col-action" />
+                    </colgroup>
+
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Vessel</th>
+                            <th>Voyage</th>
+                            <th>From Port</th>
+                            <th>To Port</th>
+                            <th>ETD</th>
+                            <th>ETA</th>
+                            <th>Transshipment</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="voyage-rows">
+                        @if (Model.SeaDetail?.Voyages != null)
+                        {
+                            for (int i = 0; i < Model.SeaDetail.Voyages.Count; i++)
+                            {
+                                var voyage = Model.SeaDetail.Voyages[i];
+                                voyage.SequenceNo = i + 1;
+                                <tr class="voyage-row">
+                                    <td class="seq-no">@(i + 1)</td>
+                                    <td>
+                                        <input type="hidden" name="SeaDetail.Voyages[@i].Id" value="@voyage.Id" />
+                                        <input type="text" name="SeaDetail.Voyages[@i].VesselName" value="@voyage.VesselName" class="form-control form-control-sm mb-1" placeholder="Vessel Name" />
+                                        <select name="SeaDetail.Voyages[@i].VesselId" asp-items="ViewBag.Vessels" class="form-select form-select-sm">
+                                            <option value="">-- Link Vessel DB --</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="SeaDetail.Voyages[@i].VoyageNo" value="@voyage.VoyageNo" class="form-control form-control-sm mb-1" placeholder="Voyage No" />
+                                        <select name="SeaDetail.Voyages[@i].VoyageId" asp-items="ViewBag.Voyages" class="form-select form-select-sm">
+                                            <option value="">-- Link Voyage DB --</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="SeaDetail.Voyages[@i].FromPortId" asp-items="ViewBag.Locations" class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="SeaDetail.Voyages[@i].ToPortId" asp-items="ViewBag.Locations" class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="datetime-local" name="SeaDetail.Voyages[@i].ETD" value="@(voyage.ETD?.ToString("yyyy-MM-ddTHH:mm"))" class="form-control form-control-sm" />
+                                    </td>
+                                    <td>
+                                        <input type="datetime-local" name="SeaDetail.Voyages[@i].ETA" value="@(voyage.ETA?.ToString("yyyy-MM-ddTHH:mm"))" class="form-control form-control-sm" />
+                                    </td>
+                                    <td>
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input type="checkbox" name="SeaDetail.Voyages[@i].IsTransshipment" value="true" class="form-check-input" @(voyage.IsTransshipment ? "checked" : "") />
+                                            <input type="hidden" name="SeaDetail.Voyages[@i].IsTransshipment" value="false" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-danger btn-sm border-0" onclick="removeVoyageRow(this)">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+                <div id="global-port-search-popup" class="global-port-search-popup d-none"></div>
+            </div>
+        </div>
+    </div>
+}
+else if (Model.TransportTypeId == 2) // Road Transport
+{
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-2">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-truck me-2"></i>
+                <h6 class="mb-0 text-white">Road Fleet & Cargo Truck Details</h6>
+            </div>
+            <button type="button"
+                    class="btn btn-light btn-sm px-3"
+                    hx-get="@Url.Action("AddRoadRow", "Booking")"
+                    hx-vals='js:{ index: document.querySelectorAll("#road-rows tr").length }'
+                    hx-target="#road-rows"
+                    hx-swap="beforeend">
+                <i class="bi bi-plus-circle-fill me-1"></i> Add Road Fleet
+            </button>
+        </div>
+        <div class="card-body bg-light p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 text-center" style="font-size: 0.85rem;">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>Pickup Location</th>
+                            <th>Delivery Location</th>
+                            <th>Truck Type</th>
+                            <th style="width: 100px;">Count</th>
+                            <th>Driver Details</th>
+                            <th>Plate No</th>
+                            <th style="width: 50px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="road-rows">
+                        @if (Model.RoadDetails != null)
+                        {
+                            for (int i = 0; i < Model.RoadDetails.Count; i++)
+                            {
+                                <tr class="road-row">
+                                    <td>
+                                        <input type="hidden" name="RoadDetails[@i].Id" value="@Model.RoadDetails[i].Id" />
+                                        <select name="RoadDetails[@i].PickupLocationId" asp-items="ViewBag.Locations" class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="RoadDetails[@i].DeliveryLocationId" asp-items="ViewBag.Locations" class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="RoadDetails[@i].TruckTypeId" asp-items="ViewBag.TruckTypes" class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="RoadDetails[@i].TruckCount" value="@Model.RoadDetails[i].TruckCount" class="form-control form-control-sm text-center" />
+                                    </td>
+                                    <td>
+                                        <input type="text" name="RoadDetails[@i].DriverName" value="@Model.RoadDetails[i].DriverName" class="form-control form-control-sm mb-1" placeholder="Driver Name" />
+                                        <input type="text" name="RoadDetails[@i].DriverMobile" value="@Model.RoadDetails[i].DriverMobile" class="form-control form-control-sm" placeholder="Mobile" />
+                                    </td>
+                                    <td>
+                                        <input type="text" name="RoadDetails[@i].TruckPlateNo" value="@Model.RoadDetails[i].TruckPlateNo" class="form-control form-control-sm" placeholder="Plate No" />
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-danger btn-sm border-0" onclick="removeRoadRow(this)">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+@*                 <div id="global-port-search-popup2" class="global-port-search-popup d-none"></div>
+ *@            </div>
+        </div>
+    </div>
+}
+else if (Model.TransportTypeId == 3) // Rail Transport
+{
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-2">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-train-front me-2"></i>
+                <h6 class="mb-0 text-white">Railway Operator & Waybill Info</h6>
+            </div>
+            <button type="button"
+                    class="btn btn-light btn-sm px-3"
+                    hx-get="@Url.Action("AddRailRow", "Booking")"
+                    hx-vals='js:{ index: document.querySelectorAll("#rail-rows tr").length }'
+                    hx-target="#rail-rows"
+                    hx-swap="beforeend">
+                <i class="bi bi-plus-circle-fill me-1"></i> Add Rail Segment
+            </button>
+        </div>
+        <div class="card-body bg-light p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 text-center" style="font-size: 0.85rem;">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>Origin Station</th>
+                            <th>Destination Station</th>
+                            <th>Rail Operator</th>
+                            <th>Train / Waybill No</th>
+                            <th>Departure / Arrival</th>
+                            <th>Remarks</th>
+                            <th style="width: 50px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rail-rows">
+                        @if (Model.RailDetails != null)
+                        {
+                            for (int i = 0; i < Model.RailDetails.Count; i++)
+                            {
+                                <tr class="rail-row">
+                                    <td>
+                                        <input type="hidden" name="RailDetails[@i].Id" value="@Model.RailDetails[i].Id" />
+                                        <select name="RailDetails[@i].OriginStationId" asp-items="ViewBag.Stations" class="form-select form-select-sm">
+                                            <option value="">-- Station --</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="RailDetails[@i].DestinationStationId" asp-items="ViewBag.Stations" class="form-select form-select-sm">
+                                            <option value="">-- Station --</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="RailDetails[@i].RailOperatorId" asp-items="ViewBag.RailOperators" class="form-select form-select-sm">
+                                            <option value="">-- Operator --</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="RailDetails[@i].TrainNo" value="@Model.RailDetails[i].TrainNo" class="form-control form-control-sm mb-1" placeholder="Train No" />
+                                        <input type="text" name="RailDetails[@i].RailWaybillNo" value="@Model.RailDetails[i].RailWaybillNo" class="form-control form-control-sm" placeholder="Waybill No" />
+                                    </td>
+                                    <td>
+                                        <input type="datetime-local" name="RailDetails[@i].DepartureDate" value="@(Model.RailDetails[i].DepartureDate?.ToString("yyyy-MM-ddTHH:mm"))" class="form-control form-control-sm mb-1" />
+                                        <input type="datetime-local" name="RailDetails[@i].ArrivalDate" value="@(Model.RailDetails[i].ArrivalDate?.ToString("yyyy-MM-ddTHH:mm"))" class="form-control form-control-sm" />
+                                    </td>
+                                    <td>
+                                        <textarea name="RailDetails[@i].Remarks" class="form-control form-control-sm" rows="2">@Model.RailDetails[i].Remarks</textarea>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-danger btn-sm border-0" onclick="removeRailRow(this)">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+else
+@if (Model.TransportTypeId == 4) // Air Transport
+{
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-dark text-white d-flex align-items-center">
+            <i class="bi bi-airplane me-2"></i>
+            <h6 class="mb-0">Air Transport & Waybill Specifications</h6>
+        </div>
+        <div class="card-body bg-light">
+            <div class="row g-3">
+                <input type="hidden" asp-for="AirDetail.Id" />
+
+                <div class="col-md-3">
+                    <label class="form-label">Airline Carrier</label>
+                    <select asp-for="AirDetail.AirlineId" asp-items="ViewBag.Airlines" class="form-select">
+                        <option value="">-- Select Airline --</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Airline Booking No</label>
+                    <input asp-for="AirDetail.AirlineBookingNo" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">MAWB No</label>
+                    <input asp-for="AirDetail.MAWBNo" class="form-control" placeholder="Master Air Waybill" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">HAWB No</label>
+                    <input asp-for="AirDetail.HAWBNo" class="form-control" placeholder="House Air Waybill" />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Departure Airport (Origin)</label>
+                    <select asp-for="AirDetail.DepartureAirportId" asp-items="ViewBag.Airports" class="form-select">
+                        <option value="">-- Select Airport --</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Arrival Airport (Destination)</label>
+                    <select asp-for="AirDetail.ArrivalAirportId" asp-items="ViewBag.Airports" class="form-select">
+                        <option value="">-- Select Airport --</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Cargo Terminal</label>
+                    <select asp-for="AirDetail.CargoTerminalId" asp-items="ViewBag.Terminals" class="form-select">
+                        <option value="">-- Select Terminal --</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Air Cut-off Date</label>
+                    <input type="datetime-local" asp-for="AirDetail.AirCutOffDate" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Estimated Departure (ETD)</label>
+                    <input type="datetime-local" asp-for="AirDetail.ETD" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Estimated Arrival (ETA)</label>
+                    <input type="datetime-local" asp-for="AirDetail.ETA" class="form-control" />
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Remarks</label>
+                    <textarea asp-for="AirDetail.Remarks" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- جدول داینامیک مدیریت سگمنت‌های پروازی -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center py-2">
+            <h6 class="mb-0 fs-6 text-white"><i class="bi bi-bezier2 me-2"></i>Flight Route & Connection Segments</h6>
+            <button type="button"
+                    class="btn btn-light btn-sm px-3"
+                    hx-get="@Url.Action("AddAirFlightRow", "Booking")"
+                    hx-vals='js:{ index: document.querySelectorAll("#flight-rows tr").length }'
+                    hx-target="#flight-rows"
+                    hx-swap="beforeend">
+                <i class="bi bi-plus-circle-fill me-1"></i> Add Connection / Flight
+            </button>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 text-center" style="font-size: 0.85rem;">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 50px;">Seq</th>
+                            <th>Flight No</th>
+                            <th>Airline</th>
+                            <th>From Airport</th>
+                            <th>To Airport</th>
+                            <th>ETD / ATD</th>
+                            <th>ETA / ATA</th>
+                            <th>Remarks</th>
+                            <th style="width: 50px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="flight-rows">
+                        @if (Model.AirDetail?.Flights != null)
+                        {
+                            for (int i = 0; i < Model.AirDetail.Flights.Count; i++)
+                            {
+                                var flight = Model.AirDetail.Flights[i];
+                                flight.SequenceNo = i + 1;
+                                <tr class="flight-row">
+                                    <td class="seq-no">@(i + 1)</td>
+                                    <td>
+                                        <input type="hidden" name="AirDetail.Flights[@i].Id" value="@flight.Id" />
+                                        <input type="text" name="AirDetail.Flights[@i].FlightNo" value="@flight.FlightNo" class="form-control form-control-sm text-center" placeholder="Flight No" />
+                                    </td>
+                                    <td>
+                                        <select name="AirDetail.Flights[@i].AirlineId" asp-items="ViewBag.Airlines" class="form-select form-select-sm">
+                                            <option value="">-- Carrier --</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="AirDetail.Flights[@i].FromAirportId" asp-items="ViewBag.Airports" class="form-select form-select-sm">
+                                            <option value="">-- From --</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="AirDetail.Flights[@i].ToAirportId" asp-items="ViewBag.Airports" class="form-select form-select-sm">
+                                            <option value="">-- To --</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="datetime-local" name="AirDetail.Flights[@i].ETD" value="@(flight.ETD?.ToString("yyyy-MM-ddTHH:mm"))" class="form-control form-control-sm mb-1" placeholder="ETD" />
+                                        <input type="datetime-local" name="AirDetail.Flights[@i].ATD" value="@(flight.ATD?.ToString("yyyy-MM-ddTHH:mm"))" class="form-control form-control-sm" placeholder="ATD" />
+                                    </td>
+                                    <td>
+                                        <input type="datetime-local" name="AirDetail.Flights[@i].ETA" value="@(flight.ETA?.ToString("yyyy-MM-ddTHH:mm"))" class="form-control form-control-sm mb-1" placeholder="ETA" />
+                                        <input type="datetime-local" name="AirDetail.Flights[@i].ATA" value="@(flight.ATA?.ToString("yyyy-MM-ddTHH:mm"))" class="form-control form-control-sm" placeholder="ATA" />
+                                    </td>
+                                    <td>
+                                        <input type="text" name="AirDetail.Flights[@i].Remarks" value="@flight.Remarks" class="form-control form-control-sm" />
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-danger btn-sm border-0" onclick="removeFlightRow(this)">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}

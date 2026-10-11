@@ -1,0 +1,77 @@
+﻿@using ShipRate.Domain.Entities.Marketing
+@model List<MarketingCallLog>
+
+<div class="table-responsive">
+    <table class="sr-grid-table text-center m-0">
+        <thead>
+            <tr>
+                <th style="width: 45px;">#</th>
+                <th>مشتری / موضوع</th>
+                <th>شماره تلفن</th>
+                <th>زمان شروع</th>
+                <th>مدت مکالمه</th>
+                <th>نتیجه</th>
+                <th>یادداشت</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model == null || !Model.Any())
+            {
+                <tr>
+                    <td colspan="7" class="text-muted py-3">هنوز تماسی ثبت نشده است.</td>
+                </tr>
+            }
+            else
+            {
+                int index = 1;
+                foreach (var call in Model)
+                {
+                    <tr>
+                        <td>@index</td>
+                        <td class="text-start">
+                            <span class="fw-bold">@call.CustomerName</span>
+                            @if (!string.IsNullOrEmpty(call.InquiryReference))
+                            {
+                                <small class="text-muted d-block">استعلام: @call.InquiryReference</small>
+                            }
+                        </td>
+                        <td dir="ltr" class="fw-bold">@call.PhoneNumber</td>
+                        <td>@call.CallStartTime.ToString("HH:mm - yyyy/MM/dd")</td>
+                        <td>
+                            @if (call.DurationSeconds > 0)
+                            {
+                                <span class="badge bg-secondary">@(call.DurationSeconds / 60):@(call.DurationSeconds % 60)</span>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td>
+                            @switch (call.Outcome)
+                            {
+                                case ShipRate.Domain.Entities.Marketing.CallOutcome.Successful:
+                                    <span class="badge bg-success">موفق</span>
+                                    break;
+                                case ShipRate.Domain.Entities.Marketing.CallOutcome.NeedsFollowUp:
+                                    <span class="badge bg-warning text-dark">نیاز به پیگیری</span>
+                                    break;
+                                case ShipRate.Domain.Entities.Marketing.CallOutcome.NoAnswer:
+                                    <span class="badge bg-danger">عدم پاسخ</span>
+                                    break;
+                                case ShipRate.Domain.Entities.Marketing.CallOutcome.Busy:
+                                    <span class="badge bg-secondary">مشغول</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-light text-dark border">@call.Outcome</span>
+                                    break;
+                            }
+                        </td>
+                        <td class="text-start small" style="max-width: 180px;">@call.Notes</td>
+                    </tr>
+                    index++;
+                }
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,17 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@using ShipRate.Domain.Entities.BaseInfo.Cargos
+@model IEnumerable<CargoCommodity>
+
+@{
+    Guid? selectedId = ViewBag.SelectedId;
+}
+
+<option value="">Select</option>
+
+@foreach (var item in Model)
+{
+    <option value="@item.Id"
+            selected="@(item.Id == selectedId ? "selected" : null)">
+        @item.CargoCommodityName
+    </option>
+}

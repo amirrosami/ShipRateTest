@@ -1,0 +1,32 @@
+﻿@using ShipRate.Application.DTOs
+@model BookingContainerTypeVm
+<tr class="container-row">
+    <td>
+        <input type="hidden" name="BookingContainerTypes[__INDEX__].Id" value="@Guid.NewGuid()" />
+        <select name="BookingContainerTypes[__INDEX__].ContainerSizeTypeId" class="form-select form-select-sm" asp-items="ViewBag.ContainerSizes">
+            <option>Select...</option>
+        </select>
+    </td>
+    <td>
+        <select name="BookingContainerTypes[__INDEX__].CntOwnTypeId" class="form-select form-select-sm" asp-items="ViewBag.OwnershipTypes">
+            <option>Select...</option>
+        </select>
+    </td>
+    <td>
+        <input type="number" name="BookingContainerTypes[__INDEX__].ContainerCount" class="form-control form-control-sm text-center" />
+    </td>
+    <td>
+        <input type="number" name="BookingContainerTypes[__INDEX__].OverLengthCM" class="form-control form-control-sm text-end" />
+    </td>
+    <td>
+        <input type="number" name="BookingContainerTypes[__INDEX__].OverHeightCM" class="form-control form-control-sm text-end" />
+    </td>
+    <td>
+        <input type="number" name="BookingContainerTypes[__INDEX__].OverWidthCM" class="form-control form-control-sm text-end" />
+    </td>
+    <td class="text-center">
+        <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove();">
+            <i class="bi bi-trash"></i>
+        </button>
+    </td>
+</tr>

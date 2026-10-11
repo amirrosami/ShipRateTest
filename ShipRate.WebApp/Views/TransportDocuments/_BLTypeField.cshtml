@@ -1,0 +1,20 @@
+﻿@using ShipRate.Application.ViewModels
+@model TransportDocumentUpsertVm
+
+@* <div id="blTypeField" class="field">
+    <label asp-for="BLTypeId"></label>
+    <select asp-for="BLTypeId" asp-items="Model.BLTypes">
+        <option value="">Select...</option>
+    </select>
+    <span asp-validation-for="BLTypeId" class="validation-message"></span>
+</div>
+ *@
+
+
+<div id="blTypeField" class="excel-field">
+    <label asp-for="BLTypeId"></label>
+    <select asp-for="BLTypeId" asp-items="Model.BLTypes">
+        <option value="">Select...</option>
+    </select>
+</div>
+

@@ -1,0 +1,85 @@
+﻿@using ShipRate.Application.DTOs
+@model BLAmendmentRequestFormDto
+
+<div class="modal fade"
+     id="blAmendmentRequestModal"
+     tabindex="-1"
+     aria-labelledby="blAmendmentRequestModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <form method="post"
+                  hx-post="@Url.Action("SaveBLAmendmentRequest", "ServiceRequests")"
+                  hx-target="#bl-amendments-panel"
+                  hx-swap="innerHTML">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="ServiceRequestId" />
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="blAmendmentRequestModalLabel">
+                        @(Model.Id.HasValue ? "Edit B/L Amendment Request" : "Add B/L Amendment Request")
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-12">
+                            <label asp-for="BLId" class="form-label"></label>
+                            <select asp-for="BLId" asp-items="Model.BLs" class="form-select">
+                                <option value="">-- Select B/L --</option>
+                            </select>
+                            <span asp-validation-for="BLId" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label asp-for="Reason" class="form-label"></label>
+                            <textarea asp-for="Reason" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Reason" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-check mt-2">
+                                <input asp-for="RequiresCarrierApproval" class="form-check-input" />
+                                <label asp-for="RequiresCarrierApproval" class="form-check-label"></label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-check mt-2">
+                                <input asp-for="RequiresCustomerApproval" class="form-check-input" />
+                                <label asp-for="RequiresCustomerApproval" class="form-check-label"></label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Save
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

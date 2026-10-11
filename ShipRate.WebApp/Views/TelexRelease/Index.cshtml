@@ -1,0 +1,143 @@
+﻿@using ShipRate.Application.ViewModels
+@model TelexReleaseIndexViewModel
+
+@{
+    ViewData["Title"] = "Telex Release Requests";
+}
+
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Telex Release Requests</h4>
+        <button class="btn btn-primary"
+                hx-get="@Url.Action("Create", "TelexRelease")"
+                hx-target="#modalBody"
+                hx-swap="innerHTML"
+                data-bs-toggle="modal"
+                data-bs-target="#mainModal">
+            <i class="bi bi-plus-lg"></i>New Telex Release
+        </button>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <form hx-get="@Url.Action("Search","TelexRelease")"
+                  hx-target="#gridContainer"
+                  hx-swap="innerHTML"
+                  class="row g-3">
+
+                <div class="col-md-4">
+                    <label class="form-label">BL No</label>
+                    <input type="text" name="BLNo" value="@Model.Search.BLNo" class="form-control" />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Status</label>
+                    <select name="TelexReleaseStatusId" class="form-select">
+                        <option value="">-- All --</option>
+                        @foreach (var item in Model.Statuses)
+                        {
+                            if (Model.Search.TelexReleaseStatusId?.ToString() == item.Value)
+                            {
+                                <option value="@item.Value" selected>@item.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">&nbsp;</label>
+                    <a href="@Url.Action("Index", "TelexRelease")" class="btn btn-secondary w-100">
+                        <i class="bi bi-arrow-clockwise"></i> Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="gridContainer">
+        @await Html.PartialAsync("_Grid", Model.Result)
+    </div>
+</div>
+
+<div class="modal fade" id="mainModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Telex Release</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="lookupModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">BL Lookup</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="lookupModalBody">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="documentManagerModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="document-manager-content">
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.body.addEventListener('telexReleaseChanged', function () {
+        htmx.ajax('GET', '@Url.Action("Search", "TelexRelease")', '#gridContainer');
+        var modal = bootstrap.Modal.getInstance(document.getElementById('mainModal'));
+        if (modal) modal.hide();
+    });
+
+    document.body.addEventListener('blSelected', function (evt) {
+        // ۱. مقداردهی فیلدها
+        document.getElementById('BLId').value = evt.detail.id;
+        document.getElementById('BLNo').value = evt.detail.blNo;
+
+        // ۲. بستن مودال جستجو
+        var lookupModal = bootstrap.Modal.getInstance(document.getElementById('lookupModal'));
+        if (lookupModal) {
+            lookupModal.hide();
+        }
+
+        // ۳. نمایش مجدد مودال اصلی با تاخیر ناچیز (جهت اتمام انیمیشن بستن مودال قبلی)
+        setTimeout(function() {
+            var mainModalEl = document.getElementById('mainModal');
+            var mainModal = bootstrap.Modal.getInstance(mainModalEl) || new bootstrap.Modal(mainModalEl);
+            mainModal.show();
+        }, 150);
+    });
+
+
+
+
+
+
+
+
+
+</script>

@@ -1,0 +1,114 @@
+﻿@using ShipRate.WebApp.ViewModels.ChargeTypeVms
+@model ChargeTypeListViewModel
+
+<style>
+.category-scroll{
+    max-height:600px;
+    overflow-y:auto;
+}
+
+.card{
+    border:0;
+    border-radius:12px;
+}
+
+.card-header{
+    background:#fafafa;
+}
+
+#chargeTypeGrid{
+    min-height:500px;
+}
+
+
+
+</style>
+
+
+<div class="container-fluid py-3">
+
+    <div class="row g-3">
+
+        <!-- Sidebar Categories -->
+        <div class="col-lg-3">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold">Charge Categories</span>
+                </div>
+
+                <div class="card-body p-2">
+
+                    <!-- Search -->
+                    <div class="px-2 pb-2">
+                        <input type="text"
+                               name="searchTerm"
+                               class="form-control form-control-sm"
+                               placeholder="Search category..."
+                               hx-get="/ChargeTypes/CategoryList"
+                               hx-trigger="keyup changed delay:400ms"
+                               hx-target="#categoryGrid"
+                               hx-include="[name='searchTerm']" />
+                    </div>
+
+                    <!-- Category List -->
+                    <div id="categoryGrid"
+                         class="category-scroll"
+                         hx-get="/ChargeTypes/CategoryList"
+                         hx-trigger="load">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Main Grid -->
+        <div class="col-lg-9">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header d-flex justify-content-between align-items-center">
+
+                    <span class="fw-semibold">
+                        Charge Types
+                    </span>
+
+@*                     <button class="btn btn-primary btn-sm"
+                            hx-get="/ChargeTypes/Form"
+                            hx-target="#dialog">
+                        + New Charge Type
+                    </button>
+ *@
+                </div>
+
+                <div class="card-body">
+
+                    <div id="chargeTypeGrid"
+                         hx-get="/ChargeTypes/List"
+                         hx-trigger="load">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Modal -->
+<div id="dialog"></div>
+
+
+<!-- Auto refresh grid -->
+<div hx-trigger="chargeTypeChanged from:body"
+     hx-get="/ChargeTypes/List"
+     hx-target="#chargeTypeGrid">
+</div>

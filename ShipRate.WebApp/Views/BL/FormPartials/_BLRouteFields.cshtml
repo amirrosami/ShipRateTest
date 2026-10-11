@@ -1,0 +1,146 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@using ShipRate.Application.DTOs.BillOfLadings
+@model BLUpsertDto
+
+@{
+    var lookups = ViewBag.Lookups as BLLookupDto;
+    var locations = lookups?.Locations ?? Enumerable.Empty<object>();
+}
+
+<div class="container-fluid px-0">
+
+    <div class="row mb-3">
+        <label asp-for="PORId" class="col-md-2 col-form-label">Place Of Receipt</label>
+
+        <div class="col-md-5">
+            <select asp-for="PORId"
+                    class="form-select js-copy-selected-text"
+                    data-target="PORText"
+                    asp-items="@(new SelectList(locations, "Id", "Name", Model.PORId))">
+                <option value="">Select POR</option>
+            </select>
+            <span asp-validation-for="PORId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-5">
+            <input asp-for="PORText" class="form-control" placeholder="POR Text" />
+            <span asp-validation-for="PORText" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="POLId" class="col-md-2 col-form-label">Port Of Loading</label>
+
+        <div class="col-md-5">
+            <select asp-for="POLId"
+                    class="form-select js-copy-selected-text"
+                    data-target="POLText"
+                    asp-items="@(new SelectList(locations, "Id", "Name", Model.POLId))">
+                <option value="">Select POL</option>
+            </select>
+            <span asp-validation-for="POLId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-5">
+            <input asp-for="POLText" class="form-control" placeholder="POL Text" />
+            <span asp-validation-for="POLText" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="PODId" class="col-md-2 col-form-label">Port Of Discharge</label>
+
+        <div class="col-md-5">
+            <select asp-for="PODId"
+                    class="form-select js-copy-selected-text"
+                    data-target="PODText"
+                    asp-items="@(new SelectList(locations, "Id", "Name", Model.PODId))">
+                <option value="">Select POD</option>
+            </select>
+            <span asp-validation-for="PODId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-5">
+            <input asp-for="PODText" class="form-control" placeholder="POD Text" />
+            <span asp-validation-for="PODText" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="PODelId" class="col-md-2 col-form-label">Place of Delivery</label>
+
+        <div class="col-md-5">
+            <select asp-for="PODelId"
+                    class="form-select js-copy-selected-text"
+                    data-target="PODelText"
+                    asp-items="@(new SelectList(locations, "Id", "Name", Model.PODelId))">
+                <option value="">Select Delivery</option>
+            </select>
+            <span asp-validation-for="PODelId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-5">
+            <input asp-for="PODelText" class="form-control" placeholder="Delivery Text" />
+            <span asp-validation-for="PODelText" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="FinalDestinationText" class="col-md-2 col-form-label">Final Destination</label>
+
+        <div class="col-md-10">
+            <input asp-for="FinalDestinationText" class="form-control" />
+            <span asp-validation-for="FinalDestinationText" class="text-danger"></span>
+        </div>
+    </div>
+
+</div>
+<script>
+    document.body.addEventListener("change", function (e) {
+        const select = e.target;
+
+        if (!select.classList.contains("js-copy-selected-text")) {
+            return;
+        }
+
+        const targetName = select.getAttribute("data-target");
+
+        if (!targetName) {
+            return;
+        }
+
+        const form = select.closest("form");
+        if (!form) {
+            return;
+        }
+
+        const targetInput =
+            form.querySelector(`[name="${targetName}"]`) ||
+            form.querySelector(`#${targetName}`);
+
+        if (!targetInput) {
+            return;
+        }
+
+        // اگر input جلو مقدار دارد، overwrite نکن
+        if (targetInput.value && targetInput.value.trim() !== "") {
+            return;
+        }
+
+        const selectedOption = select.options[select.selectedIndex];
+
+        if (!selectedOption) {
+            return;
+        }
+
+        const selectedValue = selectedOption.value;
+        const selectedText = selectedOption.text;
+
+        // اگر option پیش‌فرض انتخاب شده بود، چیزی ننویس
+        if (!selectedValue) {
+            return;
+        }
+
+        targetInput.value = selectedText;
+    });
+</script>

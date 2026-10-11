@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" TextQuality="Regular" ReportInfo.Created="07/10/2026 15:00:00" ReportInfo.Modified="09/14/2026 11:05:29" ReportInfo.CreatorVersion="2026.1.0.0">
+  <Dictionary>
+    <TableDataSource Name="Header" ReferenceName="RTSData.Header" DataType="System.Int32" Enabled="true">
+      <Column Name="Id" DataType="System.Guid"/>
+      <Column Name="RTSInstructionNo" DataType="System.String"/>
+      <Column Name="RTSInstructionDate" DataType="System.DateTime"/>
+      <Column Name="RTSInstructionLocalDate" DataType="System.String"/>
+      <Column Name="CarrierName" DataType="System.String"/>
+      <Column Name="CarrierLocalName" DataType="System.String"/>
+      <Column Name="ShipperName" DataType="System.String"/>
+      <Column Name="ShipperLocalName" DataType="System.String"/>
+      <Column Name="BookingNo" DataType="System.String"/>
+      <Column Name="OriginName" DataType="System.String"/>
+      <Column Name="POLName" DataType="System.String"/>
+      <Column Name="PODName" DataType="System.String"/>
+      <Column Name="DestName" DataType="System.String"/>
+      <Column Name="DepotName" DataType="System.String"/>
+      <Column Name="Remarks" DataType="System.String"/>
+      <Column Name="ReportFooterText" DataType="System.String"/>
+      <Column Name="PageFooterText" DataType="System.String"/>
+    </TableDataSource>
+    <TableDataSource Name="Containers" ReferenceName="RTSData.Containers" DataType="System.Int32" Enabled="true">
+      <Column Name="Id" DataType="System.Guid"/>
+      <Column Name="RTSInstructionId" DataType="System.Guid"/>
+      <Column Name="ContainerSizeTypeName" DataType="System.String"/>
+      <Column Name="ContainerCounts" DataType="System.Int32"/>
+      <Column Name="Remarks" DataType="System.String"/>
+    </TableDataSource>
+    <Total Name="TotalContainerCount" Expression="[Containers.ContainerCounts]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="444.15">
+      <TextObject Name="TextTitle" Left="274.05" Top="37.8" Width="255.15" Height="28.35" Text="نامه دستور تحویل کانتینر" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 12pt, style=Bold" TextFill.Color="MediumBlue"/>
+      <TextObject Name="LblNo" Left="132.3" Top="14.17" Width="94.5" Height="23.62" Text="شماره :" HorzAlign="Justify" VertAlign="Center" RightToLeft="true" Font="Tahoma, 9pt"/>
+      <TextObject Name="ValNo" Left="18.9" Top="14.17" Width="103.95" Height="23.62" Text="[Header.RTSInstructionNo]" HorzAlign="Right" VertAlign="Center" Font="Tahoma, 10pt"/>
+      <TextObject Name="LblDate" Left="132.3" Top="42.52" Width="94.5" Height="23.62" Text="تاریخ :" HorzAlign="Justify" VertAlign="Center" RightToLeft="true" Font="Tahoma, 9pt"/>
+      <TextObject Name="ValDate" Left="18.9" Top="42.52" Width="103.95" Height="23.62" Text="[Header.RTSInstructionLocalDate]" HorzAlign="Right" VertAlign="Center" Font="Tahoma, 10pt"/>
+      <TextObject Name="LblShipper" Left="595.35" Top="160.65" Width="103.95" Height="23.62" Text="تحویل گیرنده :" HorzAlign="Justify" VertAlign="Center" RightToLeft="true" Font="Tahoma, 9pt"/>
+      <TextObject Name="ValShipper" Left="132.3" Top="160.65" Width="453.6" Height="23.62" Text="[Header.ShipperLocalName]" HorzAlign="Justify" VertAlign="Center" RightToLeft="true" Font="Tahoma, 10pt" TextFill.Color="DarkBlue"/>
+      <PictureObject Name="CompanyLogo" Left="576.45" Top="18.9" Width="113.4" Height="85.05" Border.Lines="All"/>
+      <LineObject Name="Line1" Left="18.9" Top="113.4" Width="680.4" Border.Color="DimGray" Border.Width="0.5"/>
+      <TextObject Name="Text1" Left="595.35" Top="122.85" Width="103.95" Height="23.62" Text="دپوی تحویل :" HorzAlign="Justify" VertAlign="Center" RightToLeft="true" Font="Tahoma, 9pt"/>
+      <TextObject Name="Text2" Left="207.9" Top="122.85" Width="378" Height="18.9" Text="[Header.DepotName]" HorzAlign="Right" Font="Tahoma, 9pt" TextFill.Color="DarkBlue"/>
+      <TextObject Name="Text3" Left="595.35" Top="198.45" Width="103.95" Height="23.62" Text="مبدا بار:" HorzAlign="Justify" VertAlign="Center" RightToLeft="true" Font="Tahoma, 9pt"/>
+      <TextObject Name="Text4" Left="132.3" Top="198.45" Width="453.6" Height="23.62" Text="[Header.OriginName]" HorzAlign="Justify" VertAlign="Center" RightToLeft="true" Font="Tahoma, 10pt" TextFill.Color="DarkBlue"/>
+      <TextObject Name="Text5" Left="595.35" Top="236.25" Width="103.95" Height="23.62" Text="بندر بارگیری:" HorzAlign="Justify" VertAlign="Center" RightToLeft="true" Font="Tahoma, 9pt"/>
+      <TextObject Name="Text6" Left="132.3" Top="236.25" Width="453.6" Height="23.62" Text="[Header.POLName]" HorzAlign="Justify" VertAlign="Center" RightToLeft="true" Font="Tahoma, 10pt" TextFill.Color="DarkBlue"/>
+      <TextObject Name="Text7" Left="595.35" Top="264.6" Width="103.95" Height="23.62" Text="بندر تخلیه:" HorzAlign="Justify" VertAlign="Center" RightToLeft="true" Font="Tahoma, 9pt"/>
+      <TextObject Name="Text8" Left="132.3" Top="264.6" Width="453.6" Height="23.62" Text="[Header.PODName]" HorzAlign="Justify" VertAlign="Center" RightToLeft="true" Font="Tahoma, 10pt" TextFill.Color="DarkBlue"/>
+      <TextObject Name="Text9" Left="595.35" Top="292.95" Width="103.95" Height="23.62" Text="مقصد نهایی:" HorzAlign="Justify" VertAlign="Center" RightToLeft="true" Font="Tahoma, 9pt"/>
+      <TextObject Name="Text10" Left="132.3" Top="292.95" Width="453.6" Height="23.62" Text="[Header.DestName]" HorzAlign="Justify" VertAlign="Center" RightToLeft="true" Font="Tahoma, 10pt" TextFill.Color="DarkBlue"/>
+      <TextObject Name="Text11" Left="623.7" Top="387.45" Width="75.6" Height="23.62" Text="توضیحات:" HorzAlign="Justify" VertAlign="Center" RightToLeft="true" Font="Tahoma, 9pt"/>
+      <TextObject Name="Text12" Left="18.9" Top="378" Width="576.45" Height="56.7" CanGrow="true" Text="[Header.Remarks]" HorzAlign="Right" Font="Tahoma, 9pt" TextFill.Color="DarkBlue"/>
+      <TextObject Name="Text13" Left="113.4" Top="70.87" Width="113.4" Height="23.62" Text="شماره بوکینگ :" HorzAlign="Justify" VertAlign="Center" RightToLeft="true" Font="Tahoma, 9pt"/>
+      <TextObject Name="Text14" Left="18.9" Top="75.6" Width="103.95" Height="18.9" Text="[Header.BookingNo]" HorzAlign="Right" Font="Tahoma, 9pt" TextFill.Color="DarkBlue"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="448.15" Width="718.2" Height="28.35">
+      <TextObject Name="Hdr1" Left="642.6" Width="66.15" Height="28.35" Border.Lines="All" Fill.Color="Gainsboro" Text="ردیف" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 9pt, style=Bold"/>
+      <TextObject Name="Hdr2" Left="425.25" Width="217.35" Height="28.35" Border.Lines="All" Fill.Color="Gainsboro" Text="نوع کانتینر" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 9pt, style=Bold"/>
+      <TextObject Name="Hdr3" Left="311.85" Width="113.4" Height="28.35" Border.Lines="All" Fill.Color="Gainsboro" Text="تعداد" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 9pt, style=Bold"/>
+      <TextObject Name="Hdr4" Left="9.45" Width="302.4" Height="28.35" Border.Lines="All" Fill.Color="Gainsboro" Text="توضیحات" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 9pt, style=Bold"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="480.5" Width="718.2" Height="24.57" DataSource="Containers">
+      <TextObject Name="RowNo" Left="642.6" Width="66.15" Height="24.57" Border.Lines="All" Text="[Row#]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 9pt"/>
+      <TextObject Name="ContainerType" Left="425.25" Width="217.35" Height="24.57" Border.Lines="All" Text="[Containers.ContainerSizeTypeName]" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 9pt"/>
+      <TextObject Name="ContainerCount" Left="311.85" Width="113.4" Height="24.57" Border.Lines="All" Text="[Containers.ContainerCounts]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 9pt"/>
+      <TextObject Name="ContainerRemarks" Left="9.45" Width="302.4" Height="24.57" Border.Lines="All" CanGrow="true" Text="[Containers.Remarks]" Padding="4, 2, 4, 2" HorzAlign="Right" VertAlign="Center" RightToLeft="true" Font="Tahoma, 9pt"/>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="509.07" Width="718.2" Height="226.8">
+      <TextObject Name="SumLabel" Left="425.25" Top="9.45" Width="217.35" Height="24.57" Border.Lines="All" Fill.Color="Gainsboro" Text="جمع کل تعداد کانتینر" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 9pt, style=Bold"/>
+      <TextObject Name="SumValue" Left="311.85" Top="9.45" Width="113.4" Height="24.57" Border.Lines="All" Text="[TotalContainerCount]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 9pt, style=Bold"/>
+      <TextObject Name="SignText1" Left="519.75" Top="154.98" Width="170.1" Height="18.9" Text="امضاء و مهر مسئول مربوطه" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 9pt"/>
+      <TextObject Name="SignText2" Left="85.05" Top="154.98" Width="170.1" Height="18.9" Text="امضاء تحویل گیرنده" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 9pt"/>
+      <TextObject Name="Text15" Left="18.9" Top="103.95" Width="670.95" Height="37.8" CanGrow="true" Text="[Header.ReportFooterText]" HorzAlign="Right" Font="Tahoma, 9pt"/>
+    </ReportSummaryBand>
+    <PageFooterBand Name="PageFooter1" Top="739.87" Width="718.2" Height="28.35" PrintOnBottom="true">
+      <LineObject Name="Line2" Width="718.2" Border.Color="DimGray" Border.Width="0.5"/>
+      <TextObject Name="Text16" Left="9.45" Top="9.45" Width="699.3" Height="18.9" Text="[Header.PageFooterText]" HorzAlign="Right" Font="Arial, 10pt"/>
+    </PageFooterBand>
+    <OverlayBand Name="Overlay1" Top="772.22" Width="718.2" Height="1028.15">
+      <ShapeObject Name="PageBorderBox" Top="9.45" Width="718.2" Height="1018.7" Border.Color="DimGray" Border.Width="0.5"/>
+    </OverlayBand>
+  </ReportPage>
+</Report>

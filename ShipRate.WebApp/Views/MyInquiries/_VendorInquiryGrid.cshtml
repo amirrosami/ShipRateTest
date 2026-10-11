@@ -1,0 +1,150 @@
+﻿@using ShipRate.Application.ViewModels
+@model List<VendorInquiryRowVm>
+
+<style>
+    /* استایل اختصاصی برای جدول‌های کامپکت */
+    .table-compact {
+        font-size: 14px !important;
+    }
+
+        .table-compact th {
+            padding: 0.5rem !important;
+            font-weight: 600;
+            background-color: #f8f9fa;
+        }
+
+        .table-compact td {
+            padding: 0.4rem 0.5rem !important;
+            vertical-align: middle;
+        }
+    /* یکسان‌سازی دکمه‌ها */
+    .btn-table {
+        padding: 0.2rem 0.5rem;
+        font-size: 12px;
+        line-height: 1.2;
+    }
+</style>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="p-3">
+        <div class="alert alert-info py-2 mb-0 small">
+            No inquiries found.
+        </div>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered table-striped table-sm table-compact mb-0">
+            <thead>
+                <tr>
+                    <th>Inquiry No</th>
+                    <th>Date</th>
+                    <th>Origin</th>
+                    <th>Destination</th>
+                    <th>Cargo</th>
+                    <th>Weight</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Responses</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var badgeClass = item.Status switch
+                    {
+                        "Sent" => "bg-primary",
+                        "Responded" => "bg-success",
+                        "Rejected" => "bg-danger",
+                        _ => "bg-secondary"
+                    };
+
+                    <tr data-inquiry-id="@item.Id">
+                        <td class="fw-bold">@item.InquiryNo</td>
+                        <td class="text-nowrap">@item.InquiryDate.ToString("yyyy/MM/dd HH:mm")</td>
+                        <td>@item.Origin</td>
+                        <td>@item.Destination</td>
+                        <td>@item.CargoType</td>
+                        <td>@(item.Weight.HasValue? item.Weight.Value.ToString("N2") : "-")</td>
+
+                        <td class="text-center">
+                            <span class="badge @badgeClass rounded-pill" style="font-size: 11px;">
+                                @item.Status
+                            </span>
+                        </td>
+
+                        <td class="text-center">
+                            <span class="badge bg-light text-dark border rounded-pill">
+                                @item.ResponseCount
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="d-flex gap-1 flex-wrap">
+                                <button type="button" class="btn btn-outline-secondary btn-table" onclick="previewInquiryEmail('@item.Id')">
+                                    Preview
+                                </button>
+
+                                <button type="button" class="btn btn-outline-primary btn-table"
+                                        hx-get="@Url.Action("QuoteResponses", "MyInquiries", new { inquiryId = item.Id })"
+                                        hx-target="#vendorQuoteResponseGrid"
+                                        hx-swap="innerHTML"
+                                        onclick="markSelectedInquiry(this, '@item.Id')">
+                                    <i class="bi bi-list-ul"></i> Resps.
+                                </button>
+
+                                <button type="button" class="btn btn-success btn-table"
+                                        hx-get="@Url.Action("SubmitQuote", "MyInquiries", new { inquiryId = item.Id })"
+                                        hx-target="#quoteModalContent"
+                                        hx-swap="innerHTML"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#quoteModal">
+                                    <i class="bi bi-plus-circle"></i> Add
+                                </button>
+
+                                <button type="button" class="btn btn-outline-danger btn-table"
+                                        hx-get="@Url.Action("RejectInquiry", "MyInquiries", new { inquiryId = item.Id })"
+                                        hx-target="#quoteModalContent"
+                                        hx-swap="innerHTML"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#quoteModal">
+                                    <i class="bi bi-x-circle"></i> Reject
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+
+<script>
+    function markSelectedInquiry(btn, inquiryId) {
+        document.querySelectorAll('[data-selected-inquiry="true"]').forEach(function (x) {
+            x.removeAttribute('data-selected-inquiry');
+            x.classList.remove('table-active');
+        });
+
+        const row = btn.closest('tr');
+
+        if (row) {
+            row.setAttribute('data-selected-inquiry', 'true');
+            row.dataset.inquiryId = inquiryId;
+            row.classList.add('table-active');
+        }
+    }
+
+    function previewInquiryEmail(inquiryId) {
+        const iframe = document.getElementById('emailPreviewFrame');
+        iframe.src = '/MyInquiries/PreviewInquiryEmailFromService?inquiryId=' + inquiryId;
+        const modalElement = document.getElementById('emailPreviewModal');
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+    }
+</script>
+
+

@@ -1,0 +1,67 @@
+﻿@using ShipRate.Application.DTOs.Messaging
+@model IReadOnlyList<MessagingParticipantDto>
+
+<div class="sky-card participants-card">
+    <div class="sky-card-header">
+        <span>Participants</span>
+        <span class="participants-count">@(Model?.Count ?? 0)</span>
+    </div>
+
+    <div class="sky-card-body p-0">
+        @if (Model is null || !Model.Any())
+        {
+            <div class="participants-empty">
+                <div class="participants-empty-icon">👥</div>
+                <div class="participants-empty-title">No participant</div>
+                <div class="participants-empty-text">
+                    No users have been added to this conversation yet.
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="participants-list">
+                @foreach (var participant in Model)
+                {
+                    var displayName = string.IsNullOrWhiteSpace(participant.UserDisplayName)
+                    ? "Unknown User"
+                    : participant.UserDisplayName;
+
+                    var initial = displayName.Substring(0, 1).ToUpper();
+
+                    <div class="participant-item">
+                        <div class="participant-main">
+
+
+
+                            @if (participant.hasProfilePicture)
+                            {
+                                <div class="user-avatar user-avatar-photo">
+                                    <img src="@Url.Action("UserPhoto", "UserManagement", new { id = participant.UserId })"
+                                         alt="@displayName" />
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="user-avatar">@initial</div>
+                            }
+
+@*                             <div class="participant-avatar">
+                                @initial
+                            </div>
+ *@
+                            <div class="participant-meta">
+                                <div class="participant-name">@displayName</div>
+                                <div class="participant-subtitle">Conversation member</div>
+                            </div>
+                        </div>
+
+                        <span class="participant-status-badge">
+                            Active
+                        </span>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

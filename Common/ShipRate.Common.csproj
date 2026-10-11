@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<NoWarn>$(NoWarn);NU1608</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="FastReport.OpenSource" Version="2026.2.1" />
+		<PackageReference Include="FastReport.OpenSource.Export.PdfSimple" Version="2026.2.1" />
+		<PackageReference Include="FastReport.OpenSource.Web" Version="2026.1.3" />
+		<PackageReference Include="IPE.SmsIr" Version="1.2.7" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
+		<PackageReference Include="TaxCollectData.Library" Version="2.0.23" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Application\" />
+	</ItemGroup>
+
+</Project>

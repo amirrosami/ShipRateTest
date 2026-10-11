@@ -1,0 +1,112 @@
+﻿@{
+    ViewData["Title"] = "Base Info Hub";
+}
+
+<style>
+    .hub-section-title {
+        font-weight: 700;
+        color: #24292f;
+        margin: 1.5rem 0 1rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #e1e4e8;
+    }
+
+    .hub-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px;
+        background: #ffffff;
+        border: 1px solid #d1d9e0;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #1f2328;
+        transition: all 0.2s ease;
+    }
+
+        .hub-card:hover {
+            border-color: #0969da;
+            box-shadow: 0 2px 6px rgba(9,105,218,0.1);
+            transform: translateY(-2px);
+        }
+
+    .hub-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f0f7ff;
+        color: #0969da;
+        border-radius: 6px;
+        flex-shrink: 0;
+        font-size: 1.2rem;
+    }
+
+    .hub-title {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+    }
+
+    .hub-desc {
+        font-size: 0.8rem;
+        color: #656d76;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .hub-arrow {
+        margin-left: auto;
+        color: #adb5bd;
+        align-self: center;
+    }
+</style>
+
+<div class="container-fluid py-3">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <div>
+            <h5 class="fw-bold mb-1"><i class="bi bi-box-seam text-primary me-2"></i>Base Information Management</h5>
+            <span class="text-muted small">Manage master entities, locations, logistics assets, and classifications</span>
+        </div>
+        <span class="badge bg-light text-secondary border">Base Master Data</span>
+    </div>
+
+    <!-- Main Layout: Side-by-Side Sections -->
+    <div class="row g-4">
+
+        <!-- Column 1: Parties & Geography -->
+        <div class="col-lg-6">
+            <div class="hub-section-title"><i class="bi bi-geo-alt"></i> Parties, Ports & Geography</div>
+            <div class="row g-3">
+                <div class="col-12"><auth-policy policy="BaseInfo.Persons.View"><a asp-controller="Persons" asp-action="Index" class="hub-card"><div class="hub-icon"><i class="bi bi-people"></i></div><div><div class="hub-title">Organizations & Persons</div><p class="hub-desc">Manage customers, forwarders, shipping lines, and contacts.</p></div><i class="bi bi-chevron-right hub-arrow"></i></a></auth-policy></div>
+                <div class="col-12"><auth-policy policy="BaseInfo.Locations.View"><a asp-controller="Locations" asp-action="Index" class="hub-card"><div class="hub-icon"><i class="bi bi-pin-map"></i></div><div><div class="hub-title">Locations & Ports</div><p class="hub-desc">Ports, dry ports, customs borders, and terminals.</p></div><i class="bi bi-chevron-right hub-arrow"></i></a></auth-policy></div>
+                <div class="col-12"><auth-policy policy="BaseInfo.Territories.View"><a asp-controller="Territory" asp-action="Index" class="hub-card"><div class="hub-icon"><i class="bi bi-map"></i></div><div><div class="hub-title">Territories</div><p class="hub-desc">Geographical operational zones and regional divisions.</p></div><i class="bi bi-chevron-right hub-arrow"></i></a></auth-policy></div>
+                <div class="col-12"><auth-policy policy="BaseInfo.Banks.View"><a asp-controller="Banks" asp-action="Index" class="hub-card"><div class="hub-icon"><i class="bi bi-bank"></i></div><div><div class="hub-title">Banks & Accounts</div><p class="hub-desc">Commercial banking branches and payment gateways.</p></div><i class="bi bi-chevron-right hub-arrow"></i></a></auth-policy></div>
+                <div class="col-12"><auth-policy policy="BaseInfo.Vessels.View"><a asp-controller="Vessels" asp-action="Index" class="hub-card"><div class="hub-icon"><i class="bi bi-water"></i></div><div><div class="hub-title">Vessels</div><p class="hub-desc">Manage ships, IMO numbers, call signs, and flag states.</p></div><i class="bi bi-chevron-right hub-arrow"></i></a></auth-policy></div>
+            </div>
+        </div>
+
+        <!-- Column 2: Cargo & Classifications (Moved to Right) -->
+        <div class="col-lg-6">
+            <div class="hub-section-title"><i class="bi bi-boxes"></i> Cargo, Units & Classifications</div>
+            <div class="row g-3">
+                <div class="col-12"><auth-policy policy="BaseInfo.PackageTypes.View"><a asp-controller="PackageTypes" asp-action="Index" class="hub-card"><div class="hub-icon"><i class="bi bi-box2"></i></div><div><div class="hub-title">Package Types</div><p class="hub-desc">ISO standard packaging codes (Pallet, Drum, Carton, etc.).</p></div><i class="bi bi-chevron-right hub-arrow"></i></a></auth-policy></div>
+                <div class="col-12"><auth-policy policy="BaseInfo.CargoCommodities.View"><a asp-controller="CargoCommodity" asp-action="Index" class="hub-card"><div class="hub-icon"><i class="bi bi-basket"></i></div><div><div class="hub-title">Cargo Commodity</div><p class="hub-desc">Commodity classes, nature of cargo, and handling terms.</p></div><i class="bi bi-chevron-right hub-arrow"></i></a></auth-policy></div>
+                <div class="col-12"><auth-policy policy="BaseInfo.HSCodes.View"><a asp-controller="HSCodes" asp-action="Index" class="hub-card"><div class="hub-icon"><i class="bi bi-upc-scan"></i></div><div><div class="hub-title">HS Codes</div><p class="hub-desc">Harmonized tariff classification numbers.</p></div><i class="bi bi-chevron-right hub-arrow"></i></a></auth-policy></div>
+                <div class="col-12"><auth-policy policy="BaseInfo.DGs.View"><a asp-controller="DGs" asp-action="Index" class="hub-card"><div class="hub-icon"><i class="bi bi-exclamation-triangle"></i></div><div><div class="hub-title">Dangerous Goods (DG)</div><p class="hub-desc">IMO classes, UN codes, and hazmat handling regulations.</p></div><i class="bi bi-chevron-right hub-arrow"></i></a></auth-policy></div>
+                <div class="col-12"><auth-policy policy="BaseInfo.MeasurementUnits.View"><a asp-controller="MeasurementUnits" asp-action="Index" class="hub-card"><div class="hub-icon"><i class="bi bi-rulers"></i></div><div><div class="hub-title">Measurement Units</div><p class="hub-desc">Weight (kg, mt), Volume (cbm), and Container standards.</p></div><i class="bi bi-chevron-right hub-arrow"></i></a></auth-policy></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Section: Workflow Rules -->
+    <div class="hub-section-title mt-5"><i class="bi bi-sliders"></i> Document Rules & Workflow Types</div>
+    <div class="row g-3">
+        <div class="col-md-6 col-xl-4"><auth-policy policy="BaseInfo.DocumentTypes.View"><a asp-controller="DocumentTypes" asp-action="Index" class="hub-card"><div class="hub-icon"><i class="bi bi-file-earmark-text"></i></div><div><div class="hub-title">Document Types</div><p class="hub-desc">Configure system document categories.</p></div><i class="bi bi-chevron-right hub-arrow"></i></a></auth-policy></div>
+        <div class="col-md-6 col-xl-4"><auth-policy policy="BaseInfo.DocumentTypes.View"><a asp-controller="DocumentTypeObjectTypes" asp-action="Index" class="hub-card"><div class="hub-icon"><i class="bi bi-diagram-2"></i></div><div><div class="hub-title">Type Allocations</div><p class="hub-desc">Map documents to business entities (BL, Job).</p></div><i class="bi bi-chevron-right hub-arrow"></i></a></auth-policy></div>
+        <div class="col-md-6 col-xl-4"><auth-policy policy="BaseInfo.TaskTypes.View"><a asp-controller="TaskManagement" asp-action="Index" class="hub-card"><div class="hub-icon"><i class="bi bi-check2-square"></i></div><div><div class="hub-title">Task Types</div><p class="hub-desc">Define operational action steps and workflow tasks.</p></div><i class="bi bi-chevron-right hub-arrow"></i></a></auth-policy></div>
+        <div class="col-md-6 col-xl-4"><auth-policy policy="BaseInfo.EventTypes.View"><a asp-controller="EventTypes" asp-action="Index" class="hub-card"><div class="hub-icon"><i class="bi bi-calendar-event"></i></div><div><div class="hub-title">Event Types</div><p class="hub-desc">Operational timeline milestones and triggers.</p></div><i class="bi bi-chevron-right hub-arrow"></i></a></auth-policy></div>
+        <div class="col-md-6 col-xl-4"><auth-policy policy="BaseInfo.BlackListReasons.View"><a asp-controller="BlackListReason" asp-action="Index" class="hub-card"><div class="hub-icon"><i class="bi bi-slash-circle"></i></div><div><div class="hub-title">Black List Reasons</div><p class="hub-desc">Risk definitions and restriction clauses.</p></div><i class="bi bi-chevron-right hub-arrow"></i></a></auth-policy></div>
+    </div>
+</div>

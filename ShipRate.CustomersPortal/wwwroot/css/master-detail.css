@@ -1,0 +1,434 @@
+﻿/* wwwroot/css/master-detail.css */
+
+/* ============================
+   CSS Variables
+   ============================ */
+:root {
+    --md-primary: #3b82f6;
+    --md-primary-hover: #2563eb;
+    --md-danger: #ef4444;
+    --md-danger-hover: #dc2626;
+    --md-success: #10b981;
+    --md-warning: #f59e0b;
+    --md-border: #d1d5db;
+    --md-border-focus: #3b82f6;
+    --md-bg: #ffffff;
+    --md-bg-alt: #f9fafb;
+    --md-bg-header: #f3f4f6;
+    --md-text: #111827;
+    --md-text-muted: #6b7280;
+    --md-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --md-shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --md-radius: 8px;
+    --md-radius-sm: 4px;
+    --md-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ============================
+   Form Container
+   ============================ */
+.md-form {
+    font-family: var(--md-font);
+    max-width: 1200px;
+    margin: 0 auto;
+    color: var(--md-text);
+}
+
+.md-form-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--md-bg-header);
+}
+
+.md-form-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--md-text);
+}
+
+/* ============================
+   Validation Summary
+   ============================ */
+.md-validation-summary {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-left: 4px solid var(--md-danger);
+    border-radius: var(--md-radius-sm);
+    padding: 12px 16px;
+    margin-bottom: 20px;
+}
+
+    .md-validation-summary ul {
+        margin: 0;
+        padding: 0 0 0 20px;
+        color: #991b1b;
+        font-size: 0.875rem;
+    }
+
+    .md-validation-summary li {
+        margin-bottom: 4px;
+    }
+
+/* ============================
+   Sections
+   ============================ */
+.md-master-section,
+.md-detail-section {
+    background: var(--md-bg);
+    border: 1px solid var(--md-border);
+    border-radius: var(--md-radius);
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: var(--md-shadow);
+}
+
+.md-section-header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--md-border);
+}
+
+.md-section-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--md-text);
+}
+
+.md-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ============================
+   Grid System for Master Fields
+   ============================ */
+.md-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.md-grid-1 {
+    grid-template-columns: 1fr;
+}
+
+.md-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.md-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.md-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.md-col-span-2 {
+    grid-column: span 2;
+}
+
+.md-col-span-3 {
+    grid-column: span 3;
+}
+
+.md-col-span-4 {
+    grid-column: span 4;
+}
+
+@media (max-width: 768px) {
+    .md-grid-2, .md-grid-3, .md-grid-4 {
+        grid-template-columns: 1fr;
+    }
+
+    .md-col-span-2, .md-col-span-3, .md-col-span-4 {
+        grid-column: span 1;
+    }
+}
+
+/* ============================
+   Field Groups
+   ============================ */
+.md-field-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.md-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--md-text);
+    margin-bottom: 6px;
+}
+
+.md-required {
+    color: var(--md-danger);
+    font-weight: 700;
+}
+
+.md-help-text {
+    font-size: 0.75rem;
+    color: var(--md-text-muted);
+    margin-top: 4px;
+}
+
+/* ============================
+   Inputs
+   ============================ */
+.md-input {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 0.875rem;
+    font-family: var(--md-font);
+    border: 1px solid var(--md-border);
+    border-radius: var(--md-radius-sm);
+    background: var(--md-bg);
+    color: var(--md-text);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+    .md-input:focus {
+        outline: none;
+        border-color: var(--md-border-focus);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+.md-input-error {
+    border-color: var(--md-danger) !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+}
+
+.md-readonly {
+    background-color: var(--md-bg-alt);
+    cursor: default;
+}
+
+.md-textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.md-select {
+    appearance: auto;
+}
+
+.md-checkbox-wrapper {
+    padding-top: 4px;
+}
+
+.md-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.md-field-validation {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--md-danger);
+    min-height: 18px;
+    margin-top: 2px;
+}
+
+/* ============================
+   Detail Table
+   ============================ */
+.md-table-responsive {
+    overflow-x: auto;
+    margin-top: 8px;
+}
+
+.md-detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+    .md-detail-table thead {
+        background-color: var(--md-bg-header);
+    }
+
+    .md-detail-table th {
+        padding: 10px 12px;
+        text-align: left;
+        font-weight: 600;
+        color: var(--md-text);
+        border-bottom: 2px solid var(--md-border);
+        white-space: nowrap;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .md-detail-table td {
+        padding: 6px 8px;
+        border-bottom: 1px solid #e5e7eb;
+        vertical-align: middle;
+    }
+
+.md-detail-row:hover {
+    background-color: #f8fafc;
+}
+
+.md-detail-row .md-input {
+    padding: 6px 8px;
+    font-size: 0.8rem;
+}
+
+.md-th-row-num {
+    width: 40px;
+    text-align: center;
+}
+
+.md-row-number {
+    text-align: center;
+    font-weight: 600;
+    color: var(--md-text-muted);
+    font-size: 0.8rem;
+}
+
+.md-th-actions {
+    width: 60px;
+    text-align: center;
+}
+
+.md-cell-actions {
+    text-align: center;
+}
+
+/* Footer totals */
+.md-detail-footer {
+    background-color: var(--md-bg-header);
+    font-weight: 600;
+}
+
+    .md-detail-footer td {
+        padding: 10px 12px;
+        border-top: 2px solid var(--md-border);
+    }
+
+.md-total-label {
+    text-align: right;
+}
+
+/* ============================
+   Buttons
+   ============================ */
+.md-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: var(--md-font);
+    border: none;
+    border-radius: var(--md-radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    gap: 6px;
+}
+
+    .md-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--md-shadow);
+    }
+
+.md-btn-primary {
+    background-color: var(--md-primary);
+    color: white;
+}
+
+    .md-btn-primary:hover {
+        background-color: var(--md-primary-hover);
+    }
+
+.md-btn-secondary {
+    background-color: #6b7280;
+    color: white;
+}
+
+    .md-btn-secondary:hover {
+        background-color: #4b5563;
+    }
+
+.md-btn-danger {
+    background-color: var(--md-danger);
+    color: white;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    border-radius: 3px;
+}
+
+    .md-btn-danger:hover {
+        background-color: var(--md-danger-hover);
+    }
+
+.md-btn-add {
+    background-color: var(--md-success);
+    color: white;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+}
+
+    .md-btn-add:hover {
+        background-color: #059669;
+    }
+
+.md-btn-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ============================
+   Form Actions
+   ============================ */
+.md-form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--md-border);
+}
+
+/* ============================
+   Notification
+   ============================ */
+@keyframes mdSlideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.md-notification {
+    box-shadow: var(--md-shadow-lg);
+    font-family: var(--md-font);
+    font-size: 0.875rem;
+}
+
+/* ============================
+   Loading State
+   ============================ */
+.md-form.md-loading .md-btn-text {
+    display: none;
+}
+
+.md-form.md-loading .md-btn-loading {
+    display: inline !important;
+}
+
+.md-form.md-loading .md-btn-primary {
+    opacity: 0.7;
+    pointer-events: none;
+}

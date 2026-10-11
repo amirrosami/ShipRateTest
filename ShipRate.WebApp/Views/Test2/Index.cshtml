@@ -1,0 +1,64 @@
+﻿@model PagedResult<TestCreateEditVM>
+@using ShipRate.WebApp.Controllers
+@using ShipRate.WebApp.ViewModels
+<button class="btn btn-primary"
+        hx-get="@Url.Action("Create", "Test2")"
+        hx-target="#app-modal-content"
+        hx-swap="innerHTML">
+
+    Create
+
+</button>
+
+
+@await Html.PartialAsync(
+"_GridFilters",
+    new GridFilterViewModel
+    {
+        Page = Model.Page,
+        PageSize = Model.PageSize,
+        SearchTerm = Model.SearchTerm,
+        SortColumn = Model.SortColumn,
+        SortDirection = Model.SortDirection,
+        ListUrl = Url.Action("List", "Test2"),
+        CustomFilterPartial = "_TestCustomFilters",
+        CustomFilterValues = Model.CustomFilterValues,
+    }
+)
+
+<div id="table-container"
+     hx-post="@Url.Action("List", "Test2")"
+     hx-trigger="load, GridChanged from:body"
+     hx-swap="innerHTML"
+     hx-include="#grid-filters, #table-sort-info">
+</div>
+
+
+<div id="detail-container" class="mt-5"
+     hx-get="@Url.Action("DetailList", "Test2")"
+     hx-trigger="DetailChanged from:body"
+     hx-target="#detail-container"
+     hx-swap="innerHTML"
+     hx-include="#detail-container">
+</div>
+
+
+
+@* <button class="btn btn-sm btn-outline-primary"
+        hx-get="@Url.Action("Edit", "DGs", new { id = item.Id })"
+        hx-target="#app-modal-content"
+        hx-swap="innerHTML">
+
+    Edit
+
+</button>
+
+
+<button class="btn btn-sm btn-outline-danger"
+        hx-get="@Url.Action("Delete", "DGs", new { id = item.Id })"
+        hx-target="#app-modal-content"
+        hx-swap="innerHTML">
+
+    Delete
+
+</button> *@

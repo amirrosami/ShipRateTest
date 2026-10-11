@@ -1,0 +1,37 @@
+﻿
+@using Microsoft.Extensions.Localization
+@using ShipRate.Application.ViewModels
+@using ShipRate.WebAppCustomers
+@using System.Globalization
+@model CargoDetailFormVm
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    var isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var direction = isRtl ? "rtl" : "ltr";
+    var textAlign = isRtl ? "text-end" : "text-start";
+}
+
+            <form asp-action="Create"
+                  dir="@direction"
+                  asp-controller="CargoDetails"
+                  method="post"
+                  hx-post="@Url.Action("Create", "CargoDetails")"
+                  hx-target="#cargoDetailsPanel"
+                  hx-swap="outerHTML">
+
+                @Html.AntiForgeryToken()
+
+                @await Html.PartialAsync("~/Views/CargoDetails/_CargoDetailFormFields.cshtml", Model)
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        @(isRtl ? "بستن" : "Close")
+                    </button>
+
+                    <button type="submit" class="btn btn-primary">
+                        @(isRtl ? "ذخیره" : "Save")
+                    </button>
+                </div>
+
+            </form>

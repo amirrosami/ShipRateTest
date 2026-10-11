@@ -1,0 +1,38 @@
+﻿@using ShipRate.Application.DTOs.Notif
+@model List<SelectListItemDto>
+
+<label class="form-label">Users</label>
+
+@if (Model == null || !Model.Any())
+{
+    <select name="SelectedUserIds"
+            class="form-select"
+            multiple
+            size="8"
+            disabled>
+    </select>
+
+    <div class="form-text">
+        Select a user type to load users.
+    </div>
+}
+else
+{
+    <select name="SelectedUserIds"
+            class="form-select"
+            multiple
+            size="8"
+            required>
+        @foreach (var item in Model)
+        {
+            <option value="@item.Value"
+                    selected="@item.Selected">
+                @item.Text
+            </option>
+        }
+    </select>
+
+    <div class="form-text">
+        Hold Ctrl to select multiple users.
+    </div>
+}

@@ -1,0 +1,67 @@
+﻿@using ShipRate.Application.DTOs
+@model List<BLSerialSeriesListItemDto>
+
+<table class="table table-sm table-hover align-middle">
+    <thead class="table-light">
+        <tr>
+            <th>Series Code</th>
+            <th>Series Name</th>
+            <th>Carrier BL Type</th>
+            <th>Prefix</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Issue Date</th>
+            <th>Active</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr hx-get="@Url.Action("BatchAssignGrid", new { seriesId = item.Id })"
+                    hx-target="#batchAssignGridContainer"
+                    hx-swap="innerHTML"
+                    hx-trigger="click"
+                    hx-vals='{"seriesId": "@item.Id"}'
+                    hx-on::after-request="htmx.ajax('GET', '@Url.Action("SerialGrid")?seriesId=@item.Id', '#serialGridContainer')">
+                    <td>@item.SeriesCode</td>
+                    <td>@item.SeriesName</td>
+                    <td>@item.CarrierBLTypeName</td>
+                    <td>@item.Prefix</td>
+                    <td>@item.FromNumber</td>
+                    <td>@item.ToNumber</td>
+                    <td>@item.IssueDate.ToString("yyyy-MM-dd")</td>
+                    <td>@(item.IsActive ? "Yes" : "No")</td>
+                    <td style="white-space:nowrap;">
+                        <button class="btn btn-sm btn-outline-primary"
+                                hx-get="@Url.Action("EditSeries", new { id = item.Id })"
+                                hx-target="#modalContainer"
+                                hx-swap="innerHTML"
+                                title="Edit">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger"
+                                hx-get="@Url.Action("DeleteSeries", new { id = item.Id })"
+                                hx-target="#modalContainer"
+                                hx-swap="innerHTML"
+                                title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary"
+                                title="Details">
+                            <i class="bi bi-info-circle"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="9" class="text-center">No data</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,47 @@
+﻿@model PagedResult<BankDto>
+@using ShipRate.Application.DTOs.Base_Info
+@using ShipRate.WebApp.ViewModels
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0"><i class="bi bi-box-seam me-2"></i>Banks</h2>
+        <small class="text-muted"></small>
+    </div>
+    <button type="button"
+            class="btn btn-primary"
+            hx-get="@Url.Action("Create", "Banks")"
+            hx-target="#app-modal-content"
+            hx-swap="innerHTML">
+        <i class="bi bi-plus-lg me-1"></i>New
+    </button>
+</div>
+
+@await Html.PartialAsync(
+"_GridFilters",
+    new GridFilterViewModel
+    {
+        Page = Model.Page,
+        PageSize = Model.PageSize,
+        SearchTerm = Model.SearchTerm,
+        SortColumn = Model.SortColumn,
+        SortDirection = Model.SortDirection,
+        ListUrl = Url.Action("List", "Banks"),
+        CustomFilterPartial = "_CustomFilters",
+        CustomFilterValues = Model.CustomFilterValues,
+    }
+)
+
+
+
+
+<div id="table-container"
+     hx-post="@Url.Action("List", "Banks")"
+     hx-trigger="load, GridChanged from:body"
+     hx-swap="innerHTML"
+     hx-include="#grid-filters, #table-sort-info">
+</div>
+
+
+
+
+

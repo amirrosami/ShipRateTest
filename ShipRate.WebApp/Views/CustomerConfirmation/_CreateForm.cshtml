@@ -1,0 +1,79 @@
+﻿@using ShipRate.WebApp.ViewModels.CustomersVms
+@model CustomerConfirmationCreateViewModel
+
+<form hx-post="/CustomerConfirmation/Create"
+      hx-target="#listContainer"
+      hx-swap="innerHTML">
+
+    @Html.AntiForgeryToken()
+
+    <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+            <i class="bi bi-plus-circle"></i> New Confirmation Request
+        </h5>
+        <button type="button" class="btn-close btn-close-white" onclick="closeModal()"></button>
+    </div>
+
+    <div class="modal-body">
+
+        <!-- Person Search -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold">
+                Person <span class="text-danger">*</span>
+            </label>
+
+            <input type="hidden" id="personIdHidden" name="PersonId"
+                   value="@Model.PersonId" />
+
+            <div class="position-relative">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" id="personSearchInput"
+                           class="form-control form-control-sm"
+                           placeholder="Type to search person..."
+                           autocomplete="off" />
+                </div>
+
+                <ul id="personDropdown"
+                    class="dropdown-menu w-100 shadow"
+                    style="max-height: 200px; overflow-y: auto;">
+                </ul>
+            </div>
+
+            <div id="selectedPersonBadge"
+                 class="mt-2 @(Model.PersonId.HasValue ? "" : "d-none")">
+                <span class="badge bg-primary">
+                    <i class="bi bi-person"></i>
+                    <span id="selectedPersonName">@Model.PersonName</span>
+                    <button type="button" id="clearPersonBtn"
+                            class="btn-close btn-close-white btn-sm ms-2"
+                            style="font-size:8px;"></button>
+                </span>
+            </div>
+
+            @Html.ValidationMessageFor(m => m.PersonId, "", new { @class = "text-danger small" })
+        </div>
+
+        <!-- Remarks -->
+        <div class="mb-2">
+            <label class="form-label fw-semibold">
+                Remarks <span class="text-danger">*</span>
+            </label>
+            <textarea class="form-control form-control-sm"
+                      name="Remarks"
+                      rows="3"
+                      maxlength="200">@Model.Remarks</textarea>
+            @Html.ValidationMessageFor(m => m.Remarks, "", new { @class = "text-danger small" })
+        </div>
+
+    </div>
+
+    <div class="modal-footer py-2">
+        <button type="button" class="btn btn-secondary" onclick="closeModal()">
+            Cancel
+        </button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle"></i> Save Request
+        </button>
+    </div>
+</form>

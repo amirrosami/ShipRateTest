@@ -1,0 +1,38 @@
+﻿@using ShipRate.WebApp.Controllers
+@using ShipRate.WebApp.ViewModels
+@model DetailGridViewModel
+        
+<input type="hidden" name="masterId" value="@Model.MasterId" id="selected-master-id" />
+@{
+    int counter = 0;
+}
+@foreach (var item in Model.Data)
+    {
+    counter++;
+    var vm = (DtlTestCreateEditVM)item;
+        <tr>
+        <td>@counter</td>
+        <td>@vm.DtlName</td>
+                    <td>@vm.DtlDescription</td>
+                    <td>@vm.DtlDescription</td>
+                    <td class="text-center">
+                        <div class="btn-group btn-group-sm">
+
+                            <button type="button"
+                                    class="btn btn-outline-info"
+                                    title="Details"
+                                    hx-get="@Url.Action("Detail", "Test2")"
+                                    hx-target="#detail-container"
+                                    hx-swap="innerHTML"
+                                    hx-vals='js:{ masterId: "@Model.MasterId"}'
+                                    hx-on:htmx:beforeRequest="
+                                        document.getElementById('selected-master-id').value='@vm.MasterId'
+                                        "
+                                    >
+                                <i class="bi bi-card-list"></i>
+                            </button>
+                       </div>
+                    </td>
+        </tr>
+        }
+

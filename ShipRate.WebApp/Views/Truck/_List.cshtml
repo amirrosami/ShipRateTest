@@ -1,0 +1,226 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.Base_Info
+@using ShipRate.Application.DTOs.Cargo
+@using ShipRate.WebApp.ViewModels
+@using ShipRate.WebApp.ViewModels.Location
+@using ShipRate.WebApp.ViewModels.TransitViewModels
+@model GridViewModel
+
+@if (!Model.Data.Items.Any())
+{
+    <tr>
+        <td colspan="6" class="text-center py-5 text-muted">
+            <i class="bi bi-inbox display-4 d-block mb-2"></i>
+            No Records found.
+        </td>
+    </tr>
+}
+else
+{
+    int counter = (Model.Data.Page - 1) * Model.Data.PageSize;
+    @foreach (var item in Model.Data.Items)
+    {
+        var vm = (TruckVM)item;
+        counter++;
+        <tr>
+            <td>@counter</td>
+            <td class="fw-medium">@vm.TruckReferenceTitle</td>
+            <td class="fw-medium">@vm.TruckTypeName</td>
+            <td class="fw-medium">@vm.TruckPlateNumber</td>
+            <td class="fw-medium">@vm.TrailerPlateNumber</td>
+            <td class="fw-medium">@vm.BrandModel</td>
+            <td class="fw-medium">@vm.OwnerName</td>
+            <td class="fw-medium">@vm.CarrierName</td>
+            <td class="fw-medium">@vm.CountryName</td>
+@*             <td class="fw-medium">
+                @if (vm.IsActive)
+                {
+                    <span class="badge text-bg-success">
+                        Active
+                    </span>
+                }
+                else
+                {
+                    <span class="badge text-bg-danger">
+                        Inactive
+                    </span>
+                }
+            </td>
+ *@            <td class="text-center">
+                <div class="btn-group btn-group-sm">
+
+                    <button type="button"
+                            class="btn btn-outline-primary"
+                            title="Edit"
+                            hx-get="@Url.Action("Edit", "Truck", new { id = vm.Id })"
+                            hx-target="#app-modal-content"
+                            hx-swap="innerHTML">
+                        <i class="bi bi-pencil"></i>
+
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline-danger"
+                            title="Delete"
+                            hx-get="@Url.Action("Delete", "Truck", new { id = vm.Id })"
+                            hx-target="#app-modal-content"
+                            hx-swap="innerHTML">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    }
+}
+
+
+
+
+
+@* @using ShipRate.WebApp.ViewModels.TransitViewModels
+@model List<TruckVM>
+
+@{
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+    int totalCount = ViewBag.TotalCount;
+    string? search = ViewBag.Search;
+}
+
+<!-- ===== Record Count ===== -->
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <small class="text-muted">
+        Total: <strong>@totalCount</strong> record(s)
+        @if (!string.IsNullOrWhiteSpace(search))
+        {
+            <span> — filtered by "<em>@search</em>"</span>
+        }
+    </small>
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-warning text-center py-4">
+        <i class="bi bi-info-circle me-1"></i> No records found.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover table-striped align-middle mb-0" style="font-size: 0.88rem;">
+            <thead class="table-primary">
+                <tr>
+                    <th style="width:45px;">#</th>
+                    <th>Reference Title</th>
+                    <th>Type</th>
+                    <th>Truck Plate</th>
+                    <th>Trailer Plate</th>
+                    <th>Brand / Model</th>
+                    <th>Owner</th>
+                    <th>Carrier</th>
+                    <th>Country</th>
+                    <th class="text-center" style="width:70px;">Active</th>
+                    <th class="text-center" style="width:110px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int rowNum = (currentPage - 1) * 10;
+                }
+                @foreach (var item in Model)
+                {
+                    rowNum++;
+                    <tr>
+                        <td class="text-muted">@rowNum</td>
+                        <td><strong>@item.TruckReferenceTitle</strong></td>
+                        <td>
+                            <span class="badge bg-info text-dark">@item.TruckTypeName</span>
+                        </td>
+                        <td><code>@item.TruckPlateNumber</code></td>
+                        <td><code>@item.TrailerPlateNumber</code></td>
+                        <td>@item.BrandModel</td>
+                        <td>@item.OwnerName</td>
+                        <td>@item.CarrierName</td>
+                        <td>
+                            <small>@item.CountryName</small>
+                        </td>
+                        <td class="text-center">
+                            @if (item.IsActive)
+                            {
+                                <span class="badge bg-success">Yes</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">No</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-primary me-1"
+                                    title="Edit"
+                                    hx-get="/Truck/Edit/@item.Id"
+                                    hx-target="#modalBody"
+                                    hx-swap="innerHTML"
+                                    onclick="document.getElementById('crudModalLabel').textContent='Edit Truck'; new bootstrap.Modal(document.getElementById('crudModal')).show();">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger btn-delete"
+                                    title="Delete"
+                                    hx-delete="/Truck/Delete/@item.Id"
+                                    hx-target="#gridContainer"
+                                    hx-swap="innerHTML">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ===== Pagination ===== -->
+    @if (totalPages > 1)
+    {
+        <nav aria-label="Page navigation" class="mt-3">
+            <ul class="pagination pagination-sm justify-content-center">
+
+                <!-- Prev -->
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       hx-get="/Truck/Grid?search=@search&page=@(currentPage - 1)"
+                       hx-target="#gridContainer"
+                       hx-swap="innerHTML">
+                        Prev
+                    </a>
+                </li>
+
+                <!-- Windowed page numbers -->
+                @{
+                    int start = Math.Max(1, currentPage - 2);
+                    int end = Math.Min(totalPages, currentPage + 2);
+
+                    for (int i = start; i <= end; i++)
+                    {
+                        <li class="page-item @(i == currentPage ? "active" : "")">
+                            <a class="page-link"
+                               hx-get="/Truck/Grid?search=@search&page=@i"
+                               hx-target="#gridContainer"
+                               hx-swap="innerHTML">
+                                @i
+                            </a>
+                        </li>
+                    }
+                }
+
+                <!-- Next -->
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       hx-get="/Truck/Grid?search=@search&page=@(currentPage + 1)"
+                       hx-target="#gridContainer"
+                       hx-swap="innerHTML">
+                        Next
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+    }
+} *@

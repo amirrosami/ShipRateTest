@@ -1,0 +1,59 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@using ShipRate.Application.DTOs.BillOfLadings
+@model BLUpsertDto
+
+@{
+    var lookups = ViewBag.Lookups as BLLookupDto;
+}
+
+@if (!Model.IsContainerized)
+{
+    <h6 class="mb-2">Loose Cargo</h6>
+
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Commodity</th>
+                    <th>Package Type</th>
+                    <th>Packages</th>
+                    <th>Gross Weight</th>
+                    <th>CBM</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < Model.CargoDetails.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <input type="hidden" asp-for="CargoDetails[i].Id" />
+                        </td>
+
+                        <td>
+                            <select asp-for="CargoDetails[i].PackageTypeId"
+                                    class="form-select form-select-sm"
+                                    asp-items="@(new SelectList(lookups?.PackageTypes ?? Enumerable.Empty<object>(), "Id", "Name", Model.CargoDetails[i].PackageTypeId))">
+                                <option value="">Select Package</option>
+                            </select>
+                        </td>
+
+                        <td>
+                            <input asp-for="CargoDetails[i].PackageCount"
+                                   class="form-control form-control-sm" />
+                        </td>
+
+                        <td>
+                            <input asp-for="CargoDetails[i].GrossWeight"
+                                   class="form-control form-control-sm" />
+                        </td>
+
+                        <td>
+                            <input asp-for="CargoDetails[i].Volume"
+                                   class="form-control form-control-sm" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

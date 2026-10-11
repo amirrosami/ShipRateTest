@@ -1,0 +1,150 @@
+﻿@{
+    ViewData["Title"] = "Online Map";
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+
+    .page-map-wrapper {
+        height: calc(100vh - 70px);
+    }
+
+        .page-map-wrapper .card {
+            height: 100%;
+            margin-bottom: 0;
+        }
+
+        .page-map-wrapper .card-body {
+            height: calc(100% - 60px);
+            display: flex;
+            flex-direction: column;
+        }
+
+    #map {
+        flex: 1;
+        width: 100%;
+        min-height: 0;
+    }
+</style>
+
+<div class="container-fluid px-0 py-2">
+    <div class="page-map-wrapper">
+        <div class="card shadow-sm rounded-0 border-0">
+            <div class="card-header bg-primary text-white">
+                Global Shipment Map (Online)
+            </div>
+
+            <div class="card-body">
+                <div class="row g-2 mb-3">
+                    <div class="col-md-4">
+                        <input type="text" id="imoOrMmsiInput" class="form-control" placeholder="Enter IMO or MMSI" />
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" id="btnSearch" class="btn btn-primary w-100">Find Vessel</button>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-center">
+                        <div id="vesselInfo" class="small text-muted"></div>
+                    </div>
+                </div>
+
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // مختصات پیش‌فرض برای نمایش اولیه
+        const defaultLat = 35.725732;
+        const defaultLng = 51.416166;
+        const defaultZoom = 10;
+
+        const map = L.map('map').setView([defaultLat, defaultLng], defaultZoom);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+
+        // مارکر اولیه
+        const defaultMarker = L.marker([defaultLat, defaultLng]).addTo(map);
+        defaultMarker.bindPopup(`
+            <b>Saeei Tarabar Arsham</b>
+        `).openPopup();
+
+        let vesselMarker = null;
+
+        async function findVessel() {
+            const imoOrMmsi = document.getElementById('imoOrMmsiInput').value.trim();
+            const vesselInfo = document.getElementById('vesselInfo');
+
+            if (!imoOrMmsi) {
+                vesselInfo.innerHTML = '<span class="text-danger">Please enter IMO or MMSI.</span>';
+                return;
+            }
+
+            vesselInfo.textContent = 'Loading vessel position...';
+
+            try {
+                const response = await fetch(`/Maps/GetVesselPosition?imoOrMmsi=${encodeURIComponent(imoOrMmsi)}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to load vessel data.');
+                }
+
+                if (data.lat == null || data.lng == null) {
+                    console.log('Raw API response:', data.raw);
+                    throw new Error('Vessel found but coordinates were not returned.');
+                }
+
+                if (vesselMarker) {
+                    map.removeLayer(vesselMarker);
+                }
+
+                vesselMarker = L.marker([data.lat, data.lng]).addTo(map);
+
+                const popupHtml = `
+                    <b>${data.vesselName || 'Unknown Vessel'}</b><br>
+                    MMSI: ${data.mmsi || '-'}<br>
+                    IMO: ${data.imo || '-'}<br>
+                    Speed: ${data.speed ?? '-'}<br>
+                    Course: ${data.course ?? '-'}<br>
+                    Last Update: ${data.lastUpdate || '-'}
+                `;
+
+                vesselMarker.bindPopup(popupHtml).openPopup();
+                map.setView([data.lat, data.lng], 7);
+
+                vesselInfo.innerHTML =
+                    `Vessel: ${data.vesselName || '-'} | ` +
+                    `Lat: ${data.lat} | Lng: ${data.lng} | ` +
+                    `Speed: ${data.speed ?? '-'}`;
+
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 100);
+            } catch (error) {
+                vesselInfo.innerHTML = `<span class="text-danger">${error.message}</span>`;
+            }
+        }
+
+        document.getElementById('btnSearch').addEventListener('click', findVessel);
+
+        window.addEventListener('load', () => {
+            setTimeout(() => map.invalidateSize(), 100);
+        });
+
+        window.addEventListener('resize', () => {
+            map.invalidateSize();
+        });
+    </script>
+}

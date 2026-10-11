@@ -1,0 +1,29 @@
+﻿@using ShipRate.Application.DTOs
+@model ExitBlackListDto
+
+<div class="modal-content text-start text-dark" dir="ltr">
+    <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="actionModalLabel"><i class="bi bi-box-arrow-right"></i> Exit from Black List</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <form hx-post="@Url.Action("Exit", "BlackList")" hx-target="#modal-container" hx-swap="innerHTML">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+
+        <div class="modal-body">
+            <div class="alert alert-info">
+                You are removing <strong>@ViewBag.PersonFullName</strong> from the blacklist.
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Exit Remarks</label>
+                <textarea asp-for="BlackListExitRemarks" class="form-control" rows="3" placeholder="Provide reasons for removal (e.g. Cleared debt, resolved issue...)" required></textarea>
+                <span asp-validation-for="BlackListExitRemarks" class="text-danger small"></span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success"><i class="bi bi-check2-circle"></i> Complete Exit</button>
+        </div>
+    </form>
+</div>

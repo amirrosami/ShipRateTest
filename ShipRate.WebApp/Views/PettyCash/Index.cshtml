@@ -1,0 +1,136 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.Finance
+@model PagedResultDto<PettyCashListItemDto>
+
+@{
+    ViewData["Title"] = "Petty Cash Management";
+    var search = (PettyCashIndexSearchDto)ViewBag.Search;
+    var lookups = (PettyCashLookupDto)ViewBag.Lookups;
+}
+
+<div class="container-fluid" dir="ltr">
+    <h4 class="mb-3">Petty Cash Management</h4>
+
+    <form id="searchForm"
+          class="card card-body mb-3"
+          hx-get="@Url.Action("Grid", "PettyCash")"
+          hx-target="#pettyCashGrid"
+          hx-push-url="false">
+
+        <div class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Search</label>
+                <input name="Term" value="@search.Term" class="form-control"
+                       placeholder="Code, title, owner, expense or recharge..." />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Company</label>
+                <select name="CompanyId" class="form-select">
+                    <option value="">All</option>
+                    @foreach (var item in lookups.Companies)
+                    {
+                        <option value="@item.Value" selected="@(search.CompanyId?.ToString() == item.Value)">
+                            @item.Text
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Page Size</label>
+                <select name="PageSize" class="form-select">
+                    <option value="10" selected="@(search.PageSize == 10)">10</option>
+                    <option value="20" selected="@(search.PageSize == 20)">20</option>
+                    <option value="50" selected="@(search.PageSize == 50)">50</option>
+                </select>
+            </div>
+
+            <input type="hidden" name="Page" value="1" />
+
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary">Search</button>
+                <a class="btn btn-outline-secondary" href="@Url.Action("Index", "PettyCash")">Clear</a>
+                <button type="button"
+                        class="btn btn-success"
+                        hx-get="@Url.Action("CreatePettyCash", "PettyCash")"
+                        hx-target="#pettyModalBody"
+                        data-bs-toggle="modal"
+                        data-bs-target="#pettyModal">
+                    Add
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div id="pettyCashGrid"
+         hx-get="@Url.Action("Grid", "PettyCash", search)"
+         hx-trigger="pettyCashChanged from:body"
+         hx-include="#searchForm">
+        @await Html.PartialAsync("_PettyCashGrid", Model)
+    </div>
+
+    <div id="expensesPanel"
+         hx-trigger="expenseChanged from:body"
+         hx-include="[name='activePettyCashId']"></div>
+
+@*     <div id="rechargesPanel"
+         hx-trigger="rechargeChanged from:body"
+         hx-include="[name='activePettyCashId']">
+     </div>*@
+
+
+    <div id="rechargesPanel"
+         hx-get="@Url.Action("Recharges", "PettyCash")"
+         hx-trigger="rechargeChanged from:body"
+         hx-include="[name='activePettyCashId']"
+         hx-target="this"
+         hx-swap="innerHTML">
+    </div>
+
+
+
+
+</div>
+
+<div class="modal fade" id="pettyModal" tabindex="-1" aria-hidden="true" dir="ltr">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div id="pettyModalBody"></div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="documentManagerModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="document-manager-content">
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+    document.body.addEventListener('pettyCashChanged', function () {
+        bootstrap.Modal.getInstance(document.getElementById('pettyModal'))?.hide();
+    });
+    document.body.addEventListener('expenseChanged', function () {
+        bootstrap.Modal.getInstance(document.getElementById('pettyModal'))?.hide();
+    });
+    document.body.addEventListener('rechargeChanged', function () {
+        bootstrap.Modal.getInstance(document.getElementById('pettyModal'))?.hide();
+    });
+</script>
+
+
+
+<script>
+    document.body.addEventListener('htmx:targetError', function (e) {
+        console.log('targetError:', e);
+        console.log('target selector:', e.detail.target);
+        console.log('elt:', e.detail.elt);
+    });
+</script>
+

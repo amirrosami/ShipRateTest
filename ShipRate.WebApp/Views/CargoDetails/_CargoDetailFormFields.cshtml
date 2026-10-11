@@ -1,0 +1,502 @@
+﻿@using ShipRate.Application.ViewModels
+@model CargoDetailFormVm
+
+<style>
+    .cargo-form-compact .form-label {
+        font-size: .78rem;
+        margin-bottom: .15rem;
+        font-weight: 500;
+    }
+
+    .cargo-form-compact .form-control,
+    .cargo-form-compact .form-select {
+        font-size: .82rem;
+    }
+
+    .cargo-form-compact .form-check-label {
+        font-size: .8rem;
+    }
+
+    .cargo-form-compact .accordion-button {
+        padding: .45rem .75rem;
+        font-size: .85rem;
+        font-weight: 600;
+    }
+
+    .cargo-form-compact .accordion-body {
+        padding: .75rem;
+    }
+
+    .cargo-form-compact textarea {
+        resize: vertical;
+    }
+</style>
+
+<div class="modal-header py-2">
+    <h6 class="modal-title mb-0">Cargo Detail</h6>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body text-start cargo-form-compact" dir="ltr">
+
+    <input type="hidden" asp-for="JobId" />
+    <input type="hidden" asp-for="BookingId" />
+    <input type="hidden" asp-for="BookingLegId" />
+    <input type="hidden" asp-for="BLId" />
+    <input type="hidden" asp-for="BLContainerId" />
+    <input type="hidden" asp-for="RateRequestId" />
+    <input type="hidden" asp-for="TransitShipmentAssignmentId" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+    <!-- Main Info -->
+    <div class="row g-2 mb-2">
+
+        <div class="col-md-1">
+            <label asp-for="Sequence" class="form-label">Seq</label>
+            <input asp-for="Sequence" class="form-control form-control-sm" required />
+            <span asp-validation-for="Sequence" class="text-danger small"></span>
+        </div>
+
+        @*         <div class="col-md-3">
+            <label asp-for="PackageTypeId" class="form-label">Package Type</label>
+            <select asp-for="PackageTypeId" asp-items="Model.PackageTypes" class="form-select form-select-sm">
+                <option value="">-- Select --</option>
+            </select>
+        </div>
+ *@
+
+        <div class="col-md-3">
+            <label asp-for="PackageTypeId">Package Type</label>
+            <input type="hidden" asp-for="PackageTypeId" id="PackageTypeId" required />
+            <input type="text"
+                   id="PackageTypeSearchText"
+                   name="PackageType"
+                   value="@Model.PackageTypeName"
+                   class="form-control"
+                   placeholder="Search Package Type..."
+                   autocomplete="off"
+                   hx-get="@Url.Action("SearchPackageTypes", "PackageTypes")"
+                   hx-trigger="keyup changed delay:400ms"
+                   hx-target="#packagetypeSearchResults"
+                   hx-swap="innerHTML"
+                   hx-vals='js:{
+                                                term: document.getElementById("PackageTypeSearchText").value,
+                                                targetHiddenInputId: "PackageTypeId",
+                                                targetTextInputId: "PackageTypeSearchText"
+                                               }' />
+
+            <div id="packagetypeSearchResults"
+                 class="position-relative">
+            </div>
+
+            <span asp-validation-for="PackageTypeId" class="text-danger small"></span>
+        </div>
+        <div class="col-md-2">
+            <label asp-for="PackageCount" class="form-label">Pkg Count</label>
+            <input asp-for="PackageCount" class="form-control form-control-sm" required />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="InnerPackageTypeId">Inner Package Type</label>
+            <input type="hidden" asp-for="InnerPackageTypeId" id="InnerPackageTypeId" />
+            <input type="text"
+                   id="InnerPackageTypeSearchText"
+                   name="InnerPackageType"
+                   value="@Model.InnerPackageTypeName"
+                   class="form-control"
+                   placeholder="Search Package Type..."
+                   autocomplete="off"
+                   hx-get="@Url.Action("SearchPackageTypes", "PackageTypes")"
+                   hx-trigger="keyup changed delay:400ms"
+                   hx-target="#innerpackagetypeSearchResults"
+                   hx-swap="innerHTML"
+                   hx-vals='js:{
+                                                term: document.getElementById("InnerPackageTypeSearchText").value,
+                                                targetHiddenInputId: "InnerPackageTypeId",
+                                                targetTextInputId: "InnerPackageTypeSearchText"
+                                               }' />
+
+            <div id="innerpackagetypeSearchResults"
+                 class="position-relative">
+            </div>
+
+            <span asp-validation-for="InnerPackageTypeId" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="InnerPackageCount" class="form-label">Inner Count</label>
+            <input asp-for="InnerPackageCount" class="form-control form-control-sm" />
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="GrossWeight" class="form-label">Gross W.</label>
+            <input asp-for="GrossWeight" class="form-control form-control-sm" required />
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="NetWeight" class="form-label">Net W.</label>
+            <input asp-for="NetWeight" class="form-control form-control-sm" />
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="ChargeableWeight" class="form-label">Chargeable W.</label>
+            <input asp-for="ChargeableWeight" class="form-control form-control-sm" />
+        </div>
+
+
+        <div class="col-md-2">
+            <label asp-for="WeightUnitId" class="form-label">W. Unit</label>
+            <select asp-for="WeightUnitId" asp-items="Model.WeightUnits" class="form-select form-select-sm">
+                <option value="">-- Select --</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="Volume" class="form-label">Volume</label>
+            <input asp-for="Volume" class="form-control form-control-sm" />
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="VolumeUnitId" class="form-label">Vol. Unit</label>
+            <select asp-for="VolumeUnitId" asp-items="Model.VolumeUnits" class="form-select form-select-sm">
+                <option value="">-- Select --</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="CargoCommodityId" class="form-label">Cargo Commodity</label>
+            <select asp-for="CargoCommodityId" asp-items="Model.CargoCommodities" class="form-select form-select-sm">
+                <option value="">-- Select --</option>
+            </select>
+        </div>
+
+        @*<div class="col-md-3">
+            <label asp-for="HSCodeToSave" class="form-label">HS Code</label>
+            <input asp-for="HSCodeToSave" class="form-control form-control-sm" />
+        </div> 
+        *@
+        <div class="col-md-3">
+            <label asp-for="HSCodeToSave" class="form-label">HS Code</label>
+            <input type="text"
+                   id="HSCodeToSave"
+                   name="HSCodeToSave"
+                   value="@Model.HSCodeToSave"
+                   class="form-control"
+                   placeholder="Search HS Code..."
+                   autocomplete="off"
+                   hx-get="@Url.Action("SearchHSCodes", "HSCodes")"
+                   hx-trigger="keyup changed delay:400ms"
+                   hx-target="#hsCodeSearchResults"
+                   hx-swap="innerHTML"
+                   required
+                   hx-vals='js:{
+                            term: document.getElementById("HSCodeToSave").value,
+                            targetTextInputId: "HSCodeToSave"
+                       }' />
+
+            <div id="hsCodeSearchResults"
+                 class="position-relative">
+            </div>
+            <span asp-validation-for="HSCodeToSave" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="MarinePolutant" class="form-label">MarinePolutant</label>
+            <input asp-for="MarinePolutant" class="form-control form-control-sm" />
+        </div>
+        <div class="col-md-3">
+            <label asp-for="MSDSPageNumber" class="form-label">MSDSPageNumber</label>
+            <input asp-for="MSDSPageNumber" class="form-control form-control-sm" />
+        </div>
+        <div class="col-md-3">
+            <label asp-for="PSN" class="form-label">PSN</label>
+            <input asp-for="PSN" class="form-control form-control-sm" />
+        </div>
+
+        @*         <div class="col-md-6">
+            <label asp-for="CountryHSCodeId" class="form-label">Country HS Code</label>
+            <select asp-for="CountryHSCodeId" asp-items="Model.CountryHSCodes" class="form-select form-select-sm">
+                <option value="">-- Select --</option>
+            </select>
+        </div>
+ *@
+        <div class="col-md-4">
+            <label asp-for="CargoDescription" class="form-label">Cargo Description</label>
+            <textarea asp-for="CargoDescription" class="form-control form-control-sm" rows="2" required></textarea>
+            <span asp-validation-for="CargoDescription" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="MarksAndNumbers" class="form-label">Marks And Numbers</label>
+            <textarea asp-for="MarksAndNumbers" class="form-control form-control-sm" rows="1"></textarea>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Remarks" class="form-label">Remarks</label>
+            <textarea asp-for="Remarks" class="form-control form-control-sm" rows="1"></textarea>
+        </div>
+
+    </div>
+
+    <!-- Compact Sections -->
+    <div class="accordion" id="cargoDetailAccordion">
+
+        <!-- Dimensions -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingDimensions">
+                <button class="accordion-button collapsed" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseDimensions"
+                        aria-expanded="false"
+                        aria-controls="collapseDimensions">
+                    Dimensions
+                </button>
+            </h2>
+
+            <div id="collapseDimensions"
+                 class="accordion-collapse collapse"
+                 aria-labelledby="headingDimensions"
+                 data-bs-parent="#cargoDetailAccordion">
+
+                <div class="accordion-body">
+                    <div class="row g-2">
+
+                        <div class="col-md-2">
+                            <label asp-for="Length" class="form-label">Length</label>
+                            <input asp-for="Length" class="form-control form-control-sm" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label asp-for="Width" class="form-label">Width</label>
+                            <input asp-for="Width" class="form-control form-control-sm" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label asp-for="Height" class="form-label">Height</label>
+                            <input asp-for="Height" class="form-control form-control-sm" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="DimensionUnitId" class="form-label">Dimension Unit</label>
+                            <select asp-for="DimensionUnitId" asp-items="Model.DimensionUnits" class="form-select form-select-sm">
+                                <option value="">-- Select --</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3 d-flex align-items-end">
+                            <div class="form-check">
+                                <input asp-for="IsOverSized" class="form-check-input" />
+                                <label asp-for="IsOverSized" class="form-check-label">Over Sized</label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dangerous Goods -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingDG">
+                <button class="accordion-button collapsed" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseDG"
+                        aria-expanded="false"
+                        aria-controls="collapseDG">
+                    Dangerous Goods
+                </button>
+            </h2>
+
+            <div id="collapseDG"
+                 class="accordion-collapse collapse"
+                 aria-labelledby="headingDG"
+                 data-bs-parent="#cargoDetailAccordion">
+
+                <div class="accordion-body" id="dgSection">
+                    <div class="row g-2">
+
+                        <div class="col-md-2 d-flex align-items-end">
+                            <div class="form-check">
+                                <input asp-for="IsDG" class="form-check-input" id="IsDG" />
+                                <label asp-for="IsDG" class="form-check-label">Is DG</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="DGClassId" class="form-label">DG Class</label>
+                            <select asp-for="DGClassId" asp-items="Model.DGClasses" class="form-select form-select-sm dg-field">
+                                <option value="">-- Select --</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label asp-for="UNNumber" class="form-label">UN No.</label>
+                            <input asp-for="UNNumber" class="form-control form-control-sm dg-field" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label asp-for="DGFlashPoint" class="form-label">Flash Point</label>
+                            <input asp-for="DGFlashPoint" class="form-control form-control-sm dg-field" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label asp-for="DGPackingGroupId" class="form-label">Packing Group</label>
+                            <select asp-for="DGPackingGroupId" asp-items="Model.DGPackingGroups" class="form-select form-select-sm dg-field">
+                                <option value="">-- Select --</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Temperature -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTemp">
+                <button class="accordion-button collapsed" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseTemp"
+                        aria-expanded="false"
+                        aria-controls="collapseTemp">
+                    Temperature
+                </button>
+            </h2>
+
+            <div id="collapseTemp"
+                 class="accordion-collapse collapse"
+                 aria-labelledby="headingTemp"
+                 data-bs-parent="#cargoDetailAccordion">
+
+                <div class="accordion-body" id="tempSection">
+                    <div class="row g-2">
+
+                        <div class="col-md-3 d-flex align-items-end">
+                            <div class="form-check">
+                                <input asp-for="IsTemperatureControlled" class="form-check-input" id="IsTemperatureControlled" />
+                                <label asp-for="IsTemperatureControlled" class="form-check-label">Temperature Controlled</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label asp-for="MinTemp" class="form-label">Min</label>
+                            <input asp-for="MinTemp" class="form-control form-control-sm temp-field" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label asp-for="NormalTemp" class="form-label">Normal</label>
+                            <input asp-for="NormalTemp" class="form-control form-control-sm temp-field" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label asp-for="MaxTemp" class="form-label">Max</label>
+                            <input asp-for="MaxTemp" class="form-control form-control-sm temp-field" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="TempUnitId" class="form-label">Temp Unit</label>
+                            <select asp-for="TempUnitId" asp-items="Model.TempUnits" class="form-select form-select-sm temp-field">
+                                <option value="">-- Select --</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flags -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingFlags">
+                <button class="accordion-button collapsed" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseFlags"
+                        aria-expanded="false"
+                        aria-controls="collapseFlags">
+                    Flags
+                </button>
+            </h2>
+
+            <div id="collapseFlags"
+                 class="accordion-collapse collapse"
+                 aria-labelledby="headingFlags"
+                 data-bs-parent="#cargoDetailAccordion">
+
+                <div class="accordion-body">
+                    <div class="row g-2">
+
+                        <div class="col-md-2">
+                            <div class="form-check">
+                                <input asp-for="IsFragile" class="form-check-input" />
+                                <label asp-for="IsFragile" class="form-check-label">Fragile</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="form-check">
+                                <input asp-for="IsPerishable" class="form-check-input" />
+                                <label asp-for="IsPerishable" class="form-check-label">Perishable</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="form-check">
+                                <input asp-for="IsRotateable" class="form-check-input" />
+                                <label asp-for="IsRotateable" class="form-check-label">Rotateable</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="form-check">
+                                <input asp-for="IsStackable" class="form-check-input" />
+                                <label asp-for="IsStackable" class="form-check-label">Stackable</label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    (function () {
+        function toggleSectionByCheckbox(checkboxId, fieldClass) {
+            const checkbox = document.getElementById(checkboxId);
+            if (!checkbox) return;
+
+            const fields = document.querySelectorAll('.' + fieldClass);
+
+            function applyState() {
+                const enabled = checkbox.checked;
+                fields.forEach(field => {
+                    field.disabled = !enabled;
+
+                    if (!enabled) {
+                        if (field.tagName === 'SELECT') {
+                            field.selectedIndex = 0;
+                        } else if (field.type === 'checkbox') {
+                            field.checked = false;
+                        } else {
+                            field.value = '';
+                        }
+                    }
+                });
+            }
+
+            applyState();
+            checkbox.addEventListener('change', applyState);
+        }
+
+        function initCargoDetailToggles() {
+            toggleSectionByCheckbox('IsDG', 'dg-field');
+            toggleSectionByCheckbox('IsTemperatureControlled', 'temp-field');
+        }
+
+        document.addEventListener('DOMContentLoaded', initCargoDetailToggles);
+        document.body.addEventListener('htmx:afterSwap', function () {
+            initCargoDetailToggles();
+        });
+    })();
+</script>

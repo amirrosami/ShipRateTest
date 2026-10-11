@@ -1,0 +1,109 @@
+﻿@using ShipRate.Application.ViewModels
+@model CustomsInspectionsTabVm
+
+<div id="inspections-tab"
+     hx-get="@Url.Action("GetInspectionsTab", "CustomsClearance", new { id = Model.CustomsClearanceId })"
+     hx-trigger="customsClearanceInspectionsChanged from:body"
+     hx-swap="outerHTML">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h5 class="mb-1">Customs Inspections</h5>
+            <p class="text-muted small mb-0">Record and track physical examinations, laboratory tests, and inspector findings.</p>
+        </div>
+        @if (Model.CanEdit)
+        {
+            <button class="btn btn-primary"
+                    hx-get="@Url.Action("CreateInspectionModal", "CustomsClearance", new { customsClearanceId = Model.CustomsClearanceId })"
+                    hx-target="#modal-container"
+                    hx-swap="innerHTML">
+                <i class="bi bi-plus-lg me-1"></i> Add Inspection
+            </button>
+        }
+    </div>
+
+    @if (Model.Inspections.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-sm align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Type / Method</th>
+                        <th>Result</th>
+                        <th class="text-center">Discrepancy</th>
+                        <th class="text-center">Correction</th>
+                        <th>Inspector</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Inspections)
+                    {
+                        <tr>
+                            <td>@item.InspectionDate.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                <div class="fw-bold">@item.InspectionTypeName</div>
+                                <div class="text-muted small">@item.InspectionMethodName</div>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.InspectionResultName))
+                                {
+                                    <span class="badge bg-info text-dark">@item.InspectionResultName</span>
+                                }
+                                else
+                                {
+
+                                    <span>-</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                @if (item.DiscrepancyFound)
+                                {
+                                    <span class="badge bg-danger" title="@item.DiscrepancyDescription">
+                                        <i class="bi bi-exclamation-triangle-fill"></i> YES
+                                    </span>
+                                }
+                                else
+                                {
+
+                                    <i class="bi bi-check-circle text-success"></i>
+                                }
+                            </td>
+                            <td class="text-center">
+                                @if (item.CorrectionsRequired)
+                                {
+                                    <span class="badge bg-warning text-dark" title="@item.CorrectionsDescription">Required</span>
+                                }
+                                else
+                                {
+
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>@item.InspectorName</td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" hx-get="@Url.Action("EditInspectionModal", new { id = item.Id })" hx-target="#modal-container"
+                                            hx-swap="innerHTML">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger" hx-post="@Url.Action("DeleteInspection", new { id = item.Id })" hx-confirm="Delete this inspection record?">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="text-center p-5 border rounded bg-light">
+            <i class="bi bi-search fs-1 text-muted"></i>
+            <p class="mt-2 mb-0">No inspection records found.</p>
+        </div>
+    }
+</div>

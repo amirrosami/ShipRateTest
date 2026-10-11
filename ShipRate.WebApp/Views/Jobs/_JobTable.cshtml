@@ -1,0 +1,309 @@
+﻿@using ShipRate.Application.JobsViewModels
+@model JobIndexVm
+
+<style>
+    /* ظرف جدول و فونت متراکم اداری */
+    .jobs-table-container {
+        border: 1px solid #d1d9e0;
+        border-radius: 8px;
+        background: #fff;
+        overflow-x: auto;
+    }
+
+    .jobs-table {
+        font-size: 0.87rem;
+        margin-bottom: 0;
+        white-space: nowrap;
+    }
+
+    .jobs-table th {
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        background-color: #f8fafc;
+        color: #475569;
+        border-bottom: 2px solid #d1d9e0 !important;
+        padding: 8px 10px;
+    }
+
+    .jobs-table td {
+        padding: 6px 10px;
+        color: #1e293b;
+        border-color: #e2e8f0;
+    }
+
+    /* فریز کردن (Sticky) ستون Actions در سمت راست */
+    .jobs-table .col-actions {
+        position: sticky;
+        right: 0;
+        background-color: #fff;
+        z-index: 2;
+        box-shadow: -3px 0 6px rgba(0, 0, 0, 0.05);
+        text-align: center;
+        width: 110px;
+        min-width: 110px;
+    }
+
+    /* هماهنگی پس‌زمینه ستون ثابت با هاور سطرها و هدر */
+    .jobs-table thead .col-actions {
+        background-color: #f8fafc;
+        z-index: 3;
+    }
+
+    .jobs-table tbody tr:hover td.col-actions {
+        background-color: #f1f5f9;
+    }
+
+    .jobs-table tbody tr:hover td {
+        background-color: #f8fafc;
+    }
+
+    /* بهینه‌سازی دکمه‌های درون ستون عملیات */
+    .jobs-table .btn-action {
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        border-radius: 5px;
+    }
+</style>
+
+<div class="jobs-table-container">
+    <table class="table table-bordered align-middle table-sm jobs-table">
+        <thead>
+            <tr>
+                <th style="width: 45px;" class="text-center">#</th>
+                <th>Job Number</th>
+                <th>File Number</th>
+                <th>Company</th>
+                <th>Customer</th>
+                <th>Transport</th>
+                <th>Trade</th>
+                <th>Load Type</th>
+                <th>Origin</th>
+                <th>Destination</th>
+                <th>Movement</th>
+                <th>Status</th>
+                <th>Job Date</th>
+                <th>Sales User</th>
+                <th class="col-actions">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Jobs != null && Model.Jobs.Any())
+            {
+                var row = (Model.Search.Page - 1) * Model.Search.PageSize;
+                foreach (var item in Model.Jobs)
+                {
+                    row++;
+                    <tr id="job-row-@item.Id">
+                        <td class="text-center text-muted">@row</td>
+                        <td class="fw-semibold text-primary">@item.JobNumber</td>
+                        <td>@item.JobFileNumber</td>
+                        <td>@item.CompanyName</td>
+                        <td>@item.CustomerName</td>
+                        <td>@item.TransportType</td>
+                        <td>@item.TradeType</td>
+                        <td>@item.LoadType</td>
+                        <td>@item.Origin</td>
+                        <td>@item.Destination</td>
+                        <td>@item.MovementType</td>
+                        <td>
+                            <span class="badge bg-light text-dark border">@item.JobStatus</span>
+                        </td>
+                        <td>@item.JobDate?.ToString("yyyy-MM-dd")</td>
+                        <td>@item.SalesUserName</td>
+                        <td class="col-actions">
+                            <div class="d-flex justify-content-center gap-1">
+                                <a asp-action="Details" asp-controller="Jobs" asp-route-id="@item.Id"
+                                   class="btn btn-outline-secondary btn-action" title="Details">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+
+                                <button type="button"
+                                        class="btn btn-outline-primary btn-action"
+                                        hx-get="@Url.Action("Edit", "Jobs", new { id = item.Id })"
+                                        hx-target="#modal-content"
+                                        hx-swap="innerHTML"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#appModal"
+                                        title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-action"
+                                        hx-delete="@Url.Action("Delete", "Jobs", new { id = item.Id })"
+                                        hx-confirm="Are you sure you want to delete this job?"
+                                        hx-trigger="click"
+                                        hx-swap="none"
+                                        title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="15" class="text-center py-4 text-muted">No records found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    var currentPage = Model.Search.Page;
+    var totalPages = Model.TotalPages;
+
+    var startPage = Math.Max(1, currentPage - 2);
+    var endPage = Math.Min(totalPages, currentPage + 2);
+
+    if (currentPage <= 3)
+    {
+        endPage = Math.Min(totalPages, 5);
+    }
+
+    if (currentPage >= totalPages - 2)
+    {
+        startPage = Math.Max(1, totalPages - 4);
+    }
+
+    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+        <div class="small text-muted">
+            Page @currentPage of @totalPages
+        </div>
+
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+
+                <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                    <button class="page-link"
+                            hx-get="@Url.Action("List", "Jobs", new {
+                                JobNumber = Model.Search.JobNumber,
+                                CompanyId = Model.Search.CompanyId,
+                                CustomerId = Model.Search.CustomerId,
+                                TransportTypeId = Model.Search.TransportTypeId,
+                                OriginId = Model.Search.OriginId,
+                                DestinationId = Model.Search.DestinationId,
+                                JobStatusId = Model.Search.JobStatusId,
+                                Page = currentPage - 1,
+                                PageSize = Model.Search.PageSize
+                            })"
+                            hx-target="#jobs-table-container"
+                            hx-swap="innerHTML">
+                        Previous
+                    </button>
+                </li>
+
+                @if (startPage > 1)
+                {
+                    <li class="page-item">
+                        <button class="page-link"
+                                hx-get="@Url.Action("List", "Jobs", new {
+                                    JobNumber = Model.Search.JobNumber,
+                                    CompanyId = Model.Search.CompanyId,
+                                    CustomerId = Model.Search.CustomerId,
+                                    TransportTypeId = Model.Search.TransportTypeId,
+                                    OriginId = Model.Search.OriginId,
+                                    DestinationId = Model.Search.DestinationId,
+                                    JobStatusId = Model.Search.JobStatusId,
+                                    Page = 1,
+                                    PageSize = Model.Search.PageSize
+                                })"
+                                hx-target="#jobs-table-container"
+                                hx-swap="innerHTML">
+                            1
+                        </button>
+                    </li>
+
+                    @if (startPage > 2)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+                }
+
+                @for (int i = startPage; i <= endPage; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <button class="page-link"
+                                hx-get="@Url.Action("List", "Jobs", new {
+                                    JobNumber = Model.Search.JobNumber,
+                                    CompanyId = Model.Search.CompanyId,
+                                    CustomerId = Model.Search.CustomerId,
+                                    TransportTypeId = Model.Search.TransportTypeId,
+                                    OriginId = Model.Search.OriginId,
+                                    DestinationId = Model.Search.DestinationId,
+                                    JobStatusId = Model.Search.JobStatusId,
+                                    Page = i,
+                                    PageSize = Model.Search.PageSize
+                                })"
+                                hx-target="#jobs-table-container"
+                                hx-swap="innerHTML">
+                            @i
+                        </button>
+                    </li>
+                }
+
+                @if (endPage < totalPages)
+                {
+                    @if (endPage < totalPages - 1)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+
+                    <li class="page-item">
+                        <button class="page-link"
+                                hx-get="@Url.Action("List", "Jobs", new {
+                                    JobNumber = Model.Search.JobNumber,
+                                    CompanyId = Model.Search.CompanyId,
+                                    CustomerId = Model.Search.CustomerId,
+                                    TransportTypeId = Model.Search.TransportTypeId,
+                                    OriginId = Model.Search.OriginId,
+                                    DestinationId = Model.Search.DestinationId,
+                                    JobStatusId = Model.Search.JobStatusId,
+                                    Page = totalPages,
+                                    PageSize = Model.Search.PageSize
+                                })"
+                                hx-target="#jobs-table-container"
+                                hx-swap="innerHTML">
+                            @totalPages
+                        </button>
+                    </li>
+                }
+
+                <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                    <button class="page-link"
+                            hx-get="@Url.Action("List", "Jobs", new {
+                                JobNumber = Model.Search.JobNumber,
+                                CompanyId = Model.Search.CompanyId,
+                                CustomerId = Model.Search.CustomerId,
+                                TransportTypeId = Model.Search.TransportTypeId,
+                                OriginId = Model.Search.OriginId,
+                                DestinationId = Model.Search.DestinationId,
+                                JobStatusId = Model.Search.JobStatusId,
+                                Page = currentPage + 1,
+                                PageSize = Model.Search.PageSize
+                            })"
+                            hx-target="#jobs-table-container"
+                            hx-swap="innerHTML">
+                        Next
+                    </button>
+                </li>
+
+            </ul>
+        </nav>
+    </div>
+}

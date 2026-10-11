@@ -1,0 +1,65 @@
+﻿@using ShipRate.WebAppCustomers.ViewModels
+@model EmailFormViewModel
+
+<div class="card border-info mb-2">
+    <div class="card-header py-1 px-2 bg-info text-white d-flex justify-content-between">
+        <small>@(Model.Id.HasValue ? "View / Edit" : "New") Email</small>
+        <button type="button" class="btn-close btn-close-white btn-sm"
+                onclick="document.getElementById('email-form-container').innerHTML='';"></button>
+    </div>
+    <div class="card-body p-2">
+        <form hx-post="/DocumentManager/SaveEmail"
+              hx-target="#emails-grid"
+              hx-swap="innerHTML">
+
+            <input type="hidden" name="Id" value="@Model.Id" />
+            <input type="hidden" name="DocumentId" value="@Model.DocumentId" />
+
+            <div class="row g-2 mb-1">
+                <div class="col-md-6">
+                    <label class="form-label form-label-sm mb-0">To</label>
+                    <input type="email" name="To" value="@Model.To"
+                           class="form-control form-control-sm" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label form-label-sm mb-0">Direction</label>
+                    <select name="EmailDirectionId" class="form-select form-select-sm" required>
+                        @foreach (var d in Model.EmailDirections)
+                        {
+                            <option value="@d.Id" selected="@(d.Id == Model.EmailDirectionId)">@d.Title</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label form-label-sm mb-0">CC</label>
+                    <input type="text" name="CC" value="@Model.CC"
+                           class="form-control form-control-sm" />
+                </div>
+            </div>
+            <div class="row g-2 mb-1">
+                <div class="col-md-9">
+                    <label class="form-label form-label-sm mb-0">Subject</label>
+                    <input type="text" name="Subject" value="@Model.Subject"
+                           class="form-control form-control-sm" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label form-label-sm mb-0">BCC</label>
+                    <input type="text" name="BCC" value="@Model.BCC"
+                           class="form-control form-control-sm" />
+                </div>
+            </div>
+            <div class="row g-2 mb-1">
+                <div class="col-12">
+                    <label class="form-label form-label-sm mb-0">Body</label>
+                    <textarea name="Body" rows="3"
+                              class="form-control form-control-sm">@Model.Body</textarea>
+                </div>
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-sm btn-success">
+                    <i class="bi bi-check-lg me-1"></i>Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

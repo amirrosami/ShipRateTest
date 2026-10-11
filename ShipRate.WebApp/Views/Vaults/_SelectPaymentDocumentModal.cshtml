@@ -1,0 +1,50 @@
+﻿@model List<ShipRate.Application.DTOs.PaymentDocumentLookupDto>
+
+<div class="modal-header py-2 bg-light">
+    <h6 class="modal-title fw-bold">
+        <i class="bi bi-receipt me-1 text-primary"></i> Select Unassigned Payment Document
+    </h6>
+    <button type="button" class="btn-close" onclick="showFormSection()"></button>
+</div>
+
+<div class="modal-body p-2" style="max-height: 400px; overflow-y: auto; font-size: 0.85rem;">
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info py-2 mb-0">No unassigned documents available.</div>
+    }
+    else
+    {
+        <table class="table table-sm table-hover table-bordered mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Doc No</th>
+                    <th>Payer</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th class="text-center" style="width: 70px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var doc in Model)
+                {
+                    <tr>
+                        <td class="fw-bold text-primary">@doc.DocumentNo</td>
+                        <td>@(doc.PayerName ?? "-")</td>
+                        <td>@(doc.DocumentDate?.ToString("yyyy-MM-dd") ?? "-")</td>
+                        <td class="fw-bold text-success">@doc.Amount.ToString("N2") <small class="text-muted">@doc.CurrencyCode</small></td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-primary py-0 px-2"
+                                    onclick="selectPaymentDocument('@doc.Id', '@doc.DocumentNo', '@doc.Amount', '@doc.CurrencyId', '@(doc.PayerName?.Replace("'", "\\'"))')">
+                                Select
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<div class="modal-footer py-1 bg-light">
+    <button type="button" class="btn btn-sm btn-secondary" onclick="showFormSection()">Back</button>
+</div>

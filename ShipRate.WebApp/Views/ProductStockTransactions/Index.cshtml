@@ -1,0 +1,95 @@
+﻿@model PagedResultDto<ProductStockTransactionListDto>
+@using ShipRate.Application.DTOs
+@{
+    var filter = ViewBag.Filter as ProductStockTransactionFilterDto ?? new ProductStockTransactionFilterDto();
+    ViewData["Title"] = "Product Stock Transactions";
+}
+
+<div class="container-fluid" dir="ltr">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Product Stock Transactions</h4>
+
+        <div class="d-flex gap-2">
+            <a asp-action="InventoryStocks"
+               class="btn btn-outline-secondary">
+                Inventory Stocks
+            </a>
+
+            <button type="button"
+                    class="btn btn-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#mainModal"
+                    hx-get="@Url.Action("Create")"
+                    hx-target="#mainModalContent"
+                    hx-swap="innerHTML">
+                New Transaction
+            </button>
+        </div>
+    </div>
+
+    <form hx-get="@Url.Action("Index")"
+          hx-target="#transactionList"
+          hx-swap="innerHTML"
+          class="card card-body mb-3">
+
+        <div class="row g-2 align-items-end flex-nowrap">
+            <div class="col">
+                <label class="form-label small mb-1">Search</label>
+                <input name="SearchText" value="@filter.SearchText" class="form-control form-control-sm" />
+            </div>
+
+            <div class="col">
+                <label class="form-label small mb-1">Inventory</label>
+                <select name="InventoryId" class="form-select form-select-sm" asp-items="ViewBag.Inventories">
+                    <option value="">All</option>
+                </select>
+            </div>
+
+            <div class="col">
+                <label class="form-label small mb-1">Product</label>
+                <select name="ProductId" class="form-select form-select-sm" asp-items="ViewBag.Products">
+                    <option value="">All</option>
+                </select>
+            </div>
+
+            <div class="col-auto">
+                <label class="form-label small mb-1">Page Size</label>
+                <select name="PageSize" class="form-select form-select-sm">
+                    <option value="10" selected="@(filter.PageSize == 10)">10</option>
+                    <option value="20" selected="@(filter.PageSize == 20)">20</option>
+                    <option value="50" selected="@(filter.PageSize == 50)">50</option>
+                </select>
+            </div>
+
+            <div class="col-auto">
+                <label class="form-label small mb-1">From Date</label>
+                <input name="FromDate" value="@filter.FromDate?.ToString("yyyy-MM-dd")" type="date" class="form-control form-control-sm" />
+            </div>
+
+            <div class="col-auto">
+                <label class="form-label small mb-1">To Date</label>
+                <input name="ToDate" value="@filter.ToDate?.ToString("yyyy-MM-dd")" type="date" class="form-control form-control-sm" />
+            </div>
+
+            <div class="col-auto">
+                <button class="btn btn-outline-primary btn-sm" type="submit">Search</button>
+            </div>
+        </div>
+
+
+
+    </form>
+
+    <div id="transactionList"
+         hx-get="@Url.Action("Index")"
+         hx-trigger="productStockTransactionChanged from:body"
+         hx-swap="innerHTML">
+        @await Html.PartialAsync("_List", Model)
+    </div>
+</div>
+
+<div class="modal fade" id="mainModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div id="mainModalContent" class="modal-content"></div>
+    </div>
+</div>

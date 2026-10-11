@@ -1,0 +1,56 @@
+﻿@using ShipRate.Application.ViewModels
+@model IReadOnlyList<TripLookupItemVm>
+
+@if (Model.Count == 0)
+{
+    <div class="text-muted small">
+        No road trips found.
+    </div>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var trip in Model)
+        {
+            <button type="button"
+                    class="list-group-item list-group-item-action btn-choose-trip"
+                    data-trip-id="@trip.Id"
+                    data-truck-no="@trip.TruckNo"
+                    data-trailer-no="@trip.TrailerNo"
+                    data-driver-name="@trip.DriverName"
+                    data-display-text="@trip.DisplayText">
+
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                        <div class="fw-semibold">
+                            @trip.TruckNo
+                            @if (!string.IsNullOrWhiteSpace(trip.TrailerNo))
+                            {
+                                <span>— @trip.TrailerNo</span>
+                            }
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(trip.DriverName))
+                        {
+                            <div class="small text-muted">
+                                Driver: @trip.DriverName
+                            </div>
+                        }
+                    </div>
+
+                    <div class="text-end small text-muted">
+                        @if (!string.IsNullOrWhiteSpace(trip.CMRNo))
+                        {
+                            <div>CMR: @trip.CMRNo</div>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(trip.TIRNo))
+                        {
+                            <div>TIR: @trip.TIRNo</div>
+                        }
+                    </div>
+                </div>
+            </button>
+        }
+    </div>
+}

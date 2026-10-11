@@ -1,0 +1,77 @@
+﻿@using ShipRate.Domain.Entities.BaseInfo.Locations
+@using ShipRate.WebApp.ViewModels.TransitViewModels
+@model TripStopViewModel
+@{
+    var isEdit = Model.Id.HasValue && Model.Id != Guid.Empty;
+    var locations = ViewBag.Locations as List<Location>;
+}
+
+<!form hx-post="@(isEdit ? $"/TripStops/Edit/{Model.Id}" : "/TripStops/Create")"
+      @(isEdit ? $"hx-put=/TripStops/Edit/{Model.Id}" : "")
+      hx-target="#stop-form-container"
+      hx-swap="innerHTML">
+
+    <input type="hidden" name="TripId" value="@Model.TripId" />
+
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Stop Number *</label>
+            <input type="number" name="StopNumber" class="form-control"
+                   value="@Model.StopNumber" required min="1" />
+        </div>
+        <div class="form-group">
+            <label>Location *</label>
+            <select name="LocationId" class="form-control" required>
+                <option value="">-- Select Location --</option>
+                @foreach (var loc in locations)
+                {
+                    <option value="@loc.Id" selected="@(Model.LocationId == loc.Id)">
+                        @loc.LocationName
+                    </option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Scheduled Arrival *</label>
+            <input type="datetime-local" name="ScheduledArrival" class="form-control"
+                   value="@Model.ScheduledArrival?.ToString("yyyy-MM-ddTHH:mm")" required />
+        </div>
+        <div class="form-group">
+            <label>Scheduled Departure *</label>
+            <input type="datetime-local" name="ScheduledDeparture" class="form-control"
+                   value="@Model.ScheduledDeparture?.ToString("yyyy-MM-ddTHH:mm")" required />
+        </div>
+    </div>
+
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Actual Arrival</label>
+            <input type="datetime-local" name="ActualArrival" class="form-control"
+                   value="@Model.ActualArrival?.ToString("yyyy-MM-ddTHH:mm")" />
+        </div>
+        <div class="form-group">
+            <label>Actual Departure</label>
+            <input type="datetime-local" name="ActualDeparture" class="form-control"
+                   value="@Model.ActualDeparture?.ToString("yyyy-MM-ddTHH:mm")" />
+        </div>
+    </div>
+
+    <div class="form-group full-width">
+        <label>Remarks</label>
+        <textarea name="Remarks" class="form-control" rows="2"
+                  maxlength="200">@Model.Remarks</textarea>
+    </div>
+
+    <div class="form-actions">
+        <button type="button" class="btn btn-outline"
+                onclick="document.getElementById('stop-form-modal').classList.remove('active')">
+            Cancel
+        </button>
+        <button type="submit" class="btn btn-primary">
+            @(isEdit ? "💾 Update" : "✅ Create")
+        </button>
+    </div>
+</!form>

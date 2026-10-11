@@ -1,0 +1,109 @@
+﻿@using ShipRate.Application.ViewModels
+@model FakePaymentViewModel
+<style>
+    .payment {
+        background-color: #f4f6f9;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .payment-card {
+        border: none;
+        border-top: 5px solid #0d6efd;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    .merchant-logo {
+        font-size: 2rem;
+        color: #0d6efd;
+        font-weight: 700;
+    }
+</style>
+
+<div class="container py-5 payment">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+
+            <!-- هدر شبیه‌سازی بانک -->
+            <div class="text-center mb-4">
+                <div class="merchant-logo mb-2">
+                    <i class="bi bi-shield-fill-check"></i> Sandbox Bank
+                </div>
+                <span class="badge bg-warning text-dark text-uppercase">Test Environment</span>
+            </div>
+
+            <div class="card payment-card p-4">
+                <h5 class="card-title text-center mb-4 text-secondary">Payment details</h5>
+
+                <!-- اطلاعات تراکنش -->
+                <div class="bg-light p-3 rounded mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Description:</span>
+                        <span class="fw-bold text-dark">Payment for shipping</span>
+                    </div>
+                    
+                    <hr />
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted fw-bold">Amount to pay:</span>
+                        <span class="fs-4 fw-bold text-primary">$@Model.Amount.ToString("N2")</span>
+                    </div>
+                </div>
+
+                <!-- فرم‌های عملیاتی درگاه -->
+                <div class="d-grid gap-2">
+                    <!-- دکمه پرداخت موفق -->
+                    <form asp-action="FinalizePayment" method="post">
+                        <input type="hidden" name="token" value="@Model.Token" />
+                        <input type="hidden" name="ResNum" value="@Model.ResNum" />
+                        <input type="hidden" name="Amount" value="@Model.Amount" />
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Card Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-credit-card"></i></span>
+                                <input type="text" name="CardNumber" class="form-control font-monospace"
+                                       placeholder="1234 5678 1234 5678" maxlength="19" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- CVV2 -->
+                            <div class="col-6 mb-3">
+                                <label class="form-label small fw-bold">CVV2</label>
+                                <input type="password" name="CVV2" class="form-control text-center font-monospace"
+                                       placeholder="123" maxlength="4" />
+                            </div>
+
+                            <!-- تاریخ انقضا -->
+                            <div class="col-6 mb-3">
+                                <label class="form-label small fw-bold">Expiry Date</label>
+                                <div class="d-flex gap-1">
+                                    <input type="text" name="ExpMonth" class="form-control text-center font-monospace" placeholder="MM" maxlength="2" required />
+                                    <span class="align-self-center">/</span>
+                                    <input type="text" name="ExpYear" class="form-control text-center font-monospace" placeholder="YY" maxlength="2" required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- رمز دوم / پویا -->
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold">Static / Dynamic PIN</label>
+                            <div class="input-group">
+                                <input type="password" name="CardPin" id="otpInput" class="form-control text-center font-monospace"
+                                       placeholder="Enter PIN" maxlength="8"/>
+                              
+                            </div>
+                            
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-lg w-100 py-3">
+                            <i class="bi bi-credit-card-2-front"></i> Pay
+                        </button>
+                    </form>                    
+                </div>
+
+            </div>
+
+            <div class="text-center mt-4 text-muted small">
+                <p>Secure Sandbox System &copy; @DateTime.UtcNow.Year - ShipRate Local Gateway</p>
+            </div>
+
+        </div>
+    </div>
+</div>

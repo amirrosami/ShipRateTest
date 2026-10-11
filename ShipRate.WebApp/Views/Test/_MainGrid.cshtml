@@ -1,0 +1,15 @@
+﻿@using ShipRate.WebApp.Controllers
+@using ShipRate.WebApp.ViewModels
+@model GridViewModel
+        
+@foreach (var item in Model.Data.Items)
+    {
+        var vm = (TestCreateEditVM)item;
+        <tr>
+                    <td>@vm.Id</td>
+                    <td>@vm.Name</td>
+                    <td>@vm.Description</td>
+                </tr>
+            }
+
+

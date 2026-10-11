@@ -1,0 +1,28 @@
+﻿@using ShipRate.Application.DTOs
+@model BookingPartyVm
+@{
+    // تولید یک شناسه یکتا برای این ردیف خاص جهت Model Binding غیر متوالی
+    var uniqueId = Guid.NewGuid().ToString("N");
+}
+
+<tr class="party-row">
+    <td>
+        <!-- فیلد حیاتی برای فهماندن ایندکس غیرمتوالی به ASP.NET Core Model Binder -->
+        <input type="hidden" name="BookingParties.Index" value="@uniqueId" />
+
+        <input type="hidden" name="BookingParties[@uniqueId].Id" value="@Model.Id" />
+        <select name="BookingParties[@uniqueId].PartyRoleTypeId" class="form-select form-select-sm" asp-items="ViewBag.PartyRoleTypes">
+            <option value="">-- Select Role --</option>
+        </select>
+    </td>
+    <td>
+        <select name="BookingParties[@uniqueId].PartyId" class="form-select form-select-sm" asp-items="ViewBag.Parties">
+            <option value="">-- Select Party --</option>
+        </select>
+    </td>
+    <td class="text-center">
+        <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove();">
+            <i class="bi bi-trash"></i>
+        </button>
+    </td>
+</tr>

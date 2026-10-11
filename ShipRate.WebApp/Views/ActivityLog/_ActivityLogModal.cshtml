@@ -1,0 +1,47 @@
+﻿@using ShipRate.Application.ViewModels
+@model ActivityLogWrapperVm
+
+<div class="modal fade text-start" id="activityLogModal" tabindex="-1" aria-labelledby="activityLogModalLabel" aria-hidden="true" dir="ltr">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="activityLogModalLabel">Activity Log History</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted small">Manage and view activities and events.</span>
+                    @if (Model.EntityTypeId != 8)
+                    {
+                        <button class="btn btn-primary btn-sm"
+                        hx-get="@Url.Action("Create", "ActivityLog", new { entityTypeId = Model.EntityTypeId, entityId = Model.EntityId ,externalReferenceNo=Model.ExternalReferenceNo  })"
+                        hx-target="#activityLogEditorContainer"
+                        hx-swap="innerHTML">
+                            <i class="bi bi-plus-lg"></i> Add Event
+                        </button>
+                    }
+                </div>
+                <!-- کانتینر گرید که با HTMX پر می‌شود -->
+                <div id="activityLogGridContainer"
+                     hx-get="@Url.Action("Grid", "ActivityLog", new { entityTypeId = Model.EntityTypeId, entityId = Model.EntityId })"
+                     hx-trigger="load, activityLogChanged from:body"
+                     hx-swap="innerHTML">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-secondary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="documentManagerModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="document-manager-content">
+        </div>
+    </div>
+</div>

@@ -1,0 +1,127 @@
+﻿@using ShipRate.Web.ViewModels.PermissionGroupsManagement
+@model AssignGroupToUserViewModel
+
+@{
+    ViewData["Title"] = $"Manage Users For Group : {Model.PermissionGroupName}  ";
+}
+
+<div class="container-fluid mt-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-users-cog"></i>
+            Manage Users For Group: @Model.PermissionGroupName
+        </h2>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-right"></i> Return
+        </a>
+    </div>
+
+    <!-- Success/Error Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+
+        <!-- افزودن کاربر جدید -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-user-plus"></i> New User
+                </div>
+                <div class="card-body">
+                    <form asp-action="AssignUser" method="post">
+                        <input type="hidden" name="permissionGroupId" value="@Model.PermissionGroupId" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Select User</label>
+                            <select name="userId" class="form-select" required>
+                                <option value="">-- Select --</option>
+                                @foreach (var user in Model.AvailableUsers)
+                                {
+                                    var isAssigned = Model.CurrentUsers.Any(cu => cu.UserId == user.Id);
+                                    <option value="@user.Id" disabled="@isAssigned">
+                                        @user.UserName (@user.Email) @(isAssigned ? "✓ Previously assigned!!!!" : "")
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-check"></i> Assign
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- لیست کاربران فعلی -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <i class="fas fa-users"></i> Current Users (@Model.CurrentUsers.Count)
+                </div>
+                <div class="card-body">
+
+                    @if (!Model.CurrentUsers.Any())
+                    {
+                        <div class="alert alert-warning">
+                            <i class="fas fa-info-circle"></i>
+                            No User has been assigned to this group yet!!!
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>User Name</th>
+                                        <th>Email Address</th>
+                                        <th>Assign date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var user in Model.CurrentUsers)
+                                    {
+                                        <tr>
+                                            <td>@user.UserName</td>
+                                            <td>@user.Email</td>
+                                            <td dir="ltr" class="text-start">@user.AssignedAt.ToString("yyyy/MM/dd HH:mm")</td>
+                                            <td>
+                                                <form asp-action="RemoveUser" method="post" class="d-inline"
+                                                      onsubmit="return confirm('Are you sure to delete the user from this group؟');">
+                                                    <input type="hidden" name="permissionGroupId" value="@Model.PermissionGroupId" />
+                                                    <input type="hidden" name="userId" value="@user.UserId" />
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        <i class="fas fa-trash"></i> Delete
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

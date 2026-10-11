@@ -1,0 +1,128 @@
+﻿@using Microsoft.Extensions.Localization
+@using ShipRate.Application.ViewModels
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization
+@using ShipRate.WebAppCustomers
+@inject IStringLocalizer<SharedResource> Localizer
+@model List<CargoDetailListItemVm>
+
+@{
+    var isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var direction = isRtl ? "rtl" : "ltr";
+    var textAlign = isRtl ? "text-end" : "text-start";
+}
+
+<div class="table-responsive" dir="@direction">
+    <table class="table table-sm table-bordered table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th style="width:70px;">@Localizer["Seq"]</th>
+                <th>@Localizer["Description"]</th>
+                <th>@Localizer["HSCode"]</th>
+                <th>@Localizer["PackageType"]</th>
+                <th>@Localizer["PkgCount"]</th>
+                <th>@Localizer["GrossWeightShort"]</th>
+                <th>@Localizer["NetWeightShort"]</th>
+                <th>@Localizer["Volume"]</th>
+                <th style="width:160px;">@Localizer["Flags"]</th>
+                <th style="width:130px;" class="text-center">@Localizer["Actions"]</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="10" class="text-center text-muted p-4">
+                        @Localizer["NoCargoDetailsFound"]
+                    </td>
+                </tr>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="text-center">@item.Sequence</td>
+                        <td class="@textAlign">@item.CargoDescription</td>
+                        <td class="text-center">@item.HSCode</td>
+                        <td>@item.PackageTypeName</td>
+                        <td class="text-center">@item.PackageCount</td>
+                        <td>
+                            @item.GrossWeight
+                            @if (!string.IsNullOrWhiteSpace(item.WeightUnitName))
+                            {
+                                <small class="text-muted">@item.WeightUnitName</small>
+                            }
+                        </td>
+                        <td>
+                            @item.NetWeight
+                            @if (!string.IsNullOrWhiteSpace(item.WeightUnitName))
+                            {
+                                <small class="text-muted">@item.WeightUnitName</small>
+                            }
+                        </td>
+                        <td>
+                            @item.Volume
+                            @if (!string.IsNullOrWhiteSpace(item.VolumeUnitName))
+                            {
+                                <small class="text-muted">@item.VolumeUnitName</small>
+                            }
+                        </td>
+                        <td>
+                            @if (item.IsDG)
+                            {
+                                <span class="badge bg-danger" title="@Localizer["DangerousGoods"]">@Localizer["DG"]</span>
+                            }
+
+                            @if (item.IsTemperatureControlled)
+                            {
+                                <span class="badge bg-info text-dark" title="@Localizer["TemperatureControlled"]">@Localizer["Temp"]</span>
+                            }
+
+                            @if (item.IsFragile)
+                            {
+                                <span class="badge bg-warning text-dark">@Localizer["Fragile"]</span>
+                            }
+
+                            @if (item.IsPerishable)
+                            {
+                                <span class="badge bg-success">@Localizer["Perishable"]</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group" role="group">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-info"
+                                        title="@Localizer["Details"]"
+                                        hx-get="@Url.Action("Details", "CargoDetails", new { id = item.Id })"
+                                        hx-target="#app-modal-content-second"
+                                        hx-swap="innerHTML">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary"
+                                        title="@Localizer["Edit"]"
+                                        hx-get="@Url.Action("Edit", "CargoDetails", new { id = item.Id })"
+                                        hx-target="#app-modal-content-second"
+                                        hx-swap="innerHTML">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger"
+                                        title="@Localizer["Delete"]"
+                                        hx-get="@Url.Action("Delete", "CargoDetails", new { id = item.Id })"
+                                        hx-target="#app-modal-content-second"
+                                        hx-swap="innerHTML">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

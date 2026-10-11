@@ -1,0 +1,28 @@
+﻿<div class="modal-header">
+    <h5 class="modal-title">Issue New Notice of Arrival (NOA)</h5>
+    <button type="button" class="btn-close" onclick="hideNoaModal()"></button>
+</div>
+<div class="modal-body p-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h6 class="text-muted mb-3">Please enter the Bill of Lading (BL) number to start</h6>
+
+            <form hx-get="@Url.Action("SearchBL")"
+                  hx-target="#noaModalBody"
+                  hx-swap="innerHTML"
+                  class="d-flex gap-2">
+                <input type="text"
+                       name="searchTerm"
+                       class="form-control form-control-lg"
+                       placeholder=""
+                       required
+                       autofocus />
+                <button type="submit" class="btn btn-primary btn-lg px-4">
+                    Search BL
+                </button>
+            </form>
+
+            <div id="search-bl-error" class="mt-3"></div>
+        </div>
+    </div>
+</div>

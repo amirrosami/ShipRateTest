@@ -1,0 +1,19 @@
+﻿@using ShipRate.Application.DTOs.Documents
+@model DocumentTypeInputDto
+<div class="modal-content text-start" dir="ltr">
+    <div class="modal-header border-bottom-0">
+        <h5 class="modal-title fw-bold text-danger" id="actionModalLabel"><i class="bi bi-exclamation-triangle-fill"></i> Delete Document Type</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <form hx-post="@Url.Action("Delete", new { id = Model.Id })" hx-target="#modal-container" method="post">
+        @Html.AntiForgeryToken()
+        <div class="modal-body">
+            <p>Are you sure you want to permanently delete the document type <strong>"@Model.DocumentTypeName"</strong>?</p>
+            <p class="text-muted small mb-0">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer border-top-0">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-danger btn-sm">Yes, Delete</button>
+        </div>
+    </form>
+</div>

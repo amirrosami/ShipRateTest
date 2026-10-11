@@ -1,0 +1,74 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model List<InvoiceItemRowVm>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-sm align-middle">
+        <thead>
+            <tr>
+                <th style="width:70px;">Seq</th>
+                <th>Charge Type</th>
+                <th>Charge</th>
+                <th>Description</th>
+                <th class="text-end">QTY</th>
+                <th class="text-end">Unit Price</th>
+                <th class="text-end">Discount</th>
+                <th class="text-end">Tax %</th>
+                <th>Currency</th>
+                <th class="text-end">Before Disc.</th>
+                <th class="text-end">After Disc.</th>
+                <th class="text-end">Tax</th>
+                <th class="text-end">Total</th>
+                <th style="width:150px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.SequenceNumber</td>
+                        <td>@item.ChargeTypeName</td>
+                        <td>@item.ChargeName</td>
+                        <td>@item.Description</td>
+                        <td class="text-end">@item.QTY.ToString("N2")</td>
+                        <td class="text-end">@item.UnitPrice.ToString("N2")</td>
+                        <td class="text-end">@item.Discount.ToString("N2")</td>
+                        <td class="text-end">@item.TaxPercent.ToString("N2")</td>
+                        <td>@item.CurrencyCode</td>
+                        <td class="text-end">@item.AmountBeforeDiscount.ToString("N2")</td>
+                        <td class="text-end">@item.AmountAfterDiscount.ToString("N2")</td>
+                        <td class="text-end">@item.TaxAmount.ToString("N2")</td>
+                        <td class="text-end fw-bold">@item.TotalAmount.ToString("N2")</td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                @* <button type="button"
+                                        class="btn btn-sm btn-outline-primary"
+                                        hx-get="@Url.Action("EditItemForm", "Invoices", new { id = item.Id })"
+                                        hx-target="#invoice-item-form-container"
+                                        hx-swap="innerHTML">
+                                    Edit
+                                </button>
+
+                                <form hx-post="@Url.Action("DeleteItem", "Invoices", new { id = item.Id, invoiceId = item.InvoiceId })"
+                                      hx-target="this"
+                                      hx-swap="none"
+                                      hx-confirm="Are you sure you want to delete this item?"
+                                      class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form> *@
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="14" class="text-center text-muted">No items found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

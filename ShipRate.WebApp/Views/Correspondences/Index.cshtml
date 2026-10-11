@@ -1,0 +1,142 @@
+﻿@using ShipRate.Application.DTOs
+@model CorrespondenceFilterDto
+@{
+    ViewData["Title"] = "مدیریت مکاتبات";
+}
+
+<style>
+    .corr-header {
+        background: linear-gradient(135deg, #1e293b, #334155);
+        color: #fff;
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+    }
+    .corr-header h1 {
+        font-size: 1.3rem;
+        margin: 0;
+        font-weight: 700;
+    }
+    .filter-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    .filter-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.75rem;
+        align-items: end;
+    }
+    .filter-row .form-group {
+        margin-bottom: 0;
+    }
+    .filter-row label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #6b7280;
+        margin-bottom: 0.3rem;
+    }
+    .filter-row input, .filter-row select {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
+    }
+    .btn-filter {
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+    }
+</style>
+
+<div class="corr-header">
+    <h1>📋 مدیریت مکاتبات</h1>
+</div>
+
+<div class="filter-card">
+    <form hx-get="@Url.Action("List")"
+          hx-target="#correspondenceList"
+          hx-trigger="submit, change from:select"
+          hx-indicator="#loading">
+
+        <div class="filter-row">
+            <div class="form-group">
+                <label>موضوع</label>
+                <select name="SubjectId" class="form-select">
+                    <option value="">همه</option>
+                    @foreach (var item in ViewBag.Subjects)
+                    {
+                        <option value="@item.Id">@item.SubjectTitle</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>شماره مکاتبه</label>
+                <input type="text" name="CorrespondenceNo" class="form-control" placeholder="جستجو...">
+            </div>
+
+            <div class="form-group">
+                <label>از تاریخ</label>
+                <input type="date" name="DateFrom" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label>تا تاریخ</label>
+                <input type="date" name="DateTo" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label>کلمات کلیدی</label>
+                <input type="text" name="Keywords" class="form-control" placeholder="جستجو...">
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-filter w-100">
+                    <i class="bi bi-search me-1"></i>جستجو
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="mb-3">
+    <button type="button"
+            class="btn btn-success"
+            hx-get="@Url.Action("Create")"
+            hx-target="#modal-content"
+            hx-swap="innerHTML"
+            onclick="showModal()">
+        <i class="bi bi-plus-circle me-1"></i>ایجاد مکاتبه جدید
+    </button>
+</div>
+
+<div id="loading" class="htmx-indicator text-center my-3">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">در حال بارگذاری...</span>
+    </div>
+</div>
+
+<div id="correspondenceList"
+     hx-get="@Url.Action("List")"
+     hx-trigger="load, correspondenceUpdated from:body, correspondenceDeleted from:body"
+     hx-indicator="#loading">
+</div>
+
+<div class="modal fade" id="documentManagerModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="document-manager-content">
+        </div>
+    </div>
+</div>
+
+
+
+
+@* <script>
+    function showModal() {
+        var modal = new bootstrap.Modal(document.getElementById('appModal'));
+        modal.show();
+    }
+</script>
+ *@

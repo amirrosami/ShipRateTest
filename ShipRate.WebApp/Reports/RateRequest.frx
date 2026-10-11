@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="06/13/2026 00:00:00" ReportInfo.Modified="06/13/2026 00:00:00" ReportInfo.CreatorVersion="2026.1.0.0">
+	<Dictionary>
+		<TableDataSource Name="RateRequestHeader" ReferenceName="ReportData.RateRequestHeader" DataType="System.Int32" Enabled="true">
+			<Column Name="RequestNumber" DataType="System.String"/>
+			<Column Name="CustomerName" DataType="System.String"/>
+		</TableDataSource>
+
+		<TableDataSource Name="PackageTypes" ReferenceName="ReportData.PackageTypes" DataType="System.Int32" Enabled="true">
+			<Column Name="PackageTypeName" DataType="System.String"/>
+			<Column Name="UnitCount" DataType="System.Int32"/>
+		</TableDataSource>
+
+		<TableDataSource Name="ContainerTypes" ReferenceName="ReportData.ContainerTypes" DataType="System.Int32" Enabled="true">
+			<Column Name="ContainerSizeTypeName" DataType="System.String"/>
+			<Column Name="Counts" DataType="System.Decimal"/>
+		</TableDataSource>
+	</Dictionary>
+
+	<ReportPage Name="Page1" PaperWidth="210" PaperHeight="297" LeftMargin="10" RightMargin="10" TopMargin="10" BottomMargin="10" Watermark.Font="Arial, 60pt">
+
+		<ReportTitleBand Name="ReportTitle1" Width="718.2" Height="75.6">
+			<TextObject Name="txtTitle" Width="718.2" Height="28.35" Text="RATE REQUEST REPORT" HorzAlign="Center" VertAlign="Center" Font="Arial, 16pt, style=Bold"/>
+			<TextObject Name="txtSubTitle" Top="32" Width="718.2" Height="18.9" Text="Operational Report" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+			<LineObject Name="LineTitle" Top="65" Width="718.2" Border.Color="Gray"/>
+		</ReportTitleBand>
+
+		<DataBand Name="dbHeader" Top="79.6" Width="718.2" Height="85.05" DataSource="RateRequestHeader">
+
+			<TextObject Name="lblRequestNumber" Left="0" Top="5" Width="120" Height="18.9" Text="Request No:" Font="Arial, 9pt, style=Bold"/>
+			<TextObject Name="txtRequestNumber" Left="125" Top="5" Width="220" Height="18.9" Text="[RateRequestHeader.RequestNumber]" Font="Arial, 9pt"/>
+
+			<TextObject Name="lblCustomerName" Left="0" Top="30" Width="120" Height="18.9" Text="Customer:" Font="Arial, 9pt, style=Bold"/>
+			<TextObject Name="txtCustomerName" Left="125" Top="30" Width="400" Height="18.9" Text="[RateRequestHeader.CustomerName]" Font="Arial, 9pt"/>
+
+			<LineObject Name="LineHeaderBottom" Top="75" Width="718.2" Border.Color="Gray"/>
+		</DataBand>
+
+		<DataHeaderBand Name="dhPackage" Top="168.65" Width="718.2" Height="47.25">
+			<TextObject Name="PackageSectionTitle" Top="5" Width="718.2" Height="20" Fill.Color="Gainsboro" Text="PACKAGE TYPES" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+
+			<TextObject Name="PackageCol1" Left="0" Top="28" Width="350" Height="18.9" Border.Lines="All" Fill.Color="LightGray" Text="Package Type" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+			<TextObject Name="PackageCol2" Left="350" Top="28" Width="120" Height="18.9" Border.Lines="All" Fill.Color="LightGray" Text="Unit Count" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+		</DataHeaderBand>
+
+		<DataBand Name="dbPackage" Top="219.9" Width="718.2" Height="22.68" DataSource="PackageTypes">
+			<TextObject Name="txtPackageTypeName" Left="0" Width="350" Height="22.68" Border.Lines="All" Text="[PackageTypes.PackageTypeName]" VertAlign="Center" Font="Arial, 9pt"/>
+			<TextObject Name="txtPackageUnitCount" Left="350" Width="120" Height="22.68" Border.Lines="All" Text="[PackageTypes.UnitCount]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+		</DataBand>
+
+		<DataHeaderBand Name="dhContainer" Top="246.58" Width="718.2" Height="47.25">
+			<TextObject Name="ContainerSectionTitle" Top="5" Width="718.2" Height="20" Fill.Color="Gainsboro" Text="CONTAINER TYPES" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+
+			<TextObject Name="ContainerCol1" Left="0" Top="28" Width="350" Height="18.9" Border.Lines="All" Fill.Color="LightGray" Text="Container Size Type" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+			<TextObject Name="ContainerCol2" Left="350" Top="28" Width="120" Height="18.9" Border.Lines="All" Fill.Color="LightGray" Text="Count" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+		</DataHeaderBand>
+
+		<DataBand Name="dbContainer" Top="297.83" Width="718.2" Height="22.68" DataSource="ContainerTypes">
+			<TextObject Name="txtContainerSizeTypeName" Left="0" Width="350" Height="22.68" Border.Lines="All" Text="[ContainerTypes.ContainerSizeTypeName]" VertAlign="Center" Font="Arial, 9pt"/>
+			<TextObject Name="txtContainerCounts" Left="350" Width="120" Height="22.68" Border.Lines="All" Text="[ContainerTypes.Counts]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+		</DataBand>
+
+		<PageFooterBand Name="PageFooter1" Top="324.51" Width="718.2" Height="28.35">
+			<LineObject Name="FooterLine" Width="718.2" Border.Color="Gray"/>
+			<TextObject Name="txtPrintDate" Top="5" Width="250" Height="18.9" Text="Print Date: [Date]" Font="Arial, 8pt"/>
+			<TextObject Name="txtPageNumber" Left="550" Top="5" Width="168" Height="18.9" Text="Page [Page#]" HorzAlign="Right" Font="Arial, 8pt"/>
+		</PageFooterBand>
+
+	</ReportPage>
+</Report>

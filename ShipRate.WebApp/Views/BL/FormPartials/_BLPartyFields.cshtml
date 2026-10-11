@@ -1,0 +1,341 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@using ShipRate.Application.DTOs.BillOfLadings
+@model BLUpsertDto
+
+@{
+    var lookups = ViewBag.Lookups as BLLookupDto;
+    var parties = Model.Parties ?? new List<BLPartyDto>();
+    var persons = lookups?.Persons ?? Enumerable.Empty<object>();
+
+    var scopeKey = $"bl_{Guid.CreateVersion7():N}";
+    var accordionId = $"blPartiesAccordion_{scopeKey}";
+
+    string GetPartyTitle(int index)
+    {
+        return index switch
+        {
+            0 => "Shipper",
+            1 => "Consignee",
+            2 => "Notify",
+            _ => $"Party {index + 1}"
+        };
+    }
+}
+
+@if (!parties.Any())
+{
+    <div class="alert alert-light border mb-0 py-2 small">
+        No party has been added.
+    </div>
+}
+else
+{
+    <div class="accordion bl-party-accordion compact" id="@accordionId">
+
+        @for (var i = 0; i < parties.Count; i++)
+        {
+            var headerId = $"partyHeader_{scopeKey}_{i}";
+            var collapseId = $"partyCollapse_{scopeKey}_{i}";
+            var isFirst = i == 0;
+            var party = parties[i];
+            var partyTitle = GetPartyTitle(i);
+
+            var isShipper = i == 0;
+            var isConsignee = i == 1;
+            var isNotify = i == 2;
+
+            <div class="accordion-item mb-2 border rounded overflow-hidden">
+
+                <h2 class="accordion-header" id="@headerId">
+                    <button class="accordion-button py-2 px-3 @(isFirst ? "" : "collapsed")"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#@collapseId"
+                            aria-expanded="@(isFirst.ToString().ToLower())"
+                            aria-controls="@collapseId">
+
+                        <div class="d-flex align-items-center gap-2 w-100 overflow-hidden">
+                            <span class="fw-semibold text-nowrap">
+                                @partyTitle
+                            </span>
+
+                            <span class="text-muted small text-truncate js-party-summary">
+                                @(!string.IsNullOrWhiteSpace(party.PartyTextInBL)
+                                                        ? party.PartyTextInBL
+                                                        : "Not selected")
+                            </span>
+                        </div>
+                    </button>
+                </h2>
+
+                <div id="@collapseId"
+                     class="accordion-collapse collapse @(isFirst ? "show" : "")"
+                     aria-labelledby="@headerId"
+                     data-bs-parent="#@accordionId">
+
+                    <div class="accordion-body p-3">
+
+                        <input type="hidden" asp-for="Parties[i].Id" />
+                        <input type="hidden" asp-for="Parties[i].RoleTypeId" />
+
+                        <div class="row g-2 align-items-end">
+
+                            <div class="col-md-4">
+                                <label class="form-label small mb-1">Role</label>
+                                <div>
+                                    <span class="badge text-bg-light border role-badge">@partyTitle</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-8">
+                                <label asp-for="Parties[i].PartyId" class="form-label small mb-1">
+                                    Person
+                                </label>
+                                <select asp-for="Parties[i].PartyId"
+                                        class="form-select form-select-sm js-copy-selected-text"
+                                        data-target="Parties[@i].PartyTextInBL"
+                                        asp-items="@(new SelectList(persons, "Id", "Name", party.PartyId))">
+                                    <option value="">Select Person</option>
+                                </select>
+                                <span asp-validation-for="Parties[i].PartyId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Parties[i].PartyTextInBL" class="form-label small mb-1">
+                                    Text In BL
+                                </label>
+                                <textarea asp-for="Parties[i].PartyTextInBL"
+                                          class="form-control form-control-sm js-party-text"
+                                          rows="3"
+                                          placeholder="Text to display in BL"></textarea>
+                                <span asp-validation-for="Parties[i].PartyTextInBL" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label asp-for="Parties[i].PartyNationalNo" class="form-label small mb-1">
+                                    National No
+                                </label>
+                                <input asp-for="Parties[i].PartyNationalNo"
+                                       class="form-control form-control-sm"
+                                       placeholder="National No" />
+                                <span asp-validation-for="Parties[i].PartyNationalNo" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label asp-for="Parties[i].PartyTelephone" class="form-label small mb-1">
+                                    Tel
+                                </label>
+                                <input asp-for="Parties[i].PartyTelephone"
+                                       class="form-control form-control-sm"
+                                       placeholder="Telephone" />
+                                <span asp-validation-for="Parties[i].PartyTelephone" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label asp-for="Parties[i].PartyMobile" class="form-label small mb-1">
+                                    Mobile
+                                </label>
+                                <input asp-for="Parties[i].PartyMobile"
+                                       class="form-control form-control-sm"
+                                       placeholder="Mobile" />
+                                <span asp-validation-for="Parties[i].PartyMobile" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label asp-for="Parties[i].PartyEmail" class="form-label small mb-1">
+                                    Email
+                                </label>
+                                <input asp-for="Parties[i].PartyEmail"
+                                       class="form-control form-control-sm"
+                                       placeholder="Email" />
+                                <span asp-validation-for="Parties[i].PartyEmail" class="text-danger small"></span>
+                            </div>
+
+                            @if (isShipper)
+                            {
+                                <div class="col-md-12">
+                                    <label asp-for="Parties[i].PartyFax" class="form-label small mb-1">
+                                        Fax
+                                    </label>
+                                    <input asp-for="Parties[i].PartyFax"
+                                           class="form-control form-control-sm"
+                                           placeholder="Fax" />
+                                    <span asp-validation-for="Parties[i].PartyFax" class="text-danger small"></span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-md-3">
+                                    <label asp-for="Parties[i].PartyFax" class="form-label small mb-1">
+                                        Fax
+                                    </label>
+                                    <input asp-for="Parties[i].PartyFax"
+                                           class="form-control form-control-sm"
+                                           placeholder="Fax" />
+                                    <span asp-validation-for="Parties[i].PartyFax" class="text-danger small"></span>
+                                </div>
+                            }
+
+                            @if (isConsignee)
+                            {
+                                <div class="col-md-9">
+                                    <label class="form-label small mb-1">
+                                        Options
+                                    </label>
+
+                                    <div class="border rounded bg-light px-2 py-2">
+                                        <div class="d-flex flex-wrap gap-3 align-items-center">
+
+                                            <div class="form-check mb-0">
+                                                <input asp-for="Parties[i].IsConsigneeToOrder"
+                                                       class="form-check-input" />
+                                                <label asp-for="Parties[i].IsConsigneeToOrder"
+                                                       class="form-check-label small">
+                                                    To Order
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check mb-0">
+                                                <input asp-for="Parties[i].IsConsigneeToOrderOf"
+                                                       class="form-check-input" />
+                                                <label asp-for="Parties[i].IsConsigneeToOrderOf"
+                                                       class="form-check-label small">
+                                                    To Order Of
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check mb-0">
+                                                <input asp-for="Parties[i].IsConsigneeToBearer"
+                                                       class="form-check-input" />
+                                                <label asp-for="Parties[i].IsConsigneeToBearer"
+                                                       class="form-check-label small">
+                                                    To Bearer
+                                                </label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else if (isNotify)
+                            {
+                                <div class="col-md-9">
+                                    <label class="form-label small mb-1">
+                                        Options
+                                    </label>
+
+                                    <div class="border rounded bg-light px-2 py-2">
+                                        <div class="d-flex flex-wrap gap-3 align-items-center">
+
+                                            <div class="form-check mb-0">
+                                                <input asp-for="Parties[i].IsNotifySameAs"
+                                                       class="form-check-input js-notify-same-as"
+                                                       data-target-name="Parties[@i].PartyTextInBL" />
+
+                                                <label asp-for="Parties[i].IsNotifySameAs"
+                                                       class="form-check-label small">
+                                                    Notify Same As
+                                                </label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        }
+
+    </div>
+}
+
+<script>
+    function updatePartySummary(input) {
+        const accordionItem = input.closest(".accordion-item");
+        if (!accordionItem) return;
+
+        const summary = accordionItem.querySelector(".js-party-summary");
+        if (!summary) return;
+
+        const value = input.value.trim().replace(/\s+/g, ' ');
+        summary.textContent = value || "Not selected";
+    }
+
+    document.body.addEventListener("input", function (e) {
+        const input = e.target;
+
+        if (!input.classList.contains("js-party-text")) return;
+
+        updatePartySummary(input);
+    });
+
+    document.body.addEventListener("change", function (e) {
+        const checkbox = e.target;
+
+        if (!checkbox.classList.contains("js-notify-same-as")) return;
+
+        const targetName = checkbox.getAttribute("data-target-name");
+        if (!targetName) return;
+
+        const target = document.querySelector(`[name="${targetName}"]`);
+        if (!target) return;
+
+    if (checkbox.checked) {
+        target.value = "Same As Consignee";
+        target.setAttribute("readonly", "readonly");
+    } else {
+        target.removeAttribute("readonly");
+
+        if (target.value.trim() === "Same As Consignee") {
+            target.value = "";
+        }
+    }
+        updatePartySummary(target);
+
+        target.dispatchEvent(new Event("input", { bubbles: true }));
+        target.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+</script>
+
+<style>
+    .bl-party-accordion.compact .accordion-button {
+        background: #f8f9fa;
+        box-shadow: none;
+        min-height: 42px;
+    }
+
+        .bl-party-accordion.compact .accordion-button:not(.collapsed) {
+            background: #eef4ff;
+            color: #0d6efd;
+        }
+
+    .bl-party-accordion.compact .accordion-body {
+        background: #fff;
+    }
+
+    .bl-party-accordion.compact .form-label {
+        font-weight: 600;
+    }
+
+    .bl-party-accordion.compact textarea.form-control-sm {
+        min-height: 78px;
+        resize: vertical;
+    }
+
+    .bl-party-accordion.compact .form-check-input {
+        margin-top: .2rem;
+    }
+
+    .bl-party-accordion.compact .js-party-summary {
+        max-width: 650px;
+    }
+
+    .role-badge {
+        font-size: .85rem;
+        padding: .45rem .7rem;
+    }
+</style>

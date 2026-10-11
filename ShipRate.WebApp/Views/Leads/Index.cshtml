@@ -1,0 +1,147 @@
+﻿@{
+    ViewData["Title"] = "Leads";
+}
+
+<div class="container-fluid mt-3">
+    <!-- Search Panel در بالای صفحه -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div id="search-panel"
+                 hx-get="@Url.Action("SearchPanel", "Leads")"
+                 hx-trigger="load"
+                 hx-target="#search-panel"
+                 hx-swap="innerHTML">
+            </div>
+        </div>
+    </div>
+
+    <!-- گریدها -->
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex mb-2">
+                <button class="btn btn-sm btn-primary ms-auto"
+                        hx-get="@Url.Action("CreateForm", "Leads")"
+                        hx-target="#lead-modal-body"
+                        hx-swap="innerHTML"
+                        data-bs-toggle="modal"
+                        data-bs-target="#leadModal">
+                    New Lead
+                </button>
+            </div>
+
+            <div id="lead-grid"
+                 hx-get="@Url.Action("Grid", "Leads")"
+                 hx-trigger="load"
+                 hx-target="#lead-grid"
+                 hx-swap="innerHTML">
+            </div>
+
+            <hr />
+
+            <h5>Lead Activities</h5>
+            <div id="activity-grid">
+                <div class="text-muted small">Select a lead to see activities.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lead Modal -->
+<div class="modal fade" id="leadModal" tabindex="-1" aria-labelledby="leadModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="leadModalLabel">Lead</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="lead-modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Activity Modal -->
+<div class="modal fade" id="activityModal" tabindex="-1" aria-labelledby="activityModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="activityModalLabel">Activity</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="activity-modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Modal (بدنه‌اش با Partial پر می‌شود) -->
+<div id="assign-modal-container"></div>
+
+<!-- HTMX Triggers -->
+<div hx-trigger="leadSaved from:body"
+     hx-get="@Url.Action("Grid", "Leads")"
+     hx-target="#lead-grid"
+     hx-swap="innerHTML">
+</div>
+
+<div hx-trigger="leadDeleted from:body"
+     hx-get="@Url.Action("Grid", "Leads")"
+     hx-target="#lead-grid"
+     hx-swap="innerHTML">
+</div>
+
+<div hx-trigger="activitySaved from:body"
+     hx-get=""
+     hx-target="#activity-grid"
+     hx-swap="innerHTML">
+</div>
+
+<div hx-trigger="activityDeleted from:body"
+     hx-get=""
+     hx-target="#activity-grid"
+     hx-swap="innerHTML">
+</div>
+
+
+<div hx-trigger="leadAssigned from:body"
+     hx-get="@Url.Action("Grid", "Leads")"
+     hx-target="#lead-grid"
+     hx-swap="innerHTML">
+</div>
+
+
+
+
+
+@section Scripts {
+    <script>
+        // بستن خودکار مودال Assign بعد از انجام Assign
+        document.body.addEventListener('htmx:afterSwap', function (evt) {
+            if (evt.detail.target && evt.detail.target.id === 'assign-modal-container') {
+                var assignModalEl = document.getElementById('assignModal');
+                if (assignModalEl) {
+                    var modal = bootstrap.Modal.getInstance(assignModalEl) || new bootstrap.Modal(assignModalEl);
+                    modal.hide();
+                }
+            }
+        });
+
+        // بستن خودکار مودال Lead بعد از ذخیره
+        document.body.addEventListener('leadSaved', function () {
+            var leadModalEl = document.getElementById('leadModal');
+            if (leadModalEl) {
+                var modal = bootstrap.Modal.getInstance(leadModalEl) || new bootstrap.Modal(leadModalEl);
+                modal.hide();
+            }
+        });
+
+        // بستن خودکار مودال Activity بعد از ذخیره
+        document.body.addEventListener('activitySaved', function () {
+            var activityModalEl = document.getElementById('activityModal');
+            if (activityModalEl) {
+                var modal = bootstrap.Modal.getInstance(activityModalEl) || new bootstrap.Modal(activityModalEl);
+                modal.hide();
+            }
+        });
+    </script>
+}

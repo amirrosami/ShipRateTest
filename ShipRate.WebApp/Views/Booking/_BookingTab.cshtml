@@ -1,0 +1,67 @@
+﻿@using ShipRate.Application.JobsViewModels
+@model BookingTabVm
+
+<div class="card-header d-flex justify-content-between align-items-center">
+    <span class="fw-bold">Bookings</span>
+    <button type="button"
+            class="btn btn-sm btn-primary"
+            hx-get="@Url.Action("OpenBookingModal", "Booking", new { jobId = Model.JobId })"
+            hx-target="#bookingModal"
+            hx-swap="innerHTML">
+        <i class="bi bi-plus-lg me-1"></i> Add Booking
+    </button>
+</div>
+
+<div id="bookings-table-container"
+     hx-get="@Url.Action("BookingsList", "Jobs", new { jobId = Model.JobId })"
+     hx-trigger="bookingUpdated from:body, bookingDeleted from:body"
+     hx-swap="innerHTML">
+    @await Html.PartialAsync("~/Views/Booking/_BookingTable.cshtml", Model.Bookings)
+</div>
+
+<input type="hidden" id="selected-booking-id" name="bookingId" value="" />
+
+<div id="rts-instructions-container" class="mt-3">
+    <!-- محتوای RTS با انتخاب هر بوکینگ لود می‌شود -->
+</div>
+
+<script>
+    // تضمین باز شدن مودال پس از اتمام لود HTMX
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (evt.detail.target.id === "bookingModal") {
+            const modalEl = document.getElementById('bookingModal');
+            if (modalEl) {
+                const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+                modalInstance.show();
+            }
+        }
+    });
+
+    // آنتی‌فریز: پاکسازی تمام لایه‌های سیاه اضافی به محض بسته شدن مودال
+    document.addEventListener('hidden.bs.modal', function () {
+        // حذف تمام بک‌دراپ‌های اضافی و یتیم از DOM
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+
+        // برگرداندن وضعیت طبیعی به body
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
+
+        // خالی کردن محتوای داخلی مودال جهت جلوگیری از تداخل دفعه بعد
+        const modalContent = document.getElementById('bookingModal');
+        if (modalContent) {
+            modalContent.innerHTML = '';
+        }
+    });
+
+    // بستن مودال با تریگر سرور
+    document.body.addEventListener("bookingSaved", function () {
+        const modalEl = document.getElementById('bookingModal');
+        if (modalEl) {
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+        }
+    });
+</script>

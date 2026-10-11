@@ -1,0 +1,70 @@
+﻿@using ShipRate.Application.ViewModels
+@model ContainerActionSearchFormVm
+
+<form hx-get="@Url.Action("Index", "ContainerActions")"
+      hx-target="#container-action-table-container"
+      hx-swap="innerHTML"
+      hx-trigger="submit, keyup changed delay:500ms from:#ContainerNumber"
+      class="row g-1 align-items-center">
+
+    <input type="hidden" name="pageNumber" value="1" />
+    <input type="hidden" name="pageSize" value="10" />
+
+    <div class="col-md-2">
+        <input asp-for="ContainerNumber"
+               id="ContainerNumber"
+               class="form-control form-control-sm"
+               placeholder="Container No" />
+    </div>
+
+    <div class="col-md-2">
+        <select asp-for="CntActionTypeId" asp-items="Model.ActionTypes" class="form-select form-select-sm">
+            <option value="">Action Type</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <input asp-for="LocationName"
+               id="LocationName"
+               class="form-control form-control-sm"
+               placeholder="Location " />
+    </div>
+    <div class="col-md-1">
+        <select asp-for="CntOwnTypeId" asp-items="Model.OwnershipTypes" class="form-select form-select-sm">
+            <option value="">Owner</option>
+        </select>
+    </div>
+
+    <div class="col-md-1">
+        <select asp-for="FullMTId" asp-items="Model.FullEmptyTypes" class="form-select form-select-sm">
+            <option value="">F/M</option>
+        </select>
+    </div>
+
+    <div class="col-md-1">
+        <select asp-for="EventActionSourceId" asp-items="Model.EventSources" class="form-select form-select-sm">
+            <option value="">Source</option>
+        </select>
+    </div>
+
+    <div class="col-md-1">
+        <input asp-for="FromDate" type="date" class="form-control form-control-sm" title="From Date" />
+    </div>
+
+    <div class="col-md-1">
+        <input asp-for="ToDate" type="date" class="form-control form-control-sm" title="To Date" />
+    </div>
+
+    <div class="col-md-auto">
+        <button type="submit" class="btn btn-primary btn-sm px-3">
+            Search
+        </button>
+    </div>
+
+    <div class="col-md-auto">
+        <a href="@Url.Action("Index", "ContainerActions")"
+           class="btn btn-outline-secondary btn-sm px-3">
+            Reset
+        </a>
+    </div>
+</form>

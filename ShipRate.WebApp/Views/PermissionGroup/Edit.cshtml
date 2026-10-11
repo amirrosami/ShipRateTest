@@ -1,0 +1,78 @@
+﻿@using ShipRate.Web.ViewModels.PermissionGroupsManagement
+@model EditPermissionGroupViewModel
+
+@{
+    ViewData["Title"] = "Edit Permission Group";
+}
+
+<div class="container-fluid mt-4">
+    <h2>@ViewData["Title"]</h2>
+
+    <form asp-action="Edit" method="post" class="mt-4">
+        @Html.AntiForgeryToken()
+        <input asp-for="Id" type="hidden" />
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label">Group Name</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label">Remarks</label>
+            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <div class="form-check">
+                <input asp-for="IsActive" class="form-check-input" />
+                <label asp-for="IsActive" class="form-check-label">Active</label>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Select Permission</label>
+
+            @{
+                var categories = Model.AvailablePermissions
+                .GroupBy(p => p.Category)
+                .OrderBy(g => g.Key);
+            }
+
+            @foreach (var category in categories)
+            {
+                <div class="card mb-2">
+                    <div class="card-header">
+                        <strong>@category.Key</strong>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var permission in category)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                       name="SelectedPermissionIds"
+                                       value="@permission.Id"
+                                       id="perm_@permission.Id"
+                                       @(Model.SelectedPermissionIds.Contains(permission.Id) ? "checked" : "") />
+                                <label class="form-check-label" for="perm_@permission.Id">
+                                    @permission.DisplayName
+                                    <small class="text-muted">(@permission.Name)</small>
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

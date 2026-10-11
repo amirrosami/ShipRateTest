@@ -1,0 +1,187 @@
+﻿@* ============================================
+   NAVBAR PARTIAL VIEW
+   ============================================ *@
+
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
+@using ShipRate.Domain.Entities.Security
+@inject UserManager<ApplicationUser> UserManager
+
+
+
+@{
+    var displayName = User.FindFirst("FullName")?.Value
+                      ?? User.Identity?.Name
+                      ?? "User";
+
+    var displayRole = User.FindFirst("JobTitle")?.Value ?? "No Job Title";
+
+    var nameParts = displayName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+    var initials = nameParts.Length switch
+    {
+        >= 2 => $"{nameParts[0][0]}{nameParts[1][0]}".ToUpper(),
+        1 => $"{nameParts[0][0]}".ToUpper(),
+        _ => "U"
+    };
+
+    var currentUser = await UserManager.GetUserAsync(User);
+    var hasProfilePicture = currentUser?.Pic != null && currentUser.Pic.Length > 0;
+}
+
+
+<style>
+    .user-avatar {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        border-radius: 50%;
+        background: #6366f1;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 18px;
+        overflow: hidden;
+    }
+
+    .user-avatar-photo {
+        padding: 0;
+        background: transparent;
+    }
+
+        .user-avatar-photo img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+</style>
+
+
+<nav class="sneat-navbar">
+    <div class="navbar-left">
+        <button class="hamburger-btn" id="hamburgerBtn" title="Toggle Sidebar">
+            <i class="bi bi-list"></i>
+        </button>
+        @*         <div class="navbar-search">
+            <i class="bi bi-search search-icon"></i>
+            <input type="text" placeholder="Search shipments, customers...">
+        </div>
+ *@    </div>
+
+    <div class="navbar-right">
+
+        @if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            <div class="d-flex align-items-center gap-2">
+                @await Component.InvokeAsync("CompanySelector")
+            </div>
+        }
+
+        <!-- Theme Toggle -->
+        <button class="navbar-icon-btn" id="themeToggleBtn" title="Toggle Theme">
+            <i class="bi bi-moon-fill" id="themeIcon"></i>
+        </button>
+
+        <!-- Language -->
+        @*         <button class="navbar-icon-btn" title="Language">
+            <i class="bi bi-translate"></i>
+        </button>
+ *@
+
+        @*       <!-- Notifications -->
+        <button class="navbar-icon-btn" title="Notifications">
+            <i class="bi bi-bell"></i>
+            <span class="badge-dot"></span>
+        </button> *@
+
+
+        <!-- Notifications -->
+        <div id="navbarNotifications"
+             class="dropdown"
+             hx-get="@Url.Action("Navbar", "Notifications")"
+             hx-trigger="load, notificationChanged from:body"
+             hx-swap="innerHTML">
+            <button class="navbar-icon-btn"
+                    type="button"
+                    title="Notifications"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                <i class="bi bi-bell"></i>
+                <span class="badge-dot"></span>
+            </button>
+        </div>
+
+
+
+
+        <!-- Messages -->
+        <div id="navbarMessages"
+             class="dropdown"
+             hx-get="@Url.Action("Navbar", "Messaging")"
+             hx-trigger="load, messagingChanged from:body"
+             hx-swap="innerHTML">
+            <button class="navbar-icon-btn"
+                    type="button"
+                    title="Messages"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                <i class="bi bi-chat-dots"></i>
+            </button>
+        </div>
+
+
+
+        <!-- User -->
+        <div class="dropdown">
+            <div class="user-avatar-wrapper" data-bs-toggle="dropdown" aria-expanded="false">
+
+
+                @if (hasProfilePicture)
+                {
+                    <div class="user-avatar user-avatar-photo">
+                        <img src="@Url.Action("UserPhoto", "UserManagement", new { id = User?.FindFirstValue(ClaimTypes.NameIdentifier) })"
+                             alt="@displayName" />
+                    </div>
+                }
+                else
+                {
+                    <div class="user-avatar">@initials</div>
+                }
+
+
+
+
+
+                <div class="user-info">
+                    <span class="user-name">@displayName</span>
+                    <span class="user-role">@displayRole</span>
+                </div>
+            </div>            <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="min-width: 200px;">
+                <li>
+                    <a class="dropdown-item" href="#">
+                        <i class="bi bi-person me-2"></i> My Profile
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="#">
+                        <i class="bi bi-gear me-2"></i> Account Settings
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item text-danger" href="#">
+                        <form asp-controller="Account" asp-action="Logout" method="post" style="margin: 0;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-link text-danger" title="Logout">
+                                <i class="bi bi-box-arrow-right me-2"></i> Logout
+                            </button>
+                        </form>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

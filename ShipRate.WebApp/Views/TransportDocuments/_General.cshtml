@@ -1,0 +1,152 @@
+﻿@using ShipRate.Application.ViewModels
+@model TransportDocumentUpsertVm
+
+<div class="row g-3">
+
+    <div class="col-md-3">
+        <label asp-for="TransportTypeId" class="form-label"></label>
+        <select asp-for="TransportTypeId"
+                asp-items="Model.TransportTypes"
+                class="form-select">
+            <option value="">-- Select --</option>
+        </select>
+        <span asp-validation-for="TransportTypeId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="BLTypeId" class="form-label"></label>
+        <select asp-for="BLTypeId"
+                asp-items="Model.BLTypes"
+                class="form-select">
+            <option value="">-- Select --</option>
+        </select>
+        <span asp-validation-for="BLTypeId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="BLLevelId" class="form-label"></label>
+        <select asp-for="BLLevelId"
+                asp-items="Model.BLLevels"
+                class="form-select">
+            <option value="">-- Select --</option>
+        </select>
+        <span asp-validation-for="BLLevelId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="BLStatusId" class="form-label"></label>
+        <select asp-for="BLStatusId"
+                asp-items="Model.BLStatuses"
+                class="form-select">
+            <option value="">-- Select --</option>
+        </select>
+        <span asp-validation-for="BLStatusId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="BLNo" class="form-label"></label>
+        <input asp-for="BLNo" class="form-control" />
+        <span asp-validation-for="BLNo" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="BLIssueDate" class="form-label"></label>
+        <input asp-for="BLIssueDate" type="date" class="form-control" />
+        <span asp-validation-for="BLIssueDate" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="PlaceOfIssue" class="form-label"></label>
+        <input asp-for="PlaceOfIssue" class="form-control" />
+        <span asp-validation-for="PlaceOfIssue" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="CompanyId" class="form-label"></label>
+        <select asp-for="CompanyId"
+                asp-items="Model.Companies"
+                class="form-select">
+            <option value="">-- Select --</option>
+        </select>
+        <span asp-validation-for="CompanyId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="CarrierId" class="form-label"></label>
+        <select asp-for="CarrierId"
+                asp-items="Model.Carriers"
+                class="form-select">
+            <option value="">-- Select --</option>
+        </select>
+        <span asp-validation-for="CarrierId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="IssuerPartyId" class="form-label"></label>
+        <select asp-for="IssuerPartyId"
+                asp-items="Model.Parties"
+                class="form-select">
+            <option value="">-- Select --</option>
+        </select>
+        <span asp-validation-for="IssuerPartyId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="BLReleaseTypeId" class="form-label"></label>
+        <select asp-for="BLReleaseTypeId"
+                asp-items="Model.BLReleaseTypes"
+                class="form-select">
+            <option value="">-- Select --</option>
+        </select>
+        <span asp-validation-for="BLReleaseTypeId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="ReleaseDate" class="form-label"></label>
+        <input asp-for="ReleaseDate" type="date" class="form-control" />
+        <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-2">
+        <label asp-for="OriginalCount" class="form-label"></label>
+        <input asp-for="OriginalCount" type="number" min="0" class="form-control" />
+        <span asp-validation-for="OriginalCount" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-2">
+        <label asp-for="CopyCount" class="form-label"></label>
+        <input asp-for="CopyCount" type="number" min="0" class="form-control" />
+        <span asp-validation-for="CopyCount" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="SerialNo" class="form-label"></label>
+        <input asp-for="SerialNo" class="form-control" />
+        <span asp-validation-for="SerialNo" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="ExportReference" class="form-label"></label>
+        <input asp-for="ExportReference" class="form-control" />
+        <span asp-validation-for="ExportReference" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="ForwardingAgentReference" class="form-label"></label>
+        <input asp-for="ForwardingAgentReference" class="form-control" />
+        <span asp-validation-for="ForwardingAgentReference" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-12">
+        <div class="form-check mt-2">
+            <input asp-for="IssuedByUs" class="form-check-input" />
+            <label asp-for="IssuedByUs" class="form-check-label"></label>
+        </div>
+
+        <div class="form-check mt-2">
+            <input asp-for="IsSwitched" class="form-check-input" />
+            <label asp-for="IsSwitched" class="form-check-label"></label>
+        </div>
+    </div>
+
+</div>

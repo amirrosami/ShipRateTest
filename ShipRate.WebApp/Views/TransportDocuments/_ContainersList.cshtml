@@ -1,0 +1,19 @@
+﻿@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@using ShipRate.Application.ViewModels
+
+@model TransportDocumentUpsertVm
+
+@if (Model.Containers != null && Model.Containers.Any())
+{
+    for (var i = 0; i < Model.Containers.Count; i++)
+    {
+        var containerViewData = new ViewDataDictionary(ViewData)
+        {
+            ["ContainerIndex"] = i,
+            ["ContainerSizeTypes"] = Model.ContainerSizeTypes,
+        };
+
+        @await Html.PartialAsync("_ContainerFormFields", Model.Containers[i], containerViewData)
+        @await Html.PartialAsync("_ContainerCargoAllocationRows", Model.Containers[i], containerViewData)
+    }
+}

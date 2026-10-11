@@ -1,0 +1,65 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model SettlementHeaderEditDto
+
+<form hx-post="@Url.Action("UpdateHeader", "Settlements")"
+      hx-target="#headerPanel"
+      hx-swap="innerHTML">
+
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="SettlementNo" />
+
+    <div class="row g-3">
+
+        <div class="col-md-3">
+            <label class="form-label">Settlement No</label>
+            <input asp-for="SettlementNo" class="form-control" readonly />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Company</label>
+            <select asp-for="CompanyId" class="form-select" asp-items="ViewBag.Companies"></select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Settlement Date</label>
+            <input asp-for="SettlementDate" type="date" class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Currency</label>
+            <select asp-for="CurrencyId" class="form-select" asp-items="ViewBag.Currencies"></select>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Party</label>
+
+            <input type="hidden" asp-for="PartyId" id="EditPartyId" />
+
+            <input type="text"
+                   asp-for="PartyName"
+                   id="EditPartyName"
+                   class="form-control"
+                   autocomplete="off"
+                   hx-get="@Url.Action("Parties", "Lookup")"
+                   hx-trigger="keyup changed delay:400ms"
+                   hx-target="#editPartyResults"
+                   hx-include="#EditPartyName"
+                   hx-vals='{"targetId":"EditPartyId","targetText":"EditPartyName"}' />
+
+            <div id="editPartyResults"></div>
+        </div>
+        <div class="col-md-12">
+            <label class="form-label">Remarks</label>
+            <textarea asp-for="Remarks" class="form-control" rows="2"></textarea>
+        </div>
+        <div class="col-md-12 text-end">
+            <button type="submit" class="btn btn-primary">
+                Save Header
+            </button>
+        </div>
+
+    </div>
+
+</form>

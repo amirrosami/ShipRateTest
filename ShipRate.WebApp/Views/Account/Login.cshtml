@@ -1,0 +1,776 @@
+﻿@model LoginViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — ShipRate</title>
+
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
+
+    <style>
+        /* ───────── CSS Variables (Light) ───────── */
+        :root {
+            --bg-body: #f1f5f9;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-input: rgba(248, 250, 252, 0.8);
+            --bg-input-focus: #ffffff;
+            --border-card: rgba(255, 255, 255, 0.6);
+            --border-input: #cbd5e1;
+            --border-input-focus: #2563eb;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --text-placeholder: #94a3b8;
+            --shadow-card: 0 20px 40px rgba(15, 23, 42, 0.08);
+            --shadow-btn: 0 4px 14px rgba(37,99,235,0.35);
+            --focus-ring: rgba(37,99,235,0.15);
+            --toggle-bg: #ffffff;
+            --toggle-icon: #64748b;
+            --blob-color-1: rgba(147, 197, 253, 0.4);
+            --blob-color-2: rgba(196, 181, 253, 0.4);
+            --brand-gradient: linear-gradient(135deg, #1e3a8a, #3b82f6);
+        }
+
+        /* ───────── CSS Variables (Dark) ───────── */
+        [data-theme="dark"] {
+            --bg-body: #0b0f19;
+            --bg-card: rgba(30, 41, 59, 0.75);
+            --bg-input: rgba(15, 23, 42, 0.6);
+            --bg-input-focus: #0f172a;
+            --border-card: rgba(255, 255, 255, 0.08);
+            --border-input: rgba(255, 255, 255, 0.15);
+            --border-input-focus: #3b82f6;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --text-placeholder: #475569;
+            --shadow-card: 0 20px 40px rgba(0, 0, 0, 0.4);
+            --shadow-btn: 0 4px 14px rgba(37,99,235,0.45);
+            --focus-ring: rgba(59,130,246,0.25);
+            --toggle-bg: #1e293b;
+            --toggle-icon: #f1f5f9;
+            --blob-color-1: rgba(30, 58, 138, 0.4);
+            --blob-color-2: rgba(88, 28, 135, 0.35);
+            --brand-gradient: linear-gradient(135deg, #0f172a, #1e3a8a);
+        }
+
+        /* ───────── Reset & Base ───────── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-body);
+            transition: background 0.4s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ───────── Background Blobs (SaaS Visual Depth) ───────── */
+        .bg-blobs {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.8;
+            transition: background 0.4s ease;
+        }
+
+        .blob-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--blob-color-1);
+            top: -10%;
+            left: -10%;
+        }
+
+        .blob-2 {
+            width: 450px;
+            height: 450px;
+            background: var(--blob-color-2);
+            bottom: -10%;
+            right: -10%;
+        }
+
+        /* ───────── Theme Toggle ───────── */
+        .theme-toggle {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            border: 1px solid var(--border-card);
+            background: var(--toggle-bg);
+            color: var(--toggle-icon);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+
+            .theme-toggle:hover {
+                transform: rotate(15deg) scale(1.08);
+                border-color: var(--border-input-focus);
+                color: var(--text-primary);
+            }
+
+            .theme-toggle .bi-sun-fill {
+                display: none;
+            }
+
+            .theme-toggle .bi-moon-fill {
+                display: inline;
+            }
+
+        [data-theme="dark"] .theme-toggle .bi-sun-fill {
+            display: inline;
+        }
+
+        [data-theme="dark"] .theme-toggle .bi-moon-fill {
+            display: none;
+        }
+
+        /* ───────── Two-Column Premium Layout Container ───────── */
+        .page-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 960px;
+            margin: 20px;
+            display: flex;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+            animation: containerEntrance 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Entrance Animation */
+        @@keyframes containerEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Left Side: Brand Banner (Interactive graphic & info) */
+        .brand-banner {
+            flex: 1.1;
+            background: var(--brand-gradient);
+            padding: 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            color: #ffffff;
+            transition: background 0.4s ease;
+        }
+
+            .brand-banner::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: radial-gradient(circle at 10% 20%, rgba(255,255,255,0.08) 0%, transparent 60%);
+                pointer-events: none;
+            }
+
+        .brand-badge {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .brand-text h2 {
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 16px;
+        }
+
+        .brand-text p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.6;
+        }
+
+        .brand-features {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+            .feature-item i {
+                font-size: 18px;
+                color: #f59e0b;
+            }
+
+        /* Right Side: Form Container */
+        .form-section {
+            flex: 1;
+            padding: 48px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* ───────── Logo ───────── */
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(37,99,235,0.2);
+        }
+
+            .logo-icon svg {
+                width: 24px;
+                height: 24px;
+                fill: #fff;
+            }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+            .logo h1 span {
+                color: #f59e0b;
+            }
+
+        .logo p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* ───────── Form Controls ───────── */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                display: block;
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text-secondary);
+                margin-bottom: 8px;
+            }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+            .input-wrapper i.icon {
+                position: absolute;
+                left: 14px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 18px;
+                color: var(--text-muted);
+                transition: color 0.3s;
+            }
+
+            .input-wrapper input {
+                width: 100%;
+                height: 46px;
+                padding: 0 16px 0 44px;
+                border: 1.5px solid var(--border-input);
+                border-radius: 10px;
+                font-family: inherit;
+                font-size: 14px;
+                color: var(--text-primary);
+                background: var(--bg-input);
+                outline: none;
+                transition: all 0.25s ease;
+            }
+
+                .input-wrapper input:focus {
+                    border-color: var(--border-input-focus);
+                    background: var(--bg-input-focus);
+                    box-shadow: 0 0 0 4px var(--focus-ring);
+                }
+
+                .input-wrapper input::placeholder {
+                    color: var(--text-placeholder);
+                }
+
+        .toggle-pw {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 18px;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+
+            .toggle-pw:hover {
+                color: var(--text-primary);
+            }
+
+        /* ───────── Captcha Section ───────── */
+        .captcha-area {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .captcha-img-box {
+            flex-grow: 1;
+            height: 48px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1.5px solid var(--border-input);
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .captcha-img-box img {
+                height: 100%;
+                width: 100%;
+                object-fit: cover;
+            }
+
+        .btn-refresh-captcha {
+            height: 48px;
+            width: 48px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border-input);
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .btn-refresh-captcha:hover {
+                border-color: var(--border-input-focus);
+                color: var(--border-input-focus);
+                background: var(--bg-input-focus);
+                transform: rotate(45deg);
+            }
+
+        /* ───────── Validation ───────── */
+        .field-validation-error {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .input-validation-error {
+            border-color: #ef4444 !important;
+        }
+
+        /* ───────── Remember Me & Forgot Password ───────── */
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            font-size: 13px;
+        }
+
+            .options label {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                cursor: pointer;
+                color: var(--text-secondary);
+                font-weight: 500;
+            }
+
+                .options label input[type="checkbox"] {
+                    width: 16px;
+                    height: 16px;
+                    border-radius: 4px;
+                    accent-color: #2563eb;
+                    cursor: pointer;
+                }
+
+            .options a {
+                color: #2563eb;
+                text-decoration: none;
+                font-weight: 600;
+                transition: color 0.2s;
+            }
+
+                .options a:hover {
+                    color: #1d4ed8;
+                    text-decoration: underline;
+                }
+
+        /* ───────── Submit Button ───────── */
+        .btn-login {
+            width: 100%;
+            height: 48px;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            color: #fff;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: var(--shadow-btn);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+            .btn-login:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(37,99,235,0.45);
+            }
+
+            .btn-login:active {
+                transform: translateY(0) scale(0.98);
+            }
+
+        /* ───────── Error Summary ───────── */
+        .error-summary {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            font-size: 13px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ───────── Footer ───────── */
+        .footer {
+            text-align: center;
+            margin-top: 28px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ───────── Responsive Design ───────── */
+        @@media (max-width: 850px) {
+            .page-wrapper {
+                max-width: 440px;
+                flex-direction: column;
+            }
+
+            .brand-banner {
+                display: none; /* Hide illustrative panel on small devices */
+            }
+
+            .form-section {
+                padding: 40px 32px;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .page-wrapper {
+                margin: 15px;
+            }
+
+            .form-section {
+                padding: 32px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Blurred Glowing Orbs in Background -->
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
+        <i class="bi bi-moon-fill"></i>
+        <i class="bi bi-sun-fill"></i>
+    </button>
+
+    <!-- Main Container Card -->
+    <div class="page-wrapper">
+
+        <!-- Left Banner: Visible on Larger Screen Viewports -->
+        <div class="brand-banner">
+            <div class="brand-badge">ShipRate TMS</div>
+
+            <div class="brand-text">
+                <h3>Optimize and Manage your Freight Operations.</h3>
+                <p>An intelligent ecosystem built to control transportation tariffs, calculate carrier ratings, and keep shipments under one unified dashboard.</p>
+                <p>Proper for shipping lines , NVOCCs , forwarders,customs brokers,third party agents and transit carriers.</p>
+            </div>
+
+            <div class="brand-features">
+                <div class="feature-item">
+                    <i class="bi bi-shield-fill-check"></i>
+                    <span>Secure multi-tenant data structures</span>
+                </div>
+                <div class="feature-item">
+                    <i class="bi bi-cpu-fill"></i>
+                    <span>Optimized communications and notifications</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section: Login Form -->
+        <div class="form-section">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 16 16">
+                        <path d="M8 1a.5.5 0 0 1 .5.5V3h2a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H8.5v1H11a1 1 0 0 1 .98.804l.625 3.124A1 1 0 0 1 11.625 11H4.375a1 1 0 0 1-.98-1.072L4.02 6.804A1 1 0 0 1 5 6h2.5V5H5.5A.5.5 0 0 1 5 4.5v-1a.5.5 0 0 1 .5-.5h2V1.5A.5.5 0 0 1 8 1z" />
+                        <path d="M2.5 12a.5.5 0 0 0-.37.835l1.5 1.7a.5.5 0 0 0 .37.165h8a.5.5 0 0 0 .37-.165l1.5-1.7A.5.5 0 0 0 13.5 12h-11z" />
+                    </svg>
+                </div>
+                <h1>Ship<span>Rate</span></h1>
+                <p>Transportation Management System</p>
+            </div>
+
+            <!-- Validation Summary -->
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="error-summary">
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                    <div asp-validation-summary="All"></div>
+                </div>
+            }
+
+            <!-- Form -->
+            <form asp-action="Login" asp-controller="Account" method="post">
+                @Html.AntiForgeryToken()
+
+                <!-- Username input -->
+                <div class="form-group">
+                    <label asp-for="Username">Username</label>
+                    <div class="input-wrapper">
+                        <i class="bi bi-person icon"></i>
+                        <input asp-for="Username"
+                               type="text"
+                               placeholder="Enter your username"
+                               autocomplete="username"
+                               autofocus />
+                    </div>
+                    <span asp-validation-for="Username"></span>
+                </div>
+
+                <!-- Password Input -->
+                <div class="form-group">
+                    <label asp-for="Password">Password</label>
+                    <div class="input-wrapper">
+                        <i class="bi bi-lock icon"></i>
+                        <input asp-for="Password"
+                               type="password"
+                               id="password"
+                               placeholder="Enter your password"
+                               autocomplete="current-password" />
+                        <button type="button" class="toggle-pw" onclick="togglePassword()">
+                            <i class="bi bi-eye-slash"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Password"></span>
+                </div>
+
+                <!-- Remember Me / Forgot Password -->
+                <div class="options">
+                    <label>
+                        <input asp-for="RememberMe" type="checkbox" />
+                        Remember me
+                    </label>
+                </div>
+
+                <!-- Hidden ReturnUrl -->
+                @if (ViewBag.ReturnUrl != null)
+                {
+                    <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+                }
+
+                <!-- Captcha/Security Code -->
+                <div class="form-group">
+                    <label asp-for="CaptchaCode">Security Code</label>
+
+                    <div class="captcha-area">
+                        <div class="captcha-img-box">
+                            <img id="captchaImage"
+                                 src="@Url.Action("CaptchaImage", "Account")"
+                                 alt="Captcha" />
+                        </div>
+
+                        <button type="button"
+                                class="btn-refresh-captcha"
+                                onclick="refreshCaptchaImage()"
+                                title="Refresh Captcha">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
+
+                    <div class="input-wrapper">
+                        <i class="bi bi-shield-lock icon"></i>
+                        <input asp-for="CaptchaCode"
+                               type="text"
+                               maxlength="6"
+                               inputmode="numeric"
+                               pattern="\d{6}"
+                               autocomplete="off"
+                               placeholder="Enter 6-digit security code" />
+                    </div>
+                    <span asp-validation-for="CaptchaCode"></span>
+                </div>
+
+                <!-- Sign In Button -->
+                <button type="submit" class="btn-login">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    <span>Sign In</span>
+                </button>
+            </form>
+
+            <div class="footer">&copy; 2026 ShipRate TMS</div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        /* ───── Toggle Password Visibility ───── */
+        function togglePassword() {
+            const input = document.getElementById('password');
+            const icon = document.querySelector('.toggle-pw i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'bi bi-eye';
+            } else {
+                input.type = 'password';
+                icon.className = 'bi bi-eye-slash';
+            }
+        }
+
+        /* ───── Toggle Theme (Light / Dark) ───── */
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('shiprate-theme', next);
+        }
+
+        // Load saved theme on page load
+        (function () {
+            const saved = localStorage.getItem('shiprate-theme');
+            if (saved) {
+                document.documentElement.setAttribute('data-theme', saved);
+            } else {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+            }
+        })();
+    </script>
+
+    <!-- jQuery Validation -->
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/js/jquery.validate.min.js"></script>
+    <script src="~/js/jquery.validate.unobtrusive.min.js"></script>
+
+</body>
+</html>
+
+<script>
+    function refreshCaptcha() {
+        fetch('/Account/RefreshCaptcha')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('captchaBox').innerText = data.captcha;
+            });
+    }
+
+    function refreshCaptchaImage() {
+         const img = document.getElementById('captchaImage');
+         img.src = '@Url.Action("CaptchaImage", "Account")' + '?_=' + new Date().getTime();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const captchaInput = document.querySelector('[name="CaptchaCode"]');
+        if (captchaInput) {
+            captchaInput.addEventListener('input', function () {
+                this.value = this.value.replace(/\D/g, '').slice(0, 6);
+            });
+        }
+    });
+</script>

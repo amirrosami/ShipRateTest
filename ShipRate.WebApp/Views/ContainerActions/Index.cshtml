@@ -1,0 +1,128 @@
+﻿@using ShipRate.Application.ViewModels
+@model ContainerActionIndexVm
+
+@{
+    ViewData["Title"] = "Container Actions";
+}
+
+<div class="container-fluid px-4 py-3">
+
+    <div class="mb-3 border-1">
+        <h4 class="mb-3">Container Actions</h4>
+        @await Html.PartialAsync("_ContainerActionSearchBar", Model.SearchForm)
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-11">
+            <div id="container-action-table-container"
+                 hx-get="@Url.Action("Index", "ContainerActions")"
+                 hx-trigger="container-actions-refresh from:body"
+                 hx-target="#container-action-table-container"
+                 hx-swap="innerHTML">
+                @await Html.PartialAsync("_ContainerActionTable", Model)
+            </div>
+        </div>
+
+        <div class="col-lg-1">
+            <div class="card shadow-sm">
+                <div class="card-header py-2">
+                    <strong>Actions</strong>
+                </div>
+                <div class="card-body d-grid gap-2">
+
+                    @*                     <button class="btn btn-outline-primary btn-sm"
+                            hx-get="@Url.Action("ReleaseToShipper", "ContainerActions")"
+                            hx-target="#modal-content"
+                            hx-swap="innerHTML"
+                            data-bs-toggle="modal"
+                            data-bs-target="#appModal">
+                        RTS
+                    </button>
+ *@
+                    <a asp-controller="RtsDelivery"
+                       asp-action="Index"
+                       title="Release To Shipper"
+                       class="btn btn-outline-primary btn-sm">
+                        RTS
+                    </a>
+                    <button class="btn btn-outline-primary btn-sm" type="button">
+                        RBS
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm"
+                            hx-get="@Url.Action("LoadOnBoard", "ContainerActions")"
+                            hx-target="#modal-content"
+                            hx-swap="innerHTML"
+                            data-bs-toggle="modal"
+                            title="Load On Board"
+                            data-bs-target="#appModal">
+                        LOB
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm"
+                            hx-get="@Url.Action("Discharge", "ContainerActions")"
+                            hx-target="#modal-content"
+                            hx-swap="innerHTML"
+                            data-bs-toggle="modal"
+                            title="Discharge"
+                            data-bs-target="#appModal">
+                        Discharge
+                    </button>
+
+                    <button class="btn btn-outline-primary btn-sm" type="button">
+                        DTC
+                    </button>
+
+                    <button class="btn btn-outline-primary btn-sm"
+                            hx-get="@Url.Action("RBC", "ContainerActions")"
+                            hx-target="#modal-content"
+                            hx-swap="innerHTML"
+                            data-bs-toggle="modal"
+                            title="Return By Consignee"
+                            data-bs-target="#appModal">
+                        RBC
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade" id="appModal" tabindex="-1" aria-labelledby="appModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false"  >
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content" id="modal-content">
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        (function () {
+            const modalElement = document.getElementById('appModal');
+            const modalContent = document.getElementById('modal-content');
+
+            if (!modalElement) return;
+
+            modalElement.addEventListener('hidden.bs.modal', function () {
+                if (modalContent) {
+                    modalContent.innerHTML = '';
+                }
+
+                // Safety cleanup in case HTMX/partial swap leaves backdrop behind
+                document.querySelectorAll('.modal-backdrop').forEach(x => x.remove());
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('padding-right');
+                document.body.style.removeProperty('overflow');
+            });
+
+            document.body.addEventListener('close-modal', function () {
+                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+            });
+        })();
+    </script>
+}

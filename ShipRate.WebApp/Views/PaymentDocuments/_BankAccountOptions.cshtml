@@ -1,0 +1,18 @@
+﻿@model IEnumerable<SelectListItem>
+
+<label class="form-label" for="Cheque_BankAccountId">Bank Account</label>
+<select id="Cheque_BankAccountId" name="Cheque.BankAccountId" class="form-select">
+    <option value="">Select bank account</option>
+    @if (Model != null)
+    {
+        foreach (var item in Model)
+        {
+            <option value="@item.Value" selected="@(item.Selected ? "selected" : null)">
+                @item.Text
+            </option>
+        }
+    }
+</select>
+<span class="text-danger field-validation-valid"
+      data-valmsg-for="Cheque.BankAccountId"
+      data-valmsg-replace="true"></span>

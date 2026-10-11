@@ -1,0 +1,204 @@
+﻿@using ShipRate.Application.ViewModels
+@model CustomsClearanceItemCreateEditVm
+
+@{
+    var isEdit = Model.Id.HasValue;
+    var postUrl = isEdit
+        ? Url.Action("EditItem", "CustomsClearance")
+        : Url.Action("CreateItem", "CustomsClearance");
+}
+
+<div class="modal fade show d-block"
+     id="customs-clearance-item-modal"
+     tabindex="-1"
+     aria-modal="true"
+     role="dialog"
+     style="background-color: rgba(0,0,0,.5);">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title mb-1">@(isEdit ? "Edit Item" : "Add Item")</h5>
+                    <div class="text-muted small">Capture goods line details for this customs declaration.</div>
+                </div>
+                <button type="button"
+                        class="btn-close"
+                        aria-label="Close"
+                        onclick="closeHtmxModal()"></button>
+            </div>
+
+            <form method="post"
+                  hx-post="@postUrl"
+                  hx-target="#modal-container"
+                  hx-swap="innerHTML">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="CustomsClearanceId" />
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <label asp-for="ItemSequence" class="form-label"></label>
+                            <input asp-for="ItemSequence" class="form-control" />
+                            <span asp-validation-for="ItemSequence" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-5">
+                            <label asp-for="CountryHSCodeId" class="form-label"></label>
+                            <select asp-for="CountryHSCodeId"
+                                    asp-items="Model.CountryHsCodes"
+                                    class="form-select"
+                                    id="CountryHSCodeId">
+                                <option value="">Select HS code</option>
+                            </select>
+                            <span asp-validation-for="CountryHSCodeId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-5">
+                            <label asp-for="HSCodeToSave" class="form-label"></label>
+                            <input asp-for="HSCodeToSave" class="form-control" id="HSCodeToSave" />
+                            <span asp-validation-for="HSCodeToSave" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="GoodsDescriptionEN" class="form-label"></label>
+                            <input asp-for="GoodsDescriptionEN" class="form-control" />
+                            <span asp-validation-for="GoodsDescriptionEN" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="GoodsDescriptionLocal" class="form-label"></label>
+                            <input asp-for="GoodsDescriptionLocal" class="form-control" />
+                            <span asp-validation-for="GoodsDescriptionLocal" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="Quantity" class="form-label"></label>
+                            <input asp-for="Quantity" class="form-control js-item-qty" />
+                            <span asp-validation-for="Quantity" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="MeasurementUnitId" class="form-label"></label>
+                            <select asp-for="MeasurementUnitId"
+                                    asp-items="Model.MeasurementUnits"
+                                    class="form-select">
+                                <option value="">Select unit</option>
+                            </select>
+                            <span asp-validation-for="MeasurementUnitId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="StatisticalQuantity" class="form-label"></label>
+                            <input asp-for="StatisticalQuantity" class="form-control" />
+                            <span asp-validation-for="StatisticalQuantity" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="StatisticalMeasurementUnitId" class="form-label"></label>
+                            <select asp-for="StatisticalMeasurementUnitId"
+                                    asp-items="Model.StatisticalMeasurementUnits"
+                                    class="form-select">
+                                <option value="">Select stat. unit</option>
+                            </select>
+                            <span asp-validation-for="StatisticalMeasurementUnitId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="UnitPrice" class="form-label"></label>
+                            <input asp-for="UnitPrice" class="form-control js-item-unit-price" />
+                            <span asp-validation-for="UnitPrice" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="CurrencyId" class="form-label"></label>
+                            <select asp-for="CurrencyId"
+                                    asp-items="Model.Currencies"
+                                    class="form-select">
+                                <option value="">Select currency</option>
+                            </select>
+                            <span asp-validation-for="CurrencyId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="TotalValue" class="form-label"></label>
+                            <input asp-for="TotalValue" class="form-control js-item-total-value" />
+                            <span asp-validation-for="TotalValue" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label asp-for="Remarks" class="form-label"></label>
+                            <textarea asp-for="Remarks" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Remarks" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-light"
+                            onclick="closeHtmxModal()">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i>
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var hsSelect = document.getElementById("CountryHSCodeId");
+        var hsText = document.getElementById("HSCodeToSave");
+        var qtyInput = document.querySelector(".js-item-qty");
+        var unitPriceInput = document.querySelector(".js-item-unit-price");
+        var totalValueInput = document.querySelector(".js-item-total-value");
+
+        if (hsSelect && hsText) {
+            hsSelect.addEventListener("change", function () {
+                var selectedOption = hsSelect.options[hsSelect.selectedIndex];
+                if (!selectedOption || !selectedOption.text) {
+                    return;
+                }
+
+                var rawText = selectedOption.text;
+                var code = rawText.split(" - ")[0].trim();
+
+                if (code && !hsText.value.trim()) {
+                    hsText.value = code;
+                }
+            });
+        }
+
+        function recalcTotalValue() {
+            if (!qtyInput || !unitPriceInput || !totalValueInput) {
+                return;
+            }
+
+            var qty = parseFloat(qtyInput.value);
+            var unitPrice = parseFloat(unitPriceInput.value);
+
+            if (isNaN(qty) || isNaN(unitPrice)) {
+                return;
+            }
+
+            totalValueInput.value = (qty * unitPrice).toFixed(2);
+        }
+
+        if (qtyInput) {
+            qtyInput.addEventListener("input", recalcTotalValue);
+        }
+
+        if (unitPriceInput) {
+            unitPriceInput.addEventListener("input", recalcTotalValue);
+        }
+    })();
+</script>

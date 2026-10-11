@@ -1,0 +1,71 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model InvoiceListPageVm
+<style>
+    #partyLookupModal {
+        z-index: 1065;
+    }
+</style>
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Job Invoices</span>
+        <div>
+            <button type="button" class="btn btn-sm btn-success"
+                    onclick="htmx.trigger(document.body, 'invoice-list-refresh')">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+            </button>
+@*             <button class="btn btn-sm btn-primary"
+                    hx-get="@Url.Action("CreateModalDO", "Invoices", new { JobId = Model.Filter.JobId })"
+                    hx-target="#invoice-modal-content"
+                    hx-swap="innerHTML"
+                    onclick="openInvoiceModal()">
+                <i class="bi bi-plus-lg"></i>
+                Add DO Invoice
+            </button>
+ *@            <button class="btn btn-sm btn-primary"
+                    hx-get="@Url.Action("CreateModal", "Invoices", new { JobId = Model.Filter.JobId })"
+                    hx-target="#invoice-modal-content"
+                    hx-swap="innerHTML"
+                    onclick="openInvoiceModal()">
+                <i class="bi bi-plus-lg"></i>
+                Add
+            </button>
+        </div>
+    </div>
+    <div class="card-body p-2"
+         id="invoice-list-container"
+         hx-get="@Url.Action("List", "Invoices", new { InvoiceListFilterVm = new InvoiceListFilterVm { JobId = Model.Filter.JobId } })"
+         hx-vals='{"Filter.JobId":"@Model.Filter.JobId"}'
+         hx-trigger="invoice-list-refresh from:body"
+         hx-swap="innerHTML">
+        @await Html.PartialAsync("~/Views/Invoices/_InvoiceGrid.cshtml", Model)
+    </div>
+</div>
+
+<div class="modal fade" id="partyLookupModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content" id="party-lookup-modal-content"></div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="documentManagerModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="document-manager-content">
+        </div>
+    </div>
+</div>
+
+
+
+<div id="invoiceitems-list-container">
+</div>
+
+
+
+
+
+
+<script src="~/js/invoices.js"></script>
+
+

@@ -1,0 +1,174 @@
+﻿@* ============================================
+   _TopNavbar.cshtml — Top Navigation Bar
+   ============================================ *@
+
+<header class="top-navbar">
+    <div class="navbar-left">
+        <button class="nav-btn sidebar-toggle" id="sidebarToggle" title="Toggle Sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <a asp-controller="Home" asp-action="Index" class="nav-btn d-none d-md-flex">
+            <i class="fas fa-home"></i> <span>Home</span>
+        </a>
+        <a asp-controller="Shipment" asp-action="Create" class="nav-btn d-none d-lg-flex">
+            <i class="fas fa-plus-circle"></i> <span>New Shipment</span>
+        </a>
+        <a asp-controller="Shipment" asp-action="Track" class="nav-btn d-none d-lg-flex">
+            <i class="fas fa-search-location"></i> <span>Track</span>
+        </a>
+    </div>
+
+    <div class="navbar-right">
+        <!-- Search -->
+        <form class="navbar-search-form d-none d-sm-block" method="get"
+              asp-controller="Search" asp-action="Index">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" name="q" class="form-control"
+                   placeholder="Search shipment, AWB, container...">
+        </form>
+
+        <div class="navbar-divider d-none d-sm-block"></div>
+
+        <!-- Notifications -->
+        <div class="dropdown">
+            <button class="nav-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-bell"></i>
+                <span class="badge bg-warning badge-notify rounded-pill">7</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end notification-dropdown p-0">
+                <div class="p-3 border-bottom">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="fas fa-bell me-2 text-warning"></i>Notifications
+                        <span class="badge bg-warning rounded-pill ms-1">7</span>
+                    </h6>
+                </div>
+                <div class="p-2" style="max-height: 300px; overflow-y: auto;">
+                    <a href="#" class="notification-item text-decoration-none">
+                        <div class="notification-icon" style="background: #2980b9;">
+                            <i class="fas fa-ship"></i>
+                        </div>
+                        <div class="notification-text">
+                            <div class="noti-title">3 shipments arrived at port</div>
+                            <div class="noti-desc">Shanghai Port — Containers unloaded</div>
+                            <div class="noti-time"><i class="far fa-clock me-1"></i>3 mins ago</div>
+                        </div>
+                    </a>
+                    <a href="#" class="notification-item text-decoration-none">
+                        <div class="notification-icon" style="background: #f39c12;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="notification-text">
+                            <div class="noti-title">Container MSKU-2847 delayed</div>
+                            <div class="noti-desc">Weather delay at Suez Canal</div>
+                            <div class="noti-time"><i class="far fa-clock me-1"></i>12 mins ago</div>
+                        </div>
+                    </a>
+                    <a href="#" class="notification-item text-decoration-none">
+                        <div class="notification-icon" style="background: #27ae60;">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        <div class="notification-text">
+                            <div class="noti-title">Invoice #INV-4521 paid</div>
+                            <div class="noti-desc">Acme Corp — $45,200.00 received</div>
+                            <div class="noti-time"><i class="far fa-clock me-1"></i>2 hrs ago</div>
+                        </div>
+                    </a>
+                    <a href="#" class="notification-item text-decoration-none">
+                        <div class="notification-icon" style="background: #e74c3c;">
+                            <i class="fas fa-passport"></i>
+                        </div>
+                        <div class="notification-text">
+                            <div class="noti-title">Customs clearance required</div>
+                            <div class="noti-desc">SHP-00480 — Missing documentation</div>
+                            <div class="noti-time"><i class="far fa-clock me-1"></i>5 hrs ago</div>
+                        </div>
+                    </a>
+                </div>
+                <div class="p-2 border-top text-center">
+                    <a href="#" class="text-decoration-none fw-bold"
+                       style="font-size: 0.85rem; color: var(--gt-accent);">
+                        View All Notifications
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="dropdown">
+            <button class="nav-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-comments"></i>
+                <span class="badge bg-danger badge-notify rounded-pill">3</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end" style="width: 320px;">
+                <div class="px-3 py-2 border-bottom">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="fas fa-comments me-2 text-primary"></i>Messages
+                    </h6>
+                </div>
+                <a href="#" class="dropdown-item py-3">
+                    <strong>Shanghai Port Authority</strong><br>
+                    <small class="text-muted">Vessel schedule updated for March...</small><br>
+                    <small class="text-muted"><i class="far fa-clock me-1"></i>4 hours ago</small>
+                </a>
+                <a href="#" class="dropdown-item py-3">
+                    <strong>Hamburg Customs Office</strong><br>
+                    <small class="text-muted">Documents approved for SHP-00481</small><br>
+                    <small class="text-muted"><i class="far fa-clock me-1"></i>1 day ago</small>
+                </a>
+                <div class="p-2 border-top text-center">
+                    <a href="#" class="text-decoration-none fw-bold"
+                       style="font-size: 0.85rem; color: var(--gt-accent);">
+                        See All Messages
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Language -->
+        <a href="#" class="nav-btn" title="Language">
+            <i class="fas fa-globe"></i> <span class="d-none d-md-inline">EN</span>
+        </a>
+
+        <!-- Fullscreen -->
+        <button class="nav-btn" id="fullscreenBtn" title="Fullscreen">
+            <i class="fas fa-expand"></i>
+        </button>
+
+        <div class="navbar-divider d-none d-sm-block"></div>
+
+        <!-- User Menu -->
+        <div class="dropdown">
+            <button class="nav-btn d-flex align-items-center gap-2"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="https://ui-avatars.com/api/?name=JD&background=e67e22&color=fff&size=34&rounded=true&bold=true"
+                     class="nav-user-avatar" alt="User">
+                <span class="d-none d-md-inline text-white"
+                      style="font-size: 0.85rem; font-weight: 500;">
+                    John Doe
+                </span>
+                <i class="fas fa-chevron-down"
+                   style="font-size: 0.65rem; color: rgba(255,255,255,0.5);"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end" style="min-width: 200px;">
+                <div class="px-3 py-2 border-bottom">
+                    <strong>John Doe</strong><br>
+                    <small class="text-muted">Operations Manager</small>
+                </div>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-user me-2 text-muted"></i>My Profile
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-cog me-2 text-muted"></i>Settings
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-question-circle me-2 text-muted"></i>Help Center
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item text-danger">
+                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</header>

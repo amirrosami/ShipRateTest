@@ -1,0 +1,78 @@
+﻿@using ShipRate.Application.ViewModels
+@model CustomsClearanceCreateEditVm
+
+
+<!-- Modal Container with semi-transparent background to act as backdrop -->
+<div class="modal fade show d-block" 
+     style="background-color: rgba(0,0,0,0.5);" 
+     tabindex="-1" role="dialog">
+    
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content shadow">
+            <div class="modal-header">
+                <h5 class="modal-title">@(Model.Id.HasValue ? "Edit Customs Clearance" : "Add Customs Clearance")</h5>
+                <button type="button" class="btn-close" onclick="closeModal()"></button>
+            </div>
+
+            <form hx-post="@Url.Action(Model.Id.HasValue ? "Edit" : "Create", "CustomsClearance")"
+                  hx-target="#modal-container"
+                  hx-swap="innerHTML">
+                @Html.AntiForgeryToken()
+                
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="JobId" />
+                    <input type="hidden" asp-for="CompanyId" />
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Declaration Type</label>
+                            <select asp-for="DeclarationTypeId" asp-items="Model.DeclarationTypes" class="form-select">
+                                <option value="">Select...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Custom Office</label>
+                            <select asp-for="CustomOfficeId" asp-items="Model.CustomOffices" class="form-select">
+                                <option value="">Select...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Importer / Exporter</label>
+                            <select asp-for="ImporterExporterId" asp-items="Model.Persons" class="form-select">
+                                <option value="">Select...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Customs Broker</label>
+                            <select asp-for="CustomsBrokerId" asp-items="Model.Persons" class="form-select">
+                                <option value="">Select...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Declaration Number</label>
+                            <input asp-for="DeclarationNumber" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Declaration Date</label>
+                            <input asp-for="DeclarationDate" type="date" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reference Number</label>
+                            <input asp-for="ReferenceNumber" class="form-control" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Remarks</label>
+                            <textarea asp-for="Remarks" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

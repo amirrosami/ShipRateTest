@@ -1,0 +1,62 @@
+﻿@using ShipRate.Application.DTOs
+@model ServiceRequestApprovalsPanelDto
+
+<table class="table table-sm table-striped table-hover mb-0 align-middle">
+    <thead class="table-light">
+        <tr>
+            <th style="width:60px;">#</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Approver</th>
+            <th>Approved At</th>
+            <th>Remarks</th>
+            <th class="text-end" style="width:100px;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Items == null || !Model.Items.Any())
+        {
+            <tr>
+                <td colspan="7" class="text-center text-muted py-3">
+                    No approvals found.
+                </td>
+            </tr>
+        }
+        else
+        {
+            var rowNo = 1;
+
+            foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@rowNo</td>
+                    <td>@item.ApprovalTypeName</td>
+                    <td>@item.StatusName</td>
+                    <td>@item.ApproverUserName</td>
+                    <td>@item.ApprovedAt?.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@item.Remarks</td>
+                    <td class="text-end text-nowrap">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-primary"
+                                hx-get="@Url.Action("EditApproval", "ServiceRequests", new { id = item.Id })"
+                                hx-target="#modal-container"
+                                hx-swap="innerHTML">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger"
+                                hx-delete="@Url.Action("DeleteApproval", "ServiceRequests", new { id = item.Id, serviceRequestId = Model.ServiceRequestId })"
+                                hx-confirm="Delete this approval?"
+                                hx-target="#approvals-panel"
+                                hx-swap="innerHTML">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+
+                rowNo++;
+            }
+        }
+    </tbody>
+</table>

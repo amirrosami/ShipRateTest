@@ -1,0 +1,101 @@
+﻿<style>
+    .gateway-card {
+        width: 100%;
+        max-width: 520px;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+        .gateway-card .form-control {
+            height: 48px;
+            border-radius: 10px;
+        }
+
+        .gateway-card .btn {
+            height: 46px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+            .gateway-card .btn:hover {
+                transform: translateY(-1px);
+            }
+
+</style>
+
+@model long
+@{
+    ViewData["Title"] = "Payment";
+}
+
+<div class="gateway-page d-flex justify-content-center align-items-center min-vh-100 bg-light">
+    <div class="gateway-card card shadow-lg border-0">
+        <div class="card-header bg-primary text-white text-center py-3">
+            <h4 class="mb-0">Test Payment Gateway</h4>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="mb-4">
+                <div class="row mb-2">
+                    <div class="col-5 fw-bold">Merchant</div>
+                    <div class="col-7">Saman Merchant</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-5 fw-bold">Invoice</div>
+                    <div class="col-7">test</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-5 fw-bold">Customer</div>
+                    <div class="col-7">Sharan</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-5 fw-bold">Amount</div>
+                    <div class="col-7 text-success fw-bold">@Model.ToString("N0") Rials</div>
+                </div>
+            </div>
+
+            <form asp-controller="Invoices" asp-action="Index" method="get">
+                @Html.AntiForgeryToken()
+            >
+
+                <div class="mb-3">
+                    <label  class="form-label">Card Number</label>
+                    <input class="form-control" placeholder="6037-9918-9999-9999" />
+                    
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label  class="form-label">CVV2</label>
+                        <input class="form-control" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label  class="form-label">Month</label>
+                        <input  class="form-control" placeholder="01" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label  class="form-label">Year</label>
+                        <input  class="form-control" placeholder="03" />
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label  class="form-label">Dynamic Password</label>
+                    <input  class="form-control" />
+                    <div class="form-text">For successful test payment, enter: 123456</div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" name="submitAction" value="pay" class="btn btn-success flex-fill">
+                        Pay
+                    </button>
+                    <button type="submit" name="submitAction" value="cancel" class="btn btn-outline-secondary flex-fill">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+

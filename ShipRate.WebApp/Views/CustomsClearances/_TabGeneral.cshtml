@@ -1,0 +1,68 @@
+﻿@using ShipRate.Application.ViewModels
+@model CustomsClearanceCreateEditVm
+
+<form hx-post="@Url.Action("UpdateGeneralInfo", "CustomsClearance")"
+      hx-swap="none">
+    
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="JobId" />
+
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label asp-for="DeclarationTypeId" class="form-label">Declaration Type</label>
+            <select asp-for="DeclarationTypeId" asp-items="Model.DeclarationTypes" class="form-select"></select>
+            <span asp-validation-for="DeclarationTypeId" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="CustomOfficeId" class="form-label">Custom Office</label>
+            <select asp-for="CustomOfficeId" asp-items="Model.CustomOffices" class="form-select"></select>
+            <span asp-validation-for="CustomOfficeId" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="ImporterExporterId" class="form-label">Importer / Exporter</label>
+            <select asp-for="ImporterExporterId" asp-items="Model.Persons" class="form-select"></select>
+            <span asp-validation-for="ImporterExporterId" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="CustomsBrokerId" class="form-label">Customs Broker</label>
+            <select asp-for="CustomsBrokerId" asp-items="Model.Persons" class="form-select"></select>
+            <span asp-validation-for="CustomsBrokerId" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="DeclarationNumber" class="form-label">Declaration Number</label>
+            <input asp-for="DeclarationNumber" class="form-control" />
+            <span asp-validation-for="DeclarationNumber" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="DeclarationDate" class="form-label">Declaration Date</label>
+            <input asp-for="DeclarationDate" type="date" class="form-control" />
+            <span asp-validation-for="DeclarationDate" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="ReferenceNumber" class="form-label">Reference Number</label>
+            <input asp-for="ReferenceNumber" class="form-control" />
+            <span asp-validation-for="ReferenceNumber" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-12">
+            <label asp-for="Remarks" class="form-label">Remarks</label>
+            <textarea asp-for="Remarks" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="Remarks" class="text-danger small"></span>
+        </div>
+
+        <div class="col-12 text-end mt-3">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save me-1"></i>
+                Save General Info
+            </button>
+        </div>
+    </div>
+</form>

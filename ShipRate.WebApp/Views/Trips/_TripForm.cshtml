@@ -1,0 +1,552 @@
+﻿@using ShipRate.Domain.Entities.BaseInfo.Locations
+@using ShipRate.Domain.Entities.BaseInfo.Persons
+@using ShipRate.Domain.Entities.BaseInfo.Vehicles
+@using ShipRate.Domain.Entities.Lines
+@using ShipRate.Domain.Entities.Operations
+@using ShipRate.Domain.Entities.Settings
+@using ShipRate.WebApp.ViewModels.FlightVms
+@using ShipRate.WebApp.ViewModels.TransitViewModels
+@model TripViewModel
+@{
+    var trucks = ViewBag.Trucks as List<Truck>;
+    var drivers = ViewBag.Drivers as List<Driver>;
+    var locations = ViewBag.Locations as List<Location>;
+    var carriers = ViewBag.Carriers as List<Carrier>;
+    var companies = ViewBag.Companies as List<Company>;
+}
+
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+}
+
+<form hx-post="@Url.Action(isCreateMode ? "Create" : "Edit", "Trips")"
+      hx-target="#app-modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header form-caption-bg text-white">
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title">
+                <i class="bi bi-plus-circle me-2"></i>Add Trip
+            </h5>
+        }
+        else
+        {
+            <h5 class="modal-title">
+                <i class="bi bi-pencil-square me-2"></i>Edit Trip
+            </h5>
+            <input type="hidden" asp-for="Id" />
+        }
+
+        <button type="button"
+                class="btn-close"
+                onclick="AppModal.close()">
+        </button>
+    </div>
+
+    <div class="modal-body row">
+        @Html.AntiForgeryToken()
+
+        @await Html.PartialAsync("_ModelStateError")
+
+        <div class="mb-3 col-md-4">
+            <label>Trip Number *</label>
+            <input type="text" name="TripNumber" class="form-control"
+                   value="@Model.TripNumber" required placeholder="" />
+            <span asp-validation-for="TripNumber" class="form-validation"></span>
+        </div>
+        <div class="mb-3 col-md-4">
+            <label>Company *</label>
+            <select name="CompanyId" class="form-control" required>
+                <option value="">-- Select Company --</option>
+                @foreach (var c in companies)
+                {
+                    <option value="@c.Id" selected="@(Model.CompanyId == c.Id)">@c.Person.PersonName</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3 col-md-4">
+            <label>Truck *</label>
+            <select name="TruckId" class="form-control" required>
+                <option value="">-- Select Truck --</option>
+                @foreach (var t in trucks)
+                {
+                    <option value="@t.Id" selected="@(Model.TruckId == t.Id)">
+                        @t.TruckPlateNumber — @t.TruckReferenceTitle
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="mb-3 col-md-4">
+            <label>Driver *</label>
+            <select name="DriverId" class="form-control" required>
+                <option value="">-- Select Driver --</option>
+                @foreach (var d in drivers)
+                {
+                    <option value="@d.Id" selected="@(Model.DriverId == d.Id)">@d.Person.PersonName</option>
+                }
+            </select>
+        </div>
+        <div class="mb-3 col-md-4">
+            <label>Carrier *</label>
+            <select name="CarrierId" class="form-control" required>
+                <option value="">-- Select Carrier --</option>
+                @foreach (var c in carriers)
+                {
+                    <option value="@c.Id" selected="@(Model.CarrierId == c.Id)">@c.Person.PersonName</option>
+                }
+            </select>
+        </div>
+        
+        <div class="mb-3 col-md-4">
+            <label>Origin</label>
+            <input type="hidden" asp-for="FromLocationId" id="FromLocationId" />
+            <input type="text"
+                   id="FromLocationSearchText"
+                   name="FromLocation"
+                   value="@Model.FromLocationName"
+                   class="form-control"
+                   placeholder="Search Origin..."
+                   autocomplete="off"
+                   hx-get="@Url.Action("SearchLocations", "Locations")"
+                   hx-trigger="keyup changed delay:400ms"
+                   hx-target="#originSearchResults"
+                   hx-swap="innerHTML"
+                   hx-vals='js:{
+                            term: document.getElementById("FromLocationSearchText").value,
+                            targetHiddenInputId: "FromLocationId",
+                            targetTextInputId: "FromLocationSearchText"
+                       }' />
+
+            <div id="originSearchResults"
+                 class="position-relative">
+            </div>
+            <span asp-validation-for="FromLocationId" class="text-danger small"></span>
+        </div>
+
+
+
+
+
+        <div class="mb-3 col-md-4">
+            <label>Destination</label>
+            <input type="hidden" asp-for="ToLocationId" id="ToLocationId" />
+            <input type="text"
+                   id="ToLocationSearchText"
+                   name="ToLocation"
+                   value="@Model.ToLocationName"
+                   class="form-control"
+                   placeholder="Search Destination..."
+                   autocomplete="off"
+                   hx-get="@Url.Action("SearchLocations", "Locations")"
+                   hx-trigger="keyup changed delay:400ms"
+                   hx-target="#destinationSearchResults"
+                   hx-swap="innerHTML"
+                   hx-vals='js:{
+                            term: document.getElementById("ToLocationSearchText").value,
+                            targetHiddenInputId: "ToLocationId",
+                            targetTextInputId: "ToLocationSearchText"
+                       }' />
+
+            <div id="destinationSearchResults"
+                 class="position-relative">
+            </div>
+            <span asp-validation-for="ToLocationId" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3 col-md-4">
+            <label asp-for="ETD" class="form-label fw-semibold">
+                <i class="bi bi-check-circle me-1 text-success"></i>ETD
+            </label>
+            <input asp-for="ETD" class="form-control" type="date" />
+            <span asp-validation-for="ETD" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3 col-md-4">
+            <label asp-for="ETA" class="form-label fw-semibold">
+                <i class="bi bi-check-circle me-1 text-success"></i>ETA
+            </label>
+            <input asp-for="ETA" class="form-control" type="date" />
+            <span asp-validation-for="ETA" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3 col-md-4">
+            <label asp-for="DepartureDate" class="form-label fw-semibold">
+                <i class="bi bi-check-circle me-1 text-success"></i>Departure Date
+            </label>
+            <input asp-for="DepartureDate" class="form-control" type="datetime-local" />
+            <span asp-validation-for="DepartureDate" class="text-danger small"></span>
+        </div>
+        <div class="mb-3 col-md-4">
+            <label asp-for="ArrivalDate" class="form-label fw-semibold">
+                <i class="bi bi-check-circle me-1 text-success"></i>Arrival Date
+            </label>
+            <input asp-for="ArrivalDate" class="form-control" type="datetime-local" />
+            <span asp-validation-for="ArrivalDate" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3 col-md-12">
+            <label>Remarks</label>
+            <textarea name="Remarks" class="form-control" rows="3"
+                      placeholder="Additional notes about this trip..." >@Model.Remarks</textarea>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button"
+                class="btn btn-secondary"
+                onclick="AppModal.close()">
+            Cancel
+        </button>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>
+
+
+
+
+
+@* @using ShipRate.Domain.Entities.BaseInfo.Locations
+@using ShipRate.Domain.Entities.BaseInfo.Persons
+@using ShipRate.Domain.Entities.BaseInfo.Vehicles
+@using ShipRate.Domain.Entities.Lines
+@using ShipRate.Domain.Entities.Operations
+@using ShipRate.Domain.Entities.Settings
+@using ShipRate.Domain.Entities.TransitOperation
+@using ShipRate.WebApp.ViewModels.TransitViewModels
+@model TripViewModel
+@{
+    var isEdit = Model.Id.HasValue && Model.Id != Guid.Empty;
+    var trucks = ViewBag.Trucks as List<Truck>;
+    var drivers = ViewBag.Drivers as List<Driver>;
+    var statuses = ViewBag.Statuses as List<TripStatus>;
+    var locations = ViewBag.Locations as List<Location>;
+    var carriers = ViewBag.Carriers as List<Carrier>;
+    var companies = ViewBag.Companies as List<Company>;
+}
+
+<style>
+    .form-validation { color: var(--danger); font-size: 0.75rem; margin-top: 4px; }
+    .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .section-title { font-size: 0.85rem; font-weight: 700; color: var(--primary); margin: 20px 0 12px; padding-bottom: 6px; border-bottom: 2px solid #e8ecff; text-transform: uppercase; letter-spacing: 0.5px; }
+    .section-title:first-child { margin-top: 0; }
+</style>
+
+
+<!-- در _TripForm.cshtml خط form رو اینطوری بنویس: -->
+@if (isEdit)
+{
+    <form hx-put="/Trips/Edit/@Model.Id"
+          hx-target="#modal-body"
+          hx-swap="innerHTML"
+          hx-indicator="#form-spinner">
+
+
+        @Html.AntiForgeryToken()
+
+        <!-- Trip Info Section -->
+        <div class="section-title">📋 Trip Information</div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Trip Number *</label>
+                <input type="text" name="TripNumber" class="form-control"
+                       value="@Model.TripNumber" required placeholder="" />
+                <span asp-validation-for="TripNumber" class="form-validation"></span>
+            </div>
+            <div class="form-group">
+                <label>Company *</label>
+                <select name="CompanyId" class="form-control" required>
+                    <option value="">-- Select Company --</option>
+                    @foreach (var c in companies)
+                    {
+                        <option value="@c.Id" selected="@(Model.CompanyId == c.Id)">@c.Person.PersonName</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <!-- Vehicle & Driver Section -->
+        <div class="section-title">🚛 Vehicle & Driver</div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Truck *</label>
+                <select name="TruckId" class="form-control" required>
+                    <option value="">-- Select Truck --</option>
+                    @foreach (var t in trucks)
+                    {
+                        <option value="@t.Id" selected="@(Model.TruckId == t.Id)">
+                            @t.TruckPlateNumber — @t.TruckReferenceTitle
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Driver *</label>
+                <select name="DriverId" class="form-control" required>
+                    <option value="">-- Select Driver --</option>
+                    @foreach (var d in drivers)
+                    {
+                        <option value="@d.Id" selected="@(Model.DriverId == d.Id)">@d.Person.PersonName</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Carrier *</label>
+                <select name="CarrierId" class="form-control" required>
+                    <option value="">-- Select Carrier --</option>
+                    @foreach (var c in carriers)
+                    {
+                        <option value="@c.Id" selected="@(Model.CarrierId == c.Id)">@c.Person.PersonName</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Status *</label>
+                <select name="TripStatusId" class="form-control" required>
+                    <option value="">-- Select Status --</option>
+                    @foreach (var s in statuses)
+                    {
+                        <option value="@s.Id" selected="@(Model.TripStatusId == s.Id)">@s.TripStatusName</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <!-- Route Section -->
+        <div class="section-title">📍 Route</div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Origin *</label>
+                <select name="FromLocationId" class="form-control" required>
+                    <option value="">-- Select Origin --</option>
+                    @foreach (var loc in locations)
+                    {
+                        <option value="@loc.Id" selected="@(Model.FromLocationId == loc.Id)">@loc.LocationName</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Destination *</label>
+                <select name="ToLocationId" class="form-control" required>
+                    <option value="">-- Select Destination --</option>
+                    @foreach (var loc in locations)
+                    {
+                        <option value="@loc.Id" selected="@(Model.ToLocationId == loc.Id)">@loc.LocationName</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <!-- Schedule Section -->
+        <div class="section-title">📅 Schedule</div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Departure Date</label>
+                <input type="datetime-local" name="DepartureDate" class="form-control"
+                       value="@Model.DepartureDate?.ToString("yyyy-MM-ddTHH:mm")" />
+            </div>
+            <div class="form-group">
+                <label>Arrival Date</label>
+                <input type="datetime-local" name="ArrivalDate" class="form-control"
+                       value="@Model.ArrivalDate?.ToString("yyyy-MM-ddTHH:mm")" />
+            </div>
+        </div>
+
+        <!-- Remarks -->
+        <div class="section-title">📝 Notes</div>
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label>Remarks</label>
+                <textarea name="Remarks" class="form-control" rows="3"
+                      placeholder="Additional notes about this trip..."
+                      maxlength="200">@Model.Remarks</textarea>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+            <button type="button" class="btn btn-outline"
+                    onclick="document.getElementById('trip-modal').classList.remove('active')">
+                Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">
+                <span id="form-spinner" class="htmx-indicator"></span>
+                @(isEdit ? "💾 Update Trip" : "✅ Create Trip")
+            </button>
+        </div>
+
+
+
+
+    </form>
+}
+else
+{
+    <form hx-post="/Trips/Create"
+          hx-target="#modal-body"
+          hx-swap="innerHTML"
+          hx-indicator="#form-spinner">
+
+
+        @Html.AntiForgeryToken()
+
+        <!-- Trip Info Section -->
+        <div class="section-title">📋 Trip Information</div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Trip Number *</label>
+                <input type="text" name="TripNumber" class="form-control"
+                       value="@Model.TripNumber" required placeholder="" />
+                <span asp-validation-for="TripNumber" class="form-validation"></span>
+            </div>
+            <div class="form-group">
+                <label>Company *</label>
+                <select name="CompanyId" class="form-control" required>
+                    <option value="">-- Select Company --</option>
+                    @foreach (var c in companies)
+                    {
+                        <!option value="@c.Id" selected="@(Model.CompanyId == c.Id)">@c.Person.PersonName</!option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <!-- Vehicle & Driver Section -->
+        <div class="section-title">🚛 Vehicle & Driver</div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Truck *</label>
+                <select name="TruckId" class="form-control" required>
+                    <option value="">-- Select Truck --</option>
+                    @foreach (var t in trucks)
+                    {
+                        <option value="@t.Id" selected="@(Model.TruckId == t.Id)">
+                            @t.TruckPlateNumber — @t.TruckReferenceTitle
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Driver *</label>
+                <select name="DriverId" class="form-control" required>
+                    <option value="">-- Select Driver --</option>
+                    @foreach (var d in drivers)
+                    {
+                        <option value="@d.Id" selected="@(Model.DriverId == d.Id)">@d.Person.PersonName</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Carrier *</label>
+                <select name="CarrierId" class="form-control" required>
+                    <option value="">-- Select Carrier --</option>
+                    @foreach (var c in carriers)
+                    {
+                        <option value="@c.Id" selected="@(Model.CarrierId == c.Id)">@c.Person.PersonName</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Status *</label>
+                <select name="TripStatusId" class="form-control" required>
+                    <option value="">-- Select Status --</option>
+                    @foreach (var s in statuses)
+                    {
+                        <option value="@s.Id" selected="@(Model.TripStatusId == s.Id)">@s.TripStatusName</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <!-- Route Section -->
+        <div class="section-title">📍 Route</div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Origin *</label>
+                <select name="FromLocationId" class="form-control" required>
+                    <option value="">-- Select Origin --</option>
+                    @foreach (var loc in locations)
+                    {
+                        <option value="@loc.Id" selected="@(Model.FromLocationId == loc.Id)">@loc.LocationName</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Destination *</label>
+                <select name="ToLocationId" class="form-control" required>
+                    <option value="">-- Select Destination --</option>
+                    @foreach (var loc in locations)
+                    {
+                        <option value="@loc.Id" selected="@(Model.ToLocationId == loc.Id)">@loc.LocationName</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <!-- Schedule Section -->
+        <div class="section-title">📅 Schedule</div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Departure Date</label>
+                <input type="datetime-local" name="DepartureDate" class="form-control"
+                       value="@Model.DepartureDate?.ToString("yyyy-MM-ddTHH:mm")" />
+            </div>
+            <div class="form-group">
+                <label>Arrival Date</label>
+                <input type="datetime-local" name="ArrivalDate" class="form-control"
+                       value="@Model.ArrivalDate?.ToString("yyyy-MM-ddTHH:mm")" />
+            </div>
+        </div>
+
+        <!-- Remarks -->
+        <div class="section-title">📝 Notes</div>
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label>Remarks</label>
+                <textarea name="Remarks" class="form-control" rows="3"
+                      placeholder="Additional notes about this trip..."
+                      maxlength="200">@Model.Remarks</textarea>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+            <button type="button" class="btn btn-outline"
+                    onclick="document.getElementById('trip-modal').classList.remove('active')">
+                Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">
+                <span id="form-spinner" class="htmx-indicator"></span>
+                @(isEdit ? "💾 Update Trip" : "✅ Create Trip")
+            </button>
+        </div>
+
+
+
+
+    </form>
+}
+
+
+
+
+
+
+
+
+ *@

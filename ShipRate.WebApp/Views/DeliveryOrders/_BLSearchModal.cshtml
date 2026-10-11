@@ -1,0 +1,35 @@
+﻿@using ShipRate.Application.ViewModels
+@model List<DeliveryOrderBLLookupItemVm>
+
+<div class="modal-header">
+    <h5 class="modal-title">Select BL</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body" dir="ltr">
+    <div class="row g-2 mb-3">
+        <div class="col-md-10">
+            <input type="text"
+                   name="term"
+                   class="form-control"
+                   placeholder="Search by BL No / Ref No / Booking No"
+                   hx-get="@Url.Action("SearchBL", "DeliveryOrders")"
+                   hx-trigger="keyup changed delay:400ms, search"
+                   hx-target="#blSearchResults"
+                   hx-swap="innerHTML" />
+        </div>
+        <div class="col-md-2">
+            <button type="button"
+                    class="btn btn-outline-secondary w-100"
+                    hx-get="@Url.Action("SearchBL", "DeliveryOrders")"
+                    hx-target="#blSearchResults"
+                    hx-swap="innerHTML">
+                Search
+            </button>
+        </div>
+    </div>
+
+    <div id="blSearchResults">
+        @await Html.PartialAsync("_BLSearchResults", Model)
+    </div>
+</div>

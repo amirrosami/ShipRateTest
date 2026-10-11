@@ -1,0 +1,145 @@
+﻿@using ShipRate.Application.ViewModels
+@model DeliveryOrderListWrapperVm
+
+@{
+    ViewData["Title"] = "Delivery Orders";
+}
+
+<div class="container-fluid py-2">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <div>
+            <h2 class="mb-0 fw-bold">Delivery Orders</h2>
+        </div>
+@*         <div>
+            <a href="@Url.Action("Create", "DeliveryOrders")" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-2"></i>Create Delivery Order
+            </a>
+        </div>
+ *@
+</div>
+
+    <!-- فیلترها -->
+    <div class="card mb-2 shadow-sm border-0">
+        <div class="card-body">
+            <form id="filterForm"
+                  hx-get="@Url.Action("Index", "DeliveryOrders")"
+                  hx-target="#gridContainer"
+                  hx-swap="innerHTML"
+                  hx-trigger="submit, change from:select, keyup delay:500ms from:input[type='text']">
+
+                <div class="row g-3">
+                    <div class="col-md-2">
+                        <label class="form-label text-muted small">Search</label>
+                        <input type="text"
+                               asp-for="Filter.SearchTerm"
+                               class="form-control"
+                               placeholder="Search by DO No or BL No..." />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label text-muted small">Status</label>
+                        <select class="form-select" asp-for="Filter.StatusId" asp-items="Model.Filter.Statuses">
+                            <option value="">All Statuses</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label text-muted small">Clearance Type</label>
+                        <select class="form-select" asp-for="Filter.ClearanceTypeId" asp-items="Model.Filter.ClearanceTypes">
+                            <option value="">All Types</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label text-muted small">Carrier</label>
+                        <select class="form-select" asp-for="Filter.CarrierId" asp-items="Model.Filter.Carriers">
+                            <option value="">All Carriers</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-1">
+                        <label class="form-label text-muted small">From Date</label>
+                        <input type="date"
+                               asp-for="Filter.FromDate"
+                               value="@Model.Filter.FromDate?.ToString("yyyy-MM-dd")"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-1">
+                        <label class="form-label text-muted small">To Date</label>
+                        <input type="date"
+                               asp-for="Filter.ToDate"
+                               value="@Model.Filter.ToDate?.ToString("yyyy-MM-dd")"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="submit" class="btn btn-outline-secondary w-100">
+                            Filter
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- محتوای جدول داده‌ها -->
+    <div id="gridContainer">
+        <partial name="_ListGrid" model="Model" />
+    </div>
+
+@*     <div id="detentionSection" class="mt-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <strong>Detentions</strong>
+            </div>
+            <div class="card-body p-0" id="detentionGridContainer">
+                <div class="p-3 text-muted">
+                    Select a Delivery Order to view related Detentions.
+                </div>
+            </div>
+        </div>
+    </div>
+ *@
+
+
+    <!-- Modal ابطال -->
+    <div class="modal fade" id="cancelDOModal" tabindex="-1" aria-labelledby="cancelDOModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="cancelDOModalLabel">Cancel Delivery Order</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="cancelModalBody">
+                    <!-- محتوا به صورت پویا با HTMX لود می‌شود -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="modal fade" id="documentManagerModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="document-manager-content">
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    // شنیدن رویداد بستن یا موفقیت‌آمیز بودن ابطال جهت به‌روزرسانی جدول اصلی
+    document.body.addEventListener('refreshGrid', function() {
+        // بستن مودال با Bootstrap API
+        const modalEl = document.getElementById('cancelDOModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) {
+            modal.hide();
+        }
+        // ارسال تریگر برای لود مجدد گرید با فیلترهای فعلی
+        document.getElementById('filterForm').dispatchEvent(new Event('submit'));
+    });
+</script>

@@ -1,0 +1,47 @@
+﻿@using ShipRate.WebApp.ViewModels
+@model dynamic
+
+<div class="col-md-2">
+    <select name="PersonalityType"
+            asp-items="@ViewBag.PersonalityTypes"
+            class="form-select form-select-sm"
+            hx-post="Persons/List"
+            hx-trigger="change"
+            hx-target="#table-container"
+            hx-swap="innerHTML"
+            hx-include="#grid-filters, #table-sort-info">
+        <option class="text-dark" value="0" selected>-- Personality Type --</option>
+    </select>
+</div>
+
+<div class="col-md-2">
+    <select name="RoleType"
+            asp-items="@ViewBag.RoleTypes"
+            class="form-select form-select-sm"
+            hx-post="Persons/List"
+            hx-trigger="change"
+            hx-target="#table-container"
+            hx-swap="innerHTML"
+            hx-include="#grid-filters, #table-sort-info">
+        <option class="text-dark" value="0" selected>-- Role Type --</option>
+    </select>
+</div>
+
+<div class="col-md-2">
+    <div class="form-check mt-1">
+        <input class="form-check-input"
+               type="checkbox"
+               id="filterMyClients"
+               name="FilterMyClients"
+               value="true"
+               hx-post="Persons/List"
+               hx-trigger="change"
+               hx-target="#table-container"
+               hx-swap="innerHTML"
+               hx-include="#grid-filters, #table-sort-info" />
+
+        <label class="form-check-label small" for="filterMyClients">
+            My Clients
+        </label>
+    </div>
+</div>

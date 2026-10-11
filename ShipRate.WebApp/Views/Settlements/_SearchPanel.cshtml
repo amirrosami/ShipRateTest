@@ -1,0 +1,79 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model SettlementSearchDto
+
+<form id="settlementSearchForm"
+      class="row g-3 align-items-end"
+      hx-get="@Url.Action("List", "Settlements")"
+      hx-target="#settlementGrid"
+      hx-swap="innerHTML"
+      hx-trigger="submit, change delay:300ms">
+
+    <input type="hidden" name="Page" value="1" />
+
+    <div class="col-md-1">
+        <label class="form-label">Settlement No</label>
+        <input type="number" name="SettlementNo" class="form-control" />
+    </div>
+
+    <div class="col-md-1">
+        <label class="form-label">Date From</label>
+        <input type="date" name="SettlementDateFrom" class="form-control" />
+    </div>
+
+    <div class="col-md-1">
+        <label class="form-label">Date To</label>
+        <input type="date" name="SettlementDateTo" class="form-control" />
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">Party</label>
+
+        <input type="hidden" id="SearchPartyId" name="PartyId" />
+
+        <input type="text"
+               id="SearchPartyName"
+               name="PartyName"
+               class="form-control"
+               autocomplete="off"
+               hx-get="@Url.Action("Parties", "Lookup")"
+               hx-trigger="keyup changed delay:400ms"
+               hx-target="#searchPartyResults"
+               hx-include="#SearchPartyName"
+               hx-vals='{"targetId":"SearchPartyId","targetText":"SearchPartyName"}' />
+
+        <div id="searchPartyResults"></div>
+    </div>
+
+    <div class="col-md-1">
+        <label class="form-label">Status</label>
+        <select name="StatusId" class="form-select" asp-items="ViewBag.Statuses">
+            <option value="">All</option>
+        </select>
+    </div>
+
+    <div class="col-md-1">
+        <label class="form-label">Invoice No</label>
+        <input type="text" name="InvoiceNo" class="form-control" />
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">Payment Doc No</label>
+        <input type="text" name="PaymentDocumentNo" class="form-control" />
+    </div>
+
+    <div class="col-md-1">
+        <label class="form-label">Page Size</label>
+        <select name="PageSize" class="form-select">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+        </select>
+    </div>
+
+    <div class="col-md-1">
+        <button type="submit" class="btn btn-primary w-100 " >
+            Search
+        </button>
+    </div>
+
+</form>

@@ -1,0 +1,119 @@
+﻿@using ShipRate.Application.DTOs
+@model TipEditDto
+
+<div class="modal fade" id="tipFormModal" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" id="tip-form-modal-content">
+            <form asp-action="@(Model.Id == Guid.Empty ? "Create" : "Edit")"
+                  asp-controller="TIP"
+                  method="post"
+                  hx-post="@Url.Action(Model.Id == Guid.Empty ? "Create" : "Edit", "TIP")"
+                  hx-target="#tip-modal-placeholder"
+                  hx-swap="innerHTML">
+
+                @Html.AntiForgeryToken()
+
+                @if (Model.Id != Guid.Empty)
+                {
+                    <input type="hidden" asp-for="Id" />
+                }
+
+                <div class="modal-header">
+                    <h5 class="modal-title">@((Model.Id == Guid.Empty) ? "Create TIP" : "Edit TIP")</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">TIP No</label>
+                            <input asp-for="TIPNo" class="form-control" />
+                            <span asp-validation-for="TIPNo" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">TIP Date</label>
+                            <input asp-for="TIPDate" class="form-control" type="date" />
+                            <span asp-validation-for="TIPDate" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Expiry Date</label>
+                            <input asp-for="TIPExpiryDate" class="form-control" type="date" />
+                            <span asp-validation-for="TIPExpiryDate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        @await Html.PartialAsync("_VoyagePortSelector", new VoyagePortSelectorDto
+                        {
+                            VoyagePortId = Model.VoyagePortId,
+                                                VoyageDisplayText = Model.VoyageDisplayText,
+                                                TargetPrefix = "tip-voyageport"
+                                                })
+                        <span asp-validation-for="VoyagePortId" class="text-danger"></span>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label asp-for="CompanyId" class="form-label">Company</label>
+                                <select asp-for="CompanyId"
+                                        asp-items="Model.Companies"
+                                        class="form-select">
+                                    <option value="">-- Select Company --</option>
+                                </select>
+                                <span asp-validation-for="CompanyId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label asp-for="ShippingLineId" class="form-label">Shipping Line</label>
+                                <select asp-for="ShippingLineId"
+                                        asp-items="Model.ShippingLines"
+                                        class="form-select">
+                                    <option value="">-- Select Shipping Line --</option>
+                                </select>
+                                <span asp-validation-for="ShippingLineId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label asp-for="CustomsOfficeId" class="form-label">Customs Office</label>
+                                <select asp-for="CustomsOfficeId"
+                                        asp-items="Model.CustomsOffices"
+                                        class="form-select">
+                                    <option value="">-- Select Customs Office --</option>
+                                </select>
+                                <span asp-validation-for="CustomsOfficeId" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Remarks</label>
+                        <textarea asp-for="Remarks" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    @*                     <div class="form-check mb-3">
+                                            <input class="form-check-input" asp-for="IsActive" />
+                                            <label class="form-check-label" asp-for="IsActive">Is Active</label>
+                                        </div>
+                        *@
+</div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        Save
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

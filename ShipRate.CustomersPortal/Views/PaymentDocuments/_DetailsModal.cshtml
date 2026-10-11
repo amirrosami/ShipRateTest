@@ -1,0 +1,118 @@
+﻿@using Microsoft.Extensions.Localization
+@using ShipRate.Application.ViewModels
+@using ShipRate.WebAppCustomers
+@using System.Globalization
+@model PaymentDocumentDetailsVm
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isFa = culture == "fa";
+    var lang = isFa ? "fa" : "en";
+    var dir = isFa ? "rtl" : "ltr";
+}
+<div class="modal-header" dir="@dir">
+    <h5 class="modal-title">@(isFa ? "جزئیات سند پرداخت" : "Payment Document Details")</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body" dir="@dir">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <strong>@(isFa ? "شماره سند" : "Document Number"):</strong>
+            <div>@Model.DocumentNumber</div>
+        </div>
+
+        <div class="col-md-4">
+            <strong>@(isFa ? "تاریخ سند" : "Document Date"):</strong>
+            <div>@Model.DocumentDateShamsi</div>
+        </div>
+
+        <div class="col-md-4">
+            <strong>@(isFa ? "مبلغ" : "Amount"):</strong>
+            <div>@Model.Amount.ToString("N0")</div>
+        </div>
+
+        <div class="col-md-4">
+            <strong>@(isFa ? "شرکت" : "Company"):</strong>
+            <div>@Model.CompanyName</div>
+        </div>
+
+        <div class="col-md-4">
+            <strong>@(isFa ? "شخص" : "Person"):</strong>
+            <div>@Model.PersonName</div>
+        </div>
+
+        <div class="col-md-4">
+            <strong>@(isFa ? "ارز" : "Currency"):</strong>
+            <div>@Model.CurrencyTitle</div>
+        </div>
+
+        <div class="col-md-4">
+            <strong>@(isFa ? "جهت مالی" : "Finance Direction"):</strong>
+            <div>@Model.FinanceDirectionTitle</div>
+        </div>
+
+        <div class="col-md-4">
+            <strong>@(isFa ? "روش پرداخت" : "Payment Method"):</strong>
+            <div>@Model.PaymentMethodTitle</div>
+        </div>
+
+        <div class="col-md-4">
+            <strong>@(isFa ? "شماره پیگیری" : "Tracking Number"):</strong>
+            <div>@Model.TrackingNumber</div>
+        </div>
+
+        <div class="col-12">
+            <strong>@(isFa ? "توضیحات" : "Description"):</strong>
+            <div>@Model.Description</div>
+        </div>
+    </div>
+
+    @if (Model.Cheque != null)
+    {
+        <hr class="my-4" />
+        <h6 class="mb-3">@(isFa ? "اطلاعات چک" : "Cheque Information")</h6>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <strong>@(isFa ? "شماره چک" : "Cheque Number"):</strong>
+                <div>@Model.Cheque.ChequeNumber</div>
+            </div>
+
+            <div class="col-md-4">
+                <strong>@(isFa ? "تاریخ چک" : "Cheque Date"):</strong>
+                <div>@Model.Cheque.ChequeDateShamsi</div>
+            </div>
+
+            <div class="col-md-4">
+                <strong>@(isFa ? "نوع چک" : "Cheque Type"):</strong>
+                <div>@Model.Cheque.ChequeTypeTitle</div>
+            </div>
+
+            <div class="col-md-4">
+                <strong>@(isFa ? "بانک" : "Bank"):</strong>
+                <div>@Model.Cheque.BankName</div>
+            </div>
+
+            <div class="col-md-4">
+                <strong>@(isFa ? "شماره حساب بانکی" : "Bank Account"):</strong>
+                <div>@Model.Cheque.BankAccountNumber</div>
+            </div>
+
+            <div class="col-md-4">
+                <strong>@(isFa ? "نام صاحب حساب" : "Account Holder"):</strong>
+                <div>@Model.Cheque.AccountHolderName</div>
+            </div>
+
+            <div class="col-12">
+                <strong>@(isFa ? "توضیحات چک" : "Cheque Description"):</strong>
+                <div>@Model.Cheque.Description</div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="modal-footer" dir="@dir">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@(isFa ? "بستن" : "Close")</button>
+</div>

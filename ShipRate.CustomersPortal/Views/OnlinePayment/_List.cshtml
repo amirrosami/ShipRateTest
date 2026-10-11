@@ -1,0 +1,117 @@
+﻿@using Microsoft.Extensions.Localization
+@using ShipRate.Application.DTOs.Finance
+@using System.Globalization
+@using ShipRate.WebAppCustomers
+@model OnlinePaymentListPageVm
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isFa = culture == "fa";
+    var lang = isFa ? "fa" : "en";
+    var dir = isFa ? "rtl" : "ltr";
+}
+<div class="card">
+    <div class="card-body">
+        <form hx-get="@Url.Action("List", "OnlinePayments")"
+              hx-target="#invoice-list-container"
+              hx-swap="innerHTML"
+              class="row g-3 mb-3">
+
+            <div class="col-md-1">
+                <label class="form-label">@Localizer["RequestNo"]</label>
+                <input name="RequestNo" value="@Model.Filter.InvoiceNo" class="form-control" />
+            </div>
+
+            @*             <div class="col-md-2">
+                <label class="form-label">Invoice PNo</label>
+                <input name="InvoicePNo" value="@Model.Filter.InvoicePNo" class="form-control" />
+            </div>
+ *@
+           
+
+           
+            @* <div class="col-md-1">
+                <label class="form-label">@Localizer["Status"]</label>
+                <select name="OnlinePaymentStatusId" class="form-select">
+                    <option value="">@(isFa ? "همه" : "all")</option>
+                    @foreach (var item in Model.InvoiceStatuses)
+                    {
+                        <option value="@item.Value" selected="@(Model.Filter.InvoiceStatusId?.ToString() == item.Value)">
+                            @item.Text
+                        </option>
+                    }
+                </select>
+            </div> *@
+
+            @* <div class="col-md-1">
+                <label class="form-label">@Localizer["Direction"]</label>
+                <select name="FinanceDirectionId" class="form-select">
+                    <option value="">@(isFa ? "همه" : "all")</option>
+                    @foreach (var item in Model.FinanceDirections)
+                    {
+                        <option value="@item.Value" selected="@(Model.Filter.FinanceDirectionId?.ToString() == item.Value)">
+                            @item.Text
+                        </option>
+                    }
+                </select>
+            </div> *@
+
+            @* <div class="col-md-1">
+                <label class="form-label">@Localizer["Currency"]</label>
+                <select name="CurrencyId" class="form-select">
+                    <option value="">@(isFa ? "همه" : "all")</option>
+                    @foreach (var item in Model.Currencies)
+                    {
+                        <option value="@item.Value" selected="@(Model.Filter.CurrencyId?.ToString() == item.Value)">
+                            @item.Text
+                        </option>
+                    }
+                </select>
+            </div> *@
+
+            <div class="col-md-1">
+                <label class="form-label">@Localizer["DateFrom"]</label>
+                <input type="date"
+                       name="InvoiceDateFrom"
+                       value="@(Model.Filter.FromDate)"
+                       class="form-control" />
+            </div>
+
+            <div class="col-md-1">
+                <label class="form-label">@Localizer["DateTo"]</label>
+                <input type="date"
+                       name="InvoiceDateTo"
+                       value="@(Model.Filter.ToDate)"
+                       class="form-control" />
+            </div>
+
+            <div class="col-md-1">
+                <label class="form-label">@Localizer["PageSize"]</label>
+                <select name="PageSize" class="form-select">
+                    <option value="10" selected="@(Model.Filter.PageSize == 10)">10</option>
+                    <option value="20" selected="@(Model.Filter.PageSize == 20)">20</option>
+                    <option value="50" selected="@(Model.Filter.PageSize == 50)">50</option>
+                </select>
+            </div>
+
+            <input type="hidden" name="PageNumber" value="1" />
+
+            <div class="col-md-2 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary">Search</button>
+
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        hx-get="@Url.Action("List", "OnlinePayments", new { PageNumber = 1, PageSize = 10 })"
+                        hx-target="#invoice-list-container"
+                        hx-swap="innerHTML">
+                    Reset
+                </button>
+            </div>
+        </form>
+
+        <div id="invoice-grid-container">
+            @await Html.PartialAsync("_Grid", Model)
+        </div>
+    </div>
+</div>

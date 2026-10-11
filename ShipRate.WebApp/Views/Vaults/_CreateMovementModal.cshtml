@@ -1,0 +1,176 @@
+﻿@using ShipRate.Application.DTOs
+@model CreateVaultMovementDto
+
+<div class="modal-content vault-modal" style="font-size: 0.85rem;">
+    <!-- بخش ۱: فرم اصلی ثبت تراکنش -->
+    <div id="movementFormSection">
+        <div class="modal-header py-2 bg-light">
+            <h6 class="modal-title fw-bold">
+                <i class="bi bi-arrow-left-right me-1 text-primary"></i> Record Vault Cash Movement
+            </h6>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <form hx-post="/Vaults/CreateMovement" hx-swap="none" id="vaultMovementForm">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="VaultId" />
+            <input type="hidden" asp-for="PaymentDocumentId" id="selectedPaymentDocId" />
+
+            <div class="modal-body p-3">
+                <div class="excel-grid">
+
+                    @* 1. Direction *@
+                    <div class="excel-field">
+                        <label class="form-label text-muted fw-semibold mb-1">Direction <span class="text-danger">*</span></label>
+                        <select asp-for="InOutId" id="movementInOut" class="form-select form-select-sm" onchange="handleMovementTypeChange()">
+                            <option value="1">Incoming (+)</option>
+                            <option value="2">Outgoing (-)</option>
+                        </select>
+                    </div>
+
+                    @* 2. Currency *@
+                    <div class="excel-field">
+                        <label class="form-label text-muted fw-semibold mb-1">Currency <span class="text-danger">*</span></label>
+                        <select asp-for="CurrencyId" id="movementCurrencyId" class="form-select form-select-sm" required>
+                            <option value="">-- Select Currency --</option>
+                            @if (ViewBag.Currencies != null)
+                            {
+                                foreach (var c in (List<ShipRate.Application.DTOs.SLookupDto>)ViewBag.Currencies)
+                                {
+                                    <option value="@c.Id">@c.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    @* 3. Amount *@
+                    <div class="excel-field">
+                        <label class="form-label text-muted fw-semibold mb-1">Amount <span class="text-danger">*</span></label>
+                        <input asp-for="Amount" id="movementAmount" type="text"  class="form-control form-control-sm money-input" required />
+                    </div>
+
+                    @* 4. Source Type *@
+                    <div class="excel-field">
+                        <label class="form-label text-muted fw-semibold mb-1">Source Type <span class="text-danger">*</span></label>
+                        <select asp-for="VaultMovementSourceTypeId" id="movementSourceType" class="form-select form-select-sm" onchange="handleMovementTypeChange()">
+                            <option value="1">Customer Receipt</option>
+                            <option value="2">Bank To Vault</option>
+                            <option value="3">Petty Cash Return</option>
+                            <option value="4">Inter-Vault Transfer In</option>
+                            <option value="10">Cash Payment Request</option>
+                            <option value="11">Vault To Bank</option>
+                            <option value="12">Petty Cash Advance</option>
+                            <option value="13">Inter-Vault Transfer Out</option>
+                        </select>
+                    </div>
+
+                    @* 5. Customer Payment Document Selector *@
+                    <div class="excel-field" id="paymentDocField" style="display: none;">
+                        <label class="form-label text-muted fw-semibold mb-1">Payment Doc <span class="text-danger">*</span></label>
+                        <div class="input-group input-group-sm">
+                            <input type="text" id="selectedPaymentDocDisplay" class="form-control form-control-sm" readonly placeholder="Select Document..." />
+                            <button type="button" class="btn btn-outline-primary" onclick="loadAndShowDocuments()">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    @* 6. Reference No *@
+                    <div class="excel-field">
+                        <label class="form-label text-muted fw-semibold mb-1">Reference No</label>
+                        <input asp-for="ReferenceNo" id="movementRefNo" class="form-control form-control-sm" placeholder="Receipt / Voucher No" />
+                    </div>
+
+                    @* 7. Depositor / Beneficiary *@
+                    <div class="excel-field">
+                        <label class="form-label text-muted fw-semibold mb-1">Depositor / Beneficiary</label>
+                        <input asp-for="DepositorOrReceiver" id="movementParty" class="form-control form-control-sm" placeholder="Person / Company Name" />
+                    </div>
+
+                </div>
+
+                @* Remarks *@
+                <div class="excel-field mt-2 w-100">
+                    <label class="form-label text-muted fw-semibold mb-1">Remarks</label>
+                    <input asp-for="Remarks" class="form-control form-control-sm" placeholder="Additional notes..." />
+                </div>
+            </div>
+
+            <div class="modal-footer py-2 bg-light">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-sm btn-primary">
+                    <i class="bi bi-check-lg me-1"></i> Commit Entry
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- بخش ۲: کانتینر لیست اسناد پرداخت -->
+    <div id="docListSection" style="display: none;">
+        <div id="docListContainer">
+            <div class="p-4 text-center text-muted">
+                <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                Loading documents...
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function handleMovementTypeChange() {
+        var inOut = document.getElementById('movementInOut').value;
+        var sourceType = document.getElementById('movementSourceType').value;
+        var docField = document.getElementById('paymentDocField');
+
+        if (inOut === "1" && sourceType === "1") {
+            docField.style.display = 'block';
+        } else {
+            docField.style.display = 'none';
+            document.getElementById('selectedPaymentDocId').value = '';
+            document.getElementById('selectedPaymentDocDisplay').value = '';
+        }
+    }
+
+    async function loadAndShowDocuments() {
+        showDocListSection();
+        const container = document.getElementById('docListContainer');
+        container.innerHTML = '<div class="p-4 text-center text-muted"><div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div> Loading documents...</div>';
+
+        try {
+            const response = await fetch('/Vaults/SelectPaymentDocumentModal');
+            if (!response.ok) {
+                throw new Error('Server returned ' + response.status);
+            }
+            const html = await response.text();
+            container.innerHTML = html;
+        } catch (err) {
+            container.innerHTML = '<div class="p-3 text-danger"><i class="bi bi-exclamation-triangle me-1"></i> Failed to load documents. <button class="btn btn-sm btn-link" onclick="showFormSection()">Back</button></div>';
+            console.error(err);
+        }
+    }
+
+    function showDocListSection() {
+        document.getElementById('movementFormSection').style.display = 'none';
+        document.getElementById('docListSection').style.display = 'block';
+    }
+
+    function showFormSection() {
+        document.getElementById('docListSection').style.display = 'none';
+        document.getElementById('movementFormSection').style.display = 'block';
+    }
+
+    function selectPaymentDocument(id, docNo, amount, currencyId, partyName) {
+        document.getElementById('selectedPaymentDocId').value = id;
+        document.getElementById('selectedPaymentDocDisplay').value = (docNo || '') + (amount ? ' (' + amount + ')' : '');
+
+        if (amount) document.getElementById('movementAmount').value = amount;
+        if (currencyId) document.getElementById('movementCurrencyId').value = currencyId;
+        if (docNo) document.getElementById('movementRefNo').value = docNo;
+        if (partyName) document.getElementById('movementParty').value = partyName;
+
+        showFormSection();
+    }
+
+    // مقداردهی اولیه وضعیت نمایش فیلد
+    handleMovementTypeChange();
+</script>

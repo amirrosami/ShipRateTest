@@ -1,0 +1,175 @@
+﻿@using ShipRate.WebApp.ViewModels.FinanceVms
+@model List<ExpenseCategoryVM>
+@{
+    int currentPage = (int)(ViewBag.CurrentPage ?? 1);
+    int totalPages = (int)(ViewBag.TotalPages ?? 1);
+    int totalCount = (int)(ViewBag.TotalCount ?? 0);
+    string search = ViewBag.Search?.ToString() ?? "";
+}
+
+<!-- Store current page for JS refresh -->
+<div data-page-info="@currentPage" style="display:none;"></div>
+
+<table class="table table-hover table-striped mb-0 align-middle">
+    <thead class="table-light">
+        <tr>
+            <th style="width:50px">#</th>
+            <th>Title</th>
+            <th>Account Code</th>
+            <th class="text-end">Max Allowed Amount</th>
+            <th>Company</th>
+            <th class="text-center" style="width:80px">Active</th>
+            <th class="text-center" style="width:130px">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="7" class="text-center text-muted py-4">
+                    <i class="bi bi-inbox fs-3 d-block mb-1"></i>
+                    No expense categories found.
+                </td>
+            </tr>
+        }
+        else
+        {
+            int idx = (currentPage - 1) * 10;
+            @foreach (var item in Model)
+            {
+                idx++;
+                <tr>
+                    <td class="text-muted">@idx</td>
+                    <td class="fw-semibold">@item.Title</td>
+                    <td>
+                        <code>@item.AccountCode</code>
+                    </td>
+                    <td class="text-end">
+                        @item.MaxAllowedAmount.ToString("N2")
+                    </td>
+                    <td>@item.CompanyName</td>
+                    <td class="text-center">
+                        @if (item.IsActive)
+                        {
+                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Yes</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger"><i class="bi bi-x-circle"></i> No</span>
+                        }
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-warning"
+                                    title="Edit"
+                                    hx-get="@Url.Action("Edit", new { id = item.Id })"
+                                    hx-target="#modalBody"
+                                    hx-swap="innerHTML"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#crudModal">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-outline-danger"
+                                    title="Delete"
+                                    hx-delete="@Url.Action("Delete", new { id = item.Id })"
+                                    hx-confirm="Are you sure you want to delete this category?"
+                                    hx-target="#gridContainer"
+                                    hx-swap="innerHTML">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<!-- ======================== FOOTER: Count + Pagination ======================== -->
+<div class="d-flex justify-content-between align-items-center px-3 py-2 bg-light border-top">
+    <!-- Record count -->
+    <small class="text-muted">
+        <i class="bi bi-database"></i>
+        Total: <strong>@totalCount</strong> record(s)
+        @if (!string.IsNullOrWhiteSpace(search))
+        {
+            <span class="ms-2">
+                | Filtered by: <em>"@search"</em>
+            </span>
+        }
+    </small>
+
+    <!-- Pagination -->
+    @if (totalPages > 1)
+    {
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                <!-- First -->
+                <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                    <a class="page-link" href="#"
+                       hx-get="@Url.Action("Grid", new { search = search, page = 1 })"
+                       hx-target="#gridContainer"
+                       hx-swap="innerHTML"
+                       title="First page">
+                        <i class="bi bi-chevron-double-left"></i>
+                    </a>
+                </li>
+
+                <!-- Previous -->
+                <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                    <a class="page-link" href="#"
+                       hx-get="@Url.Action("Grid", new { search = search, page = currentPage - 1 })"
+                       hx-target="#gridContainer"
+                       hx-swap="innerHTML"
+                       title="Previous page">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+
+                <!-- Page Numbers (show max 5 pages window) -->
+                @{
+                    int startPage = Math.Max(1, currentPage - 2);
+                    int endPage = Math.Min(totalPages, startPage + 4);
+                    if (endPage - startPage < 4)
+                    {
+                        startPage = Math.Max(1, endPage - 4);
+                    }
+                }
+
+                @for (int p = startPage; p <= endPage; p++)
+                {
+                    <li class="page-item @(p == currentPage ? "active" : "")">
+                        <a class="page-link" href="#"
+                           hx-get="@Url.Action("Grid", new { search = search, page = p })"
+                           hx-target="#gridContainer"
+                           hx-swap="innerHTML">
+                            @p
+                        </a>
+                    </li>
+                }
+
+                <!-- Next -->
+                <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                    <a class="page-link" href="#"
+                       hx-get="@Url.Action("Grid", new { search = search, page = currentPage + 1 })"
+                       hx-target="#gridContainer"
+                       hx-swap="innerHTML"
+                       title="Next page">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+
+                <!-- Last -->
+                <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                    <a class="page-link" href="#"
+                       hx-get="@Url.Action("Grid", new { search = search, page = totalPages })"
+                       hx-target="#gridContainer"
+                       hx-swap="innerHTML"
+                       title="Last page">
+                        <i class="bi bi-chevron-double-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>

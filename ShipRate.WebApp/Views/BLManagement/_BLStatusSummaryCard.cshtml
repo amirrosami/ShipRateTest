@@ -1,0 +1,142 @@
+﻿@using ShipRate.Application.ViewModels
+@model MasterConsoleStatusSummaryVm
+<div class="card shadow-sm h-100 border-0">
+    <div class="card-header bg-light py-2 px-3 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-shield-check text-primary"></i>
+            <span class="fw-bold small text-uppercase">Check Lists</span>
+
+            @* Badge کلی *@
+            <span class="badge rounded-pill bg-secondary-subtle text-secondary border">
+                @* @Model.TotalDone / @Model.TotalCount *@
+            </span>
+        </div>
+
+@*         <div class="d-flex align-items-center gap-2">
+            <small class="text-muted">10%</small>
+            <div class="progress" style="width:140px; height:6px;">
+                <div class="progress-bar bg-success" style="width:30%"></div>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#blChecklistBody">
+                Details
+            </button>
+        </div>
+ *@    </div>
+
+    <div id="blChecklistBody" class="collapse show">
+        <div class="card-body p-3">
+
+            <div class="row g-3">
+
+                @* Group card *@
+                <div class="col-12">
+                    <div class="border rounded-3 p-2 h-100 bg-white">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="fw-semibold small">
+                                <i class="bi bi-file-earmark-text me-1 text-primary"></i>
+                                This BL
+                            </div>
+                            @* <span class="badge bg-light text-dark border">3/7</span> *@
+                        </div>
+
+@*                         <div class="progress mb-2" style="height:4px;">
+                            <div class="progress-bar bg-success" style="width:43%"></div>
+                        </div>
+ *@
+                        <div class="row g-2">
+@*                             <div class="col-12 col-lg-6">
+                                <div class="d-flex align-items-center gap-2 p-2 border rounded-2 checklist-item done">
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                    <div class="small">
+                                        BL Draft Approved
+                                        <div class="text-muted" style="font-size:.75rem;">by Ops</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-6">
+                                <div class="d-flex align-items-center gap-2 p-2 border rounded-2 checklist-item blocked">
+                                    <i class="bi bi-x-circle-fill text-danger"></i>
+                                    <div class="small">
+                                        Original BL Received
+                                        <div class="text-muted" style="font-size:.75rem;">missing</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-6">
+                                <div class="d-flex align-items-center gap-2 p-2 border rounded-2 checklist-item pending">
+                                    <i class="bi bi-circle text-secondary"></i>
+                                    <div class="small">
+                                        Manifest Confirmed
+                                        <div class="text-muted" style="font-size:.75rem;">pending</div>
+                                    </div>
+                                </div>
+                            </div>
+ *@
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="col-12">
+                    <div class="border rounded-3 p-2 h-100 bg-white">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="fw-semibold small">
+                                <i class="bi bi-file-earmark-text me-1 text-primary"></i>
+                                Other BLs
+                            </div>
+                            @* <span class="badge bg-light text-dark border">3/7</span> *@
+                        </div>
+
+                        @*                         <div class="progress mb-2" style="height:4px;">
+                            <div class="progress-bar bg-success" style="width:43%"></div>
+                        </div>
+ *@
+                        <div class="row g-2">
+@*                             <div class="col-12 col-lg-6">
+                                <div class="d-flex align-items-center gap-2 p-2 border rounded-2 checklist-item done">
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                    <div class="small">
+                                        Other Debits : 
+                                        <div class="text-muted" style="font-size:.75rem;">by Ops</div>
+                                    </div>
+                                </div>
+                            </div>
+ *@                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .checklist-item {
+        background: #fff;
+    }
+
+        .checklist-item.done {
+            border-color: rgba(25,135,84,.35) !important;
+            background: rgba(25,135,84,.04);
+        }
+
+        .checklist-item.blocked {
+            border-color: rgba(220,53,69,.35) !important;
+            background: rgba(220,53,69,.04);
+        }
+
+        .checklist-item.pending {
+            border-color: rgba(108,117,125,.25) !important;
+        }
+
+</style>
+

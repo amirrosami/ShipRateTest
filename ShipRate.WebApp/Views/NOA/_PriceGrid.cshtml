@@ -1,0 +1,344 @@
+﻿@using ShipRate.Application.DTOs
+@model PriceGridVM
+
+<style>
+    /* یکپارچه‌سازی ابعاد و فونت‌ها */
+    .price-table input,
+    .price-table select {
+        border: 1px solid #ced4da;
+        background: #fff;
+        width: 100%;
+        padding: 2px 6px;
+        font-size: 12.5px;
+        height: 27px;
+        line-height: 1.4;
+        border-radius: 3px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .price-table input {
+        text-align: left;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .price-table select {
+        padding-right: 18px;
+    }
+
+        .price-table input:focus,
+        .price-table select:focus {
+            background: #fff9c4 !important;
+            border-color: #ffc107;
+            outline: none;
+        }
+
+    .price-table td.num-cell {
+        font-size: 12.5px;
+        text-align: left;
+        font-variant-numeric: tabular-nums;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .price-table th, .price-table td {
+        vertical-align: middle;
+        padding: 4px 6px;
+    }
+
+        /* ستون نهایی Total */
+        .price-table td.col-total,
+        .price-table th.col-total {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-weight: 700 !important;
+            font-size: 13px !important;
+            text-align: left;
+            border-left: 1px solid #cbd5e1;
+        }
+
+    /* ۱. رنگ ردیف‌های دستی کاربر (فاقد مقدار سیستم): سبز ملایم */
+    .price-table tr.row-new > td {
+        background-color: #e8f5e9 !important;
+    }
+
+        .price-table tr.row-new > td.col-total {
+            background-color: #c8e6c9 !important;
+        }
+
+    /* ۲. رنگ ردیف‌های ویرایش‌شده نسبت به سیستم: زرد/کرم ملایم */
+    .price-table tr.row-modified > td {
+        background-color: #fff9c4 !important;
+    }
+
+        .price-table tr.row-modified > td.col-total {
+            background-color: #fff176 !important;
+        }
+
+    /* استایل ردیف افزودن جدید بالای جدول */
+    .new-row-bg > td {
+        background-color: #f8fafc !important;
+        border-bottom: 2px solid #cbd5e1;
+    }
+
+    /* ۳. کنترل نمایش/عدم نمایش ستون‌های سیستم (دیفالت: پنهان) */
+    .price-table .col-sys {
+        display: none !important;
+    }
+
+    .price-table.show-sys .col-sys {
+        display: table-cell !important;
+    }
+
+    /* راهنمای رنگ‌ها (Legend Indicators) */
+    .legend-indicator {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        margin-right: 4px;
+        border: 1px solid rgba(0,0,0,0.15);
+    }
+
+    .legend-new {
+        background-color: #e8f5e9;
+    }
+
+    .legend-modified {
+        background-color: #fff9c4;
+    }
+</style>
+
+<form id="priceGridForm"
+      hx-post="@Url.Action("SavePrices", "NOA")"
+      hx-target="#noa-prices-slot"
+      hx-on::config-request="cleanThousandSeparators(event)">
+
+    <input type="hidden" name="Form.Id" id="noa-form-id" value="@Model.NOAId" hx-swap-oob="true" />
+    <input type="hidden" name="NOAId" value="@Model.NOAId" />
+
+    <div class="border mt-2">
+        <div class="bg-light p-2 border-bottom fw-bold d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <span>Calculated Charges</span>
+
+                <!-- راهنمای رنگ‌ها (Legend) -->
+                <div class="d-flex align-items-center gap-2 small text-muted fw-normal ms-2 border-start ps-3 user-select-none" style="font-size: 11.5px;">
+                    <span class="d-inline-flex align-items-center">
+                        <span class="legend-indicator legend-new"></span> New (Manual)
+                    </span>
+                    <span class="d-inline-flex align-items-center ms-1">
+                        <span class="legend-indicator legend-modified"></span> Modified
+                    </span>
+                </div>
+
+                <!-- چک‌باکس Show/Hide ستون‌های سیستم -->
+                <div class="form-check form-switch mb-0 fw-normal border-start ps-4">
+                    <input class="form-check-input" type="checkbox" id="chkShowSysCols" onchange="toggleSysColumns(this)" role="switch" style="cursor: pointer;">
+                    <label class="form-check-label text-muted small user-select-none" for="chkShowSysCols" style="cursor: pointer; font-size: 11.5px;">Show System (Sys)</label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-xs btn-outline-success">Save Changes</button>
+        </div>
+
+        <table class="table table-sm table-bordered align-middle mb-0 price-table">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 35px;" class="text-center">#</th>
+                    <th style="width: 110px;">DO.Type</th>
+                    <th>Charge Type</th>
+                    <th style="width: 115px;" class="text-end col-sys">Initial (Sys)</th>
+                    <th style="width: 105px;" class="text-end col-sys">VAT (Sys)</th>
+                    <th style="width: 115px;" class="text-end col-sys">Total (Sys)</th>
+                    <th style="width: 125px;" class="text-end">Initial</th>
+                    <th style="width: 115px;" class="text-end">VAT</th>
+                    <th style="width: 125px;" class="text-end col-total">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- ۱. ردیف افزودن هزینه جدید -->
+                <tr class="new-row-bg">
+                    <td class="text-center fw-bold text-success">+</td>
+                    <td>
+                        <select class="form-select form-select-sm" name="NewRow.ClearanceTypeId">
+                            <option value="">--</option>
+                            @foreach (var x in Model.ClearanceTypes)
+                            {
+                                <option value="@x.Value">@x.Text</option>
+                            }
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-select form-select-sm" name="NewRow.ChargeTypeId">
+                            <option value="">--</option>
+                            @foreach (var x in Model.ChargeTypes)
+                            {
+                                <option value="@x.Value">@x.Text</option>
+                            }
+                        </select>
+                    </td>
+                    <td colspan="3" class="text-center text-muted small py-1 col-sys">New Charge Entry</td>
+                    <td>
+                        <input type="text" name="NewRow.InitialValue" class="thousand-format" oninput="handlePriceInput(this)" placeholder="0" />
+                    </td>
+                    <td>
+                        <input type="text" name="NewRow.VATAmount" class="thousand-format" readonly placeholder="0" />
+                    </td>
+                    <td class="col-total">
+                        <span class="total-cell">0</span>
+                    </td>
+                </tr>
+
+                <!-- ۲. ردیف‌های موجود -->
+                @for (int i = 0; i < Model.Prices.Count; i++)
+                {
+                    var item = Model.Prices[i];
+
+                    bool hasSysValue = item.SysCalcInitialValue.HasValue;
+                    bool isNew = !hasSysValue;
+                    bool isModified = hasSysValue && (
+                    (item.InitialValue != item.SysCalcInitialValue.Value) ||
+                    (item.VATAmount != (item.SysCalcVATAmount ?? 0))
+                    );
+
+                    string rowClass = isNew ? "row-new" : (isModified ? "row-modified" : "");
+
+                    <input type="hidden" name="Prices[@i].Id" value="@item.Id" />
+                    <input type="hidden" name="Prices[@i].NOAId" value="@item.NOAId" />
+                    <input type="hidden" name="Prices[@i].SequenceNo" value="@item.SequenceNo" />
+                    <input type="hidden" name="Prices[@i].ChargeTypeId" value="@item.ChargeTypeId" />
+                    <input type="hidden" name="Prices[@i].CurrencyId" value="@item.CurrencyId" />
+                    <input type="hidden" name="Prices[@i].SysCalcInitialValue" value="@item.SysCalcInitialValue" />
+                    <input type="hidden" name="Prices[@i].SysCalcVATAmount" value="@item.SysCalcVATAmount" />
+                    <input type="hidden" name="Prices[@i].SysCalcTotalValue" value="@item.SysCalcTotalValue" />
+
+                    <tr class="@rowClass"
+                        data-has-sys="@(hasSysValue ? "true" : "false")"
+                        data-sys-initial="@(item.SysCalcInitialValue?.ToString() ?? "")"
+                        data-sys-vat="@(item.SysCalcVATAmount?.ToString() ?? "")">
+
+                        <td class="text-center text-muted">@(i + 1)</td>
+                        <td>@item.ClearanceTypeName</td>
+                        <td>@item.ChargeTypeName</td>
+                        <td class="num-cell col-sys">@item.SysCalcInitialValue?.ToString("N0")</td>
+                        <td class="num-cell col-sys">@item.SysCalcVATAmount?.ToString("N0")</td>
+                        <td class="num-cell col-sys">@item.SysCalcTotalValue?.ToString("N0")</td>
+                        <td>
+                            <input type="text" name="Prices[@i].InitialValue" class="thousand-format" value="@item.InitialValue.ToString("N0")" oninput="handlePriceInput(this)" />
+                        </td>
+                        <td>
+                            <input type="text" name="Prices[@i].VATAmount" class="thousand-format" value="@item.VATAmount.ToString("N0")" oninput="handlePriceInput(this)" />
+                        </td>
+                        <td class="col-total num-cell">
+                            <span class="total-cell">@item.TotalValue.ToString("N0")</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</form>
+
+<script>
+    // کنترل Show / Hide ستون‌های سیستم
+    function toggleSysColumns(chk) {
+        const table = document.querySelector('.price-table');
+        if (!table) return;
+
+        if (chk.checked) {
+            table.classList.add('show-sys');
+        } else {
+            table.classList.remove('show-sys');
+        }
+    }
+
+    function formatWithThousandSeparator(val) {
+        if (!val) return '';
+        let parts = val.toString().replace(/[^0-9.]/g, '').split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        return parts.join('.');
+    }
+
+    function getCleanNumericValue(val) {
+        if (!val) return 0;
+        let clean = val.toString().replace(/,/g, '');
+        return parseFloat(clean) || 0;
+    }
+
+    function handlePriceInput(input) {
+        let cursorPosition = input.selectionStart;
+        let originalLength = input.value.length;
+
+        let rawVal = input.value;
+        let formatted = formatWithThousandSeparator(rawVal);
+        input.value = formatted;
+
+        let newLength = formatted.length;
+        cursorPosition += (newLength - originalLength);
+        if (cursorPosition >= 0) {
+            input.setSelectionRange(cursorPosition, cursorPosition);
+        }
+
+        calculateRowTotal(input);
+    }
+
+    function calculateRowTotal(el) {
+        const row = el.closest('tr');
+        if (!row) return;
+
+        const initialInput = row.querySelector('input[name$=".InitialValue"]');
+        const vatInput = row.querySelector('input[name$=".VATAmount"]');
+        const totalCell = row.querySelector('.total-cell');
+
+        if (!initialInput || !vatInput || !totalCell) return;
+
+        const initialVal = getCleanNumericValue(initialInput.value);
+
+        if (el === initialInput) {
+            const vatRate = 0.1;
+            const autoVat = Math.round(initialVal * vatRate);
+            vatInput.value = autoVat > 0 ? formatWithThousandSeparator(String(autoVat)) : '0';
+        }
+
+        const vatVal = getCleanNumericValue(vatInput.value);
+
+        const total = initialVal + vatVal;
+        totalCell.textContent = total.toLocaleString('en-US');
+
+        checkRowModified(row, initialVal, vatVal);
+    }
+
+    function checkRowModified(row, initialVal, vatVal) {
+        const hasSys = row.getAttribute('data-has-sys') === 'true';
+
+        if (!hasSys) {
+            row.classList.add('row-new');
+            row.classList.remove('row-modified');
+            return;
+        }
+
+        const sysInitialAttr = row.getAttribute('data-sys-initial');
+        const sysVatAttr = row.getAttribute('data-sys-vat');
+
+        const sysInitial = sysInitialAttr !== "" ? parseFloat(sysInitialAttr) : null;
+        const sysVat = sysVatAttr !== "" ? parseFloat(sysVatAttr) : 0;
+
+        const isModified = (initialVal !== sysInitial) || (vatVal !== sysVat);
+
+        if (isModified) {
+            row.classList.add('row-modified');
+        } else {
+            row.classList.remove('row-modified');
+        }
+    }
+
+    function cleanThousandSeparators(evt) {
+        if (evt.detail && evt.detail.parameters) {
+            for (let key in evt.detail.parameters) {
+                if (typeof evt.detail.parameters[key] === 'string' &&
+                    (key.includes('InitialValue') || key.includes('VATAmount'))) {
+                    evt.detail.parameters[key] = evt.detail.parameters[key].replace(/,/g, '');
+                }
+            }
+        }
+    }
+</script>

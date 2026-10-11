@@ -1,0 +1,145 @@
+﻿@using ShipRate.Application.DTOs
+@model VoyageManagementIndexViewModel
+
+<form id="voyage-search-form"
+      class="row g-3"
+      hx-get="@Url.Action("Search", "VoyageManagement")"
+      hx-target="#voyage-grid-container"
+      hx-swap="innerHTML">
+
+    <div class="col-md-2">
+        <label class="form-label">Voyage No</label>
+        <input asp-for="Search.VoyageNo" name="VoyageNo" class="form-control" />
+    </div>
+
+    <!-- ⚓️ بخش جدید ComboBox بنادر با HTMX -->
+
+    <div class="col-md-2">
+        <label class="form-label">Port</label>
+        <select id="PortSelect2" name="PortId" class="form-select form-select-sm">
+            @if (Model.Search?.PortId !=Guid.Empty)
+            {
+                <option value="@Model.Search.PortId" selected>@Model.Search.PortName</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">Vessel</label>
+        <select asp-for="Search.VesselId" name="VesselId" asp-items="Model.Vessels" class="form-select">
+            <option value="">All</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">Shipping Line</label>
+        <select asp-for="Search.ShippingLineId" name="ShippingLineId" asp-items="Model.ShippingLines" class="form-select">
+            <option value="">All</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">Event</label>
+        <select asp-for="Search.EventTypeId" name="EventTypeId" asp-items="Model.EventTypes" class="form-select">
+            <option value="">All</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">Page Size</label>
+        <select asp-for="Search.PageSize" name="PageSize" class="form-select">
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">Event Date From</label>
+        <input asp-for="Search.EventDateFrom" name="EventDateFrom" type="date" class="form-control" />
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">Event Date To</label>
+        <input asp-for="Search.EventDateTo" name="EventDateTo" type="date" class="form-control" />
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">ETA From</label>
+        <input asp-for="Search.EtaFrom" name="EtaFrom" type="date" class="form-control" />
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">ETA To</label>
+        <input asp-for="Search.EtaTo" name="EtaTo" type="date" class="form-control" />
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">ATA From</label>
+        <input asp-for="Search.AtaFrom" name="AtaFrom" type="date" class="form-control" />
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">ATA To</label>
+        <input asp-for="Search.AtaTo" name="AtaTo" type="date" class="form-control" />
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">Sort By</label>
+        <select asp-for="Search.SortBy" name="SortBy" class="form-select">
+            <option value="eta">ETA</option>
+            <option value="ata">ATA</option>
+            <option value="vessel">Vessel</option>
+            <option value="voyagein">Voyage In</option>
+            <option value="voyageout">Voyage Out</option>
+            <option value="port">Port</option>
+            <option value="lasteventdate">Last Event Date</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">Sort Order</label>
+        <select asp-for="Search.SortDesc" name="SortDesc" class="form-select">
+            <option value="false">Ascending</option>
+            <option value="true">Descending</option>
+        </select>
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Search</button>
+
+        <button type="button"
+                class="btn btn-outline-secondary"
+                onclick="document.getElementById('voyage-search-form').reset(); htmx.trigger('#voyage-search-form', 'submit');">
+            Clear
+        </button>
+    </div>
+
+    <input type="hidden" name="PageNumber" value="1" />
+</form>
+<script src="~/js/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#PortSelect2').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Search Port...',
+            allowClear: true,
+            minimumInputLength: 1, // پس از تایپ حداقل ۱ کاراکتر سرچ می‌زند
+            ajax: {
+                url: '/VoyageManagement/GetPortsJson',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { q: params.term };
+                },
+                processResults: function (data) {
+                    return {
+                        results: $.map(data, function (item) {
+                            return { id: item.id, text: item.text }
+                        })
+                    };
+                }
+            }
+        });
+    });
+</script>

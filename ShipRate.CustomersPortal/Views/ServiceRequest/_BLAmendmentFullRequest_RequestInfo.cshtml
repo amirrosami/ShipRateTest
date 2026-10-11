@@ -1,0 +1,110 @@
+﻿@using ShipRate.Application.DTOs
+@model BLAmendmentFullRequestFormDto
+
+<input type="hidden" asp-for="Request.Model.RequestTypeId" value="1" />
+
+<div class="row g-3">
+
+    <div class="col-md-4">
+        <label asp-for="Request.Model.CompanyId" class="form-label">Company</label>
+        <select asp-for="Request.Model.CompanyId"
+                class="form-select"
+                asp-items="@(new SelectList(Model.Request.Companies, "Id", "Name"))">
+            <option value="">Select...</option>
+        </select>
+        <span asp-validation-for="Request.Model.CompanyId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="Request.Model.InOutId" class="form-label">In/Out</label>
+        <select asp-for="Request.Model.InOutId"
+                class="form-select"
+                asp-items="@(new SelectList(Model.Request.InOuts, "Id", "Name"))">
+            <option value="">Select...</option>
+        </select>
+        <span asp-validation-for="Request.Model.InOutId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="Request.Model.PriorityId" class="form-label">Priority</label>
+        <select asp-for="Request.Model.PriorityId"
+                class="form-select"
+                asp-items="@(new SelectList(Model.Request.Priorities, "Id", "Name"))">
+            <option value="">Select...</option>
+        </select>
+        <span asp-validation-for="Request.Model.PriorityId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-8">
+        <label asp-for="Request.Model.PartyId" class="form-label">Party</label>
+
+        <input type="hidden"
+               asp-for="Request.Model.PartyId"
+               id="CPartyId" />
+
+        <input type="text"
+               id="CPartySearchText"
+               name="CParty"
+               value="@Model.Request.PartyDisplayName"
+               class="form-control"
+               placeholder="Search Party..."
+               autocomplete="off"
+               hx-get="@Url.Action("SearchParties", "JobParty")"
+               hx-trigger="keyup changed delay:400ms"
+               hx-target="#partySearchResults"
+               hx-swap="innerHTML"
+               hx-vals='js:{
+                    term: document.getElementById("CPartySearchText").value,
+                    targetHiddenInputId: "CPartyId",
+                    targetTextInputId: "CPartySearchText"
+               }' />
+
+        <div id="partySearchResults" class="position-relative"></div>
+
+        <span asp-validation-for="Request.Model.PartyId" class="text-danger small"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="Request.Model.PartyDetailName" class="form-label">Party Detail Name</label>
+        <input asp-for="Request.Model.PartyDetailName" class="form-control" />
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="Request.Model.RequestNo" class="form-label">Request No</label>
+        <input asp-for="Request.Model.RequestNo" class="form-control" />
+        <span asp-validation-for="Request.Model.RequestNo" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-8">
+        <label asp-for="Request.Model.Subject" class="form-label">Subject</label>
+        <input asp-for="Request.Model.Subject" class="form-control" />
+        <span asp-validation-for="Request.Model.Subject" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-12">
+        <label asp-for="Request.Model.Description" class="form-label">Description</label>
+        <textarea asp-for="Request.Model.Description" class="form-control" rows="3"></textarea>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="Request.Model.RequestDate" class="form-label">Request Date</label>
+        <input asp-for="Request.Model.RequestDate" type="datetime-local" class="form-control" />
+        <span asp-validation-for="Request.Model.RequestDate" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="Request.Model.DueDate" class="form-label">Due Date</label>
+        <input asp-for="Request.Model.DueDate" type="datetime-local" class="form-control" />
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="Request.Model.ExternalReferenceNo" class="form-label">External Reference No</label>
+        <input asp-for="Request.Model.ExternalReferenceNo" class="form-control" />
+    </div>
+
+    <div class="col-md-12">
+        <label asp-for="Request.Model.Remarks" class="form-label">Remarks</label>
+        <input asp-for="Request.Model.Remarks" class="form-control" />
+    </div>
+
+</div>

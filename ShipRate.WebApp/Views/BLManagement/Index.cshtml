@@ -1,0 +1,316 @@
+﻿@using ShipRate.Application.DTOs.BillOfLadings
+@model BLManagementPageViewModel
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Bill of Lading Management";
+
+    var search = Model.Search;
+}
+
+<div class="container-fluid py-4 px-3 px-lg-4 text-start" dir="ltr">
+
+    <!-- Page Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div>
+            <h4 class="mb-1 fw-bold text-dark">
+                Bill of Lading Management
+            </h4>
+
+            <div class="small text-muted">
+                Search and manage bills of lading
+            </div>
+        </div>  
+    </div>
+
+    <!-- Search and Filter Card -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-3">
+
+            <form id="filterForm"
+                  method="post"
+                  action="@Url.Action("SearchList", "BLManagement")"
+                  hx-post="@Url.Action("SearchList", "BLManagement")"
+                  hx-target="#bl-grid-container"
+                  hx-swap="innerHTML"
+                  hx-trigger="submit, change delay:500ms from:input, change from:select"
+                  class="row g-3">
+
+                <!-- Global Search -->
+                <div class="col-12 col-lg-4">
+                    <label for="globalSearch"
+                           class="form-label small fw-semibold text-muted mb-1">
+                        Global Search
+                    </label>
+
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+
+                        <input id="globalSearch"
+                               type="search"
+                               name="GlobalSearch"
+                               value="@search?.GlobalSearch"
+                               class="form-control bg-light border-start-0"
+                               placeholder="BL No, Job No, Shipper, Carrier..."
+                               autocomplete="off" />
+                    </div>
+                </div>
+
+                <!-- Transport Mode -->
+                <div class="col-12 col-md-4 col-lg-2">
+                    <label for="transportTypeId"
+                           class="form-label small fw-semibold text-muted mb-1">
+                        Mode
+                    </label>
+
+                    <select id="transportTypeId"
+                            name="TransportTypeId"
+                            class="form-select form-select-sm bg-light">
+                        <option value="">All Modes</option>
+                        <option value="1">Sea</option>
+                        <option value="2">Road</option>
+                        <option value="3">Rail</option>
+                        <option value="4">Air</option>
+                        <option value="5">MultiModal</option>
+                    </select>
+                </div>
+
+                <!-- BL Number -->
+                <div class="col-12 col-md-4 col-lg-3">
+                    <label for="blNo"
+                           class="form-label small fw-semibold text-muted mb-1">
+                        Bill Number
+                    </label>
+
+                    <input id="blNo"
+                           type="text"
+                           name="BLNo"
+                           value="@search?.BLNo"
+                           class="form-control form-control-sm bg-light"
+                           placeholder="BL Number"
+                           autocomplete="off" />
+                </div>
+
+                <!-- Job Number -->
+                <div class="col-12 col-md-4 col-lg-3">
+                    <label for="jobNo"
+                           class="form-label small fw-semibold text-muted mb-1">
+                        File / Job No
+                    </label>
+
+                    <input id="jobNo"
+                           type="text"
+                           name="JobNo"
+                           value="@search?.JobNo"
+                           class="form-control form-control-sm bg-light"
+                           placeholder="Job Number"
+                           autocomplete="off" />
+                </div>
+
+                <!-- Filter Actions -->
+                <div class="col-12">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 border-top pt-3">
+
+                        <button type="button"
+                                class="btn btn-sm btn-link text-primary text-decoration-none px-0"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#advancedFilters"
+                                aria-expanded="false"
+                                aria-controls="advancedFilters">
+                            <i class="bi bi-sliders me-1"></i>
+                            Advanced Filters
+                        </button>
+
+                        <div class="d-flex gap-2">
+                            <button type="reset"
+                                    class="btn btn-sm btn-light border"
+                                    onclick="window.location.reload();">
+                                <i class="bi bi-x-circle me-1"></i>
+                                Clear
+                            </button>
+
+                            <button type="submit"
+                                    class="btn btn-sm btn-dark">
+                                <i class="bi bi-search me-1"></i>
+                                Apply
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Filters -->
+                <div id="advancedFilters" class="collapse col-12">
+                    <div class="row g-3 pt-2">
+
+                        <!-- Shipper -->
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <label for="shipperName"
+                                   class="form-label small fw-semibold text-muted mb-1">
+                                Shipper
+                            </label>
+
+                            <input id="shipperName"
+                                   type="text"
+                                   name="ShipperName"
+                                   value="@search?.ShipperName"
+                                   class="form-control form-control-sm bg-light"
+                                   autocomplete="off" />
+                        </div>
+
+                        <!-- Consignee -->
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <label for="consigneeName"
+                                   class="form-label small fw-semibold text-muted mb-1">
+                                Consignee
+                            </label>
+
+                            <input id="consigneeName"
+                                   type="text"
+                                   name="ConsigneeName"
+                                   value="@search?.ConsigneeName"
+                                   class="form-control form-control-sm bg-light"
+                                   autocomplete="off" />
+                        </div>
+
+                        <!-- Origin -->
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <label for="origin"
+                                   class="form-label small fw-semibold text-muted mb-1">
+                                Origin
+                            </label>
+
+                            <input id="origin"
+                                   type="text"
+                                   name="Origin"
+                                   value="@search?.Origin"
+                                   class="form-control form-control-sm bg-light"
+                                   placeholder="POR / POL"
+                                   autocomplete="off" />
+                        </div>
+
+                        <!-- Destination -->
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <label for="destination"
+                                   class="form-label small fw-semibold text-muted mb-1">
+                                Destination
+                            </label>
+
+                            <input id="destination"
+                                   type="text"
+                                   name="Destination"
+                                   value="@search?.Destination"
+                                   class="form-control form-control-sm bg-light"
+                                   placeholder="POD / Final Destination"
+                                   autocomplete="off" />
+                        </div>
+
+                        <!-- Container Number -->
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <label for="containerNo"
+                                   class="form-label small fw-semibold text-muted mb-1">
+                                Container No
+                            </label>
+
+                            <input id="containerNo"
+                                   type="text"
+                                   name="ContainerNo"
+                                   value="@search?.ContainerNo"
+                                   class="form-control form-control-sm bg-light"
+                                   autocomplete="off" />
+                        </div>
+
+                        <!-- Vessel / Voyage -->
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <label for="vesselVoyage"
+                                   class="form-label small fw-semibold text-muted mb-1">
+                                Vessel / Voyage
+                            </label>
+
+                            <input id="vesselVoyage"
+                                   type="text"
+                                   name="VesselVoyage"
+                                   value="@search?.VesselVoyage"
+                                   class="form-control form-control-sm bg-light"
+                                   autocomplete="off" />
+                        </div>
+
+                        <!-- Issue Date From -->
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <label for="issueDateFrom"
+                                   class="form-label small fw-semibold text-muted mb-1">
+                                Issue From
+                            </label>
+
+                            <input id="issueDateFrom"
+                                   type="date"
+                                   name="IssueDateFrom"
+                                   value="@search?.IssueDateFrom?.ToString("yyyy-MM-dd")"
+                                   class="form-control form-control-sm bg-light" />
+                        </div>
+
+                        <!-- Issue Date To -->
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <label for="issueDateTo"
+                                   class="form-label small fw-semibold text-muted mb-1">
+                                Issue To
+                            </label>
+
+                            <input id="issueDateTo"
+                                   type="date"
+                                   name="IssueDateTo"
+                                   value="@search?.IssueDateTo?.ToString("yyyy-MM-dd")"
+                                   class="form-control form-control-sm bg-light" />
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div class="card border-0 shadow-sm">
+        <div id="bl-grid-container">
+            @await Html.PartialAsync("_BLListPartial", Model)
+        </div>
+    </div>
+</div>
+
+<!-- HTMX Modal -->
+<div id="modal-container"
+     class="modal fade"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div id="modal-content-target"
+             class="modal-content">
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.body.addEventListener("htmx:afterOnLoad", function (event) {
+            const target = event.detail?.target;
+
+            if (!target || target.id !== "bl-grid-container") {
+                return;
+            }
+
+            const modalElement = document.getElementById("modal-container");
+
+            if (!modalElement || typeof bootstrap === "undefined") {
+                return;
+            }
+
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+        });
+    </script>
+}

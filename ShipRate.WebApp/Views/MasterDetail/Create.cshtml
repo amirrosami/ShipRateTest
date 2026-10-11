@@ -1,0 +1,156 @@
+﻿@using ShipRate.WebApp.Models
+@using ShipRate.WebApp.TagHelpers
+@* Views/Orders/Create.cshtml *@
+@model OrderViewModel
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/master-detail.css" />
+}
+
+<master-detail-form asp-action="Create"
+                    asp-controller="Orders"
+                    form-id="orderForm"
+                    form-title="Create New Order"
+                    submit-text="Save Order"
+                    cancel-url="/Orders"
+                    cancel-text="Back to List"
+                    enable-validation="true">
+
+    @* ============ MASTER SECTION ============ *@
+    <master-section title="Order Information" columns="3">
+
+        <master-field name="OrderNumber"
+                      label="Order Number"
+                      type="Text"
+                      value="@Model.OrderNumber"
+                      required="true"
+                      placeholder="" />
+
+        <master-field name="OrderDate"
+                      label="Order Date"
+                      type="Date"
+                      value="@Model.OrderDate.ToString("yyyy-MM-dd")"
+                      required="true" />
+
+        <master-field name="Status"
+                      label="Status"
+                      type="Select"
+                      select-items="@(new List<SelectListData> {
+                                                new SelectListData { Value = "0", Text = "Pending" },
+                                                new SelectListData { Value = "1", Text = "Confirmed" },
+                                                new SelectListData { Value = "2", Text = "Shipped" },
+                                                new SelectListData { Value = "3", Text = "Delivered" }
+                                            })"
+                      required="true" />
+
+        <master-field name="CustomerName"
+                      label="Customer Name"
+                      type="Text"
+                      value="@Model.CustomerName"
+                      required="true"
+                      placeholder="Full name" />
+
+        <master-field name="CustomerEmail"
+                      label="Customer Email"
+                      type="Email"
+                      value="@Model.CustomerEmail"
+                      placeholder="email@example.com" />
+
+        <master-field name="CustomerPhone"
+                      label="Phone"
+                      type="Tel"
+                      value="@Model.CustomerPhone"
+                      placeholder="+1 234 567 8900" />
+
+        <master-field name="ShippingAddress"
+                      label="Shipping Address"
+                      type="TextArea"
+                      value="@Model.ShippingAddress"
+                      col-span="3"
+                      rows="2"
+                      required="true" />
+
+        <master-field name="Notes"
+                      label="Internal Notes"
+                      type="TextArea"
+                      value="@Model.Notes"
+                      col-span="3"
+                      rows="2"
+                      help-text="These notes are for internal use only." />
+
+    </master-section>
+
+    @* ============ DETAIL SECTION ============ *@
+    <detail-section title="Order Items"
+                    property-name="OrderDetails"
+                    add-button-text="+ Add Item"
+                    show-row-numbers="true"
+                    allow-delete="true"
+                    min-rows="1"
+                    max-rows="50"
+                    initial-rows="1"
+                    confirm-delete="true"
+                    confirm-delete-message="Remove this item?"
+                    show-footer-totals="true">
+
+        <detail-column name="Id"
+                       header="Id"
+                       type="Hidden"
+                       default-value="0" />
+
+        <detail-column name="ProductId"
+                       header="Product"
+                       type="Select"
+                       required="true"
+                       width="200px"
+                       select-items="@ViewBag.Products" />
+
+        <detail-column name="Quantity"
+                       header="Qty"
+                       type="Number"
+                       required="true"
+                       default-value="1"
+                       min="1"
+                       max="9999"
+                       width="80px" />
+
+        <detail-column name="UnitPrice"
+                       header="Unit Price"
+                       type="Decimal"
+                       required="true"
+                       default-value="0.00"
+                       min="0"
+                       step="0.01"
+                       width="120px" />
+
+        <detail-column name="DiscountPercent"
+                       header="Discount %"
+                       type="Decimal"
+                       default-value="0"
+                       min="0"
+                       max="100"
+                       step="0.1"
+                       width="100px" />
+
+        <detail-column name="LineTotal"
+                       header="Line Total"
+                       type="ReadOnly"
+                       width="120px"
+                       compute="Quantity * UnitPrice * (1 - DiscountPercent / 100)"
+                       show-total="true" />
+
+        <detail-column name="Description"
+                       header="Description"
+                       type="Text"
+                       is-total-label="true"
+                       total-label-text="Grand Total:"
+                       placeholder="Optional note"
+                       width="180px" />
+
+    </detail-section>
+
+</master-detail-form>
+
+@section Scripts {
+    <script src="~/js/master-detail.js"></script>
+}

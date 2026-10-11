@@ -1,0 +1,95 @@
+﻿@{
+    ViewData["Title"] = "RTS Delivery";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid py-4 text-start" dir="ltr">
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h1 class="h3 mb-1">RTS Delivery</h1>
+            <p class="text-muted mb-0">
+                Search an RTS instruction and issue empty containers to the customer.
+            </p>
+        </div>
+    </div>
+    <!-- بخش جستجو -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white font-weight-bold">
+            <strong>Search RTS</strong>
+        </div>
+        <div class="card-body">
+            <form hx-get="@Url.Action("SearchRts", "RtsDelivery")"
+                  hx-target="#rts-summary-container"
+                  hx-swap="innerHTML"
+                  hx-indicator="#rts-search-indicator"
+                  class="row g-3 align-items-end">
+                <div class="col-md-5 col-lg-3">
+                    <label for="rtsNo" class="form-label">RTS Number</label>
+                    <input id="rtsNo"
+                           name="rtsNo"
+                           type="text"
+                           class="form-control form-control-lg text-uppercase"
+                           placeholder=""
+                           autocomplete="off"
+                           required />
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary btn-lg px-4">
+                        Search
+                    </button>
+                </div>
+                <div class="col-auto">
+                    <div id="rts-search-indicator"
+                         class="spinner-border text-primary htmx-indicator"
+                         role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- کانتینر لود نتایج جستجوی RTS -->
+    <div id="rts-summary-container"></div>
+</div>
+
+<!-- Modal گلوبال برای باز شدن فرم ثبت خروج -->
+<div class="modal fade"
+     id="rtsIssueModal"
+     tabindex="-1"
+     aria-labelledby="rtsIssueModalLabel"
+     aria-hidden="true"
+     dir="ltr">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" id="modal-content-target"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // بستن مودال و پاک کردن مقدار آن پس از ثبت موفق
+        document.body.addEventListener('rtsIssueSaved', function () {
+            const modalElement = document.getElementById('rtsIssueModal');
+            const modalContent = document.getElementById('modal-content-target');
+
+            if (!modalElement) return;
+
+            const modalInstance = bootstrap.Modal.getInstance(modalElement)
+                || new bootstrap.Modal(modalElement);
+
+            modalInstance.hide();
+
+            if (modalContent) {
+                modalContent.innerHTML = '';
+            }
+        });
+
+        // فوکوس خودکار روی فیلد شماره کانتینر به محض نمایش مودال
+        document.getElementById('rtsIssueModal').addEventListener('shown.bs.modal', function () {
+            const containerInput = document.querySelector('#rtsIssueModal input[name="ContainerNumber"]');
+            if (containerInput) {
+                containerInput.focus();
+                containerInput.select();
+            }
+        });
+    </script>
+}

@@ -1,0 +1,36 @@
+﻿@using ShipRate.WebApp.ViewModels.AgentVms
+@model AgentTerritoryFormViewModel
+
+<div class="modal-header">
+    <h5 class="modal-title">Agent Territory</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<form hx-post="@(Model.Id==Guid.Empty? "/Agents/CreateTerritory":"/Agents/EditTerritory"  )   "
+      hx-target="#agentTerritoriesContainer"
+      hx-swap="innerHTML">
+
+    <div class="modal-body">
+
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="AgentId" />
+
+        <div class="mb-3">
+            <label class="form-label">Territory</label>
+            <select asp-for="TerritoryId" asp-items="Model.Territories" class="form-select"></select>
+        </div>
+
+
+        <div class="form-check">
+            <input asp-for="IsActive" class="form-check-input" />
+            <label class="form-check-label">Active</label>
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    </div>
+
+</form>

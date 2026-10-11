@@ -1,0 +1,167 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.ViewModels
+@model PagedResultDto<PaymentDocumentListItemVm>
+
+<style>
+    /* استایل اختصاصی برای فشرده‌تر کردن جدول و اسکرول افقی مطمئن */
+    .compact-table th,
+    .compact-table td {
+        font-size: 0.85rem;
+        padding: 6px 10px !important;
+        vertical-align: middle;
+        white-space: nowrap; /* جلوگیری از شکسته شدن خطوط */
+    }
+
+    /* حداقل عرض جدول برای فعال‌سازی اسکرول افقی در تمام صفحه‌ها */
+    .table-min-width {
+        min-width: 1500px;
+    }
+
+    .btn-icon {
+        padding: 2px 6px !important;
+        line-height: 1;
+    }
+
+    /* استایل شکیل‌تر برای اسکرول بار باریک */
+    .table-responsive::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+    }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+</style>
+
+<div class="card shadow-sm" dir="ltr">
+    <div class="card-body p-0">
+        <!-- اضافه شدن w-100 جهت اطمینان از قرارگیری کانتینر اسکرول -->
+        <div class="table-responsive w-100">
+            <!-- اضافه شدن کلاس table-min-width برای ایجاد اسکرول افقی -->
+            <table class="table table-bordered table-hover table-striped table-sm compact-table table-min-width mb-0">
+                <thead class="table-light align-middle">
+                    <tr>
+                        <th class="text-center" style="width: 40px;">#</th>
+                        <th>Company</th>
+                        <th>System Id</th>
+                        <th>Pay Type</th>
+                        <th>Doc No</th>
+                        <th>Date</th>
+                        <th>Party</th>
+                        <th>Method</th>
+                        <th class="text-end">Amount</th>
+                        <th class="text-end">Allocated</th>
+                        <th class="text-end">Remain</th>
+                        <th class="text-center">Curr</th>
+                        <th>Create Date</th>
+                        <th>Update Date</th>
+                        <th class="text-center" style="width: 140px; position: sticky; right: 0; background: #f8f9fa;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items != null && Model.Items.Any())
+                    {
+                        var rowNumber = ((Model.PageNumber - 1) * Model.PageSize) + 1;
+                        foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td class="text-center fw-bold text-muted">@rowNumber</td>
+                                <td>@item.CompanyName</td>
+                                <td class="fw-semibold">@item.SystemId</td>
+                                <td style="@(item.HasVaultTransaction ? "background-color: #f0fdf4; color: #15803d;" : "")">
+                                    @item.FinanceDirectionTitle
+                                </td>
+                                <td>@item.DocumentNumber</td>
+                                <td>@item.DocumentDateShamsi</td>
+                                <td>@item.PersonName</td>
+                                <td>@item.PaymentMethodTitle</td>
+                                <td class="text-end fw-bold">@item.Amount.ToString("N2")</td>
+                                <td class="text-end text-success">@item.AllocatedAmount.ToString("N2")</td>
+                                <td class="text-end text-danger fw-semibold">@item.UnAllocatedAmount.ToString("N2")</td>
+                                <td class="text-center"><span class="badge bg-light text-dark border">@item.CurrencyTitle</span></td>
+                                <td><span title="@item.CreateUserName">@item.CreatedAt.ToString("yyyy-MM-dd")</span></td>
+                                <td><span title="@item.UpdateUserName">@item.UpdatedAt?.ToString("yyyy-MM-dd")</span></td>
+                                <td class="text-center" style="position: sticky; right: 0; background: #fff;">
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-outline-info btn-icon" title="Details"
+                                                hx-get="@Url.Action("Details", "PaymentDocuments", new { id = item.Id })"
+                                                hx-target="#globalModalContent" hx-swap="innerHTML"
+                                                data-bs-toggle="modal" data-bs-target="#globalModal">
+                                            <i class="bi bi-file-earmark-text"></i>
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-outline-primary btn-icon"
+                                                title="View Usage"
+                                                hx-get="@Url.Action("Usages", "PaymentDocuments", new { id = item.Id })"
+                                                hx-target="#payment-document-usage-panel"
+                                                hx-swap="innerHTML"
+                                                hx-indicator="#payment-usage-loading">
+                                            <i class="bi bi-diagram-3"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-warning btn-icon" title="Edit"
+                                                hx-get="@Url.Action("Edit", "PaymentDocuments", new { id = item.Id })"
+                                                hx-target="#globalModalContent" hx-swap="innerHTML"
+                                                data-bs-toggle="modal" data-bs-target="#globalModal">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+
+                                        <button type="button" class="btn btn-outline-danger btn-icon" title="Delete"
+                                                hx-get="@Url.Action("Delete", "PaymentDocuments", new { id = item.Id })"
+                                                hx-target="#globalModalContent" hx-swap="innerHTML"
+                                                data-bs-toggle="modal" data-bs-target="#globalModal">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            rowNumber++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="15" class="text-center py-4 text-muted small">
+                                No payment documents found.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @if (Model.TotalCount > Model.PageSize)
+    {
+        var totalPages = (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize);
+        <div class="card-footer d-flex justify-content-between align-items-center py-2 bg-light">
+            <div class="small text-muted">Total: <strong>@Model.TotalCount</strong></div>
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                        <button class="page-link" hx-get="@Url.Action("List", "PaymentDocuments", new { page = 1 })" hx-target="#payment-document-list" hx-include="#paymentDocumentSearchForm">«</button>
+                    </li>
+                    <li class="page-item active"><span class="page-link">@Model.PageNumber</span></li>
+                    <li class="page-item @(Model.PageNumber == totalPages ? "disabled" : "")">
+                        <button class="page-link" hx-get="@Url.Action("List", "PaymentDocuments", new { page = totalPages })" hx-target="#payment-document-list" hx-include="#paymentDocumentSearchForm">»</button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>
+
+<div id="payment-usage-loading" class="htmx-indicator text-center py-3">
+    <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+    <span class="small text-muted ms-2">Loading usage...</span>
+</div>
+
+<div id="payment-document-usage-panel"></div>

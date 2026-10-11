@@ -1,0 +1,72 @@
+﻿@using ShipRate.WebApp.ViewModels.RouteVms
+@model RouteIndexViewModel
+<div class="container-fluid">
+
+    <div class="card mb-4">
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <input name="SearchTerm"
+                           class="form-control"
+                           placeholder="Search routes..."
+                           hx-get="/Routes/List"
+                           hx-trigger="keyup changed delay:400ms"
+                           hx-target="#table-container"
+                           hx-include="[name]" />
+                </div>
+
+                <div class="col-md-3">
+                    <input name="OriginName"
+                           class="form-control"
+                           placeholder="Search origins..."
+                           hx-get="/Routes/List"
+                           hx-target="#table-container"
+                           hx-include="[name]">
+                </div>
+
+                <div class="col-md-3">
+                    <input name="DestinationName"
+                           class="form-control"
+                           placeholder="Search destinations..."
+                           hx-get="/Routes/List"
+                           hx-target="#table-container"
+                           hx-include="[name]">
+                </div>
+
+
+
+                <div class="col-md-2">
+                    <button class="btn btn-primary"
+                            hx-get="/Routes/Create"
+                            hx-target="#modal-container"
+                            hx-trigger="click">
+                        <i class="bi bi-plus-circle"></i>
+                        Add Route
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="table-container"
+         hx-get="/Routes/List"
+         hx-trigger="load, routeChanged from:body"
+         hx-target="this">
+    </div>
+
+</div>
+
+<div id="modal-container"></div>
+
+
+@* <!-- سایر تگ‌ها -->
+<script>
+    (function(){
+        const t=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+        document.documentElement.setAttribute('data-theme',t);
+    })();
+</script>
+
+ *@

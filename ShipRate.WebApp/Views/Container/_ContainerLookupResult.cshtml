@@ -1,0 +1,72 @@
+﻿@using ShipRate.Application.ViewModels
+@model ContainerLookupResultViewModel
+
+@if (string.IsNullOrWhiteSpace(Model.ContainerNumber))
+{
+    <!-- در صورتی که کاربر چیزی تایپ نکرده باشد خالی می‌ماند -->
+}
+else if (Model.Exists)
+{
+    <!-- کانتینر یافت شد -->
+    <div class="card border-success bg-light-subtle shadow-sm">
+        <div class="card-body py-2 px-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="badge bg-success me-2"><i class="bi bi-check-circle me-1"></i>Found in Inventory</span>
+                    <strong>@Model.ContainerNumber</strong>
+                    <span class="text-muted ms-2">(Type: @Model.SizeTypeName)</span>
+                </div>
+                <div>
+                    <small class="text-muted">Tare: <strong>@(Model.TareWeight?.ToString("N0") ?? "N/A") kg</strong></small>
+                </div>
+            </div>
+            @if (Model.IsMismatchWithType)
+            {
+                <div class="text-warning small mt-1">
+                    <i class="bi bi-exclamation-triangle"></i> Warning: This container type does not match the RTS requested type!
+                </div>
+            }
+        </div>
+    </div>
+    <input type="hidden" name="IsNewContainer" value="false" />
+    <input type="hidden" name="ExistingContainerId" value="@Model.ContainerId" />
+
+    <!-- در صورتی که وزن خالی در دیتابیس بود، فیلد وزن اصلی فرم به طور خودکار پر می‌شود -->
+    @if (Model.TareWeight.HasValue)
+    {
+        <script>
+            document.getElementById('field-tare-weight').value = '@Model.TareWeight.Value';
+        </script>
+    }
+}
+else
+{
+    <!-- کانتینر یافت نشد: نمایش فرم ایجاد مشخصات سریع کانتینر -->
+    <div class="card border-warning bg-warning-subtle shadow-sm">
+        <div class="card-header bg-transparent py-2 border-warning d-flex justify-content-between align-items-center">
+            <span class="text-dark fw-bold small">
+                <i class="bi bi-info-circle-fill text-warning me-1"></i> Container not found in master records!
+            </span>
+            <span class="badge bg-warning text-dark">Register & Issue</span>
+        </div>
+        <div class="card-body py-2">
+            <p class="small text-muted mb-2">Please provide container master specifications. It will be registered automatically upon submit:</p>
+            <input type="hidden" name="IsNewContainer" value="true" />
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold mb-1">Container Size/Type</label>
+                    <select name="NewContainerSizeTypeId" class="form-select form-select-sm" asp-items="Model.ContainerTypeSelectList" required>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold mb-1">Payload / Max Weight (kg)</label>
+                    <input type="number" name="NewContainerMaxPayload" class="form-control form-select-sm" placeholder="" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold mb-1">Tare Weight(kg)</label>
+                    <input type="number" name="NewContainerTareWeight" class="form-control form-select-sm" placeholder="" />
+                </div>
+            </div>
+        </div>
+    </div>
+}

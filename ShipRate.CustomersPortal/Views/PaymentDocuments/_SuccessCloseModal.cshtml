@@ -1,0 +1,26 @@
+﻿@using Microsoft.Extensions.Localization
+@using ShipRate.WebAppCustomers
+@using System.Globalization
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isFa = culture == "fa";
+    var lang = isFa ? "fa" : "en";
+    var dir = isFa ? "rtl" : "ltr";
+}
+<div class="p-3 text-center" dir="ltr">
+    <div class="text-success mb-2">Operation completed successfully.</div>
+</div>
+
+<script>
+    (function () {
+        const modalEl = document.getElementById('globalModal');
+        if (modalEl) {
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) {
+                modal.hide();
+            }
+        }
+    })();
+</script>

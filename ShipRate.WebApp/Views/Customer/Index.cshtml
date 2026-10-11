@@ -1,0 +1,24 @@
+﻿@using ShipRate.Application.DTOs.Persons
+@using System.Linq.Expressions
+@model List<CustomerDto>
+@addTagHelper *, ShipRate.TagHelpers
+
+<h2>Customers</h2>
+<p><a asp-action="AddCustomer" class="btn btn-primary">Create New</a></p>
+
+@{
+    var cols = new Dictionary<string, string>
+    {
+        { "ContactName", "Contact Name" },
+        { "PersonDto.PersonName", "Person Name" },
+        { "PersonDto.PersonPersianName", "Person Persian Name" }
+    };
+}
+
+
+<grid items="Model"
+      columns="cols"
+      page="@ViewBag.Page"
+      sort-column="@ViewBag.SortColumn"
+      sort-desc="@ViewBag.SortDesc">
+</grid>

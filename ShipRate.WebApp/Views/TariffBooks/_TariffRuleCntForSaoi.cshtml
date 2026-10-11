@@ -1,0 +1,343 @@
+﻿@using ShipRate.Application.ViewModels
+@model TariffRuleForSaoiVM
+
+@{
+    ViewData["Title"] = "تنظیم تعرفه‌های انجمن کشتیرانی ";
+}
+
+<div class="container-fluid py-4" dir="rtl">
+    <div class="card shadow-lg border-0 rounded-3">
+        <div class="card-header bg-dark text-white p-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">
+                <i class="bi bi-journal-text me-2 text-warning"></i>
+                جدول تعرفه خدمات بندری و دریایی انجمن کشتیرانی و خدمات وابسته 
+            </h5>
+            <span class="badge bg-warning text-dark px-3 py-2 fs-6">فرم ورود اطلاعات تکمیلی</span>
+        </div>
+
+        <div class="card-body p-4 bg-light">
+            <form hx-post="@Url.Action("SaveTariffRuleForSaoi", "TariffBooks")"
+                  id="tariffForm" 
+                  hx-target="#mainModalContent"
+                  hx-swap="innerHTML">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="TariffBookId" />
+
+                <div class="table-responsive rounded-3 shadow-sm bg-white">
+                    <table class="table table-hover table-bordered text-center align-middle mb-0">
+                        <thead class="table-dark align-middle">
+                            <tr>
+                                <th style="width: 5%;">ردیف</th>
+                                <th style="width: 40%;" class="text-start ps-4">شرح خدمات تعرفه</th>
+                                <th style="width: 15%;">از (مقدار/تعداد)</th>
+                                <th style="width: 15%;">تا (مقدار/تعداد)</th>
+                                <th style="width: 25%;">مبلغ تعرفه (ریال)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <!-- ردیف ۱ -->
+                            <tr>
+                                <td class="fw-bold bg-light">۱</td>
+                                <td class="text-start ps-4 fw-semibold">
+                                    اخذ پروانه ورود موقت (برای هر دستگاه کانتینر 20 و 40 فوت)
+                                </td>
+                                <td class="text-muted" colspan="2">—</td>
+                                <td>
+                                    <div class="input-group">
+                                        <input asp-for="Row1TempFeeValue" class="form-control text-center fw-bold currency-input money-input  " type="text" placeholder="0" />
+                                        <span class="input-group-text text-muted fs-7">ریال</span>
+                                    </div>
+                                    <span asp-validation-for="Row1TempFeeValue" class="text-danger small"></span>
+                                </td>
+                            </tr>
+
+                            <!-- ردیف ۲ - پله اول -->
+                            <tr class="table-warning-subtle">
+                                <td rowspan="3" class="fw-bold align-middle bg-light">۲</td>
+                                <td class="text-start ps-4 fw-semibold">
+                                    صدور ترخیصیه / اصلاحیه / صدور مجدد <br />
+                                    <small class="text-muted fw-normal">(پله اول: کمترین تعداد/حجم)</small>
+                                </td>
+                                <td>
+                                    <input asp-for="Row2_Issue_1_From" class="form-control text-center" type="number" placeholder="از" />
+                                </td>
+                                <td>
+                                    <input asp-for="Row2_Issue_1_To" class="form-control text-center" type="number" placeholder="تا" />
+                                </td>
+                                <td>
+                                    <div class="input-group">
+                                        <input asp-for="Row2_Issue_1_Value" class="form-control text-center fw-bold currency-input money-input" type="text" placeholder="0" />
+                                        <span class="input-group-text text-muted fs-7">ریال</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ردیف ۲ - پله دوم -->
+                            <tr class="table-warning-subtle">
+                                <td class="text-start ps-4 fw-semibold">
+                                    صدور ترخیصیه / اصلاحیه / صدور مجدد <br />
+                                    <small class="text-muted fw-normal">(پله دوم: متوسط)</small>
+                                </td>
+                                <td>
+                                    <input asp-for="Row2_Issue_2_From" class="form-control text-center" type="number" placeholder="از" />
+                                </td>
+                                <td>
+                                    <input asp-for="Row2_Issue_2_To" class="form-control text-center" type="number" placeholder="تا" />
+                                </td>
+                                <td>
+                                    <div class="input-group">
+                                        <input asp-for="Row2_Issue_2_Value" class="form-control text-center fw-bold currency-input  money-input" type="text" placeholder="0" />
+                                        <span class="input-group-text text-muted fs-7">ریال</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ردیف ۲ - پله سوم -->
+                            <tr class="table-warning-subtle">
+                                <td class="text-start ps-4 fw-semibold">
+                                    صدور ترخیصیه / اصلاحیه / صدور مجدد <br />
+                                    <small class="text-muted fw-normal">(پله سوم: بالاترین حجم)</small>
+                                </td>
+                                <td>
+                                    <input asp-for="Row2_Issue_3_From" class="form-control text-center" type="number" placeholder="از" />
+                                </td>
+                                <td>
+                                    <input asp-for="Row2_Issue_3_To" class="form-control text-center" type="number" placeholder="تا" />
+                                </td>
+                                <td>
+                                    <div class="input-group">
+                                        <input asp-for="Row2_Issue_3_Value" class="form-control text-center fw-bold currency-input  money-input" type="text" placeholder="0" />
+                                        <span class="input-group-text text-muted fs-7">ریال</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ردیف ۳ -->
+                            <tr>
+                                <td class="fw-bold bg-light">۳</td>
+                                <td class="text-start ps-4 fw-semibold">
+                                    ارائه خدمات اداری هر گونه اصلاحیه
+                                </td>
+                                <td class="text-muted" colspan="2">—</td>
+                                <td>
+                                    <div class="input-group">
+                                        <input asp-for="Row3_AmmendAdmin_Value" class="form-control text-center fw-bold currency-input  money-input" type="text" placeholder="0" />
+                                        <span class="input-group-text text-muted fs-7">ریال</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ردیف ۴ -->
+                            <tr>
+                                <td class="fw-bold bg-light">۴</td>
+                                <td class="text-start ps-4 fw-semibold">
+                                    تجمیع و تفکیک بارنامه و یا مانیفست کالای ورودی به بنادر کشور هر مورد
+                                </td>
+                                <td class="text-muted" colspan="2">—</td>
+                                <td>
+                                    <div class="input-group">
+                                        <input asp-for="Row4_MergeManifest_Value" class="form-control text-center fw-bold currency-input  money-input" type="text" placeholder="0" />
+                                        <span class="input-group-text text-muted fs-7">ریال</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ردیف ۵ -->
+                            <tr>
+                                <td class="fw-bold bg-light">۵</td>
+                                <td class="text-start ps-4 fw-semibold">
+                                    صدور موافقت تراانشیپ
+                                </td>
+                                <td class="text-muted" colspan="2">—</td>
+                                <td>
+                                    <div class="input-group">
+                                        <input asp-for="Row5_TranshipValue_Value" class="form-control text-center fw-bold currency-input  money-input" type="text" placeholder="0" />
+                                        <span class="input-group-text text-muted fs-7">ریال</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ردیف ۶ -->
+                            <tr>
+                                <td class="fw-bold bg-light">۶</td>
+                                <td class="text-start ps-4 fw-semibold">
+                                    بارگذاری اطلاعات الکترونیک به ازای هر ست بار وارداتی یا صادراتی
+                                </td>
+                                <td class="text-muted" colspan="2">—</td>
+                                <td>
+                                    <div class="input-group">
+                                        <input asp-for="Row6_Upload_Value" class="form-control text-center fw-bold currency-input" type="text" placeholder="0" />
+                                        <span class="input-group-text text-muted fs-7">ریال</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ردیف ۷ -->
+                            <tr>
+                                <td class="fw-bold bg-light">۷</td>
+                                <td class="text-start ps-4 fw-semibold">
+                                    هزینه هر عدد پلمپ صادراتی
+                                </td>
+                                <td class="text-muted" colspan="2">—</td>
+                                <td>
+                                    <div class="input-group">
+                                        <input asp-for="Row7_Seal_Value" class="form-control text-center fw-bold currency-input  money-input" type="text" placeholder="0" />
+                                        <span class="input-group-text text-muted fs-7">ریال</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ردیف ۸ -->
+                            <tr>
+                                <td class="fw-bold bg-light">۸</td>
+                                <td class="text-start ps-4 fw-semibold">
+                                    برچسب زدایی هر دستگاه کانتینر
+                                </td>
+                                <td class="text-muted" colspan="2">—</td>
+                                <td>
+                                    <div class="input-group">
+                                        <input asp-for="Row8_labelRemoval_Value" class="form-control text-center fw-bold currency-input" type="text" placeholder="0" />
+                                        <span class="input-group-text text-muted fs-7">ریال</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ردیف ۹ -->
+                            <tr>
+                                <td class="fw-bold bg-light">۹</td>
+                                <td class="text-start ps-4 fw-semibold">
+                                    بارگذاری و تبادل اسناد کالاهای خطرناک هر ست بارنامه
+                                </td>
+                                <td class="text-muted" colspan="2">—</td>
+                                <td>
+                                    <div class="input-group">
+                                        <input asp-for="Row9_Danger_Value" class="form-control text-center fw-bold currency-input  money-input" type="text" placeholder="0" />
+                                        <span class="input-group-text text-muted fs-7">ریال</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ردیف ۱۰ -->
+                            <tr>
+                                <td class="fw-bold bg-light">۱۰</td>
+                                <td class="text-start ps-4 fw-semibold">
+                                    کنسلی کانتنیرهای صادراتی به ازای هر دستگاه کانتینر
+                                </td>
+                                <td class="text-muted" colspan="2">—</td>
+                                <td>
+                                    <div class="input-group">
+                                        <input asp-for="Row10_ExportCancel_Value" class="form-control text-center fw-bold currency-input  money-input" type="text" placeholder="0" />
+                                        <span class="input-group-text text-muted fs-7">ریال</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ردیف ۱۱ -->
+                            <tr>
+                                <td class="fw-bold bg-light">۱۱</td>
+                                <td class="text-start ps-4 fw-semibold">
+                                    عملیات شیفتینگ کانتینر در بندر چابهار
+                                </td>
+                                <td class="text-muted" colspan="2">—</td>
+                                <td>
+                                    <div class="input-group">
+                                        <input asp-for="Row11_Shifting_Value" class="form-control text-center fw-bold currency-input  money-input" type="text" placeholder="0" />
+                                        <span class="input-group-text text-muted fs-7">ریال</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- ردیف 12 -->
+                            <tr>
+                                <td class="fw-bold bg-light">۱۲</td>
+                                <td class="text-start ps-4 fw-semibold">
+                                    هزینه اچ اس کد مازاد بر یک مورد به ازای هر مورد
+                                </td>
+                                <td class="text-muted" colspan="2">—</td>
+                                <td>
+                                    <div class="input-group">
+                                        <input asp-for="Row12_Extra_HsCode_Value" class="form-control text-center fw-bold currency-input  money-input" type="text" placeholder="0" />
+                                        <span class="input-group-text text-muted fs-7">ریال</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- دکمه‌های اقدام -->
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2 fw-semibold">
+                        <i class="bi bi-x-circle me-1"></i> انصراف
+                    </a>
+                    <button type="submit" class="btn btn-success px-5 py-2 fw-bold shadow-sm">
+                        <i class="bi bi-check2-circle me-1"></i> ذخیره مقادیر تعرفه
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* استایل‌های اختصاصی فرم تعرفه */
+    .table {
+        font-size: 0.9rem; /* کاهش فونت کل جدول */
+    }
+
+        .table input.form-control {
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+            transition: all 0.2s ease-in-out;
+            font-size: 0.85rem; /* کاهش فونت فیلدهای ورودی */
+        }
+
+            .table input.form-control:focus {
+                border-color: #0d6efd;
+                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+                background-color: #fffde7; /* رنگ ملایم زرد در زمان فوکوس برای دقت بیشتر */
+            }
+
+    .table-warning-subtle {
+        background-color: #fff9e6 !important;
+    }
+
+    .fs-7 {
+        font-size: 0.8rem; /* کمی کوچکتر کردن fs-7 */
+    }
+</style>
+
+
+<script>
+    (function () {
+        // تابع فرمت اعداد
+        function formatNumber(n) {
+            if (!n) return "";
+            return n.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        const form = document.getElementById('tariffForm');
+        if (!form) return;
+
+        const currencyInputs = form.querySelectorAll('.currency-input');
+
+        currencyInputs.forEach(input => {
+            // اعمال ۳ رقم ۳ رقم اولیه
+            if (input.value) {
+                input.value = formatNumber(input.value);
+            }
+
+            input.addEventListener('input', function (e) {
+                let value = e.target.value.replace(/\D/g, '');
+                e.target.value = formatNumber(value);
+            });
+        });
+
+        // حذف کاماها قبل از ارسال
+        form.addEventListener('submit', function () {
+            currencyInputs.forEach(input => {
+                input.value = input.value.replace(/,/g, '');
+            });
+        });
+    })();
+</script>

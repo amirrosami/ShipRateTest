@@ -1,0 +1,140 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.WebApp.ViewModels.AgentVms
+@model PaginatedList<AgentListViewModel>
+
+<div class="table-responsive">
+    <table class="table table-hover table-sm align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>#</th>
+                <th>Agent Name</th>
+                <th>Act Scopes</th>
+                <th>Status</th>
+                <th class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int row = (Model.PageIndex - 1) * Model.PageSize + 1;
+            }
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@(row++)</td>
+                    <td>@item.PersonName</td>
+                    <td>
+                        @foreach (var tt in item.ScopeNames)
+                        {
+                            <span class="badge bg-secondary me-1">@tt</span>
+                        }
+                    </td>
+                    @* <td>@item.ScopeNames</td> *@
+                    <td>
+                        @if (item.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Inactive</span>
+                        }
+                    </td>
+                    <td class="text-center">
+
+                        <button class="btn btn-sm btn-outline-primary"
+                                hx-get="/Agents/RolesList?agentId=@item.Id"
+                                hx-target="#agentRolesContainer"
+                                hx-swap="innerHTML"
+                                title="Roles">
+                            <i class="bi bi-shield-check"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-success"
+                                hx-get="/Agents/TerritoriesList?agentId=@item.Id"
+                                hx-target="#agentTerritoriesContainer"
+                                hx-swap="innerHTML"
+                                title="Territories">
+                            <i class="bi bi-globe"></i>
+                        </button>
+
+
+                        <button class="btn btn-sm btn-outline-warning"
+                                title="Manage Charge Types"
+                                hx-get="/Agents/ManageChargeTypes?agentId=@item.Id"
+                                hx-target="#modal-content"
+                                hx-swap="innerHTML">
+                            <i class="bi bi-cash-stack"></i>
+                        </button>
+
+
+                        <!-- Edit Agent → Modal بزرگ -->
+                        <button class="btn btn-sm btn-outline-primary"
+                                hx-get="/Agents/Edit?id=@item.Id"
+                                hx-target="#modal-content"
+                                hx-swap="innerHTML">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-primary"
+                                title="Edit"
+                                hx-get="@Url.Action("Edit", "Persons", new { id = item.Id })"
+                                hx-target="#app-modal-content"
+                                hx-swap="innerHTML">
+                            <i class="bi bi-person-gear"></i>
+                        </button>
+                        @*                         <!-- Edit Person → Modal بزرگ -->
+                        <button class="btn btn-sm btn-outline-secondary"
+                                hx-get="/Persons/Edit?id=@item.Id"
+                                hx-target="#modal-content"
+                                hx-swap="innerHTML">
+                            <i class="bi bi-person-gear"></i>
+                        </button>
+ *@
+                        <!-- Delete → Modal کوچک -->
+                        <button class="btn btn-sm btn-outline-danger"
+                                hx-get="/Agents/Delete?id=@item.Id"
+                                hx-target="#modal-content2"
+                                hx-swap="innerHTML">
+                            <i class="bi bi-trash"></i>
+                        </button>
+
+                        <!-- Toggle Active Button -->
+                        <button class="btn btn-sm @(item.IsActive ? "btn-outline-secondary" : "btn-outline-success")"
+                                hx-post="/Agents/ToggleActive?id=@item.Id"
+                                hx-swap="none"
+                                title="@(item.IsActive ? "Deactivate" : "Activate")"
+                                hx-confirm="Are you sure you want to chabge activation status of Agent?">
+
+                            <i class="bi @(item.IsActive ? "bi-toggle-on" : "bi-toggle-off")"></i>
+                        </button>
+
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+@if (Model.TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination pagination-sm justify-content-center">
+            <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                <a class="page-link" href="javascript:void(0)"
+                   onclick="goToPage(@(Model.PageIndex - 1))">«</a>
+            </li>
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                    <a class="page-link" href="javascript:void(0)"
+                       onclick="goToPage(@i)">@i</a>
+                </li>
+            }
+            <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                <a class="page-link" href="javascript:void(0)"
+                   onclick="goToPage(@(Model.PageIndex + 1))">»</a>
+            </li>
+        </ul>
+    </nav>
+}

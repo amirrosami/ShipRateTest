@@ -1,0 +1,61 @@
+﻿@using ShipRate.WebAppCustomers.ViewModels
+@model DocumentFormViewModel
+
+<div class="card border-primary mb-2">
+    <div class="card-header py-1 px-2 bg-primary text-white d-flex justify-content-between">
+        <small>@(Model.Id.HasValue ? "Edit" : "New") Document</small>
+        <button type="button" class="btn-close btn-close-white btn-sm"
+                onclick="document.getElementById('doc-form-container').innerHTML='';"></button>
+    </div>
+    <div class="card-body p-2">
+        <form hx-post="/DocumentManager/SaveDocument"
+              hx-target="@(Model.ObjectTypeId!=1 ? "#document-manager-content" : "this")"
+              hx-swap="innerHTML">
+
+            <input type="hidden" name="Id" value="@Model.Id" />
+            <input type="hidden" name="ObjectId" value="@Model.ObjectId" />
+            <input type="hidden" name="ObjectTypeId" value="@Model.ObjectTypeId" />
+
+            <div class="row g-2 mb-1">
+                <div class="col-md-4">
+                    <label class="form-label form-label-sm mb-0">Document Type</label>
+                    <select name="DocumentTypeId" class="form-select form-select-sm" required>
+                        <option value="">-- Select --</option>
+                        @foreach (var t in Model.DocumentTypes)
+                        {
+                            <option value="@t.Id" selected="@(t.Id == Model.DocumentTypeId)">@t.Title</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label form-label-sm mb-0">Title</label>
+                    <input type="text" name="DocumentTitle" value="@Model.DocumentTitle"
+                           class="form-control form-control-sm" required />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label form-label-sm mb-0">Doc No</label>
+                    <input type="text" name="DocumentNo" value="@Model.DocumentNo"
+                           class="form-control form-control-sm" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label form-label-sm mb-0">Date</label>
+                    <input type="date" name="DocumentDate"
+                           value="@Model.DocumentDate.ToString("yyyy-MM-dd")"
+                           class="form-control form-control-sm" required />
+                </div>
+            </div>
+            <div class="row g-2 mb-1">
+                <div class="col-12">
+                    <label class="form-label form-label-sm mb-0">Description</label>
+                    <textarea name="DocumentDescription" rows="2"
+                              class="form-control form-control-sm">@Model.DocumentDescription</textarea>
+                </div>
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-sm btn-success">
+                    <i class="bi bi-check-lg me-1"></i>Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

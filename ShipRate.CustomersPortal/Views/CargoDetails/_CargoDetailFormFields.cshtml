@@ -1,0 +1,426 @@
+﻿@using ShipRate.Application.ViewModels
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@using ShipRate.WebAppCustomers
+@inject IStringLocalizer<SharedResource> Localizer
+@model CargoDetailFormVm
+
+@{
+    var isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var direction = isRtl ? "rtl" : "ltr";
+    var textAlign = isRtl ? "text-end" : "text-start";
+}
+
+<style>
+
+    .modal-content{
+        direction: @(isRtl ? "rtl" : "ltr");
+    }
+    .cargo-form-compact .form-label {
+        font-size: .78rem;
+        margin-bottom: .15rem;
+        font-weight: 500;
+    }
+
+    .cargo-form-compact .form-control,
+    .cargo-form-compact .form-select {
+        font-size: .82rem;
+    }
+
+    .cargo-form-compact .form-check-label {
+        font-size: .8rem;
+    }
+
+    .cargo-form-compact .accordion-button {
+        padding: .45rem .75rem;
+        font-size: .85rem;
+        font-weight: 600;
+    }
+
+    .cargo-form-compact .accordion-body {
+        padding: .75rem;
+    }
+
+    .cargo-form-compact textarea {
+        resize: vertical;
+    }
+</style>
+
+<div class="modal-header py-2">
+    <h6 class="modal-title mb-0">@Localizer["CargoDetail"]</h6>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["Close"]"></button>
+</div>
+
+<div class="modal-body @textAlign cargo-form-compact" dir="@direction">
+
+    <input type="hidden" asp-for="JobId" />
+    <input type="hidden" asp-for="BLId" />
+    <input type="hidden" asp-for="BLContainerId" />
+    <input type="hidden" asp-for="RateRequestId" />
+    <input type="hidden" asp-for="TransitShipmentAssignmentId" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+    <div class="row g-2 mb-2">
+
+        <div class="col-md-1">
+            <label asp-for="Sequence" class="form-label">@Localizer["Seq"]</label>
+            <input asp-for="Sequence" class="form-control form-control-sm" />
+            <span asp-validation-for="Sequence" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="PackageTypeId" class="form-label">@Localizer["PackageType"]</label>
+            <select asp-for="PackageTypeId" asp-items="Model.PackageTypes" class="form-select form-select-sm">
+                <option value="">@Localizer["Select"]</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="PackageCount" class="form-label">@Localizer["PkgCount"]</label>
+            <input asp-for="PackageCount" class="form-control form-control-sm" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="InnerPackageTypeId" class="form-label">@Localizer["InnerPackage"]</label>
+            <select asp-for="InnerPackageTypeId" asp-items="Model.InnerPackageTypes" class="form-select form-select-sm">
+                <option value="">@Localizer["Select"]</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="InnerPackageCount" class="form-label">@Localizer["InnerCount"]</label>
+            <input asp-for="InnerPackageCount" class="form-control form-control-sm" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="GrossWeight" class="form-label">@Localizer["GrossWeightShort"]</label>
+            <input asp-for="GrossWeight" class="form-control form-control-sm" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="NetWeight" class="form-label">@Localizer["NetWeightShort"]</label>
+            <input asp-for="NetWeight" class="form-control form-control-sm" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="ChargeableWeight" class="form-label">@Localizer["ChargeableWeight"]</label>
+            <input asp-for="ChargeableWeight" class="form-control form-control-sm" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="WeightUnitId" class="form-label">@Localizer["WeightUnitShort"]</label>
+            <select asp-for="WeightUnitId" asp-items="Model.WeightUnits" class="form-select form-select-sm">
+                <option value="">@Localizer["Select"]</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="Volume" class="form-label">@Localizer["Volume"]</label>
+            <input asp-for="Volume" class="form-control form-control-sm" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="VolumeUnitId" class="form-label">@Localizer["VolumeUnit"]</label>
+            <select asp-for="VolumeUnitId" asp-items="Model.VolumeUnits" class="form-select form-select-sm">
+                <option value="">@Localizer["Select"]</option>
+            </select>
+        </div>
+
+        <div class="col-md-6"></div>
+
+        <div class="col-md-3">
+            <label asp-for="CargoCommodityId" class="form-label">@Localizer["CargoCommodity"]</label>
+            <select asp-for="CargoCommodityId" asp-items="Model.CargoCommodities" class="form-select form-select-sm">
+                <option value="">@Localizer["Select"]</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="HSCodeToSave" class="form-label">@Localizer["HSCode"]</label>
+            <input asp-for="HSCodeToSave" class="form-control form-control-sm" />
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="CountryHSCodeId" class="form-label">@Localizer["CountryHSCode"]</label>
+            <select asp-for="CountryHSCodeId" asp-items="Model.CountryHSCodes" class="form-select form-select-sm">
+                <option value="">@Localizer["Select"]</option>
+            </select>
+        </div>
+
+        <div class="col-md-12">
+            <label asp-for="CargoDescription" class="form-label">@Localizer["CargoDescription"]</label>
+            <textarea asp-for="CargoDescription" class="form-control form-control-sm" rows="2"></textarea>
+            <span asp-validation-for="CargoDescription" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="MarksAndNumbers" class="form-label">@Localizer["MarksAndNumbers"]</label>
+            <textarea asp-for="MarksAndNumbers" class="form-control form-control-sm" rows="1"></textarea>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Remarks" class="form-label">@Localizer["Remarks"]</label>
+            <textarea asp-for="Remarks" class="form-control form-control-sm" rows="1"></textarea>
+        </div>
+
+    </div>
+
+    <div class="accordion" id="cargoDetailAccordion">
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingDimensions">
+                <button class="accordion-button collapsed" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseDimensions"
+                        aria-expanded="false"
+                        aria-controls="collapseDimensions">
+                    @Localizer["Dimensions"]
+                </button>
+            </h2>
+
+            <div id="collapseDimensions"
+                 class="accordion-collapse collapse"
+                 aria-labelledby="headingDimensions"
+                 data-bs-parent="#cargoDetailAccordion">
+
+                <div class="accordion-body">
+                    <div class="row g-2">
+
+                        <div class="col-md-2">
+                            <label asp-for="Length" class="form-label">@Localizer["Length"]</label>
+                            <input asp-for="Length" class="form-control form-control-sm" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label asp-for="Width" class="form-label">@Localizer["Width"]</label>
+                            <input asp-for="Width" class="form-control form-control-sm" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label asp-for="Height" class="form-label">@Localizer["Height"]</label>
+                            <input asp-for="Height" class="form-control form-control-sm" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="DimensionUnitId" class="form-label">@Localizer["DimensionUnit"]</label>
+                            <select asp-for="DimensionUnitId" asp-items="Model.DimensionUnits" class="form-select form-select-sm">
+                                <option value="">@Localizer["Select"]</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3 d-flex align-items-end">
+                            <div class="form-check">
+                                <input asp-for="IsOverSized" class="form-check-input" />
+                                <label asp-for="IsOverSized" class="form-check-label">@Localizer["OverSized"]</label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingDG">
+                <button class="accordion-button collapsed" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseDG"
+                        aria-expanded="false"
+                        aria-controls="collapseDG">
+                    @Localizer["DangerousGoods"]
+                </button>
+            </h2>
+
+            <div id="collapseDG"
+                 class="accordion-collapse collapse"
+                 aria-labelledby="headingDG"
+                 data-bs-parent="#cargoDetailAccordion">
+
+                <div class="accordion-body" id="dgSection">
+                    <div class="row g-2">
+
+                        <div class="col-md-2 d-flex align-items-end">
+                            <div class="form-check">
+                                <input asp-for="IsDG" class="form-check-input" id="IsDG" />
+                                <label asp-for="IsDG" class="form-check-label">@Localizer["IsDG"]</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="DGClassId" class="form-label">@Localizer["DGClass"]</label>
+                            <select asp-for="DGClassId" asp-items="Model.DGClasses" class="form-select form-select-sm dg-field">
+                                <option value="">@Localizer["Select"]</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label asp-for="UNNumber" class="form-label">@Localizer["UNNumber"]</label>
+                            <input asp-for="UNNumber" class="form-control form-control-sm dg-field" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label asp-for="DGFlashPoint" class="form-label">@Localizer["FlashPoint"]</label>
+                            <input asp-for="DGFlashPoint" class="form-control form-control-sm dg-field" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label asp-for="DGPackingGroupId" class="form-label">@Localizer["PackingGroup"]</label>
+                            <select asp-for="DGPackingGroupId" asp-items="Model.DGPackingGroups" class="form-select form-select-sm dg-field">
+                                <option value="">@Localizer["Select"]</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTemp">
+                <button class="accordion-button collapsed" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseTemp"
+                        aria-expanded="false"
+                        aria-controls="collapseTemp">
+                    @Localizer["Temperature"]
+                </button>
+            </h2>
+
+            <div id="collapseTemp"
+                 class="accordion-collapse collapse"
+                 aria-labelledby="headingTemp"
+                 data-bs-parent="#cargoDetailAccordion">
+
+                <div class="accordion-body" id="tempSection">
+                    <div class="row g-2">
+
+                        <div class="col-md-3 d-flex align-items-end">
+                            <div class="form-check">
+                                <input asp-for="IsTemperatureControlled" class="form-check-input" id="IsTemperatureControlled" />
+                                <label asp-for="IsTemperatureControlled" class="form-check-label">@Localizer["TemperatureControlled"]</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label asp-for="MinTemp" class="form-label">@Localizer["Min"]</label>
+                            <input asp-for="MinTemp" class="form-control form-control-sm temp-field" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label asp-for="NormalTemp" class="form-label">@Localizer["Normal"]</label>
+                            <input asp-for="NormalTemp" class="form-control form-control-sm temp-field" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label asp-for="MaxTemp" class="form-label">@Localizer["Max"]</label>
+                            <input asp-for="MaxTemp" class="form-control form-control-sm temp-field" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="TempUnitId" class="form-label">@Localizer["TempUnit"]</label>
+                            <select asp-for="TempUnitId" asp-items="Model.TempUnits" class="form-select form-select-sm temp-field">
+                                <option value="">@Localizer["Select"]</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingFlags">
+                <button class="accordion-button collapsed" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseFlags"
+                        aria-expanded="false"
+                        aria-controls="collapseFlags">
+                    @Localizer["Flags"]
+                </button>
+            </h2>
+
+            <div id="collapseFlags"
+                 class="accordion-collapse collapse"
+                 aria-labelledby="headingFlags"
+                 data-bs-parent="#cargoDetailAccordion">
+
+                <div class="accordion-body">
+                    <div class="row g-2">
+
+                        <div class="col-md-2">
+                            <div class="form-check">
+                                <input asp-for="IsFragile" class="form-check-input" />
+                                <label asp-for="IsFragile" class="form-check-label">@Localizer["Fragile"]</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="form-check">
+                                <input asp-for="IsPerishable" class="form-check-input" />
+                                <label asp-for="IsPerishable" class="form-check-label">@Localizer["Perishable"]</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="form-check">
+                                <input asp-for="IsRotateable" class="form-check-input" />
+                                <label asp-for="IsRotateable" class="form-check-label">@Localizer["Rotateable"]</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="form-check">
+                                <input asp-for="IsStackable" class="form-check-input" />
+                                <label asp-for="IsStackable" class="form-check-label">@Localizer["Stackable"]</label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    (function () {
+        function toggleSectionByCheckbox(checkboxId, fieldClass) {
+            const checkbox = document.getElementById(checkboxId);
+            if (!checkbox) return;
+
+            const fields = document.querySelectorAll('.' + fieldClass);
+
+            function applyState() {
+                const enabled = checkbox.checked;
+                fields.forEach(field => {
+                    field.disabled = !enabled;
+
+                    if (!enabled) {
+                        if (field.tagName === 'SELECT') {
+                            field.selectedIndex = 0;
+                        } else if (field.type === 'checkbox') {
+                            field.checked = false;
+                        } else {
+                            field.value = '';
+                        }
+                    }
+                });
+            }
+
+            applyState();
+            checkbox.addEventListener('change', applyState);
+        }
+
+        function initCargoDetailToggles() {
+            toggleSectionByCheckbox('IsDG', 'dg-field');
+            toggleSectionByCheckbox('IsTemperatureControlled', 'temp-field');
+        }
+
+        document.addEventListener('DOMContentLoaded', initCargoDetailToggles);
+        document.body.addEventListener('htmx:afterSwap', function () {
+            initCargoDetailToggles();
+        });
+    })();
+</script>

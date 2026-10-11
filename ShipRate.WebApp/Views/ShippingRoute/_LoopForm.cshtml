@@ -1,0 +1,89 @@
+﻿@using ShipRate.WebApp.ViewModels.ShippingRouteVms
+@model LoopFormViewModel
+
+<form hx-post="@(Model.LoopId == Guid.Empty
+                    ? "/ShippingRoute/LoopCreate"
+                    : "/ShippingRoute/LoopEdit")"
+      hx-target="#modalBody"
+      hx-swap="innerHTML">
+
+    <div class="modal-body">
+        <input type="hidden" name="LoopId" value="@Model.LoopId" />
+        <input type="hidden" name="ShippingLineServiceId" value="@Model.ShippingLineServiceId" />
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger alert-sm py-2">
+                <ul class="mb-0 small">
+                    @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@err.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">
+                Loop Name <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   class="form-control"
+                   name="LoopName"
+                   value="@Model.LoopName"
+                   maxlength="200"
+                   required
+                   placeholder="Enter loop name" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Loop Code</label>
+            <input type="text"
+                   class="form-control"
+                   name="LoopCode"
+                   value="@Model.LoopCode"
+                   maxlength="50"
+                   placeholder="" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Company</label>
+            <select class="form-select" name="CompanyId">
+                <option value="">-- None --</option>
+                @foreach (var c in Model.Companies)
+                {
+                    <option value="@c.CompanyId">
+
+@*                             @(Model.CompanyId == c.CompanyId ? "selected" : "")>
+ *@
+
+
+                        @c.CompanyName
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <div class="form-check form-switch">
+                <input class="form-check-input"
+                       type="checkbox"
+                       name="IsActive"
+                       value="true"
+                       id="loopIsActive"
+                       @(Model.IsActive ? "checked" : "") />
+                <label class="form-check-label" for="loopIsActive">Active</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-lg"></i> Cancel
+        </button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg"></i>
+            @(Model.LoopId == Guid.Empty ? "Create" : "Save Changes")
+        </button>
+    </div>
+</form>

@@ -1,0 +1,74 @@
+﻿@using ShipRate.Application.DTOs
+@model PagedResultDto<ShipRate.Application.ViewModels.JobPartyListItemVm>
+
+@{
+    var jobId = (Guid)ViewBag.JobId;
+}
+
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-hover align-middle text-start mb-0" dir="ltr">
+        <thead class="table-light">
+            <tr>
+                <th style="width:70px;">Seq</th>
+                <th>Role Type</th>
+                <th>Party</th>
+                <th style="width:110px;">Primary</th>
+                <th>Contact Name</th>
+                <th>Contact Email</th>
+                <th>Contact Phone</th>
+                <th style="width:130px;" class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Items != null && Model.Items.Any())
+            {
+                foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.SequenceNo</td>
+                        <td>@item.RoleTypeName</td>
+                        <td>@item.PartyName</td>
+                        <td>@(item.IsPrimaryRole ? "Yes" : "No")</td>
+                        <td>@item.ContactName</td>
+                        <td>@item.ContactEmail</td>
+                        <td>@item.ContactPhone</td>
+                        <td class="text-center">
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-secondary"
+                                    title="Details"
+                                    hx-get="@Url.Action("Details", "JobParty", new { id = item.Id })"
+                                    hx-target="#modalContainer"
+                                    hx-swap="innerHTML">
+                                <i class="bi bi-eye"></i>
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-primary"
+                                    title="Edit"
+                                    hx-get="@Url.Action("Edit", "JobParty", new { id = item.Id })"
+                                    hx-target="#modalContainer"
+                                    hx-swap="innerHTML">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    title="Delete"
+                                    hx-get="@Url.Action("Delete", "JobParty", new { id = item.Id })"
+                                    hx-target="#modalContainer"
+                                    hx-swap="innerHTML">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="9" class="text-center text-muted">No records found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

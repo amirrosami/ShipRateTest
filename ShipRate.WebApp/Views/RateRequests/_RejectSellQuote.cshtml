@@ -1,0 +1,37 @@
+﻿@using ShipRate.Application.ViewModels
+@model RejectSellQuoteVm
+<form asp-action="RejectSellQuoteInApp"
+      method="post"
+      hx-post="@Url.Action("RejectSellQuoteInApp")"
+      hx-target="#SellQuotesListContainer"
+      hx-swap="innerHTML">
+
+    @Html.AntiForgeryToken()
+    <input asp-for="SellQuoteId" type="hidden" />
+
+    <div class="modal-header">
+        <h5 class="modal-title text-danger">Reject Quotation Response</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+
+    <div class="modal-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="alert alert-warning">
+            Are you sure you want to reject this quotation response?
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Comments" class="form-label"></label>
+            <textarea asp-for="Comments" class="form-control" rows="5"></textarea>
+            <span asp-validation-for="Comments" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-x-circle"></i> Reject Response
+        </button>
+    </div>
+</form>

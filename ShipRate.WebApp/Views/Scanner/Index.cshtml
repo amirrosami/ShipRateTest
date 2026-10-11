@@ -1,0 +1,84 @@
+﻿@{
+    ViewData["Title"] = "Scanner";
+}
+
+<h2>Scanner</h2>
+
+<div style="margin-bottom: 10px;">
+    <button type="button" onclick="scanDocument()">Scan</button>
+    <button type="button" onclick="uploadDocument()">Upload</button>
+</div>
+
+<div id="dwtcontrolContainer" style="width:800px;height:500px;border:1px solid #ccc;"></div>
+
+<div id="message" style="margin-top:15px;"></div>
+
+<script src="~/lib/dwt/dynamsoft.webtwain.config.js"></script>
+<script src="~/lib/dwt/dynamsoft.webtwain.initiate.js"></script>
+
+<script>
+    let DWObject = null;
+
+    function setMessage(text, isError = false) {
+        const msg = document.getElementById("message");
+        msg.innerText = text;
+        msg.style.color = isError ? "red" : "green";
+    }
+
+    Dynamsoft.DWT.RegisterEvent('OnWebTwainReady', function () {
+        DWObject = Dynamsoft.DWT.GetWebTwain('dwtcontrolContainer');
+
+        if (DWObject) {
+            setMessage("Scanner is ready.");
+            console.log("Scanner SDK ready");
+        } else {
+            setMessage("Scanner control failed to load.", true);
+        }
+    });
+
+    function scanDocument() {
+        if (!DWObject) {
+            setMessage("Scanner is not ready.", true);
+            return;
+        }
+
+        DWObject.SelectSourceAsync()
+            .then(() => DWObject.OpenSourceAsync())
+            .then(() => DWObject.AcquireImageAsync({
+                IfDisableSourceAfterAcquire: true
+            }))
+            .then(() => {
+                setMessage("Scan completed.");
+            })
+            .catch(err => {
+                console.error(err);
+                setMessage("Scan failed.", true);
+            });
+    }
+
+    function uploadDocument() {
+        if (!DWObject) {
+            setMessage("Scanner is not ready.", true);
+            return;
+        }
+
+        if (DWObject.HowManyImagesInBuffer === 0) {
+            setMessage("No scanned image found.", true);
+            return;
+        }
+
+        DWObject.HTTPUploadThroughPost(
+            location.hostname,
+            DWObject.CurrentImageIndexInBuffer,
+            "/Scanner/UploadFromScanner",
+            "scan.jpg",
+            function () {
+                setMessage("Upload successful.");
+            },
+            function (errorCode, errorString) {
+                console.error(errorCode, errorString);
+                setMessage("Upload failed: " + errorString, true);
+            }
+        );
+    }
+</script>

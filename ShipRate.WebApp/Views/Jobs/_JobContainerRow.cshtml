@@ -1,0 +1,61 @@
+﻿@using ShipRate.Application.JobsViewModels
+@model JobContainerCreateVm
+<div class="card mb-2 container-row">
+    <div class="card-body py-2">
+        <input type="hidden" name="Containers.Index" value="@Model.Index" />
+
+        @*         <div class="d-flex justify-content-between align-items-center mb-3">
+            <strong>Container @(Model.Index + 1)</strong>
+            <button type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    onclick="this.closest('.container-row').remove()">
+                Remove
+            </button>
+        </div>
+ *@
+        <div class="row g-2 align-items-center">
+            <div class="col-md-1">
+                <label asp-for="ContainerSizeTypeId" class="form-label small fw-semibold" title="سایز و نوع کانتینرها">SizeType:</label>
+            </div>
+            <div class="col-md-3 ">
+                <select name="Containers[@Model.Index].ContainerSizeTypeId" class="form-select form-select-sm">
+                    <option value="">...</option>
+                    @foreach (var item in Model.SizeTypes)
+                    {
+                        <option value="@item.Value" selected="@(item.Value == Model.ContainerSizeTypeId.ToString() ? "selected" : null)">
+                            @item.Text
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-1">
+                <label asp-for="cntOwnTypeId" class="form-label small fw-semibold" title="نوع مالکیت">Own Type:</label>
+            </div>
+            <div class="col-md-3 ">
+                <select name="Containers[@Model.Index].CntOwnTypeId" class="form-select form-select-sm">
+                    <option value="">...</option>
+                    @foreach (var item in Model.CntOwnTypes)
+                    {
+                        <option value="@item.Value" selected="@(item.Value == Model.cntOwnTypeId.ToString() ? "selected" : null)">
+                            @item.Text
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-1">
+                <label asp-for="Counts" class="form-label small fw-semibold" title="تعداد کانتینر">Counts:</label>
+            </div>
+            <div class="col-md-3 ">
+                <div class="input-group input-group-sm">
+                    <input name="Containers[@Model.Index].Counts"
+                           value="@Model.Counts"
+                           class="form-control form-control-sm"
+                           placeholder="" />
+                    <button type="button"
+                            class="btn-close m-2"
+                            onclick="this.closest('.container-row').remove()">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>

@@ -1,0 +1,203 @@
+﻿@using ShipRate.Application.ViewModels
+@model MasterConsoleBLSummaryVm
+
+<div class="card shadow-sm h-100 border-0">
+    <div class="card-header bg-light py-2 px-3 d-flex justify-content-between align-items-center">
+        <span class="fw-bold small text-dark text-uppercase">
+            <i class="bi bi-file-earmark-text me-1 text-primary"></i> BL Information (Summary)
+        </span>
+        <span class="badge bg-info-subtle text-success border">@Model.BLNo</span>
+    </div>
+    <div class="card-body p-2">
+        <div class="row g-3 align-items-stretch">
+
+            <!-- Left Side: Shipment Summary Table -->
+            <div class="col-lg-6 d-flex flex-column">
+                <div class="card border-1 shipment-card flex-grow-1">
+                    <div class="table-responsive h-100">
+                        <table class="table table-bordered mb-0 shipment-info-table">
+                            <colgroup>
+                                <col style="width: 20%;">
+                                <col style="width: 30%;">
+                                <col style="width: 20%;">
+                                <col style="width: 30%;">
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <th class="bg-light-subtle">BL No</th>
+                                    <td class="fw-bold" style="background-color: gold; color: #007bff;">@Model.BLNo</td>
+                                    <th class="bg-light-subtle">FileNo/S.Person</th>
+                                    <td class="fw-bold" style="background-color: gold; color: #007bff;">@Model.JobFileNo (@Model.SalesUserName)</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light-subtle">Booking No</th>
+                                    <td>@Model.BookingNo</td>
+                                    <th class="bg-light-subtle">Carrier</th>
+                                    <td>@Model.CarrierName</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light-subtle">Vessel</th>
+                                    <td>@Model.VesselName</td>
+                                    <th class="bg-light-subtle">Voyage</th>
+                                    <td>@Model.VoyageNumber</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light-subtle">POL (Origin)</th>
+                                    <td>@Model.POL</td>
+                                    <th class="bg-light-subtle">POD (Dest.)</th>
+                                    <td>@Model.POD</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light-subtle">BL Issue Date</th>
+                                    <td>@Model.IssueDate?.ToString("yyyy-MM-dd")</td>
+                                    <th class="bg-light-subtle">Package Count</th>
+                                    <td>@Model.PackageCount</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light-subtle">Gross Weight</th>
+                                    <td>@Model.GrossWeightKg?.ToString("N2") <small class="text-muted">KG</small></td>
+                                    <th class="bg-light-subtle">Containers</th>
+                                    <td><span class="badge bg-secondary">@Model.ContainerCount Box(es)</span></td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light-subtle">Consignee</th>
+                                    <td colspan="3" class="small text-uppercase text-break">@Model.ConsigneeText</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light-subtle">Notify Party</th>
+                                    <td colspan="3" class="small text-uppercase text-break">@Model.NotifyText</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light-subtle">Booker Client</th>
+                                    <td colspan="3" class="small text-uppercase text-break">@Model.BookerClientName</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Cargo Packages & Containers -->
+            <div class="col-lg-6 d-flex flex-column gap-2">
+
+                <!-- 1. Cargo / Packages (Max 2 rows height) -->
+                <div class="border rounded d-flex flex-column overflow-hidden" style="max-height: 105px;">
+                    <div class="px-3 py-1 bg-light border-bottom fw-semibold small d-flex justify-content-between align-items-center flex-shrink-0">
+                        <span><i class="bi bi-box-seam me-1 text-secondary"></i> Cargo / Packages</span>
+                        <span class="badge bg-light text-success border">@(Model.Cargos?.Count ?? 0)</span>
+                    </div>
+
+                    @if (Model.Cargos == null || Model.Cargos.Count == 0)
+                    {
+                        <div class="p-2 text-muted small text-center">No cargo info.</div>
+                    }
+                    else
+                    {
+                        <div class="overflow-auto">
+                            <table class="table table-sm table-hover mb-0 align-middle text-nowrap small">
+                                <thead class="table-light sticky-top">
+                                    <tr>
+                                        <th class="text-center" style="width: 30px;">#</th>
+                                        <th>Package</th>
+                                        <th>Count</th>
+                                        <th>Gross</th>
+                                        <th>Volume</th>
+                                        <th>HS Code</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int pRowNo = 1;
+                                    }
+                                    @foreach (var item in Model.Cargos)
+                                    {
+                                        <tr>
+                                            <td class="text-center text-muted fw-normal">@(pRowNo++)</td>
+                                            <td>@(item.PackageTypeName ?? "-")</td>
+                                            <td>@item.PackageCount</td>
+                                            <td>@item.GrossWeight</td>
+                                            <td>@item.Volume</td>
+                                            <td>@item.HSCode</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+
+                <!-- 2. Containers (Max 5 rows height with Horizontal & Vertical Scroll) -->
+                <div class="border rounded d-flex flex-column overflow-hidden" style="max-height: 235px;">
+                    <div class="px-3 py-1 bg-light border-bottom fw-semibold small d-flex justify-content-between align-items-center flex-shrink-0">
+                        <span><i class="bi bi-truck me-1 text-secondary"></i> Containers</span>
+                        <span class="badge bg-light text-success border">@(Model.Containers?.Count ?? 0)</span>
+                    </div>
+
+                    @if (Model.Containers == null || Model.Containers.Count == 0)
+                    {
+                        <div class="p-2 text-muted small text-center">No containers found.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive overflow-auto flex-grow-1">
+                            <table class="table table-sm table-hover table-bordered mb-0 align-middle text-nowrap small text-start border-secondary-subtle">
+                                <thead class="table-light sticky-top border-bottom border-secondary-subtle">
+                                    <tr>
+                                        <th class="text-center" style="width: 30px;">#</th>
+                                        <th style="min-width: 110px;">Container</th>
+                                        <th style="width: 70px;">Size</th>
+                                        <th style="width: 50px;">#Pkg</th>
+                                        <th style="min-width: 90px;">RTS Date</th>
+                                        <th style="min-width: 90px;">RBS Date</th>
+                                        <th style="min-width: 90px;">FirstLOB Date</th>
+                                        <th style="min-width: 90px;">LastDis Date</th>
+                                        <th style="min-width: 90px;">DTC Date</th>
+                                        <th style="min-width: 90px;">RBC Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int cRowNo = 1;
+                                    }
+                                    @foreach (var item in Model.Containers)
+                                    {
+                                        <tr title="Seal: @(item.SealNo ?? "-")">
+                                            <td class="text-center text-muted fw-normal">@(cRowNo++)</td>
+                                            <td class="text-secondary font-monospace">@item.ContainerNo</td>
+                                            <td>@(item.ContainerType ?? "-")</td>
+                                            <td>@(item.PackageCount)</td>
+                                            <td>@item.RTSDate?.ToString("yyyy-MM-dd")</td>
+                                            <td>@item.RBSDate?.ToString("yyyy-MM-dd")</td>
+                                            <td>@item.FirstLOBDate?.ToString("yyyy-MM-dd")</td>
+                                            <td>@item.LastDischargeDate?.ToString("yyyy-MM-dd")</td>
+                                            <td>@item.DTCDate?.ToString("yyyy-MM-dd")</td>
+                                            <td>@item.RBCDate?.ToString("yyyy-MM-dd")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .shipment-card {
+        border-radius: 0 !important;
+        border: 1px solid #0d6efd !important;
+    }
+
+    .shipment-info-table {
+        table-layout: fixed !important;
+        width: 100% !important;
+        border-color: #0d6efd !important;
+    }
+
+    .bg-light-subtle {
+        background-color: #f8f9fa !important;
+    }
+</style>

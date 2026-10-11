@@ -1,0 +1,116 @@
+﻿@using ShipRate.Application.DTOs
+@model PagedResultDto<NOAListDto>
+
+<div class="card border shadow-sm mt-1" id="noa-grid">
+    <!-- Header Card -->
+    <div class="bg-light py-2 px-3 d-flex justify-content-between align-items-center border-bottom">
+        <span class="fw-bold small text-dark text-uppercase">
+            <i class="bi bi-file-earmark-text me-1 text-primary"></i>
+            Notice Of Arrivals
+        </span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-secondary-subtle text-dark border">
+                @Model.TotalCount
+            </span>
+            @*<button type="button"
+                    class="btn btn-sm btn-outline-primary py-1 px-2"
+                    hx-get="@Url.Action("Form", "NOA", new { id = 0 })"
+                    hx-target="#noaModalBody"
+                    hx-swap="innerHTML"
+                    onclick="showNoaModal()">
+                <i class="bi bi-plus-lg"></i> Add
+            </button> *@
+        </div>
+    </div>
+
+    <!-- کانتینر اسکرول افقی استاندارد -->
+    <div class="table-responsive w-100" style="overflow-x: auto;">
+        <table class="table table-sm table-bordered table-hover align-middle mb-0 text-nowrap small text-start border-secondary-subtle" style="min-width: 780px;">
+            <thead class="table-light text-uppercase font-monospace align-middle border-bottom border-secondary-subtle">
+                <tr>
+                    <th style="width: 40px;" class="text-center">#</th>
+                    <th style="min-width: 140px;">Number</th>
+                    <th style="min-width: 110px;">Issue Date</th>
+                    <th style="min-width: 110px;">Arrival Date</th>
+                    <th style="min-width: 110px;">MasterRecv.Date</th>
+                    <th style="min-width: 130px;">Create User</th>
+                    <th style="min-width: 140px;">Create At</th>
+                    <th class="text-center" style="min-width: 180px; width: 180px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Items != null && Model.Items.Any())
+                {
+                    int rowNo = 1;
+                    @foreach (var row in Model.Items)
+                    {
+                        <tr>
+                            <td class="text-center text-muted fw-semibold">@(rowNo++)</td>
+                            <td class="fw-semibold text-primary font-monospace">@row.NOANumber</td>
+                            <td>@(row.IssuedDate?.ToString("yyyy-MM-dd") ?? "-")</td>
+                            <td>@(row.ArrivalDate?.ToString("yyyy-MM-dd") ?? "-")</td>
+                            <td>@(row.MasterNOAReceiveDate?.ToString("yyyy-MM-dd") ?? "-")</td>
+                            <td>@(row.CreatedByUserName ?? "-")</td>
+                            <td class="text-muted">@(row.CreatedAt?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a class="btn btn-outline-secondary py-1 px-2 @(row.InOutId == 2 ? "" : "disabled")"
+                                       target="_blank"
+                                       href="@Url.Action("Print", "NOA", new { id = row.Id })"
+                                       title="Print">
+                                        <i class="bi bi-printer"></i>
+                                    </a>
+                                    <button type="button"
+                                            class="btn btn-outline-primary py-1 px-2"
+                                            title="Edit"
+                                            hx-get="@Url.Action("Form", "NOA", new { id = row.Id })"
+                                            hx-target="#noaModalBody"
+                                            hx-swap="innerHTML"
+                                            hx-on::after-request="showNoaModal()">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button type="button"
+                                            class="btn btn-outline-danger py-1 px-2"
+                                            title="Delete"
+                                            hx-post="@Url.Action("Delete", "NOA", new { id = row.Id })"
+                                            hx-include="closest form"
+                                            hx-target="this"
+                                            hx-confirm="Delete this NOA?">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    <button type="button"
+                                            class="btn btn-outline-info py-1 px-2"
+                                            title="Send/History"
+                                            hx-get="@Url.Action("SendHistory", "NOA", new { id = row.Id })"
+                                            hx-target="#sendModalBody"
+                                            hx-on::after-request="showSendModal()">
+                                        <i class="bi bi-envelope-check"></i>
+                                    </button>
+
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1"
+                                            title="Attachments"
+                                            hx-get="/DocumentManager/Index?objectId=@row.Id &objectTypeId=7"
+                                            hx-target="#document-manager-content"
+                                            hx-swap="innerHTML"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#documentManagerModal">
+                                        <i class="bi bi-folder2-open"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted align-middle" style="height: 120px;">
+                            <i class="bi bi-exclamation-circle d-block mb-1 fs-5"></i>
+                            No Notice of Arrival records found.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

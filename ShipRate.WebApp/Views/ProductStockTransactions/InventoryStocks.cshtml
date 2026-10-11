@@ -1,0 +1,54 @@
+﻿@model PagedResultDto<InventoryProductStockDto>
+@using ShipRate.Application.DTOs
+@{
+    var filter = ViewBag.Filter as InventoryProductStockFilterDto ?? new InventoryProductStockFilterDto();
+    ViewData["Title"] = "Inventory Stocks";
+}
+
+<div class="container-fluid" dir="ltr">
+    <h4 class="mb-3">Inventory Stocks</h4>
+
+    <form hx-get="@Url.Action("InventoryStocks")"
+          hx-target="#inventoryStocksList"
+          hx-swap="innerHTML"
+          class="card card-body mb-3">
+
+        <div class="row g-2">
+            <div class="col-md-3">
+                <label class="form-label">Search</label>
+                <input name="SearchText" value="@filter.SearchText" class="form-control" />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Inventory</label>
+                <select name="InventoryId" class="form-select" asp-items="ViewBag.Inventories">
+                    <option value="">All</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Product</label>
+                <select name="ProductId" class="form-select" asp-items="ViewBag.Products">
+                    <option value="">All</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Page Size</label>
+                <select name="PageSize" class="form-select">
+                    <option value="10" selected="@(filter.PageSize == 10)">10</option>
+                    <option value="20" selected="@(filter.PageSize == 20)">20</option>
+                    <option value="50" selected="@(filter.PageSize == 50)">50</option>
+                </select>
+            </div>
+
+            <div class="col-md-1 align-self-end">
+                <button class="btn btn-outline-primary w-100" type="submit">Search</button>
+            </div>
+        </div>
+    </form>
+
+    <div id="inventoryStocksList">
+        @await Html.PartialAsync("_InventoryStocksList", Model)
+    </div>
+</div>

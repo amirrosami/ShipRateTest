@@ -1,0 +1,27 @@
+﻿<div class="modal fade"
+     id="mainModal"
+     tabindex="-1"
+     aria-labelledby="mainModalLabel"
+     aria-hidden="true"
+     dir="ltr">
+
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content" id="mainModalContent">
+            <!-- HTMX content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<script>
+    document.body.addEventListener('hidden.bs.modal', function (event) {
+        const modal = event.target;
+
+        if (modal && modal.id === 'mainModal') {
+            const content = document.getElementById('mainModalContent');
+
+            if (content) {
+                content.innerHTML = '';
+            }
+        }
+    });
+</script>

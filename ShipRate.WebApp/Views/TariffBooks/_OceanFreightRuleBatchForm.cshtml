@@ -1,0 +1,218 @@
+﻿@using ShipRate.Application.ViewModels
+@model OceanFreightRuleBatchFormVm
+
+<form id="oceanFreightRuleBatchForm"
+      asp-action="SaveOceanFreightRules"
+      asp-controller="TariffBooks"
+      method="post">
+
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="TariffBookId" />
+    <input type="hidden" asp-for="TariffTypeId" />
+    <input type="hidden" asp-for="CurrencyId" />
+    <input type="hidden" asp-for="EffectiveFrom" />
+    <input type="hidden" asp-for="EffectiveTo" />
+
+    <textarea asp-for="CopiedRowsText"
+              id="OceanFreightCopiedRowsText"
+              class="d-none"
+              hidden></textarea>
+
+    <textarea asp-for="PastedRowsText"
+              id="OceanFreightPastedRowsText"
+              class="d-none"
+              hidden></textarea>
+
+    <div class="px-4 py-3">
+
+        <div class="border rounded bg-light px-3 py-3 mb-3">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label text-muted small mb-1">Tariff</label>
+                    <div class="fw-semibold text-primary">
+                        @Model.TariffBookTitle
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label text-muted small mb-1">Currency</label>
+                    <div class="fw-semibold text-success">
+                        @Model.CurrencyTitle
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label text-muted small mb-1">Valid From</label>
+                    <div class="fw-semibold text-dark">
+                        @(Model.EffectiveFrom?.ToString("yyyy/MM/dd") ?? "-")
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label text-muted small mb-1">Valid To</label>
+                    <div class="fw-semibold text-dark">
+                        @(Model.EffectiveTo?.ToString("yyyy/MM/dd") ?? "-")
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+        <div class="row g-3 mb-3">
+            <div class="col-md-3">
+                <label asp-for="OriginId" class="form-label">Origin</label>
+                <select asp-for="OriginId"
+                        asp-items="Model.Origins"
+                        class="form-select"
+                        hx-post="@Url.Action("LoadOceanFreightRulesGrid", "TariffBooks")"
+                        hx-target="#oceanFreightRowsGrid"
+                        hx-include="#oceanFreightRuleBatchForm"
+                        hx-trigger="change">
+                    <option value="">Select...</option>
+                </select>
+                <span asp-validation-for="OriginId" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="DestinationId" class="form-label">Destination</label>
+                <select asp-for="DestinationId"
+                        asp-items="Model.Destinations"
+                        class="form-select"
+                        hx-post="@Url.Action("LoadOceanFreightRulesGrid", "TariffBooks")"
+                        hx-target="#oceanFreightRowsGrid"
+                        hx-include="#oceanFreightRuleBatchForm"
+                        hx-trigger="change">
+                    <option value="">Select...</option>
+                </select>
+                <span asp-validation-for="DestinationId" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="PartyId" class="form-label">Carrier / Party</label>
+                <select asp-for="PartyId"
+                        asp-items="Model.Parties"
+                        class="form-select"
+                        hx-post="@Url.Action("LoadOceanFreightRulesGrid", "TariffBooks")"
+                        hx-target="#oceanFreightRowsGrid"
+                        hx-include="#oceanFreightRuleBatchForm"
+                        hx-trigger="change">
+                    <option value="">Select...</option>
+                </select>
+                <span asp-validation-for="PartyId" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="ScopeTypeId" class="form-label">Scope</label>
+                <select asp-for="ScopeTypeId"
+                        asp-items="Model.ScopeTypes"
+                        class="form-select"
+                        hx-post="@Url.Action("LoadOceanFreightRulesGrid", "TariffBooks")"
+                        hx-target="#oceanFreightRowsGrid"
+                        hx-include="#oceanFreightRuleBatchForm"
+                        hx-trigger="change">
+                    <option value="">Select...</option>
+                </select>
+                <span asp-validation-for="ScopeTypeId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0">Ocean Freight Rates</h6>
+
+            <div class="btn-group btn-group-sm">
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        onclick="copyOceanFreightRows()">
+                    Copy
+                </button>
+
+                <button type="button"
+                        class="btn btn-outline-primary"
+                        onclick="pasteOceanFreightRows()">
+                    Paste
+                </button>
+
+                <button type="button"
+                        class="btn btn-outline-success"
+                        hx-post="@Url.Action("AddOceanFreightRuleRow", "TariffBooks")"
+                        hx-target="#oceanFreightRowsGrid"
+                        hx-include="#oceanFreightRuleBatchForm">
+                    Add Row
+                </button>
+            </div>
+        </div>
+
+        <div id="oceanFreightRowsGrid">
+            @await Html.PartialAsync("_OceanFreightRateRowsGrid", Model)
+        </div>
+    </div>
+
+    <div class="modal-footer px-4">
+        <button type="button"
+                class="btn btn-light"
+                data-bs-dismiss="modal">
+            Close
+        </button>
+
+        <button type="submit"
+                class="btn btn-primary">
+            Save
+        </button>
+    </div>
+
+    <button type="button"
+            id="PasteOceanFreightRowsButton"
+            class="d-none"
+            hx-post="@Url.Action("PasteOceanFreightRuleRows", "TariffBooks")"
+            hx-target="#oceanFreightRowsGrid"
+            hx-include="#oceanFreightRuleBatchForm">
+    </button>
+</form>
+
+<script>
+    window.oceanFreightCopiedRowsText = window.oceanFreightCopiedRowsText || "";
+
+    function copyOceanFreightRows() {
+        const rows = [];
+
+        document
+            .querySelectorAll("#oceanFreightRowsGrid tbody tr[data-rate-row='true']")
+            .forEach(function (tr) {
+                const containerSizeTypeId = tr.querySelector("[name$='.ContainerSizeTypeId']")?.value || "";
+                const chargeTypeId = tr.querySelector("[name$='.ChargeTypeId']")?.value || "";
+                const amount = tr.querySelector("[name$='.Amount']")?.value || "";
+                const extraAttributes = tr.querySelector("[name$='.ExtraAttributes']")?.value || "";
+
+                if (containerSizeTypeId || chargeTypeId || amount || extraAttributes) {
+                    rows.push([
+                        containerSizeTypeId,
+                        chargeTypeId,
+                        amount,
+                        extraAttributes
+                    ].join("\t"));
+                }
+            });
+
+        window.oceanFreightCopiedRowsText = rows.join("\n");
+
+        const copiedInput = document.getElementById("OceanFreightCopiedRowsText");
+        if (copiedInput) {
+            copiedInput.value = window.oceanFreightCopiedRowsText;
+        }
+    }
+
+    function pasteOceanFreightRows() {
+        const pastedInput = document.getElementById("OceanFreightPastedRowsText");
+
+        if (!pastedInput || !window.oceanFreightCopiedRowsText) {
+            return;
+        }
+
+        pastedInput.value = window.oceanFreightCopiedRowsText;
+
+        const pasteButton = document.getElementById("PasteOceanFreightRowsButton");
+        if (pasteButton) {
+            pasteButton.click();
+        }
+    }
+</script>

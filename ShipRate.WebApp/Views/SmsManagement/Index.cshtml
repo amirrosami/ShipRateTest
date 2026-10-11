@@ -1,0 +1,274 @@
+﻿@using ShipRate.Application.DTOs
+
+@model SmsDashboardViewModel
+@{
+    ViewData["Title"] = "SMS Management Console";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid mt-3" dir="ltr">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0 text-dark fw-bold">
+            <i class="bi bi-chat-square-text me-2"></i> SMS Management Console
+        </h4>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sendSmsModal">
+            <i class="bi bi-send-plus me-1"></i> Compose New SMS
+        </button>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1 small">Queued / Pending</h6>
+                        <h3 class="fw-bold mb-0 text-warning">@Model.Stats.QueuedCount</h3>
+                    </div>
+                    <i class="bi bi-hourglass-split fs-2 text-warning"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1 small">Sent Today</h6>
+                        <h3 class="fw-bold mb-0 text-success">@Model.Stats.SentTodayCount</h3>
+                    </div>
+                    <i class="bi bi-check-circle fs-2 text-success"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1 small">Failed Messages</h6>
+                        <h3 class="fw-bold mb-0 text-danger">@Model.Stats.FailedCount</h3>
+                    </div>
+                    <i class="bi bi-exclamation-triangle fs-2 text-danger"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1 small">Unread Incoming (MO)</h6>
+                        <h3 class="fw-bold mb-0 text-info">@Model.Stats.UnreadIncomingCount</h3>
+                    </div>
+                    <i class="bi bi-inbox fs-2 text-info"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom-0 pt-3">
+            <ul class="nav nav-tabs card-header-tabs" id="smsTabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active fw-bold" id="outbox-tab" data-bs-toggle="tab" data-bs-target="#outbox-pane" type="button">
+                        <i class="bi bi-send me-1"></i> Outbox Management
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link fw-bold" id="incoming-tab" data-bs-toggle="tab" data-bs-target="#incoming-pane" type="button">
+                        <i class="bi bi-download me-1"></i> Incoming Messages (MO)
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content">
+                <!-- Outbox Pane -->
+                <div class="tab-pane fade show active" id="outbox-pane">
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-4">
+                            <input type="text" id="outboxSearch" class="form-control" placeholder="Search mobile, tracking ID, or body...">
+                        </div>
+                        <div class="col-md-3">
+                            <select id="outboxStatus" class="form-select">
+                                <option value="">All Statuses</option>
+                                <option value="0">Queued</option>
+                                <option value="1">Sending</option>
+                                <option value="2">Sent Successfully</option>
+                                <option value="3">Delivered</option>
+                                <option value="4">Failed</option>
+                                <option value="5">Pending in Queue</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-secondary w-100" onclick="loadOutboxList()">
+                                <i class="bi bi-search me-1"></i> Filter
+                            </button>
+                        </div>
+                    </div>
+                    <div id="outboxContainer">
+                        <div class="text-center py-4"><div class="spinner-border text-primary"></div></div>
+                    </div>
+                </div>
+
+                <!-- Incoming Pane -->
+                <div class="tab-pane fade" id="incoming-pane">
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-4">
+                            <input type="text" id="incomingSearch" class="form-control" placeholder="Search sender mobile or text...">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-secondary w-100" onclick="loadIncomingList()">
+                                <i class="bi bi-search me-1"></i> Filter
+                            </button>
+                        </div>
+                    </div>
+                    <div id="incomingContainer">
+                        <div class="text-center py-4"><div class="spinner-border text-primary"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Compose Manual SMS Modal -->
+<div class="modal fade" id="sendSmsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" dir="ltr">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-send me-1"></i> Send Manual SMS</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="sendSmsForm">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label">Recipient Mobile</label>
+                        <input type="text" id="smsMobile" class="form-control" placeholder="+989123456789" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Message Tag</label>
+                        <input type="text" id="smsTag" class="form-control" value="Manual" placeholder="e.g. NOA, DO, Alert">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Customer Tracking ID (Optional)</label>
+                        <input type="text" id="smsTrackingId" class="form-control" placeholder="Reference code or shipment ID">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Message Body</label>
+                        <textarea id="smsBody" class="form-control" rows="4" maxlength="500" required></textarea>
+                        <div class="form-text d-flex justify-content-between">
+                            <span>Characters: <span id="charCount">0</span>/500</span>
+                            <span id="smsPagesCount">Parts: 1</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitSendSms()">Send SMS</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            loadOutboxList();
+
+            $('#smsTabs button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                if (e.target.id === 'incoming-tab') {
+                    loadIncomingList();
+                }
+            });
+
+            $('#smsBody').on('input', function () {
+                var len = $(this).val().length;
+                $('#charCount').text(len);
+                var pages = Math.ceil(len / 70) || 1;
+                $('#smsPagesCount').text('Parts: ' + pages);
+            });
+        });
+
+        function loadOutboxList() {
+            var filter = {
+                searchTerm: $('#outboxSearch').val(),
+                status: $('#outboxStatus').val() ? parseInt($('#outboxStatus').val()) : null,
+                page: 1
+            };
+
+            $.ajax({
+                url: '/SmsManagement/OutboxList',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(filter),
+                success: function (html) {
+                    $('#outboxContainer').html(html);
+                }
+            });
+        }
+
+        function loadIncomingList() {
+            var filter = {
+                searchText: $('#incomingSearch').val(),
+                page: 1
+            };
+
+            $.ajax({
+                url: '/SmsManagement/IncomingList',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(filter),
+                success: function (html) {
+                    $('#incomingContainer').html(html);
+                }
+            });
+        }
+
+        function submitSendSms() {
+            var dto = {
+                mobileNumber: $('#smsMobile').val(),
+                tag: $('#smsTag').val(),
+                trackingId: $('#smsTrackingId').val(),
+                messageBody: $('#smsBody').val()
+            };
+
+            if (!dto.mobileNumber || !dto.messageBody) {
+                alert('Please enter recipient mobile and message body.');
+                return;
+            }
+
+            $.ajax({
+                url: '/SmsManagement/SendManualSms',
+                type: 'POST',
+                contentType: 'application/json',
+                headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() },
+                data: JSON.stringify(dto),
+                success: function (res) {
+                    if (res.success) {
+                        $('#sendSmsModal').modal('hide');
+                        $('#sendSmsForm')[0].reset();
+                        loadOutboxList();
+                        alert(res.message);
+                    } else {
+                        alert('Error: ' + res.message);
+                    }
+                }
+            });
+        }
+
+        function retrySms(id) {
+            if (!confirm('Are you sure you want to retry this message?')) return;
+
+            $.post('/SmsManagement/RetryFailedSms', { id: id }, function (res) {
+                if (res.success) {
+                    loadOutboxList();
+                } else {
+                    alert(res.message);
+                }
+            });
+        }
+    </script>
+}

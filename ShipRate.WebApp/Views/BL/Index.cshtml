@@ -1,0 +1,57 @@
+﻿@using ShipRate.Application.ViewModels
+@model BLManagePageVm
+
+@{
+    ViewData["Title"] = "BL Management";
+}
+
+<div class="container-fluid py-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">BL Management</h4>
+
+        <button class="btn btn-primary"
+                hx-get="@Url.Action("CreateModal", "BL", new {
+                    jobId = Model.Context.JobId,
+                    bookingId = Model.Context.BookingId,
+                    shipmentId = Model.Context.ShipmentId,
+                    shipmentLegId = Model.Context.ShipmentLegId
+                })"
+                hx-target="#modalBody"
+                hx-swap="innerHTML"
+                data-bs-toggle="modal"
+                data-bs-target="#mainModal">
+            New BL
+        </button>
+    </div>
+
+    <div id="blList">
+        @await Html.PartialAsync("_BLList", Model)
+    </div>
+</div>
+
+<div class="modal fade" id="mainModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">BL Form</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.body.addEventListener('blSaved', function () {
+        var modalEl = document.getElementById('mainModal');
+        var modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+    });
+
+    document.body.addEventListener('blDeleted', function () {
+        var modalEl = document.getElementById('mainModal');
+        var modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+    });
+</script>

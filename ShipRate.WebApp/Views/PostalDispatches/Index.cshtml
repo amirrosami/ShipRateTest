@@ -1,0 +1,135 @@
+﻿@using ShipRate.WebApp.ViewModels
+@model PostalDispatchSearchViewModel
+@{
+    ViewData["Title"] = "Postal Dispatches";
+}
+
+<div class="container-fluid mt-3">
+
+    <!-- Search Panel -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-2">
+            <span><i class="bi bi-search"></i> Search Dispatches</span>
+            <button class="btn btn-sm btn-light"
+                    hx-get="@Url.Action("Create")"
+                    hx-target="#modal-container"
+                    hx-swap="innerHTML">
+                <i class="bi bi-plus-lg"></i> New Dispatch
+            </button>
+        </div>
+        <div class="card-body py-2">
+            <form id="searchForm"
+                  hx-get="@Url.Action("DispatchGrid")"
+                  hx-target="#dispatch-grid"
+                  hx-swap="innerHTML"
+                  hx-trigger="submit"
+                  hx-include="[name]">
+                <div class="row g-2">
+                    <div class="col-md-2">
+                        <input type="text" name="TrackingNumber" class="form-control form-control-sm"
+                               placeholder="Tracking Number" value="@Model.TrackingNumber" />
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" name="SenderName" class="form-control form-control-sm"
+                               placeholder="Sender" value="@Model.SenderName" />
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" name="ReceiverName" class="form-control form-control-sm"
+                               placeholder="Receiver" value="@Model.ReceiverName" />
+                    </div>
+                    <div class="col-md-2">
+                        <select name="StatusId" class="form-select form-select-sm">
+                            <option value="">-- Status --</option>
+                            @foreach (var s in (SelectList)ViewBag.Statuses)
+                            {
+                                <option value="@s.Value">@s.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" name="FromDate" class="form-control form-control-sm"
+                               placeholder="From Date" />
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" name="ToDate" class="form-control form-control-sm"
+                               placeholder="To Date" />
+                    </div>
+                </div>
+                <div class="row g-2 mt-1">
+                    <div class="col-md-3">
+                        <input type="text" name="DocumentDescription" class="form-control form-control-sm"
+                               placeholder="Document Description (Items)" />
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="ItemReference" class="form-control form-control-sm"
+                               placeholder="Item Reference" />
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+                        <button type="reset" class="btn btn-sm btn-outline-secondary"
+                                onclick="this.closest('form').reset(); htmx.trigger('#searchForm','submit')">
+                            <i class="bi bi-x-circle"></i> Clear
+                        </button>
+                    </div>
+                </div>
+                <input type="hidden" name="Page" value="1" />
+            </form>
+        </div>
+    </div>
+
+    <!-- Dispatch Grid (Master) -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-dark text-white py-2">
+            <i class="bi bi-truck"></i> Dispatches
+        </div>
+        <div class="card-body p-0" id="dispatch-grid"
+             hx-get="@Url.Action("DispatchGrid")"
+             hx-trigger="load, refreshGrid from:body"
+             hx-swap="innerHTML">
+        </div>
+    </div>
+
+    <!-- Item Grid (Detail) -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-secondary text-white py-2">
+            <i class="bi bi-box-seam"></i> Dispatch Items
+            <small id="selected-dispatch-label" class="ms-2 text-light"></small>
+        </div>
+        <div class="card-body p-0" id="item-grid">
+            <div class="text-center text-muted py-4">Select a dispatch to view items</div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="modal fade" id="documentManagerModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="document-manager-content">
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Modal Container -->
+<div id="modal-container" hx-on::after-settle="
+    var m = document.getElementById('dispatchModal');
+    if(m){ new bootstrap.Modal(m).show(); }
+    var c = document.getElementById('confirmModal');
+    if(c){ new bootstrap.Modal(c).show(); }
+"></div>
+
+<script>
+    document.body.addEventListener('closeModal', function () {
+        document.querySelectorAll('.modal.show').forEach(function (m) {
+            bootstrap.Modal.getInstance(m)?.hide();
+        });
+        document.querySelectorAll('.modal-backdrop').forEach(function (b) { b.remove(); });
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
+    });
+</script>

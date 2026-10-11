@@ -1,0 +1,29 @@
+﻿@using ShipRate.Application.DTOs
+@model List<TipUsageContainerListDto>
+
+<table class="table table-bordered table-hover table-sm">
+    <thead class="table-light">
+        <tr>
+            <th>Container No</th>
+            <th>Size Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.ContainerNumber</td>
+                    <td>@item.SizeTypeShortName</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="2" class="text-center">No containers found for selected TIP usage.</td>
+            </tr>
+        }
+    </tbody>
+</table>

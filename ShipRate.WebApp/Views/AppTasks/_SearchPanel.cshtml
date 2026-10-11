@@ -1,0 +1,152 @@
+﻿@using ShipRate.Application.DTOs.AppTasks
+@model AppTaskSearchViewModel
+
+<div class="card mb-3">
+    <div class="card-body">
+
+        <form id="appTaskSearchForm"
+              hx-get="@Url.Action("List", "AppTasks")"
+              hx-target="#appTaskList"
+              hx-swap="innerHTML">
+
+            <div class="row g-2">
+
+                <div class="col-md-2">
+                    <label class="form-label">Keyword</label>
+                    <input type="text"
+                           name="Keyword"
+                           value="@Model.Filter.Keyword"
+                           class="form-control"
+                           placeholder="Title or description" />
+                </div>
+
+                <div class="col-md-1">
+                    <label class="form-label">Status</label>
+                    <select name="TaskStatusId" class="form-select">
+                        <option value="">All</option>
+                        @foreach (var item in Model.TaskStatuses)
+                        {
+                            if (Model.Filter.TaskStatusId?.ToString() == item.Value)
+                            {
+                                <option value="@item.Value" selected>@item.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-1">
+                    <label class="form-label">Priority</label>
+                    <select name="PriorityId" class="form-select">
+                        <option value="">All</option>
+                        @foreach (var item in Model.Priorities)
+                        {
+                            if (Model.Filter.PriorityId?.ToString() == item.Value)
+                            {
+                                <option value="@item.Value" selected>@item.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Assignee</label>
+                    <select name="AssignedToUserId" class="form-select">
+                        <option value="">All</option>
+                        @foreach (var item in Model.Users)
+                        {
+                            if (Model.Filter.AssignedToUserId?.ToString() == item.Value)
+                            {
+                                <option value="@item.Value" selected>@item.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-1">
+                    <label class="form-label">Size</label>
+                    <select name="PageSize" class="form-select">
+                        @foreach (var item in Model.PageSizes)
+                        {
+                            if (Model.Filter.PageSize.ToString() == item.Value)
+                            {
+                                <option value="@item.Value" selected>@item.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-1 d-flex align-items-end">
+                    <div class="form-check mb-2">
+                        @if (Model.ForceMyTasksOnly)
+                        {
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   checked
+                                   disabled />
+
+                            <input type="hidden"
+                                   name="MyTasksOnly"
+                                   value="true" />
+                        }
+                        else
+                        {
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   name="MyTasksOnly"
+                                   value="true"
+                                   @(Model.Filter.MyTasksOnly == true ? "checked" : "") />
+                        }
+
+                        <label class="form-check-label">Mine</label>
+                    </div>
+                </div>
+
+                <div class="col-md-1 d-flex align-items-end">
+                    <div class="form-check mb-2">
+                        @if (Model.Filter.IncludeCompleted == true)
+                        {
+                            <input class="form-check-input" type="checkbox" name="IncludeCompleted" value="true" checked />
+                        }
+                        else
+                        {
+                            <input class="form-check-input" type="checkbox" name="IncludeCompleted" value="true" />
+                        }
+                        <label class="form-check-label">Done</label>
+                    </div>
+                </div>
+
+                <input type="hidden" name="PageNumber" value="1" />
+
+                <div class="col-md-3 d-flex gap-2 align-items-end">
+                    <button type="submit" class="btn btn-primary">
+                        Search
+                    </button>
+
+                    <a class="btn btn-outline-secondary"
+                       hx-get="@Url.Action("List", "AppTasks")"
+                       hx-target="#appTaskList"
+                       hx-swap="innerHTML">
+                        Reset
+                    </a>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>

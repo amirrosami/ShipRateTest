@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="06/12/2026 15:09:50" ReportInfo.Modified="06/12/2026 15:16:50" ReportInfo.CreatorVersion="2026.1.0.0">
+  <Styles Name="Gray">
+    <Style Name="Title" Font="Arial, 12pt, style=Bold"/>
+    <Style Name="Header" Fill.Color="Gainsboro" Font="Arial, 10pt, style=Bold"/>
+    <Style Name="Group" Font="Arial, 10pt, style=Bold"/>
+    <Style Name="Data" Font="Arial, 10pt"/>
+    <Style Name="Footer" Fill.Color="Gainsboro" Font="Arial, 10pt"/>
+    <Style Name="EvenRows" Fill.Color="WhiteSmoke" Font="Arial, 10pt"/>
+  </Styles>
+  <Dictionary>
+    <MsSqlDataConnection Name="Connection" ConnectionString="rijcmlqr2sEgbyd/XFgYBeuRgqcA2qFAy3i8nfYv5VlyovfIkz1w2X7WfHbnJs7fiOecMM485ayRgnOTZg/ZrFkNP7qKVVquzPHZ0si2/LNmL+FUfIAR4OL3nvgxuz90y1Kg7FplPevdc/SUC2uonrcuIN7h25b1KqR/Ee2BVRh2I2/R1xYB/2uqgLxzLHiN0/yg28z">
+      <TableDataSource Name="fin_PettyCashes" DataType="System.Int32" Enabled="true" TableName="fin.&quot;PettyCashes&quot;">
+        <Column Name="Id" DataType="System.Guid"/>
+        <Column Name="CompanyId" DataType="System.Int32"/>
+        <Column Name="Code" DataType="System.String"/>
+        <Column Name="Title" DataType="System.String"/>
+        <Column Name="InitialAmount" DataType="System.Decimal"/>
+        <Column Name="CurrentBalance" DataType="System.Decimal"/>
+        <Column Name="PersonId" DataType="System.Guid"/>
+        <Column Name="CustodianUserId" DataType="System.Guid"/>
+        <Column Name="IsActive" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="IsDeleted" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="CreatedAt" DataType="System.DateTime"/>
+        <Column Name="UpdatedAt" DataType="System.DateTime"/>
+        <Column Name="CreateUserId" DataType="System.Guid"/>
+        <Column Name="EditUserId" DataType="System.Guid"/>
+      </TableDataSource>
+    </MsSqlDataConnection>
+    <MsSqlDataConnection Name="Connection1" ConnectionString="rijcmlqr2sEgbyd/XFgYBeuRgqcA2qFAy3i8nfYv5VlyovfIkz1w2X7WfHbnJs7fiOecMM485ayRgnOTZg/ZrFkNP7qKVVquzPHZ0si2/LNmL+FUfIAR4OL3nvgxuz90y1Kg7FplPevdc/SUC2uonrcuIN7h25b1KqR/Ee2BVRh2I2/R1ybykMmOWNtU5io44abOLoK">
+      <TableDataSource Name="fin_PettyCashExpenses1" DataType="System.Int32" Enabled="true" TableName="fin.&quot;PettyCashExpenses&quot;">
+        <Column Name="Id" DataType="System.Guid"/>
+        <Column Name="CompanyId" DataType="System.Int32"/>
+        <Column Name="PettyCashId" DataType="System.Guid"/>
+        <Column Name="ExpenseDate" DataType="System.DateTime"/>
+        <Column Name="Amount" DataType="System.Decimal"/>
+        <Column Name="ExpenseCategoryId" DataType="System.Guid"/>
+        <Column Name="CostCenterId" DataType="System.Guid"/>
+        <Column Name="Description" DataType="System.String"/>
+        <Column Name="ApprovedByUserId" DataType="System.Guid"/>
+        <Column Name="ApprovedAt" DataType="System.DateTime"/>
+        <Column Name="IsActive" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="IsDeleted" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="CreatedAt" DataType="System.DateTime"/>
+        <Column Name="UpdatedAt" DataType="System.DateTime"/>
+        <Column Name="CreateUserId" DataType="System.Guid"/>
+        <Column Name="EditUserId" DataType="System.Guid"/>
+        <Column Name="StatusId" DataType="System.Int32"/>
+      </TableDataSource>
+    </MsSqlDataConnection>
+  </Dictionary>
+  <ReportPage Name="Page1" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="37.8">
+      <TextObject Name="Text1" Width="718.2" Height="37.8" Dock="Fill" Text="fin_PettyCashes" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold" Style="Title"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="41.8" Width="718.2" Height="66.15">
+      <TextObject Name="Text3" Width="359.1" Height="18.9" Fill.Color="Gainsboro" Text="Code" Font="Arial, 10pt, style=Bold" Style="Header"/>
+      <TextObject Name="Text5" Left="359.1" Width="359.1" Height="18.9" Fill.Color="Gainsboro" Text="Title" Font="Arial, 10pt, style=Bold" Style="Header"/>
+    </PageHeaderBand>
+    <GroupHeaderBand Name="GroupHeader1" Top="111.95" Width="718.2" Height="28.35" Condition="[fin_PettyCashes.Code]">
+      <TextObject Name="Text6" Width="718.2" Height="28.35" Dock="Fill" Text="[fin_PettyCashes.Title]" Font="Arial, 10pt, style=Bold" Style="Group"/>
+      <TextObject Name="Text2" Left="444.15" Width="189" Height="18.9" Text="[fin_PettyCashes.Code]" Font="Arial, 10pt" Style="Data"/>
+      <DataBand Name="Data1" Top="144.3" Width="718.2" Height="18.9" EvenStyle="EvenRows" DataSource="fin_PettyCashes">
+        <SubreportObject Name="Subreport1" Left="245.7" Width="94.5" Height="18.9" ReportPage="Page2"/>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="167.2" Width="718.2" Height="18.9"/>
+    </GroupHeaderBand>
+    <PageFooterBand Name="PageFooter1" Top="190.1" Width="718.2" Height="18.9">
+      <TextObject Name="Text8" Width="718.2" Height="18.9" Dock="Fill" Fill.Color="Gainsboro" Text="[PageN]" HorzAlign="Right" Font="Arial, 10pt" Style="Footer"/>
+    </PageFooterBand>
+  </ReportPage>
+  <ReportPage Name="Page2" Watermark.Font="Arial, 60pt">
+    <DataBand Name="Data2" Top="41.8" Width="718.2" Height="75.6" DataSource="fin_PettyCashExpenses1">
+      <TextObject Name="Text9" Left="37.8" Top="9.45" Width="94.5" Height="18.9" Text="[fin_PettyCashExpenses1.Amount]" Format="Currency" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Right" WordWrap="false" Font="Arial, 10pt" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text10" Left="170.1" Top="9.45" Width="226.8" Height="18.9" Text="[fin_PettyCashExpenses1.Description]" Font="Arial, 10pt"/>
+      <DataHeaderBand Name="DataHeader1" Width="718.2" Height="37.8">
+        <TextObject Name="Text4" Left="37.8" Width="94.5" Height="18.9" Text="Amount" Font="Arial, 10pt"/>
+        <TextObject Name="Text7" Left="170.1" Width="94.5" Height="18.9" Text="Description" Font="Arial, 10pt"/>
+      </DataHeaderBand>
+    </DataBand>
+  </ReportPage>
+</Report>

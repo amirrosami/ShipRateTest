@@ -1,0 +1,375 @@
+﻿@using ShipRate.Domain.Entities.Security
+@model ShipRate.Web.Models.UserFormViewModel
+
+<form asp-action="@(Model.IsEditMode ? "Edit" : "Create")" 
+      method="post" 
+      autocomplete="off"
+      enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+
+    @if (Model.IsEditMode)
+    {
+        <input type="hidden" asp-for="Id" />
+    }
+
+    @if (ViewData.ModelState.ErrorCount > 0)
+    {
+        <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+    }
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label asp-for="UserTypeId" class="form-label">User Type</label>
+            <select asp-for="UserTypeId" asp-items="@Model.UserTypes" class="form-select">
+                <option value="">-- Select User Type --</option>
+            </select>
+            <span asp-validation-for="UserTypeId" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="PersonId" class="form-label">Party</label>
+
+            <input type="hidden"
+                   asp-for="PersonId"
+                   id="CPartyId" />
+
+            <input type="text"
+                   id="CPartySearchText"
+                   name="CParty"
+                   value="@Model.PersonName"
+                   class="form-control"
+                   placeholder="Search party..."
+                   autocomplete="off"
+                   hx-get="@Url.Action("SearchParties", "JobParty")"
+                   hx-trigger="keyup changed delay:400ms"
+                   hx-target="#partySearchResults"
+                   hx-swap="innerHTML"
+                   hx-vals='js:{
+                       term: document.getElementById("CPartySearchText").value,
+                       targetHiddenInputId: "CPartyId",
+                       targetTextInputId: "CPartySearchText"
+                   }' />
+
+            <div id="partySearchResults" class="position-relative"></div>
+            <span asp-validation-for="PersonId" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="UserName" class="form-label"></label>
+            <input asp-for="UserName" class="form-control" placeholder="Enter user name" autocomplete="off" />
+            <span asp-validation-for="UserName" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" placeholder="Enter email address" />
+            <span asp-validation-for="Email" class="text-danger small"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="PhoneNumber" class="form-label"></label>
+            <input asp-for="PhoneNumber" class="form-control" placeholder="" />
+            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Mobile" class="form-label"></label>
+            <input asp-for="Mobile" class="form-control" placeholder="09" />
+            <span asp-validation-for="Mobile" class="text-danger small"></span>
+        </div>
+        <div class="col-12">
+            <label asp-for="FullName" class="form-label"></label>
+            <input asp-for="FullName" class="form-control" placeholder="Enter full name" />
+            <span asp-validation-for="FullName" class="text-danger small"></span>
+        </div>
+        <div class="col-6">
+            <label asp-for="JobTitle" class="form-label"></label>
+            <input asp-for="JobTitle" class="form-control" placeholder="Enter Job Title" />
+            <span asp-validation-for="JobTitle" class="text-danger small"></span>
+        </div>
+        <div class="col-6">
+            <label asp-for="SalesFilePrefix" class="form-label"></label>
+            <input asp-for="SalesFilePrefix" class="form-control" placeholder="Enter Sales File Prefix" />
+            <span asp-validation-for="SalesFilePrefix" class="text-danger small"></span>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label fw-semibold">
+                <i class="bi bi-image me-1 text-primary"></i>
+                User Picture
+            </label>
+
+            <div class="border rounded p-3 bg-light">
+                <div class="row g-3 align-items-start">
+                    <div class="col-md-3 text-center">
+                        <img id="picPreview"
+                             src="@(string.IsNullOrWhiteSpace(Model.ExistingPicBase64)
+                                      ? Url.Content("~/images/no-pic.webp")
+                                      : $"data:image/*;base64,{Model.ExistingPicBase64}")"
+                             alt="User Picture"
+                             class="img-thumbnail"
+                             style="width: 160px; height: 160px; object-fit: cover;" />
+                    </div>
+
+                    <div class="col-md-9">
+                        <label asp-for="PicFile" class="form-label"></label>
+                        <input asp-for="PicFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.gif,.webp,image/*" />
+                        <span asp-validation-for="PicFile" class="text-danger small"></span>
+
+
+                        <script>
+                            document.addEventListener("change", function (event) {
+                                if (event.target.id !== "PicFile") {
+                                    return;
+                                }
+
+                                const fileInput = event.target;
+                                const preview = document.getElementById("picPreview");
+
+                                if (!preview) {
+                                    alert("picPreview image not found");
+                                    return;
+                                }
+
+                                const file = fileInput.files && fileInput.files[0];
+
+                                if (!file) {
+                                    return;
+                                }
+
+                                if (!file.type.startsWith("image/")) {
+                                    alert("Please select an image file.");
+                                    fileInput.value = "";
+                                    return;
+                                }
+
+                                const reader = new FileReader();
+
+                                reader.onload = function (e) {
+                                    preview.src = e.target.result;
+                                };
+
+                                reader.readAsDataURL(file);
+                            });
+                        </script>
+
+
+
+
+
+
+
+
+
+
+
+
+                        <div class="form-text">
+                            Allowed formats: jpg, jpeg, png, gif, webp - Max size: 2 MB
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(Model.ExistingPicBase64))
+                        {
+                            <div class="form-check mt-3">
+                                <input asp-for="RemovePic" class="form-check-input" />
+                                <label asp-for="RemovePic" class="form-check-label">
+                                    Remove current picture
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+@*         <div class="col-md-6">
+            <label asp-for="RoleName" class="form-label"></label>
+            <select asp-for="RoleName" class="form-select">
+                <option value="">-- Select Role --</option>
+                @foreach (var role in ViewBag.Roles as List<ApplicationRole> ?? new List<ApplicationRole>())
+                {
+                    <option value="@role.Name">@role.Name</option>
+                }
+            </select>
+            <span asp-validation-for="RoleName" class="text-danger small"></span>
+        </div>
+ *@
+
+
+        <div class="col-12">
+            <label class="form-label fw-semibold">
+                <i class="bi bi-shield-lock me-1 text-primary"></i>
+                Roles
+            </label>
+
+            <div class="border rounded p-3 bg-light">
+                <div class="row g-2">
+
+                    @foreach (var role in ViewBag.Roles as List<ApplicationRole> ?? new List<ApplicationRole>())
+                    {
+                        var isChecked = Model.SelectedRoles != null && Model.SelectedRoles.Contains(role.Name);
+
+                        <div class="col-md-4 col-sm-6">
+
+                            <input type="checkbox"
+                                   class="form-check-input me-2"
+                                   name="SelectedRoles"
+                                   value="@role.Name"
+                                   id="role_@role.Id"
+                                   @(isChecked ? "checked" : "") />
+
+                            <label class="form-check-label" for="role_@role.Id">
+                                @role.Name
+                            </label>
+
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+
+
+
+        @if (!Model.IsEditMode)
+        {
+            <div class="col-md-6">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" placeholder="Enter password" autocomplete="new-password" />
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="ConfirmPassword" class="form-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" placeholder="Repeat password" autocomplete="new-password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+            </div>
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="alert alert-light border mb-0">
+                    <i class="bi bi-info-circle me-1 text-primary"></i>
+                    Password is not changed here. If needed, create a separate reset/change password action.
+                </div>
+            </div>
+        }
+
+        <div class="col-md-6">
+            <label asp-for="TwoFactorMethodId" class="form-label">
+                Two-Factor Authentication
+            </label>
+
+            <select asp-for="TwoFactorMethodId"
+                    asp-items="Model.TwoFactorMethods"
+                    class="form-select"
+                    id="twoFactorMethodSelect">
+            </select>
+
+            <span asp-validation-for="TwoFactorMethodId"
+                  class="text-danger">
+            </span>
+        </div>
+
+        <div class="col-md-6 d-flex align-items-end">
+            <div class="form-check mb-2">
+                <input asp-for="TwoFactorEnabled"
+                       class="form-check-input"
+                       id="twoFactorEnabled" />
+
+                <label asp-for="TwoFactorEnabled"
+                       class="form-check-label">
+                    Enable two-factor authentication
+                </label>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label fw-semibold">
+                <i class="bi bi-buildings me-1 text-primary"></i>
+                Company Access
+            </label>
+
+            <div class="border rounded p-3 bg-light">
+                @if (Model.Companies != null && Model.Companies.Any())
+                {
+                    <div class="row g-2">
+                        @foreach (var company in Model.Companies)
+                        {
+                            var isChecked = Model.SelectedCompanyIds != null &&
+                            Model.SelectedCompanyIds.Contains(company.Id);
+
+                            <div class="col-md-4 col-sm-6">
+                                <input type="checkbox"
+                                       class="btn-check company-check"
+                                       name="SelectedCompanyIds"
+                                       id="company_@company.Id"
+                                       value="@company.Id"
+                                       autocomplete="off"
+                                       @(isChecked ? "checked" : "") />
+
+                                <label class="btn btn-outline-primary w-100 d-flex justify-content-between align-items-center text-start"
+                                       for="company_@company.Id">
+                                    <span>
+                                        <i class="bi bi-building me-1"></i>
+                                        @company.Name
+                                    </span>
+
+                                    <span class="company-check-icon @(isChecked ? "" : "d-none")">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        No companies available.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-4" />
+
+    <div class="d-flex justify-content-end gap-2">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            Cancel
+        </a>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+            @(Model.IsEditMode ? "Save Changes" : "Create User")
+        </button>
+    </div>
+</form>
+
+
+<script>
+    (() => {
+    const methodSelect = document.getElementById('twoFactorMethodSelect');
+    const enabledCheckbox = document.getElementById('twoFactorEnabled');
+
+    if (!methodSelect || !enabledCheckbox) return;
+
+    function syncTwoFactorState() {
+    const isNone = methodSelect.value === '0';
+
+    if (isNone) {
+    enabledCheckbox.checked = false;
+    enabledCheckbox.disabled = true;
+    } else {
+    enabledCheckbox.disabled = false;
+    }
+    }
+
+    methodSelect.addEventListener('change', syncTwoFactorState);
+    syncTwoFactorState();
+    })();
+</script>
+
+

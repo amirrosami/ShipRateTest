@@ -1,0 +1,1210 @@
+﻿@using System.Text.Json
+@using ShipRate.Application.ViewModels.Dashboard
+@model DashboardVm
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+
+<style>
+    .customer-growth-chart-wrapper {
+        position: relative;
+        width: 100%;
+        height: 105px;
+        margin-top: .75rem;
+    }
+
+        .customer-growth-chart-wrapper canvas {
+            width: 100% !important;
+            height: 105px !important;
+        }
+
+    .customer-total-value {
+        color: #435971 !important;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .customer-growth-summary .small {
+        font-size: .72rem;
+    }
+
+    .shipping-route {
+        color: #435971 !important;
+        font-weight: 600;
+    }
+
+    .shipment-count {
+        display: inline-block;
+        min-width: 70px;
+        padding: .35rem .65rem;
+        border-radius: .375rem;
+        background-color: rgba(105, 108, 255, .12);
+        color: #696cff !important;
+        font-size: .875rem;
+        font-weight: 700;
+        text-align: center;
+    }
+
+
+    .monthly-revenue-list {
+        display: flex;
+        flex-direction: column;
+        gap: .45rem;
+    }
+
+    .monthly-revenue-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 38px;
+        padding: .45rem .65rem;
+        border-radius: .375rem;
+        background-color: rgba(67, 89, 113, .06);
+    }
+
+        .monthly-revenue-row .revenue-amount {
+            color: #2f3a4a !important;
+            font-size: 1.05rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .monthly-revenue-row .revenue-currency {
+            color: #697a8d !important;
+            font-size: .82rem;
+            font-weight: 600;
+        }
+
+        .monthly-revenue-row .stat-change {
+            margin: 0;
+            font-size: .78rem;
+            font-weight: 700;
+        }
+
+            .monthly-revenue-row .stat-change i {
+                font-size: 1.1rem;
+                vertical-align: -0.12rem;
+            }
+
+
+    .monthly-finance-list {
+        display: flex;
+        flex-direction: column;
+        gap: .4rem;
+    }
+
+    .monthly-finance-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .5rem;
+        min-height: 38px;
+        padding: .45rem .55rem;
+        border-radius: .375rem;
+        background-color: rgba(67, 89, 113, .06);
+    }
+
+    .monthly-finance-currency {
+        min-width: 36px;
+        color: #566a7f;
+        font-size: .75rem;
+        font-weight: 700;
+    }
+
+    .monthly-finance-values {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: .65rem;
+        font-size: .78rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .finance-revenue {
+        color: #28a745 !important;
+    }
+
+    .finance-expense {
+        color: #dc3545 !important;
+    }
+
+    .finance-net {
+        color: #566a7f;
+        border-left: 1px solid rgba(67, 89, 113, .18);
+        padding-left: .65rem;
+    }
+
+        .finance-net.text-success {
+            color: #28a745 !important;
+        }
+
+        .finance-net.text-danger {
+            color: #dc3545 !important;
+        }
+
+    .monthly-finance-values i {
+        font-size: .85rem;
+    }
+
+    .monthly-finance-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .55rem;
+        font-size: .67rem;
+        font-weight: 600;
+    }
+
+</style>
+
+
+
+
+@* <!-- Welcome Banner -->
+<div class="welcome-banner fade-in">
+    <h4>Welcome back, John! 🚢</h4>
+    <p>You have <strong>8 shipments</strong> in transit and <strong>3 customs declarations</strong> pending review today.</p>
+    <a asp-controller="Shipment" asp-action="Create" class="btn btn-light btn-sm px-4">
+        <i class="bi bi-plus-lg me-1"></i> New Shipment
+    </a>
+</div>
+ *@
+<!-- Stat Cards Row -->
+@if (!User.IsInRole("External Party"))
+{
+
+    <!-- Quick Access Section -->
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-3">
+                    <h6 class="mb-3 fw-semibold"><i class="bi bi-lightning-charge me-2"></i>Quick Access</h6>
+                    <div class="row g-2">
+                        @if (User.IsInRole("Sales User"))
+                        {
+                            <div class="col-6 col-md-2">
+                                <button type="button"
+                                        class="btn btn-outline-primary w-100 py-3"
+                                        onclick="window.location.href='@Url.Action("Index", "RateRequests")'">
+                                    <i class="bi bi-folder-plus d-block fs-4 mb-1"></i> Rate Requests
+                                </button>
+                            </div>
+
+                        }
+                        <div class="col-6 col-md-2">
+                            <button type="button"
+                                    class="btn btn-outline-primary w-100 py-3"
+                                    onclick="window.location.href='@Url.Action("Index", "Jobs")'">
+                                <i class="bi bi-folder-plus d-block fs-4 mb-1"></i> Job Files
+                            </button>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <button type="button"
+                                    class="btn btn-outline-primary w-100 py-3"
+                                    onclick="window.location.href='@Url.Action("Index", "BLManagement")'">
+                                <i class="bi bi-file-earmark-text d-block fs-4 mb-1"></i> Bill Of Ladings
+                            </button>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <button type="button"
+                                    class="btn btn-outline-primary w-100 py-3"
+                                    onclick="window.location.href='@Url.Action("Index", "Invoices")'">
+                                <i class="bi bi-file-earmark-text d-block fs-4 mb-1"></i> Invoices
+                            </button>
+                        </div>
+                        @if (User.IsInRole("Finance Expert"))
+                        {
+                            <div class="col-6 col-md-2">
+                                <button type="button"
+                                        class="btn btn-outline-primary w-100 py-3"
+                                        onclick="window.location.href='@Url.Action("Index", "Settlements")'">
+                                    <i class="bi bi-clipboard-check d-block fs-4 mb-1"></i> Settlements
+                                </button>
+                            </div>
+                        }
+
+
+                        <div class="col-6 col-md-2">
+                            <button type="button"
+                                    class="btn btn-outline-primary w-100 py-3"
+                                    onclick="window.location.href='@Url.Action("Index", "ServiceRequests")'">
+                                <i class="bi bi-clipboard-check d-block fs-4 mb-1"></i> Requests
+                            </button>
+                        </div>
+
+
+
+@*                         <div class="col-6 col-md-2">
+                            <button type="button"
+                                    class="btn btn-outline-primary w-100 py-3"
+                                    onclick="window.location.href='@Url.Action("Index", "Correspondences")'">
+                                <i class="bi bi-envelope-paper d-block fs-4 mb-1"></i> Correspondences
+                            </button>
+                        </div>
+ *@
+                        <!-- Track -->
+                        @*                         <div class="col-6 col-md-2">
+                            <button class="btn btn-outline-info w-100 py-3" onclick="alert('Open Tracking Search')">
+                                <i class="bi bi-search d-block fs-4 mb-1"></i> Track Shipment
+                            </button>
+                        </div>
+ *@                        <!-- Invoice -->
+                        @*                         <div class="col-6 col-md-2">
+                            <button class="btn btn-outline-success w-100 py-3">
+                                <i class="bi bi-receipt d-block fs-4 mb-1"></i> New Invoice
+                            </button>
+                        </div>
+ *@                        <!-- Upload -->
+                        @*                      <div class="col-6 col-md-2">
+                            <button class="btn btn-outline-warning w-100 py-3">
+                                <i class="bi bi-cloud-arrow-up d-block fs-4 mb-1"></i> Upload Doc
+                            </button>
+                        </div>
+                        <!-- Support -->
+                        <div class="col-6 col-md-2">
+                            <button class="btn btn-outline-secondary w-100 py-3">
+                                <i class="bi bi-headset d-block fs-4 mb-1"></i> Support
+                            </button>
+                        </div>
+ *@                        <!-- Reports -->
+                        <div class="col-6 col-md-2">
+                            <button class="btn btn-outline-dark w-100 py-3">
+                                <a asp-controller="Reports" asp-action="Index" class="submenu-link"><i class="bi bi-graph-up-arrow d-block fs-4 mb-1"></i> Reports</a>
+                            </button>
+                        </div>
+
+                        <div class="col-6 col-md-2 d-flex align-items-center">
+                            <form asp-controller="Jobs"
+                                  asp-action="QuickSearch"
+                                  method="post"
+                                  class="quick-search-form">
+
+                                @Html.AntiForgeryToken()
+
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0">
+                                        <i class="bi bi-search text-primary"></i>
+                                    </span>
+                                    <input type="text"
+                                           name="searchTerm"
+                                           class="form-control border-start-0 shadow-none"
+                                           placeholder=""
+                                           autocomplete="off"
+                                           required />
+
+                                    <button type="submit"
+                                            class="btn btn-primary px-4">
+                                        Find
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <div class="row g-4 mb-4">
+        <!-- Active Shipments -->
+@*         <div class="col-xl-3 col-md-6 fade-in fade-in-delay-1">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(105,108,255,0.1); color: var(--sneat-primary);">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div class="stat-value">@ViewBag.ActiveShipments</div>
+                <div class="stat-label">Active Shipments</div>
+            </div>
+        </div>
+ *@
+        <!-- Revenue -->
+        @*         <div class="col-xl-3 col-md-6 fade-in fade-in-delay-2">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(113,221,55,0.1); color: var(--sneat-success);">
+                    <i class="bi bi-currency-dollar"></i>
+                </div>
+                <div class="stat-value">$2.4M</div>
+                <div class="stat-label">Monthly Revenue</div>
+                <div class="stat-change text-success">
+                    <i class="bi bi-arrow-up-short"></i> +8.3% vs last month
+                </div>
+            </div> 
+            </div>*@
+@*         <div class="col-xl-3 col-md-6 fade-in fade-in-delay-2">
+            <div class="stat-card h-100">
+
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="stat-icon"
+                         style="background: rgba(113,221,55,0.1); color: var(--sneat-success);">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+
+                    <span class="badge bg-label-success">
+                        Current Month
+                    </span>
+                </div>
+
+                <div class="stat-label mt-3 mb-2">
+                    Monthly Finance Summary
+                </div>
+
+                @if (Model.MonthlyFinanceByCurrencies?.Any() == true)
+                {
+                    <div class="monthly-finance-list">
+
+                        @foreach (var item in Model.MonthlyFinanceByCurrencies)
+                        {
+                            var netCssClass = item.IsProfitable
+                            ? "text-success"
+                            : "text-danger";
+
+                            var netIcon = item.IsProfitable
+                            ? "bi-arrow-up-right"
+                            : "bi-arrow-down-right";
+
+                            <div class="monthly-finance-row">
+
+                                <div class="monthly-finance-currency">
+                                    @item.CurrencyCode
+                                </div>
+
+                                <div class="monthly-finance-values">
+                                    <span class="finance-revenue" title="Revenue">
+                                        <i class="bi bi-arrow-down-left"></i>
+                                        @item.RevenueAmount.ToString("N0")
+                                    </span>
+
+                                    <span class="finance-expense" title="Expenses">
+                                        <i class="bi bi-arrow-up-right"></i>
+                                        @item.ExpenseAmount.ToString("N0")
+                                    </span>
+
+                                    <span class="finance-net @netCssClass" title="Net">
+                                        <i class="bi @netIcon"></i>
+                                        @item.NetAmount.ToString("N0")
+                                    </span>
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+
+                    <div class="monthly-finance-legend mt-2">
+                        <span class="text-success">
+                            <i class="bi bi-arrow-down-left"></i> Revenue
+                        </span>
+
+                        <span class="text-danger">
+                            <i class="bi bi-arrow-up-right"></i> Expenses
+                        </span>
+
+                        <span class="text-primary">
+                            <i class="bi bi-calculator"></i> Net
+                        </span>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-muted small mt-2">
+                        No financial activity for this month
+                    </div>
+                }
+            </div>
+        </div>
+ *@
+
+
+
+        <!-- Customs Clearance -->
+        @*     <div class="col-xl-3 col-md-6 fade-in fade-in-delay-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(255,171,0,0.1); color: var(--sneat-warning);">
+                <i class="bi bi-shield-check"></i>
+            </div>
+            <div class="stat-value">94.2%</div>
+            <div class="stat-label">Clearance Rate</div>
+            <div class="stat-change text-warning">
+                <i class="bi bi-dash"></i> -0.5% vs last month
+            </div>
+        </div>
+    </div>
+ *@
+
+
+        <!-- Transport Distribution (Doughnut) -->
+        @*         <div class="col-xl-3 col-md-6 fade-in fade-in-delay-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body pt-0 d-flex flex-column align-items-center justify-content-center">
+                    <div style="position:relative; height:220px; width:220px;">
+                        <canvas id="chartDoughnut"></canvas>
+                    </div>
+                    <div class="d-flex flex-wrap gap-3 mt-3 small justify-content-center">
+                        <span><i class="bi bi-circle-fill text-primary me-1"></i>Sea 45%</span>
+                        <span><i class="bi bi-circle-fill me-1" style="color:#36b9cc"></i>Air 25%</span>
+                        <span><i class="bi bi-circle-fill me-1" style="color:#f6c23e"></i>Road 20%</span>
+                        <span><i class="bi bi-circle-fill me-1" style="color:#1cc88a"></i>Rail 10%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+ *@
+
+
+
+        <!-- Customer Growth - Last 6 Months -->
+        <div class="col-xl-3 col-md-6 fade-in fade-in-delay-4">
+            <div class="stat-card h-100">
+
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="stat-icon"
+                         style="background: rgba(3,195,236,0.1); color: var(--sneat-info);">
+                        <i class="bi bi-people"></i>
+                    </div>
+
+                    <span class="badge bg-label-info">
+                        Last 6 Months
+                    </span>
+                </div>
+
+                <div class="stat-label mt-3">
+                    Customer Growth
+                </div>
+
+                <div class="customer-growth-summary">
+                    <div class="stat-value customer-total-value">
+                        @Model.CustomerGrowth.TotalCustomers.ToString("N0")
+                    </div>
+
+                    <div class="small text-muted">
+                        New Customers
+                    </div>
+                </div>
+
+                <div class="customer-growth-chart-wrapper">
+                    <canvas id="customerGrowthChart"></canvas>
+                </div>
+
+                @{
+                    var customerChangeClass =
+                    Model.CustomerGrowth.IsIncrease
+                    ? "text-success"
+                    : "text-danger";
+
+                    var customerChangeIcon =
+                    Model.CustomerGrowth.IsIncrease
+                    ? "bi-arrow-up-short"
+                    : "bi-arrow-down-short";
+                }
+
+                <div class="stat-change @customerChangeClass mt-2">
+                    <i class="bi @customerChangeIcon"></i>
+
+                    @if (Model.CustomerGrowth.PreviousMonthCount == 0)
+                    {
+                        <span>
+                            @Model.CustomerGrowth.CurrentMonthCount.ToString("N0")
+                            new this month
+                        </span>
+                    }
+                    else
+                    {
+                        <span>
+                            @Math.Abs(Model.CustomerGrowth.ChangePercent).ToString("N1")%
+                            vs last month
+                        </span>
+                    }
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+        <div class="col-xl-3 col-md-6 fade-in fade-in-delay-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body pt-0 d-flex flex-column align-items-center justify-content-center">
+
+                    <div class="stat-label align-self-start mt-3 mb-2">
+                        Transportation Mode
+                    </div>
+
+                    @if (Model.TransportationModes?.Any() == true)
+                    {
+                        <div style="position: relative; height: 220px; width: 220px;">
+                            <canvas id="chartDoughnut"></canvas>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-3 mt-3 small justify-content-center">
+                            @foreach (var item in Model.TransportationModes)
+                            {
+                                <span class="text-nowrap">
+                                    <i class="bi bi-circle-fill me-1"
+                                       style="color: @item.Color"></i>
+                                    @item.Title @item.Percentage.ToString("N0")%
+                                </span>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-muted small py-5">
+                            No jobs found for this month.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <div class="row g-3 mb-4">
+        <!-- Shipment Volume (Line Chart) -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-semibold">Shipment Volume</h6>
+
+                    <div class="btn-group btn-group-sm" id="shipmentVolumeRangeButtons">
+                        <button type="button"
+                                class="btn btn-outline-secondary active"
+                                data-range="weekly">
+                            Week
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                data-range="monthly">
+                            Month
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                data-range="yearly">
+                            Year
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-body pt-0">
+                    <div style="position:relative; height:300px;">
+                        <canvas id="chartVolume"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Transport Distribution (Doughnut) -->
+        @*     <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0">
+                <h6 class="mb-0 fw-semibold">Transport Mode</h6>
+            </div>
+            <div class="card-body pt-0 d-flex flex-column align-items-center justify-content-center">
+                <div style="position:relative; height:220px; width:220px;">
+                    <canvas id="chartDoughnut"></canvas>
+                </div>
+                <div class="d-flex flex-wrap gap-3 mt-3 small justify-content-center">
+                    <span><i class="bi bi-circle-fill text-primary me-1"></i>Sea 40%</span>
+                    <span><i class="bi bi-circle-fill me-1" style="color:#36b9cc"></i>Air 25%</span>
+                    <span><i class="bi bi-circle-fill me-1" style="color:#f6c23e"></i>Road 20%</span>
+                    <span><i class="bi bi-circle-fill me-1" style="color:#1cc88a"></i>Rail 10%</span>
+                    <span><i class="bi bi-circle-fill text-secondary me-1"></i>MultiModal 5%</span>
+                </div>
+            </div>
+        </div>
+    </div> *@
+
+        <div class="col-lg-4" id="dashboard-tasks-container"
+             hx-get="@Url.Action("DashboardWidget", "AppTasks")"
+             hx-trigger="load"
+             hx-target="#dashboard-tasks-container"
+             hx-swap="innerHTML">
+        </div>
+
+    </div>
+
+
+
+    <div class="row g-3 mb-4">
+        <!-- Top Shipping Routes -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-header bg-transparent border-0">
+                    <h6 class="mb-0 fw-semibold">
+                        Top Shipping Routes
+                    </h6>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Route</th>
+                                    <th class="text-center">Shipments</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @if (Model.TopShippingRoutes?.Any() == true)
+                                {
+                                    foreach (var route in Model.TopShippingRoutes)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="shipping-route">
+                                                    @route.Route
+                                                </div>
+                                            </td>
+
+                                            <td class="text-center">
+                                                <span lass="shipment-count">
+                                                    @route.ShipmentCount.ToString("N0")
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="2"
+                                            class="text-center text-muted py-4">
+                                            No shipping routes found.
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+
+        <div class="col-lg-4" id="dashboard-activity-container"
+             hx-get="@Url.Action("ActivityFeedWidget", "Home")"
+             hx-trigger="load, every 60s"
+             hx-target="#dashboard-activity-container"
+             hx-swap="innerHTML">
+        </div>
+    </div>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="appTaskDrawer" style="width: 720px;">
+        <div class="offcanvas-body p-0" id="appTaskDrawerContent"></div>
+    </div>
+
+
+
+
+
+
+    <!-- Recent Shipments Table -->
+    @* <div class="data-card fade-in">
+    <div class="card-header">
+        <h5><i class="bi bi-box-seam me-2"></i>Recent Shipments</h5>
+        <a asp-controller="Shipment" asp-action="Index" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-eye me-1"></i> View All
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="sneat-table">
+                <thead>
+                    <tr>
+                        <th>Tracking ID</th>
+                        <th>Customer</th>
+                        <th>Origin</th>
+                        <th>Destination</th>
+                        <th>Mode</th>
+                        <th>Status</th>
+                        <th>ETA</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong style="color:var(--sneat-primary)">#TG-24-00891</strong></td>
+                        <td>Siemens AG</td>
+                        <td>Hamburg, DE</td>
+                        <td>Shanghai, CN</td>
+                        <td>
+                            <span class="transport-mode">
+                                <i class="bi bi-water text-info"></i> Sea
+                            </span>
+                        </td>
+                        <td><span class="status-badge status-in-transit">In Transit</span></td>
+                        <td>Mar 15, 2026</td>
+                        <td>
+                            <button class="action-btn" title="View"><i class="bi bi-eye"></i></button>
+                            <button class="action-btn" title="Edit"><i class="bi bi-pencil"></i></button>
+                            <button class="action-btn" title="More"><i class="bi bi-three-dots-vertical"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color:var(--sneat-primary)">#TG-24-00890</strong></td>
+                        <td>Toyota Motors</td>
+                        <td>Nagoya, JP</td>
+                        <td>Los Angeles, US</td>
+                        <td>
+                            <span class="transport-mode">
+                                <i class="bi bi-water text-info"></i> Sea
+                            </span>
+                        </td>
+                        <td><span class="status-badge status-customs">In Customs</span></td>
+                        <td>Mar 08, 2026</td>
+                        <td>
+                            <button class="action-btn" title="View"><i class="bi bi-eye"></i></button>
+                            <button class="action-btn" title="Edit"><i class="bi bi-pencil"></i></button>
+                            <button class="action-btn" title="More"><i class="bi bi-three-dots-vertical"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color:var(--sneat-primary)">#TG-24-00889</strong></td>
+                        <td>Samsung Electronics</td>
+                        <td>Incheon, KR</td>
+                        <td>Dubai, AE</td>
+                        <td>
+                            <span class="transport-mode">
+                                <i class="bi bi-airplane text-primary"></i> Air
+                            </span>
+                        </td>
+                        <td><span class="status-badge status-delivered">Delivered</span></td>
+                        <td>Feb 28, 2026</td>
+                        <td>
+                            <button class="action-btn" title="View"><i class="bi bi-eye"></i></button>
+                            <button class="action-btn" title="Edit"><i class="bi bi-pencil"></i></button>
+                            <button class="action-btn" title="More"><i class="bi bi-three-dots-vertical"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color:var(--sneat-primary)">#TG-24-00888</strong></td>
+                        <td>BASF SE</td>
+                        <td>Rotterdam, NL</td>
+                        <td>Mumbai, IN</td>
+                        <td>
+                            <span class="transport-mode">
+                                <i class="bi bi-water text-info"></i> Sea
+                            </span>
+                        </td>
+                        <td><span class="status-badge status-in-transit">In Transit</span></td>
+                        <td>Mar 22, 2026</td>
+                        <td>
+                            <button class="action-btn" title="View"><i class="bi bi-eye"></i></button>
+                            <button class="action-btn" title="Edit"><i class="bi bi-pencil"></i></button>
+                            <button class="action-btn" title="More"><i class="bi bi-three-dots-vertical"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color:var(--sneat-primary)">#TG-24-00887</strong></td>
+                        <td>Nestlé SA</td>
+                        <td>Zurich, CH</td>
+                        <td>São Paulo, BR</td>
+                        <td>
+                            <span class="transport-mode">
+                                <i class="bi bi-airplane text-primary"></i> Air
+                            </span>
+                        </td>
+                        <td><span class="status-badge status-delayed">Delayed</span></td>
+                        <td>Mar 05, 2026</td>
+                        <td>
+                            <button class="action-btn" title="View"><i class="bi bi-eye"></i></button>
+                            <button class="action-btn" title="Edit"><i class="bi bi-pencil"></i></button>
+                            <button class="action-btn" title="More"><i class="bi bi-three-dots-vertical"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color:var(--sneat-primary)">#TG-24-00886</strong></td>
+                        <td>Apple Inc.</td>
+                        <td>Shenzhen, CN</td>
+                        <td>New York, US</td>
+                        <td>
+                            <span class="transport-mode">
+                                <i class="bi bi-airplane text-primary"></i> Air
+                            </span>
+                        </td>
+                        <td><span class="status-badge status-pending">Pending</span></td>
+                        <td>Mar 10, 2026</td>
+                        <td>
+                            <button class="action-btn" title="View"><i class="bi bi-eye"></i></button>
+                            <button class="action-btn" title="Edit"><i class="bi bi-pencil"></i></button>
+                            <button class="action-btn" title="More"><i class="bi bi-three-dots-vertical"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+ *@
+
+    @section Styles {
+        @* Page-specific styles can go here *@
+    }
+
+    @section Scripts {
+        <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const transportationModes = @Html.Raw(
+                                                                                                                                        JsonSerializer.Serialize(Model.TransportationModes ?? [])
+                                                                                                        );
+
+    const chartCanvas = document.getElementById('chartDoughnut');
+
+                            if (!chartCanvas || !transportationModes.length) {
+                                return;
+                            }
+
+                            new Chart(chartCanvas, {
+                                type: 'doughnut',
+                                data: {
+                                    labels: transportationModes.map(x => x.Title),
+                                    datasets: [{
+                                        data: transportationModes.map(x => x.Count),
+                                        backgroundColor: transportationModes.map(x => x.Color),
+                                        borderWidth: 0,
+                                        hoverOffset: 8
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    cutout: '68%',
+                                    plugins: {
+                                        legend: {
+                                            display: false
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (context) {
+                                                    const item = transportationModes[context.dataIndex];
+
+                                                    return `${item.Title}: ${item.Count.toLocaleString()} Jobs (${item.Percentage}%)`;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        });
+        </script>
+
+
+
+
+
+
+        <script>
+
+                            const colors = {
+                            primary: '#4e73df',
+                            success: '#1cc88a',
+                            info: '#36b9cc',
+                            warning: '#f6c23e',
+                            danger: '#e74a3b',
+                            secondary: '#858796',
+                            light: '#f8f9fc'
+                            };
+
+                            // ===== HELPER: get CSS var or fallback =====
+                            function textColor() {
+                            return getComputedStyle(document.documentElement)
+                            .getPropertyValue('--bs-body-color').trim() || '#333';
+                            }
+                            function gridColor() {
+                            return 'rgba(128,128,128,0.15)';
+                            }
+
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const initialChartData = @Html.Raw(
+                                                                                JsonSerializer.Serialize(
+                                                                                                                Model.ShipmentVolume,
+                                                                                                                new JsonSerializerOptions
+                                                                                                                {
+                                                                                                                                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                                                                                                                })
+                                                );
+
+    const chartCanvas = document.getElementById('chartVolume');
+
+                            if (!chartCanvas) {
+                                return;
+                            }
+
+                            const volumeChart = new Chart(chartCanvas, {
+                                type: 'line',
+                                data: {
+                                    labels: initialChartData.labels,
+                                    datasets: [
+                                        {
+                                            label: initialChartData.currentPeriodLabel,
+                                            data: initialChartData.currentPeriodData,
+                                            borderColor: colors.primary,
+                                            backgroundColor: 'rgba(78,115,223,0.12)',
+                                            fill: true,
+                                            tension: 0.4,
+                                            pointRadius: 4,
+                                            pointBackgroundColor: '#fff',
+                                            pointBorderWidth: 2
+                                        },
+                                        {
+                                            label: initialChartData.previousPeriodLabel,
+                                            data: initialChartData.previousPeriodData,
+                                            borderColor: colors.secondary,
+                                            backgroundColor: 'transparent',
+                                            borderDash: [5, 5],
+                                            fill: false,
+                                            tension: 0.4,
+                                            pointRadius: 3,
+                                            pointBackgroundColor: '#fff',
+                                            pointBorderWidth: 2
+                                        }
+                                    ]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            position: 'top',
+                                            labels: {
+                                                usePointStyle: true,
+                                                padding: 20,
+                                                color: textColor()
+                                            }
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (context) {
+                                                    return `${context.dataset.label}: ${context.raw.toLocaleString()} Jobs`;
+                                                }
+                                            }
+                                        }
+                                    },
+                                    scales: {
+                                        x: {
+                                            grid: {
+                                                display: false
+                                            },
+                                            ticks: {
+                                                color: textColor()
+                                            }
+                                        },
+                                        y: {
+                                            beginAtZero: true,
+                                            ticks: {
+                                                precision: 0,
+                                                color: textColor(),
+                                                callback: function (value) {
+                                                    return value.toLocaleString();
+                                                }
+                                            },
+                                            grid: {
+                                                color: gridColor()
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+
+                            function updateShipmentVolumeChart(chartData) {
+                                volumeChart.data.labels = chartData.labels;
+
+                                volumeChart.data.datasets[0].label = chartData.currentPeriodLabel;
+                                volumeChart.data.datasets[0].data = chartData.currentPeriodData;
+
+                                volumeChart.data.datasets[1].label = chartData.previousPeriodLabel;
+                                volumeChart.data.datasets[1].data = chartData.previousPeriodData;
+
+                                volumeChart.update();
+                            }
+
+                            document.querySelectorAll('#shipmentVolumeRangeButtons button')
+                                .forEach(function (button) {
+                                    button.addEventListener('click', async function () {
+                                        const range = this.dataset.range;
+
+                                        if (!range || this.classList.contains('active')) {
+                                            return;
+                                        }
+
+                                        const buttons = document.querySelectorAll(
+                                            '#shipmentVolumeRangeButtons button'
+                                        );
+
+                                        buttons.forEach(btn => btn.disabled = true);
+
+                                        try {
+                                            const response = await fetch(
+                                                `@Url.Action("ShipmentVolumeData", "Home")?range=${encodeURIComponent(range)}`,
+                                                {
+                                                    headers: {
+                                                        'X-Requested-With': 'XMLHttpRequest'
+                                                    }
+                                                }
+                                            );
+
+                                            if (!response.ok) {
+                                                throw new Error('Unable to load shipment volume data.');
+                                            }
+
+                                            const chartData = await response.json();
+
+                                            updateShipmentVolumeChart(chartData);
+
+                                            buttons.forEach(btn => btn.classList.remove('active'));
+                                            this.classList.add('active');
+                                        }
+                                        catch (error) {
+                                            console.error(error);
+                                        }
+                                        finally {
+                                            buttons.forEach(btn => btn.disabled = false);
+                                        }
+                                    });
+                                });
+                        });
+        </script>
+
+
+        <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const customerGrowthData = @Html.Raw(
+                                        JsonSerializer.Serialize(
+                                                        Model.CustomerGrowth,
+                                                        new JsonSerializerOptions
+                                                        {
+                                                                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                                                        })
+                        );
+
+    const chartCanvas =
+        document.getElementById('customerGrowthChart');
+
+                    if (!chartCanvas) {
+                        return;
+                    }
+
+                    const chartContext = chartCanvas.getContext('2d');
+
+                    const gradient = chartContext.createLinearGradient(
+                        0,
+                        0,
+                        0,
+                        120
+                    );
+
+                    gradient.addColorStop(
+                        0,
+                        'rgba(3, 195, 236, 0.30)'
+                    );
+
+                    gradient.addColorStop(
+                        1,
+                        'rgba(3, 195, 236, 0.02)'
+                    );
+
+                    new Chart(chartCanvas, {
+                        type: 'line',
+                        data: {
+                            labels: customerGrowthData.labels,
+                            datasets: [
+                                {
+                                    label: 'New Customers',
+                                    data: customerGrowthData.counts,
+                                    borderColor: '#03c3ec',
+                                    backgroundColor: gradient,
+                                    fill: true,
+                                    tension: 0.4,
+                                    pointRadius: 3,
+                                    pointHoverRadius: 5,
+                                    pointBackgroundColor: '#ffffff',
+                                    pointBorderColor: '#03c3ec',
+                                    pointBorderWidth: 2
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            return `${context.raw.toLocaleString()} new customers`;
+                                        }
+                                    }
+                                }
+                            },
+
+                            scales: {
+                                x: {
+                                    grid: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        color: '#697a8d',
+                                        maxRotation: 45,
+                                        minRotation: 0,
+                                        font: {
+                                            size: 9
+                                        }
+                                    }
+                                },
+
+                                y: {
+                                    beginAtZero: true,
+                                    suggestedMax: 5,
+                                    grid: {
+                                        color: 'rgba(67, 89, 113, 0.10)'
+                                    },
+                                    ticks: {
+                                        precision: 0,
+                                        color: '#697a8d',
+                                        font: {
+                                            size: 9
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
+        </script>
+
+
+
+
+    }
+}
+
+
+
+
+
+

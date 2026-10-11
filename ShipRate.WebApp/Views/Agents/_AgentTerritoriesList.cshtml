@@ -1,0 +1,69 @@
+﻿@using ShipRate.WebApp.ViewModels.AgentVms
+@model AgentTerritoriesListViewModel
+
+<div class="card mt-4">
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>
+            Territories for Agent: <strong>@Model.AgentName</strong>
+        </span>
+
+        <button class="btn btn-success btn-sm"
+                hx-get="/Agents/CreateTerritory?agentId=@Model.AgentId"
+                hx-target="#modal-content"
+                hx-swap="innerHTML"
+                data-bs-toggle="modal"
+                data-bs-target="#modal-content">
+            <i class="bi bi-plus-circle"></i> New Territory
+        </button>
+    </div>
+
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Territory Name</th>
+                    <th>Status</th>
+                    <th style="width:150px;">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var terr in Model.Items)
+                {
+                    <tr>
+                        <td>@terr.TerritoryName</td>
+
+                        <td>
+                            <span class="badge @(terr.IsActive ? "bg-success" : "bg-secondary")">
+                                @(terr.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <button class="btn btn-sm btn-warning"
+                                    hx-get="/Agents/EditTerritory?id=@terr.Id"
+                                    hx-target="#modal-content"
+                                    hx-swap="innerHTML"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modal-content">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <button class="btn btn-sm btn-danger"
+                                    hx-delete="/Agents/DeleteTerritory/@terr.Id"
+                                    hx-confirm="Are you sure?"
+                                    hx-target="#agentTerritoriesContainer"
+                                    hx-swap="innerHTML">
+                                <i class="bi bi-trash"></i>
+                            </button>
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

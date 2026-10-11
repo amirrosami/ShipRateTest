@@ -1,0 +1,72 @@
+﻿@using ShipRate.Application.DTOs.UserTeams
+@model List<UserTeamMemberDto>
+
+@{
+    var teamId = ViewBag.TeamId;
+}
+
+<div id="membersGrid">
+
+    <div class="mb-2">
+
+        <button class="btn btn-success btn-sm"
+                hx-get="/UserTeams/CreateMember?teamId=@teamId"
+                hx-target="#app-modal-content"
+                hx-swap="innerHTML">
+            Add Member
+        </button>
+
+    </div>
+
+    <table class="table table-sm table-striped">
+
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Role</th>
+                <th width="100"></th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @if (Model == null || !Model.Any())
+            {
+                <tr>
+                    <td colspan="3" class="text-center text-muted">
+                        No members found
+                    </td>
+                </tr>
+            }
+            else
+            {
+                foreach (var m in Model)
+                {
+                    <tr>
+
+                        <td>@m.FullName</td>
+
+                        <td>@m.MemberRole</td>
+
+                        <td>
+
+                            <button class="btn btn-danger btn-sm"
+                                    hx-post="/UserTeams/DeleteMember"
+                                    hx-vals='{"id":"@m.Id","teamId":"@teamId"}'
+                                    hx-target="#membersGrid"
+                                    hx-swap="outerHTML"
+                                    hx-confirm="Remove this member?">
+                                Delete
+                            </button>
+
+                        </td>
+
+                    </tr>
+                }
+            }
+
+        </tbody>
+
+    </table>
+
+</div>

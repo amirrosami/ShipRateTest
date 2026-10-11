@@ -1,0 +1,315 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model InvoiceEditVm
+<style>
+    /* ───── گرید Excel-like ───── */
+    .excel-grid {
+        display: grid;
+        gap: 0;
+        border: 1px solid #d1d9e0;
+    }
+
+    .excel-grid-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .excel-grid-4 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* ───── فیلد افقی: Label | Input ───── */
+    .excel-field {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+        border: 0.5px solid #d1d9e0;
+        background: #fff;
+        padding: 3px 6px;
+        position: relative;
+        width: 100%;
+    }
+
+        .excel-field > label {
+            width: 130px;
+            min-width: 130px;
+            font-size: 13px; /* فونت بزرگ‌تر برای Label */
+            font-weight: 600;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            background: #eef6ff;
+            padding: 5px 8px;
+            border-radius: 3px;
+            text-align: start;
+            flex-shrink: 0;
+        }
+
+    /* باکس دربرگیرنده کنترل جهت پر کردن کامل سلول */
+    .excel-input-wrap {
+        flex: 1 1 auto;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+
+    .excel-field input,
+    .excel-field select,
+    .excel-field textarea {
+        width: 100% !important;
+        font-size: 14px !important; /* فونت بزرگ‌تر برای ورودی‌ها */
+        padding: 4px 8px;
+    }
+
+    .excel-field select {
+        cursor: pointer;
+    }
+
+    /* ───── عرض ستون‌ها ───── */
+    .excel-field.span-2 {
+        grid-column: span 2;
+    }
+
+    .excel-field.span-3 {
+        grid-column: span 3;
+    }
+
+    /* ───── فوکوس زرد فقط روی خود کنترل (Input/Select/Textarea) ───── */
+    .excel-field input:focus,
+    .excel-field select:focus,
+    .excel-field textarea:focus,
+    #PartyNameDisplay:focus {
+        background-color: #fff9c4 !important; /* زرد کم‌رنگ برای ورودی */
+        border-color: #ffc107 !important;
+        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25) !important;
+        outline: none;
+    }
+
+    /* ───── پیام‌های خطا ───── */
+    .excel-field span.text-danger {
+        position: absolute;
+        bottom: -6px;
+        right: 6px;
+        font-size: 11px;
+        background: #fff;
+        padding: 0 4px;
+        border-radius: 2px;
+        white-space: nowrap;
+        z-index: 2;
+    }
+</style>
+
+<form hx-post="@Url.Action("SaveHeader", "Invoices")"
+      hx-target="#invoice-modal-content"
+      hx-swap="innerHTML">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="PartyId" />
+    <input type="hidden" asp-for="JobId" />
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+    <div class="excel-grid excel-grid-3">
+        <!-- ردیف ۱ -->
+        <div class="excel-field">
+            <label asp-for="CompanyId">Company</label>
+            <div class="excel-input-wrap">
+                <select asp-for="CompanyId" class="form-select form-select-sm w-100">
+                    <option value="">Select...</option>
+                    @foreach (var item in Model.Companies)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+                <span asp-validation-for="CompanyId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="excel-field">
+            <label asp-for="BranchId">Branch</label>
+            <div class="excel-input-wrap">
+                <select asp-for="BranchId" class="form-select form-select-sm w-100">
+                    <option value="">Select...</option>
+                    @foreach (var item in Model.Branches)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+                <span asp-validation-for="BranchId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="excel-field">
+            <label asp-for="FinanceDirectionId">Sell/Buy</label>
+            <div class="excel-input-wrap">
+                <select asp-for="FinanceDirectionId" class="form-select form-select-sm w-100">
+                    <option value="">Select...</option>
+                    @foreach (var item in Model.FinanceDirections)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+                <span asp-validation-for="FinanceDirectionId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- ردیف ۲ -->
+        <div class="excel-field">
+            <label asp-for="FNFId">F/NF</label>
+            <div class="excel-input-wrap">
+                <select asp-for="FNFId" class="form-select form-select-sm w-100">
+                    <option value="">Select...</option>
+                    @foreach (var item in Model.FNFS)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+                <span asp-validation-for="FNFId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="excel-field">
+            <label asp-for="InvoiceModelId">Invoice Model</label>
+            <div class="excel-input-wrap">
+                <select asp-for="InvoiceModelId" class="form-select form-select-sm w-100">
+                    <option value="">Select...</option>
+                    @foreach (var item in Model.InvoiceModels)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+                <span asp-validation-for="InvoiceModelId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="excel-field">
+            <label asp-for="InvoiceSubjectId">Invoice Subject</label>
+            <div class="excel-input-wrap">
+                <select asp-for="InvoiceSubjectId" class="form-select form-select-sm w-100">
+                    <option value="">Select...</option>
+                    @foreach (var item in Model.InvoiceSubjects)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+                <span asp-validation-for="InvoiceSubjectId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- ردیف ۳ -->
+        <div class="excel-field">
+            <label asp-for="InvoiceSubjectTitle">Invoice Title</label>
+            <div class="excel-input-wrap">
+                <input asp-for="InvoiceSubjectTitle" class="form-control form-control-sm w-100" />
+                <span asp-validation-for="InvoiceSubjectTitle" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="excel-field">
+            <label asp-for="BLId">BL</label>
+            <div class="excel-input-wrap">
+                <select asp-for="BLId" class="form-select form-select-sm w-100">
+                    <option value="">Select...</option>
+                    @foreach (var item in Model.BLs)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+                <span asp-validation-for="BLId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="excel-field">
+            <label asp-for="BookingId">Booking</label>
+            <div class="excel-input-wrap">
+                <select asp-for="BookingId" class="form-select form-select-sm w-100">
+                    <option value="">Select...</option>
+                    @foreach (var item in Model.Bookings)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+                <span asp-validation-for="BookingId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="excel-field">
+            <label asp-for="CurrencyId">Currency</label>
+            <div class="excel-input-wrap">
+                <select asp-for="CurrencyId" class="form-select form-select-sm w-100">
+                    <option value="">Select...</option>
+                    @foreach (var item in Model.Currencies)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+                <span asp-validation-for="CurrencyId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- ردیف ۴ -->
+        <div class="excel-field">
+            <label asp-for="InvoiceNo">Invoice No</label>
+            <div class="excel-input-wrap">
+                <input asp-for="InvoiceNo" class="form-control form-control-sm w-100" />
+                <span asp-validation-for="InvoiceNo" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="excel-field">
+            <label asp-for="InvoiceDate">Invoice Date</label>
+            <div class="excel-input-wrap">
+                <input asp-for="InvoiceDate" type="date" class="form-control form-control-sm w-100" />
+                <span asp-validation-for="InvoiceDate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="excel-field">
+            <label asp-for="DueDate">Due Date</label>
+            <div class="excel-input-wrap">
+                <input asp-for="DueDate" type="date" class="form-control form-control-sm w-100" />
+                <span asp-validation-for="DueDate" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- ردیف ۵ -->
+        <div class="excel-field">
+            <label asp-for="DefaultTaxPercent">Default VAT %</label>
+            <div class="excel-input-wrap">
+                <input asp-for="DefaultTaxPercent" class="form-control form-control-sm w-100" />
+                <span asp-validation-for="DefaultTaxPercent" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="excel-field span-2">
+            <!-- جای خالی دو سلول بعدی برای حفظ تقارن گرید -->
+        </div>
+
+        <!-- ردیف ۶: Party — تمام‌عرض (span-3) -->
+        <div class="excel-field span-3">
+            <label>Party</label>
+            <div class="excel-input-wrap gap-2">
+                <span id="PartyNameDisplay" class="form-control form-control-sm bg-light text-truncate flex-grow-1" tabindex="0">
+                    @(string.IsNullOrWhiteSpace(Model.PartyName) ? "Select Party..." : Model.PartyName)
+                </span>
+                <!-- دکمه‌ها کاملاً چسبیده به انتهای خط -->
+                <div class="d-flex gap-1 flex-shrink-0 ms-auto">
+                    <button type="button" class="btn btn-sm btn-outline-primary px-3"
+                            hx-get="@Url.Action("PartyLookupModal", "Invoices", new { jobId = Model.JobId })"
+                            hx-target="#party-lookup-modal-content" hx-swap="innerHTML"
+                            onclick="openPartyLookupModal()">
+                        Select
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger px-3" onclick="clearSelectedParty()">Clear</button>
+                </div>
+                <span asp-validation-for="PartyId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- ردیف ۷: Remarks — تمام‌عرض (span-3) -->
+        <div class="excel-field span-3">
+            <label asp-for="Remarks">Remarks In Invoice</label>
+            <div class="excel-input-wrap">
+                <textarea asp-for="Remarks" class="form-control form-control-sm w-100" rows="2"></textarea>
+                <span asp-validation-for="Remarks" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- دکمه‌های اکشن فرم -->
+    <div class="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary btn-sm px-3">Save Header</button>
+    </div>
+</form>

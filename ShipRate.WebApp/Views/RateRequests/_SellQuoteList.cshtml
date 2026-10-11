@@ -1,0 +1,256 @@
+﻿@using ShipRate.WebApp.ViewModels
+@* @model List<SellQuoteListViewModel> *@
+
+@model SellQuoteListIndex
+
+
+<style>
+    .action-icon-btn {
+        width: 32px;
+        height: 32px;
+        padding: 0 !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .badge-purple {
+        background-color: #6f42c1 !important; /* رنگ بنفش استاندارد Bootstrap (Purple) */
+        color: #fff !important;
+    }
+
+
+</style>
+
+@Html.AntiForgeryToken()
+<div class="card">
+    <div class="card-header bg-info text-white">
+        <div class="d-flex justify-content-between">
+            <h5 class="mb-0">
+                <i class="bi bi-list-ul"></i> Quotations Sent To Customer : @ViewBag.RequestNo
+            </h5>
+            <button class="btn btn-primary px-4 shadow-sm"
+                    hx-get="@Url.Action("CreateSellQuote", "RateRequests", new { rateRequestId = Model.RateRequestId })"
+                    hx-target="#modal-content"
+                    hx-trigger="click">
+                <i class="bi bi-currency-exchange me-2"></i> + Add New Sell Quote
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (Model.SellQuotesList.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Quotation No</th>
+                            <th>Quotation Date</th>
+                            <th>TransportationBy</th>
+                            <th>ETA</th>
+                            <th>ETD</th>
+                            <th>Valid Until</th>
+                            <th>Status</th>
+                            <th>Create User</th>
+                            <th>Last Edit User</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var q in Model.SellQuotesList)
+                        {
+                            var badgeClass = q.StatusId switch
+                            {
+                                1 => "bg-secondary",
+                                2 => "bg-primary",
+                                3 => "bg-success",
+                                4 => "bg-danger",
+                                7 => "badge-purple",
+                                _ => "bg-secondary"
+                            };
+
+                            <tr>
+                                <td>@q.QuotationNo</td>
+                                <td>@q.QuotationDate?.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>@q.TransportMovementNo</td>
+                                <td>@q.ETA?.ToString("yyyy-MM-dd")</td>
+                                <td>@q.ETD?.ToString("yyyy-MM-dd")</td>
+                                <td>@q.ValidUntil</td>
+                                <td>
+                                    <span class="badge @badgeClass">
+                                        @q.Status
+                                    </span>
+                                </td>
+                                <td>@q.CreateUserName</td>
+                                <td>@q.UpdateUserName</td>
+                                <td>
+                                    <div class="d-flex gap-1 flex-nowrap">
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-info action-icon-btn"
+                                                title="Preview"
+                                                onclick="previewsellQuoteEmail('@q.Id')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-warning action-icon-btn"
+                                                title="Edit"
+                                                hx-get="/RateRequests/EditSellQuote/@q.Id"
+                                                hx-target="#modal-content"
+                                                hx-swap="innerHTML"
+                                                hx-trigger="click">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-success action-icon-btn"
+                                                title="Charges List"
+                                                hx-get="/RateRequests/GetSellQuoteItems?quoteId=@q.Id"
+                                                hx-target="#sellQuoteItemsListContainer"
+                                                hx-swap="innerHTML">
+                                            <i class="bi bi-cash-stack"></i>
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-secondary action-icon-btn"
+                                                title="Details"
+                                                hx-get="/RateRequests/GetSellQuoteDetails?quoteId=@q.Id"
+                                                hx-target="#modal-content"
+                                                hx-swap="innerHTML">
+                                            <i class="bi bi-card-list"></i>
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-success action-icon-btn"
+                                                title="Send Email"
+                                                onclick="sendSellQuoteEmail('@q.Id')">
+                                            <i class="bi bi-send"></i>
+                                        </button>
+
+@*                                         <button type="button"
+                                                class="btn btn-sm btn-outline-primary action-icon-btn"
+                                                title="Send InApp"
+                                                hx-post="/RateRequests/SendSellQuoteInApp?quoteId=@q.Id"
+                                                hx-confirm="Send In App this sell quotation response to customer?"
+                                                hx-target="#inquiryListContainer"
+                                                hx-swap="innerHTML">
+                                            <i class="bi bi-send"></i>
+                                        </button>
+ *@
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-success action-icon-btn"
+                                                title="Accept InApp"
+                                                hx-get="/RateRequests/AcceptSellQuoteInApp?quoteId=@q.Id"
+                                                hx-target="#modal-content"
+                                                hx-swap="innerHTML">
+                                            <i class="bi bi-check-circle"></i>
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-danger action-icon-btn"
+                                                title="Reject InApp"
+                                                hx-get="/RateRequests/RejectSellQuoteInApp?quoteId=@q.Id"
+                                                hx-confirm="Reject In App this sell quotation response to customer?"
+                                                hx-target="#modal-content"
+                                                hx-swap="innerHTML">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-dark action-icon-btn"
+                                                title="Generate Job"
+                                                hx-get="/RateRequests/GenerateJobFromQuote?quoteId=@q.Id"
+                                                hx-confirm="Are you sure you want to generate a new job?"
+                                                hx-target="#modal-content"
+                                                hx-swap="innerHTML">
+                                            <i class="bi bi-briefcase"></i>
+                                        </button>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info mb-0">
+                <i class="bi bi-info-circle"></i> No Responds found for this rate request(send to customer).
+            </div>
+        }
+    </div>
+
+
+    <div id="emailPreviewContainer"></div>
+    <div class="modal fade" id="emailPreviewModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Sell Quotation Response Email Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body p-0">
+                    <iframe id="emailPreviewFrame"
+                            style="width:100%; height:750px; border:0;">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+    <div class="card-footer text-end">
+        <button class="btn btn-sm btn-secondary" onclick="document.getElementById('SellQuotesListContainer').innerHTML = ''">
+            <i class="bi bi-x-circle"></i> Close
+        </button>
+    </div>
+</div>
+<script>
+    function previewsellQuoteEmail(quoteId) {
+        const iframe = document.getElementById('emailPreviewFrame');
+        iframe.src = '/RateRequests/PreviewSellQuoteEmailFromService?quoteId=' + quoteId ;
+        const modalElement = document.getElementById('emailPreviewModal');
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+    }
+    function sendSellQuoteEmail(quoteId) {
+        if (!confirm('Are you sure to send this email?')) {
+            return;
+        }
+
+        fetch('/RateRequests/SendSellQuoteEmail', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': getAntiForgeryToken()
+            },
+            body: 'quoteId=' + quoteId
+        })
+        .then(response => response.json())
+        .then(result => {
+            alert(result.message);
+            if (result.success) {
+                location.reload();
+            }
+        })
+        .catch(err => {
+            alert('Error in email send');
+            console.error(err);
+        });
+    }
+    function getAntiForgeryToken() {
+          const el = document.querySelector('input[name="__RequestVerificationToken"]');
+          return el ? el.value : '';
+      }
+</script>

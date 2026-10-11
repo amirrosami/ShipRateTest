@@ -1,0 +1,66 @@
+﻿@using ShipRate.Application.DTOs.Messaging
+@model MessagingUnreadHeaderDto
+
+<div class="dropdown">
+    <button class="btn btn-sm btn-outline-secondary dropdown-toggle position-relative"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false">
+        Messages
+
+        @if (Model.TotalUnreadCount > 0)
+        {
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                @Model.TotalUnreadCount
+            </span>
+        }
+    </button>
+
+    <div class="dropdown-menu dropdown-menu-end p-0" style="min-width: 320px;">
+        <div class="px-3 py-2 border-bottom fw-semibold">
+            New Messages
+        </div>
+
+        @if (!Model.Items.Any())
+        {
+            <div class="px-3 py-3 text-muted small">
+                No new messages
+            </div>
+        }
+        else
+        {
+            @foreach (var item in Model.Items)
+            {
+                <a class="dropdown-item py-2"
+                   href="@Url.Action("Conversation", "Messaging", new { id = item.ConversationId })">
+                    <div class="d-flex justify-content-between gap-2">
+                        <strong class="text-truncate">@item.Subject</strong>
+                        <span class="badge bg-primary">@item.UnreadCount</span>
+                    </div>
+
+                    <div class="small text-muted text-truncate">
+                        @item.SenderDisplayName
+                    </div>
+
+                    <div class="small text-truncate">
+                        @item.LastMessagePreview
+                    </div>
+
+                    @if (item.LastMessageAt.HasValue)
+                    {
+                        <div class="small text-muted">
+                            @item.LastMessageAt.Value.ToString("yyyy-MM-dd HH:mm")
+                        </div>
+                    }
+                </a>
+            }
+        }
+
+        <div class="border-top">
+            <a class="dropdown-item text-center small"
+               href="@Url.Action("Index", "Messaging")">
+                View all conversations
+            </a>
+        </div>
+    </div>
+</div>

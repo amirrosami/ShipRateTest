@@ -1,0 +1,230 @@
+﻿@using ShipRate.Application.ViewModels
+@model DeliveryOrderListWrapperVm
+
+<div class="card shadow-sm border-0">
+    <div class="table-responsive overflow-auto">
+        <table class="table table-hover align-middle mb-0 text-nowrap" style="min-width: 1400px;">
+            <thead class="table-light text-uppercase font-monospace small">
+                <tr>
+                    <th class="ps-4">DO No</th>
+                    <th>DO Date</th>
+                    <th>BL No</th>
+                    <th>Carrier</th>
+                    <th>Consignee</th>
+                    <th>Expiry Date</th>
+                    <th>Containers</th>
+                    <th>Status</th>
+                    @* اضافه شدن ستون موقت منو جهت تست *@
+                    <th class="text-center" style="width: 80px;">Actions</th>
+@*                     <th class="pe-4 text-end">Actions</th>
+ *@                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Items.Any())
+                {
+                    <tr>
+                        @* اصلاح colspan به 10 به دلیل اضافه شدن ستون منو *@
+                        <td colspan="10" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                            No delivery orders found matching the criteria.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-bold">
+                                @(string.IsNullOrWhiteSpace(item.DONo) ? "No Draft Number" : item.DONo)
+                            </td>
+                            <td>@(item.DoDate?.ToString("yyyy-MM-dd") ?? "-")</td>
+                            <td>
+                                <span class="badge bg-light text-dark border font-monospace">@item.BLNo</span>
+                            </td>
+                            <td>
+                                <span>@item.CarrierName</span>
+                            </td>
+                            <td class="text-truncate" style="max-width: 200px;">
+                                @(item.ConsigneeName ?? "-")
+                            </td>
+                            <td>
+                                @if (item.ExpiryDate.HasValue && item.ExpiryDate.Value < DateTime.Today)
+                                {
+                                    <span class="text-danger fw-semibold" title="Expired">
+                                        @item.ExpiryDate.Value.ToString("yyyy-MM-dd")
+                                        <i class="bi bi-exclamation-circle-fill"></i>
+                                    </span>
+                                }
+                                else
+                                {
+                                    @item.ExpiryDate?.ToString("yyyy-MM-dd")
+                                }
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">@item.ContainerCount Ctr</span>
+                            </td>
+                            <td>
+                                @{
+                                    var statusBadgeClass = item.StatusId switch
+                                    {
+                                        10 => "bg-warning text-dark",
+                                        30 => "bg-success",
+                                        99 => "bg-danger",
+                                        _ => "bg-secondary"
+                                    };
+                                }
+                                <span class="badge @statusBadgeClass px-2 py-1 fs-7">
+                                    @item.StatusName
+                                </span>
+                            </td>
+                            @* پیاده‌سازی منوی سه نقطه عمودی (با خروجی آزاد از کانتینر) *@
+                            <td class="text-center" style="overflow: visible;">
+                                <div class="dropdown">
+                                    <button class="btn btn-link text-secondary p-0 border-0" 
+                                            type="button" 
+                                            data-bs-toggle="dropdown" 
+                                            data-bs-container="body"
+                                            aria-expanded="false">
+                                        <i class="bi bi-three-dots-vertical fs-5"></i>
+                                    </button>
+                                    <ul class="dropdown-menu shadow border-0 py-2">
+@*                                         <li>
+                                            <a class="dropdown-item py-2" href="@Url.Action("Details", "DeliveryOrders", new { id = item.DeliveryOrderId })">
+                                                <i class="bi bi-eye me-2 text-muted"></i> View Details
+                                            </a>
+                                        </li>
+ *@                                        <li>
+                                            <a class="dropdown-item py-2" href="@Url.Action("Print", "DeliveryOrders", new { id = item.DeliveryOrderId })" target="_blank">
+                                                <i class="bi bi-printer me-2 text-muted"></i> Print/Export
+                                            </a>
+                                        </li>
+@*                                         <li>
+                                            <a class="dropdown-item py-2 text-primary" href="@Url.Action("Edit", "DeliveryOrders", new { id = item.DeliveryOrderId })">
+                                                <i class="bi bi-pencil me-2"></i> Edit Draft
+                                            </a>
+                                        </li>
+ *@                                        <li><hr class="dropdown-divider"></li>
+@*                                         <li>
+                                            <button type="button" 
+                                                    class="dropdown-item py-2 text-info"
+                                                    hx-get="@Url.Action("GetDetentionsGrid", "DeliveryOrders", new { id = item.BLId })"
+                                                    hx-target="#detentionGridContainer"
+                                                    hx-swap="innerHTML">
+                                                <i class="bi bi-clock-history me-2"></i> Show Detentions
+                                            </button>
+                                        </li>
+ *@@*                                         <li>
+                                            <button type="button"
+                                                    class="dropdown-item py-2 text-warning"
+                                                    hx-get="@Url.Action("GetCancelModal", "DeliveryOrders", new { id = item.DeliveryOrderId })"
+                                                    hx-target="#cancelModalBody"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#cancelDOModal">
+                                                <i class="bi bi-x-circle me-2"></i> Cancel Delivery Order
+                                            </button>
+                                        </li>
+ *@                                        <li>
+                                            <button type="button"
+                                                    class="dropdown-item py-2 text-secondary"
+                                                    hx-get="/DocumentManager/Index?objectId=@item.DeliveryOrderId&objectTypeId=15"
+                                                    hx-target="#document-manager-content"
+                                                    hx-swap="innerHTML"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#documentManagerModal">
+                                                <i class="bi bi-folder2-open me-2"></i> Attachments
+                                            </button>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+@*                                         <li>
+                                            <button type="button"
+                                                    class="dropdown-item py-2 text-danger"
+                                                    hx-delete="@Url.Action("Delete", "DeliveryOrders", new { id = item.DeliveryOrderId })"
+                                                    hx-confirm="Are you sure you want to delete this draft DO?"
+                                                    hx-target="#gridContainer">
+                                                <i class="bi bi-trash me-2"></i> Delete Draft
+                                            </button>
+                                        </li>
+ *@                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="card-footer bg-white border-top py-3">
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm justify-content-center mb-0">
+                    <li class="page-item @(Model.Filter.Page == 1 ? "disabled" : "")">
+                        <button class="page-link"
+                                hx-get="@Url.Action("Index", "DeliveryOrders", new {
+                                            SearchTerm = Model.Filter.SearchTerm,
+                                            IsFinalized = Model.Filter.IsFinalized,
+                                            FromDate = Model.Filter.FromDate?.ToString("yyyy-MM-dd"),
+                                            ToDate = Model.Filter.ToDate?.ToString("yyyy-MM-dd"),
+                                            Page = Model.Filter.Page - 1,
+                                            PageSize = Model.Filter.PageSize
+                                        })"
+                                hx-target="#gridContainer"
+                                hx-swap="innerHTML">
+                            Previous
+                        </button>
+                    </li>
+
+                    @for (int p = 1; p <= Model.TotalPages; p++)
+                    {
+                        <li class="page-item @(Model.Filter.Page == p ? "active" : "")">
+                            <button class="page-link"
+                                    hx-get="@Url.Action("Index", "DeliveryOrders", new {
+                                                SearchTerm = Model.Filter.SearchTerm,
+                                                IsFinalized = Model.Filter.IsFinalized,
+                                                FromDate = Model.Filter.FromDate?.ToString("yyyy-MM-dd"),
+                                                ToDate = Model.Filter.ToDate?.ToString("yyyy-MM-dd"),
+                                                Page = p,
+                                                PageSize = Model.Filter.PageSize
+                                            })"
+                                    hx-target="#gridContainer"
+                                    hx-swap="innerHTML">
+                                @p
+                            </button>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.Filter.Page == Model.TotalPages ? "disabled" : "")">
+                        <button class="page-link"
+                                hx-get="@Url.Action("Index", "DeliveryOrders", new {
+                                            SearchTerm = Model.Filter.SearchTerm,
+                                            IsFinalized = Model.Filter.IsFinalized,
+                                            FromDate = Model.Filter.FromDate?.ToString("yyyy-MM-dd"),
+                                            ToDate = Model.Filter.ToDate?.ToString("yyyy-MM-dd"),
+                                            Page = Model.Filter.Page + 1,
+                                            PageSize = Model.Filter.PageSize
+                                        })"
+                                hx-target="#gridContainer"
+                                hx-swap="innerHTML">
+                            Next
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>
+<script>
+    document.querySelectorAll('.dropdown').forEach(dropdown => {
+        dropdown.addEventListener('show.bs.dropdown', function () {
+            // انتقال منو به بدنه اصلی صفحه برای جلوگیری از clipping
+            document.body.appendChild(this.querySelector('.dropdown-menu'));
+        });
+        
+        dropdown.addEventListener('hidden.bs.dropdown', function () {
+            // بازگرداندن منو به جای اصلی خود در گرید بعد از بسته شدن
+            this.appendChild(this.querySelector('.dropdown-menu'));
+        });
+    });
+</script>

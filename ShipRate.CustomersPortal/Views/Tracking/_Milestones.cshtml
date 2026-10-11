@@ -1,0 +1,11 @@
+@using ShippingTrackingMvc.Models
+@model Shipment
+<div class="events">
+    @foreach(var e in Model.Milestones)
+    {
+        <div class="event @(e.Pending ? "pending" : "")">
+            <div class="t">@e.Title</div>
+            <div class="d">@e.Date</div>
+        </div>
+    }
+</div>

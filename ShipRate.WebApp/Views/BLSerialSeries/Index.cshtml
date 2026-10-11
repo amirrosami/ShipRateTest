@@ -1,0 +1,78 @@
+﻿@using ShipRate.Application.DTOs
+@model BLSerialSeriesIndexViewModel
+@{
+    ViewData["Title"] = "BL Serial Series Management";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid" dir="ltr">
+    <h3 class="mb-3">BL Serial Series Management</h3>
+
+    <!-- Search Panel -->
+    <div class="card mb-3">
+        <div class="card-header">
+            Search
+        </div>
+        <div class="card-body">
+            <form id="searchForm"
+                  hx-post="@Url.Action("SeriesGrid")"
+                  hx-target="#seriesGridContainer"
+                  hx-swap="innerHTML">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">Carrier BL Type</label>
+                        <select class="form-select" asp-for="Search.CarrierBLTypeId"
+                                asp-items="Model.CarrierBLTypes">
+                            <option value="">-- All --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Serial Number</label>
+                        <input type="number" class="form-control" asp-for="Search.SerialNumber" />
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+                        <button type="button" class="btn btn-secondary"
+                                onclick="document.getElementById('searchForm').reset();">
+                            Clear
+                        </button>
+                        <button type="button" class="btn btn-success ms-2"
+                                hx-get="@Url.Action("EditSeries")"
+                                hx-target="#modalContainer"
+                                hx-trigger="click"
+                                hx-swap="innerHTML">
+                            <i class="bi bi-plus-circle"></i> New Series
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Series Grid -->
+    <div id="seriesGridContainer"
+         class="mb-3"
+         hx-post="@Url.Action("SeriesGrid")"
+         hx-trigger="load"
+         hx-include="#searchForm"
+         hx-target="#seriesGridContainer"
+         hx-swap="innerHTML">
+        <div class="text-center text-muted py-4">
+            Loading series...
+        </div>
+    </div>
+    <!-- BatchAssign Grid -->
+    <div id="batchAssignGridContainer" class="mb-3">
+        @* بعد از انتخاب سری از گرید بالا پر می‌شود *@
+    </div>
+
+    <!-- Serial Grid -->
+    <div id="serialGridContainer" class="mb-3">
+        @* بعد از انتخاب سری از گرید بالا پر می‌شود *@
+    </div>
+
+    <!-- Modal Container -->
+    <div id="modalContainer"></div>
+</div>

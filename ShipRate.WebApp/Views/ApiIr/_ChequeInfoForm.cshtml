@@ -1,0 +1,108 @@
+﻿@using ShipRate.Application.DTOs.ApiIr
+@model ChequeInfoLookupVm
+
+<div class="modal-header">
+    <h5 class="modal-title">استعلام چک‌های برگشتی از API.ir</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <form hx-post="@Url.Action("ChequeInfo", "ApiIr")"
+          hx-target="#apiIrModalBody"
+          hx-swap="innerHTML"
+          hx-indicator="#apiIrLoading"
+          class="row g-3">
+
+        @Html.AntiForgeryToken()
+
+        <div class="col-12">
+            <label class="form-label">کد ملی یا شناسه ملی</label>
+            <input asp-for="NationalCode" class="form-control ltr text-start" maxlength="11" />
+            <span asp-validation-for="NationalCode" class="text-danger small"></span>
+        </div>
+
+        <div class="col-12 d-flex gap-2 align-items-center">
+            <button type="submit" class="btn btn-primary">
+                <span id="apiIrLoading" class="htmx-indicator spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                استعلام چک
+            </button>
+        </div>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger mt-3 mb-0">@Model.ErrorMessage</div>
+    }
+
+
+
+    @if (Model.Result is not null)
+    {
+        if (Model.Result?.Data is not null)
+        {
+            var data = Model.Result.Data;
+            <div class="card mt-3 border-0 shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <strong>اطلاعات صاحب حساب: @data.Name</strong>
+                    <span class="badge bg-danger">تعداد چک: @data.Count</span>
+                </div>
+                <div class="card-body p-0">
+                    @if (data.ChequeList != null && data.ChequeList.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mb-0 align-middle">
+                                <thead class="table-light">
+                                    <tr class="small">
+                                        <th>شناسه صیاد / شماره</th>
+                                        <th>مبلغ (ریال)</th>
+                                        <th>تاریخ سررسید / برگشت</th>
+                                        <th>بانک و علت</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in data.ChequeList)
+                                    {
+                                        <tr>
+                                            <td class="small">
+                                                <div class="fw-bold">@item.ChequeId</div>
+                                                <div class="text-muted">@item.ChequeNumber</div>
+                                            </td>
+                                            <td class="small text-danger fw-bold">
+                                                @string.Format("{0:N0}", long.Parse(item.Amount ?? "0"))
+                                            </td>
+                                            <td class="small">
+                                                <div>@item.ChequeDate</div>
+                                                <div class="text-muted">@item.BackDate</div>
+                                            </td>
+                                            <td class="small">
+                                                <div class="fw-semibold">@item.BranchDescription</div>
+                                                <div class="text-wrap text-danger" style="max-width: 150px;">@item.DishonorReason</div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="p-3 text-center text-success">
+                            <i class="bi bi-check-circle-fill me-2"></i> هیچ چک برگشتی برای این شخص یافت نشد.
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card mt-3 border-0 shadow-sm">
+                @if (Model.Result.Success)
+                {
+                    <div class="p-3 text-center text-success">
+                        <i class="bi bi-check-circle-fill me-2"></i> @Model.ErrorMessage
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>

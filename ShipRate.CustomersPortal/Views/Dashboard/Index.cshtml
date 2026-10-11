@@ -1,0 +1,1080 @@
+﻿@model DashboardViewModel
+@using System.Globalization
+@using ShipRate.WebAppCustomers.ViewModels
+@{
+    var isFa = CultureInfo.CurrentUICulture.Name.StartsWith("fa");
+    ViewData["Title"] = isFa ? "داشبورد مشتری" : "Customer Dashboard";
+}
+
+<div class="dashboard">
+    <!-- Welcome -->
+    <section class="hero-card">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fa-solid fa-cloud-sun"></i>
+                <span>@(isFa ? "داشبورد مشتریان" : "Customer Portal")</span>
+            </div>
+
+            <h2>@(isFa ? "خوش آمدید به درگاه مشتریان" : "Welcome to the Customer Portal")</h2>
+            <p>
+                @(isFa
+                                ? "از این بخش می‌توانید سفارش‌ها، محموله‌ها، اسناد، پرداخت‌ها و درخواست‌های پشتیبانی خود را مدیریت کنید."
+                                : "Manage your orders, shipments, documents, payments and support requests from here.")
+            </p>
+        </div>
+
+        <div class="hero-actions">
+            <a asp-controller="RateRequests" asp-action="Index" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i>
+                <span>@(isFa ? "ثبت سفارش جدید" : "New Order")</span>
+            </a>
+            <a asp-controller="Tracking" asp-action="Index" class="btn btn-outline">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>@(isFa ? "رهگیری محموله" : "Track Shipment")</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-icon"><i class="fa-solid fa-box"></i></span>
+            <div>
+                <h3>12</h3>
+                <p>@(isFa ? "سفارشات فعال" : "Active Orders")</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-icon"><i class="fa-solid fa-truck-fast"></i></span>
+            <div>
+                <h3>7</h3>
+                <p>@(isFa ? "محموله‌های در حال حمل" : "In Transit")</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-icon"><i class="fa-solid fa-receipt"></i></span>
+            <div>
+                <h3>4</h3>
+                <p>@(isFa ? "فاکتورهای پرداخت‌نشده" : "Unpaid Invoices")</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-icon"><i class="fa-solid fa-comments"></i></span>
+            <div>
+                <h3>3</h3>
+                <p>@(isFa ? "تیکت‌های باز" : "Open Tickets")</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="dashboard-grid">
+        <!-- Recent Orders -->
+        <div class="panel-card">
+            <div class="panel-header">
+                <h3>@(isFa ? "سفارش‌های اخیر" : "Recent Orders")</h3>
+                <a asp-controller="RateRequests" asp-action="Index">@(isFa ? "مشاهده همه" : "View All")</a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>@(isFa ? "کد سفارش" : "Order No")</th>
+                            <th>@(isFa ? "مبدأ" : "Origin")</th>
+                            <th>@(isFa ? "مقصد" : "Destination")</th>
+                            <th>@(isFa ? "وضعیت" : "Status")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.RateRequests)
+                        {
+                            <tr>
+                                <td>@item.RequestNo</td>
+                                <td>@item.OriginName</td>
+                                <td>@item.DestinationName</td>
+                                <td>
+                                    <span class="status-pill">@item.StatusName</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="panel-card">
+            <div class="panel-header">
+                <h3>@(isFa ? "اعلان‌ها" : "Notifications")</h3>
+                <a href="#">@(isFa ? "همه" : "All")</a>
+            </div>
+
+            <div class="notification-list">
+
+                @foreach (var item in Model.Notifications)
+                {
+                    <div class="notification-item">
+                        <span class="dot"></span>
+                        <div>
+                            <p>(@item.DateQueued.ToString("yyyy-MM-dd HH:mm:ss"))</p>
+                            <strong>@item.Subject</strong>
+                            <p>@item.Body</p>
+                        </div>
+                    </div>
+                }
+                @* <div class="notification-item">
+                    <span class="dot"></span>
+                    <div>
+                        <strong>@(isFa ? "بارگذاری مدارک سفارش ORD-10022" : "Documents required for ORD-10022")</strong>
+                        <p>@(isFa ? "لطفاً پکینگ لیست و فاکتور را ارسال کنید." : "Please upload packing list and invoice.")</p>
+                    </div>
+                </div>
+
+                <div class="notification-item">
+                    <span class="dot"></span>
+                    <div>
+                        <strong>@(isFa ? "فاکتور جدید صادر شد" : "New invoice issued")</strong>
+                        <p>@(isFa ? "فاکتور شماره INV-4582 آماده پرداخت است." : "Invoice INV-4582 is ready for payment.")</p>
+                    </div>
+                </div>
+
+                <div class="notification-item">
+                    <span class="dot"></span>
+                    <div>
+                        <strong>@(isFa ? "تغییر وضعیت محموله" : "Shipment status updated")</strong>
+                        <p>@(isFa ? "محموله ORD-10021 وارد فاز بارگیری شد." : "ORD-10021 entered loading stage.")</p>
+                    </div>
+                </div> *@
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Actions -->
+    @* <section class="panel-card">
+        <div class="panel-header">
+            <h3>@(isFa ? "دسترسی سریع" : "Quick Actions")</h3>
+        </div>
+
+        <div class="actions-grid">
+            <a asp-controller="RateRequests" asp-action="Index" class="action-card">
+                <i class="fa-solid fa-plus"></i>
+                <span>@(isFa ? "ثبت سفارش" : "Create Order")</span>
+            </a>
+
+            <a asp-controller="Tracking" asp-action="Index" class="action-card">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>@(isFa ? "رهگیری" : "Track")</span>
+            </a>
+
+            <a asp-controller="Documents" asp-action="Index" class="action-card">
+                <i class="fa-solid fa-upload"></i>
+                <span>@(isFa ? "آپلود مدارک" : "Upload Docs")</span>
+            </a>
+
+            <a asp-controller="Invoices" asp-action="Index" class="action-card">
+                <i class="fa-solid fa-credit-card"></i>
+                <span>@(isFa ? "پرداخت" : "Pay Invoice")</span>
+            </a>
+
+            <a asp-controller="Support" asp-action="Create" class="action-card">
+                <i class="fa-solid fa-headset"></i>
+                <span>@(isFa ? "ثبت تیکت" : "New Ticket")</span>
+            </a>
+        </div>
+    </section> *@
+
+    <!-- Invoices -->
+    <section class="panel-card">
+        <div class="panel-header">
+            <h3>@(isFa ? "فاکتورهای اخیر" : "Recent Invoices")</h3>
+            <a asp-controller="Invoices" asp-action="Index">@(isFa ? "مشاهده همه" : "View All")</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>@(isFa ? "شرکت" : "Company")</th>
+                        <th>@(isFa ? "شماره فاکتور" : "Invoice No")</th>
+                        <th>@(isFa ? "مبلغ" : "Amount")</th>
+                        <th>@(isFa ? "وضعیت" : "Status")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Invoices)
+                    {
+                        <tr>
+                            <td>@item.Company.Person.PersonName</td>
+                            <td>@item.InvoiceNo</td>
+                            <td>@item.TotalAmount</td>
+                            <td>
+                                <span class="status-pill">@item.InvoiceStatus.InvoiceStatusName</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+@section Styles {
+    <style>
+        :root {
+            --sky-50: #f0f9ff;
+            --sky-100: #e0f2fe;
+            --sky-200: #bae6fd;
+            --sky-300: #7dd3fc;
+            --sky-500: #0ea5e9;
+            --sky-600: #0284c7;
+            --sky-700: #0369a1;
+            --text-900: #0f172a;
+            --text-600: #475569;
+            --border: #dbeafe;
+            --card: rgba(255, 255, 255, 0.82);
+        }
+
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .hero-card,
+        .panel-card,
+        .stat-card {
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(186, 230, 253, 0.9);
+            border-radius: 22px;
+            box-shadow: 0 12px 30px rgba(2, 132, 199, 0.08);
+        }
+
+        .hero-card {
+            position: relative;
+            overflow: hidden;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            background: radial-gradient(circle at top right, rgba(125, 211, 252, 0.35), transparent 28%), linear-gradient(135deg, #f0f9ff 0%, #ffffff 55%, #eff6ff 100%);
+        }
+
+            .hero-card::after {
+                content: "";
+                position: absolute;
+                inset: auto -40px -50px auto;
+                width: 180px;
+                height: 180px;
+                border-radius: 50%;
+                background: rgba(14, 165, 233, 0.08);
+                filter: blur(10px);
+                pointer-events: none;
+            }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 760px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            margin-bottom: 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--sky-700);
+            border: 1px solid var(--sky-100);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+            .hero-badge i {
+                color: var(--sky-500);
+            }
+
+        .hero-card h2 {
+            margin: 0 0 10px;
+            font-size: 28px;
+            line-height: 1.35;
+            color: var(--text-900);
+        }
+
+        .hero-card p {
+            margin: 0;
+            color: var(--text-600);
+            line-height: 1.9;
+            font-size: 15px;
+            max-width: 720px;
+        }
+
+        .hero-actions {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 18px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 700;
+            border: 1px solid transparent;
+            transition: all 0.22s ease;
+            text-decoration: none;
+            min-height: 46px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--sky-500), var(--sky-600));
+            color: #fff;
+            box-shadow: 0 10px 20px rgba(14, 165, 233, 0.22);
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-1px);
+                color: #fff;
+                box-shadow: 0 14px 26px rgba(14, 165, 233, 0.28);
+            }
+
+        .btn-outline {
+            background: #fff;
+            border-color: var(--sky-200);
+            color: var(--sky-700);
+        }
+
+            .btn-outline:hover {
+                background: var(--sky-50);
+                transform: translateY(-1px);
+                color: var(--sky-700);
+            }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+
+        .stat-card {
+            padding: 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-3px);
+                border-color: var(--sky-200);
+                box-shadow: 0 16px 30px rgba(2, 132, 199, 0.12);
+            }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--sky-50), #fff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--sky-500);
+            font-size: 20px;
+            border: 1px solid var(--sky-100);
+            flex-shrink: 0;
+        }
+
+        .stat-card h3 {
+            margin: 0;
+            font-size: 24px;
+            color: var(--text-900);
+            line-height: 1;
+        }
+
+        .stat-card p {
+            margin: 5px 0 0;
+            color: var(--text-600);
+            font-size: 13px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 18px;
+        }
+
+        .panel-card {
+            padding: 20px;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+            .panel-header h3 {
+                margin: 0;
+                font-size: 18px;
+                color: var(--text-900);
+            }
+
+            .panel-header a {
+                font-size: 13px;
+                color: var(--sky-600);
+                font-weight: 700;
+                text-decoration: none;
+            }
+
+                .panel-header a:hover {
+                    color: var(--sky-700);
+                    text-decoration: underline;
+                }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 640px;
+        }
+
+            .data-table th,
+            .data-table td {
+                padding: 13px 10px;
+                border-bottom: 1px solid #eaf2fb;
+                text-align: start;
+                font-size: 14px;
+            }
+
+            .data-table th {
+                color: #64748b;
+                font-weight: 700;
+                font-size: 13px;
+                background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+            }
+
+            .data-table tbody tr:hover {
+                background: #f8fbff;
+            }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .notification-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .notification-item {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            padding: 12px;
+            border-radius: 16px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+            border: 1px solid #eaf2fb;
+        }
+
+            .notification-item .dot {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, var(--sky-500), var(--sky-300));
+                margin-top: 7px;
+                flex-shrink: 0;
+                box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.10);
+            }
+
+            .notification-item strong {
+                color: var(--text-900);
+                font-size: 14px;
+            }
+
+            .notification-item p {
+                margin: 4px 0 0;
+                color: var(--text-600);
+                font-size: 13px;
+                line-height: 1.7;
+            }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+        }
+
+        .action-card {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+            border: 1px solid #e2eef9;
+            border-radius: 18px;
+            padding: 18px 14px;
+            text-align: center;
+            transition: all 0.22s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+            .action-card i {
+                display: block;
+                font-size: 22px;
+                color: var(--sky-500);
+                margin-bottom: 10px;
+            }
+
+            .action-card span {
+                color: var(--text-900);
+                font-weight: 700;
+                font-size: 13px;
+            }
+
+            .action-card:hover {
+                transform: translateY(-3px);
+                border-color: var(--sky-300);
+                box-shadow: 0 14px 24px rgba(2, 132, 199, 0.10);
+                background: #ffffff;
+            }
+
+        @@media (max-width: 992px) {
+            .stats-grid,
+            .dashboard-grid,
+            .actions-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .hero-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .hero-actions {
+                justify-content: flex-start;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .stats-grid,
+            .dashboard-grid,
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .panel-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .hero-card {
+                padding: 22px;
+            }
+
+                .hero-card h2 {
+                    font-size: 24px;
+                }
+        }
+    </style>
+}
+
+
+
+
+
+
+
+@* @model DashboardViewModel
+@using System.Globalization
+@using ShipRate.WebAppCustomers.ViewModels
+@{
+    var isFa = CultureInfo.CurrentUICulture.Name.StartsWith("fa");
+    ViewData["Title"] = isFa ? "داشبورد مشتری" : "Customer Dashboard";
+}
+
+<div class="dashboard">
+    <!-- Welcome -->
+    <section class="hero-card">
+        <div>
+            <h2>@(isFa ? "خوش آمدید به درگاه مشتریان" : "Welcome to the Customer Portal")</h2>
+            <p>
+                @(isFa
+                                ? "از این بخش می‌توانید سفارش‌ها، محموله‌ها، اسناد، پرداخت‌ها و درخواست‌های پشتیبانی خود را مدیریت کنید."
+                                : "Manage your orders, shipments, documents, payments and support requests from here.")
+            </p>
+        </div>
+
+        <div class="hero-actions">
+            <a asp-controller="RateRequests" asp-action="Index" class="btn btn-primary">
+                @(isFa ? "ثبت سفارش جدید" : "New Order")
+            </a>
+            <a asp-controller="Tracking" asp-action="Index" class="btn btn-outline">
+                @(isFa ? "رهگیری محموله" : "Track Shipment")
+            </a>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-icon"><i class="fa-solid fa-box"></i></span>
+            <div>
+                <h3>12</h3>
+                <p>@(isFa ? "سفارشات فعال" : "Active Orders")</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-icon"><i class="fa-solid fa-truck-fast"></i></span>
+            <div>
+                <h3>7</h3>
+                <p>@(isFa ? "محموله‌های در حال حمل" : "In Transit")</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-icon"><i class="fa-solid fa-receipt"></i></span>
+            <div>
+                <h3>4</h3>
+                <p>@(isFa ? "فاکتورهای پرداخت‌نشده" : "Unpaid Invoices")</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-icon"><i class="fa-solid fa-comments"></i></span>
+            <div>
+                <h3>3</h3>
+                <p>@(isFa ? "تیکت‌های باز" : "Open Tickets")</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="dashboard-grid">
+        <!-- Recent Orders -->
+        <div class="panel-card">
+            <div class="panel-header">
+                <h3>@(isFa ? "سفارش‌های اخیر" : "Recent Orders")</h3>
+                <a asp-controller="RateRequests" asp-action="Index">@(isFa ? "مشاهده همه" : "View All")</a>
+            </div>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>@(isFa ? "کد سفارش" : "Order No")</th>
+                            <th>@(isFa ? "مبدأ" : "Origin")</th>
+                            <th>@(isFa ? "مقصد" : "Destination")</th>
+                            <th>@(isFa ? "وضعیت" : "Status")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                       @foreach (var item in Model.RateRequests)
+                        {
+                            <tr>
+                                <td>@item.RequestNo</td>
+                                <td>@item.OriginName</td>
+                                <td>@item.DestinationName</td>
+                                <td>@item.StatusName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="panel-card">
+            <div class="panel-header">
+                <h3>@(isFa ? "اعلان‌ها" : "Notifications")</h3>
+                <a href="#">@(isFa ? "همه" : "All")</a>
+            </div>
+
+            <div class="notification-list">
+                <div class="notification-item">
+                    <span class="dot"></span>
+                    <div>
+                        <strong>@(isFa ? "بارگذاری مدارک سفارش ORD-10022" : "Documents required for ORD-10022")</strong>
+                        <p>@(isFa ? "لطفاً پکینگ لیست و فاکتور را ارسال کنید." : "Please upload packing list and invoice.")</p>
+                    </div>
+                </div>
+
+                <div class="notification-item">
+                    <span class="dot"></span>
+                    <div>
+                        <strong>@(isFa ? "فاکتور جدید صادر شد" : "New invoice issued")</strong>
+                        <p>@(isFa ? "فاکتور شماره INV-4582 آماده پرداخت است." : "Invoice INV-4582 is ready for payment.")</p>
+                    </div>
+                </div>
+
+                <div class="notification-item">
+                    <span class="dot"></span>
+                    <div>
+                        <strong>@(isFa ? "تغییر وضعیت محموله" : "Shipment status updated")</strong>
+                        <p>@(isFa ? "محموله ORD-10021 وارد فاز بارگیری شد." : "ORD-10021 entered loading stage.")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Actions -->
+    @* <section class="panel-card">
+        <div class="panel-header">
+            <h3>@(isFa ? "دسترسی سریع" : "Quick Actions")</h3>
+        </div>
+
+        <div class="actions-grid">
+            <a asp-controller="Orders" asp-action="Create" class="action-card">
+                <i class="fa-solid fa-plus"></i>
+                <span>@(isFa ? "ثبت سفارش" : "Create Order")</span>
+            </a>
+
+            <a asp-controller="Tracking" asp-action="Index" class="action-card">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>@(isFa ? "رهگیری" : "Track")</span>
+            </a>
+
+            <a asp-controller="Documents" asp-action="Index" class="action-card">
+                <i class="fa-solid fa-upload"></i>
+                <span>@(isFa ? "آپلود مدارک" : "Upload Docs")</span>
+            </a>
+
+            <a asp-controller="Invoices" asp-action="Index" class="action-card">
+                <i class="fa-solid fa-credit-card"></i>
+                <span>@(isFa ? "پرداخت" : "Pay Invoice")</span>
+            </a>
+
+            <a asp-controller="Support" asp-action="Create" class="action-card">
+                <i class="fa-solid fa-headset"></i>
+                <span>@(isFa ? "ثبت تیکت" : "New Ticket")</span>
+            </a>
+        </div>
+    </section> 
+
+    <!-- Invoices -->
+    <section class="panel-card">
+        <div class="panel-header">
+            <h3>@(isFa ? "فاکتورهای اخیر" : "Recent Invoices")</h3>
+            <a asp-controller="Invoices" asp-action="Index">@(isFa ? "مشاهده همه" : "View All")</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>@(isFa ? "شرکت" : "Invoice No")</th>
+                        <th>@(isFa ? "شماره فاکتور" : "Invoice No")</th>
+                        <th>@(isFa ? "مبلغ" : "Amount")</th>
+                        <th>@(isFa ? "وضعیت" : "Status")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Invoices)
+                    {
+                        <tr>
+                            <td>@item.Company.Person.PersonName</td>
+                            <td>@item.InvoiceNo</td>
+                            <td>@item.TotalAmount</td>
+                            <td>@item.InvoiceStatus.InvoiceStatusName</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+
+@section Styles {
+    <style>
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .hero-card,
+        .panel-card,
+        .stat-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 18px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+        }
+
+        .hero-card {
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+            .hero-card h2 {
+                margin: 0 0 8px;
+                font-size: 24px;
+                color: #0f172a;
+            }
+
+            .hero-card p {
+                margin: 0;
+                color: #6b7280;
+                line-height: 1.9;
+            }
+
+        .hero-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 11px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: #0f172a;
+            color: #fff;
+        }
+
+        .btn-outline {
+            background: #fff;
+            border-color: #d1d5db;
+            color: #0f172a;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+
+        .stat-card {
+            padding: 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .stat-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 16px;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #caa968;
+            font-size: 20px;
+        }
+
+        .stat-card h3 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .stat-card p {
+            margin: 4px 0 0;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 18px;
+        }
+
+        .panel-card {
+            padding: 20px;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+            .panel-header h3 {
+                margin: 0;
+                font-size: 18px;
+                color: #0f172a;
+            }
+
+            .panel-header a {
+                font-size: 13px;
+                color: #2563eb;
+            }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 640px;
+        }
+
+            .data-table th,
+            .data-table td {
+                padding: 13px 10px;
+                border-bottom: 1px solid #eef2f7;
+                text-align: start;
+                font-size: 14px;
+            }
+
+            .data-table th {
+                color: #6b7280;
+                font-weight: 600;
+                font-size: 13px;
+            }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .notification-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .notification-item {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+            .notification-item .dot {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background: #caa968;
+                margin-top: 7px;
+                flex-shrink: 0;
+            }
+
+            .notification-item p {
+                margin: 4px 0 0;
+                color: #6b7280;
+                font-size: 13px;
+                line-height: 1.7;
+            }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+        }
+
+        .action-card {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 18px 14px;
+            text-align: center;
+            transition: 0.2s ease;
+        }
+
+            .action-card i {
+                display: block;
+                font-size: 22px;
+                color: #0f172a;
+                margin-bottom: 10px;
+            }
+
+            .action-card:hover {
+                transform: translateY(-2px);
+                border-color: #caa968;
+            }
+
+        .link-action {
+            color: #2563eb;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        @@media (max-width: 992px) {
+            .stats-grid,
+            .dashboard-grid,
+            .actions-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .hero-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .stats-grid,
+            .dashboard-grid,
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .panel-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+} *@

@@ -1,0 +1,86 @@
+﻿@using Microsoft.Extensions.Localization
+@using ShipRate.Application.DTOs
+@using ShipRate.Application.JobsViewModels
+@using ShipRate.WebAppCustomers
+@using ShipRate.WebAppCustomers.ViewModels
+@using System.Globalization
+@model PagedResultDto<JobListItemVm>
+@inject IStringLocalizer<SharedResource> Localizer
+@{
+    var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isFa = culture == "fa";
+    var lang = isFa ? "fa" : "en";
+    var dir = isFa ? "rtl" : "ltr";
+}
+
+@{
+    ViewData["Title"] = $"{Localizer["Jobs"]}";
+}
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="mb-0"><i class="bi bi-globe me-2"></i>@Localizer["Shipments"]</h2>
+            <small class="text-muted"></small>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            @Localizer["Search"]
+        </div>
+
+        <div class="card-body">
+
+            <form id="trackingSearchForm"
+                  hx-get="/Tracking/List"
+                  hx-target="#tableContainer"
+                  hx-push-url="true">
+
+                <div class="row g-1">
+
+                    <div class="col-md-1">
+                        <label class="form-label">@(isFa ? "جستجو" : "Search")</label>
+                        <input type="text" class="form-control" name="SearchTerm" value="@Model.SearchTerm">
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button class="btn btn-primary me-2" type="submit">@(isFa ? "جستجو" : "Search")</button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="tableContainer">
+         @* hx-get="@Url.Action("Tracking", "List")"
+         hx-trigger="TrackingChanged from:body"
+         hx-swap="innerHTML"
+         hx-include="#trackingSearchForm"> *@
+        @await Html.PartialAsync("_List", Model)
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

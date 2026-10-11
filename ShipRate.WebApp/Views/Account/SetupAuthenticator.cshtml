@@ -1,0 +1,302 @@
+﻿@model GoogleAuthenticatorSetupVm
+@{
+    ViewData["Title"] = "Setup Two-Factor Authentication";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ShipRate</title>
+
+    <!-- Bootstrap 5 & Icons -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.css" asp-append-version="true" />
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 25px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        .setup-card {
+            width: 100%;
+            max-width: 460px;
+            padding: 35px 30px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+        }
+
+        .setup-icon-wrapper {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: #2563eb;
+            background-color: #eff6ff;
+            font-size: 28px;
+        }
+
+        .setup-title {
+            margin-bottom: 6px;
+            color: #0f172a;
+            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .setup-subtitle {
+            margin-bottom: 22px;
+            color: #64748b;
+            text-align: center;
+            font-size: 13.5px;
+            line-height: 1.5;
+        }
+
+        .step-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            background: #eff6ff;
+            color: #2563eb;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 6px;
+        }
+
+        .step-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .qr-wrapper {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            display: inline-block;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .manual-key-box {
+            font-family: 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+            letter-spacing: 1.5px;
+            font-size: 13px;
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-weight: 600;
+            border: 1px solid #cbd5e1;
+        }
+
+        .otp-input {
+            height: 52px;
+            border-radius: 10px;
+            text-align: center;
+            letter-spacing: 8px;
+            font-size: 24px;
+            font-weight: 600;
+            direction: ltr;
+            border: 1.5px solid #cbd5e1;
+            transition: all 0.2s ease-in-out;
+        }
+
+            .otp-input:focus {
+                border-color: #2563eb;
+                box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+            }
+
+        .btn-enable {
+            width: 100%;
+            height: 48px;
+            border: 0;
+            border-radius: 10px;
+            color: #ffffff;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.2s ease-in-out;
+        }
+
+            .btn-enable:hover {
+                color: #ffffff;
+                background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            }
+
+        .cancel-link {
+            display: block;
+            margin-top: 16px;
+            color: #64748b;
+            text-align: center;
+            text-decoration: none;
+            font-size: 13.5px;
+            transition: color 0.2s;
+        }
+
+            .cancel-link:hover {
+                color: #0f172a;
+            }
+
+        .validation-summary-valid {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <main class="setup-card">
+        <div class="setup-icon-wrapper">
+            <i class="bi bi-qr-code-scan"></i>
+        </div>
+
+        <h1 class="setup-title">Setup 2-Step Verification</h1>
+        <p class="setup-subtitle">Link your Google Authenticator or any compatible TOTP app with your ShipRate account.</p>
+
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small mb-3"></div>
+
+        <!-- Step 1: QR Code -->
+        <div class="mb-4 text-center">
+            <div class="step-label justify-content-center">
+                <span class="step-badge">1</span> Scan QR Code in your app
+            </div>
+            <div class="d-flex justify-content-center my-2">
+                <div class="qr-wrapper">
+                    <div id="qrCodeContainer"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Manual Key -->
+        <div class="mb-4">
+            <div class="step-label">
+                <span class="step-badge">2</span> Or enter setup key manually
+            </div>
+            <div class="input-group">
+                <input type="text"
+                       class="form-control manual-key-box text-center"
+                       id="sharedKeyInput"
+                       value="@Model.SharedKey"
+                       readonly />
+                <button class="btn btn-outline-secondary"
+                        type="button"
+                        id="btnCopyKey"
+                        title="Copy Key">
+                    <i class="bi bi-clipboard"></i>
+                </button>
+            </div>
+        </div>
+
+        <hr class="my-4 text-muted opacity-25" />
+
+        <!-- Step 3: Verify & Enable -->
+        <form asp-controller="Account" asp-action="EnableAuthenticator" method="post" autocomplete="off">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="UserId" />
+            <input type="hidden" asp-for="ReturnUrl" />
+            <input type="hidden" asp-for="SharedKey" />
+            <input type="hidden" asp-for="AuthenticatorUri" />
+
+            <div class="mb-4">
+                <label asp-for="VerificationCode" class="step-label">
+                    <span class="step-badge">3</span> Enter the 6-digit code
+                </label>
+                <input asp-for="VerificationCode"
+                       class="form-control otp-input"
+                       placeholder="000000"
+                       maxlength="6"
+                       inputmode="numeric"
+                       autocomplete="one-time-code"
+                       autofocus />
+                <span asp-validation-for="VerificationCode" class="text-danger small mt-1 d-block"></span>
+            </div>
+
+            <button type="submit" class="btn btn-enable">
+                <i class="bi bi-check-circle me-1"></i> Verify & Enable
+            </button>
+
+            <a href="@(string.IsNullOrEmpty(Model.ReturnUrl) ? Url.Action("Login", "Account") : Model.ReturnUrl)"
+               class="cancel-link">
+                <i class="bi bi-arrow-left me-1"></i> Cancel
+            </a>
+        </form>
+    </main>
+
+    <!-- Essential Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/js/qrcode.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // 1. تولید QR Code
+            var uri = @Html.Raw(Json.Serialize(Model.AuthenticatorUri));
+            var qrContainer = document.getElementById("qrCodeContainer");
+
+            if (uri && qrContainer && typeof QRCode !== "undefined") {
+                new QRCode(qrContainer, {
+                    text: uri,
+                    width: 170,
+                    height: 170,
+                    colorDark: "#0f172a",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            }
+
+            // 2. کپی کردن SharedKey
+            var btnCopy = document.getElementById("btnCopyKey");
+            var keyInput = document.getElementById("sharedKeyInput");
+
+            if (btnCopy && keyInput) {
+                btnCopy.addEventListener("click", function () {
+                    keyInput.select();
+                    navigator.clipboard.writeText(keyInput.value).then(function () {
+                        var icon = btnCopy.querySelector("i");
+                        icon.className = "bi bi-check2 text-success";
+                        setTimeout(function () {
+                            icon.className = "bi bi-clipboard";
+                        }, 2000);
+                    });
+                });
+            }
+
+            // 3. فیلتر ورودی فقط ارقام (Numeric Only)
+            var codeInput = document.getElementById("VerificationCode");
+            if (codeInput) {
+                codeInput.addEventListener("input", function () {
+                    this.value = this.value.replace(/\D/g, '').substring(0, 6);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

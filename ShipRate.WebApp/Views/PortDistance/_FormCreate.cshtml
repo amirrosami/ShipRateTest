@@ -1,0 +1,166 @@
+﻿@using ShipRate.Application.DTOs.Base_Info
+@using static ShipRate.Application.DTOs.PortDistanceDto
+@model PortDistanceCreateDto
+
+<form hx-post="@Url.Action("Create", "PortDistance")"
+      hx-target="#modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add Distance</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    </div>
+
+    <div class="modal-body">
+        @Html.AntiForgeryToken()
+        @if (!ViewData.ModelState.IsValid)
+        {
+            var allErrors = ViewData.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            if (allErrors.Any())
+            {
+                <div class="alert alert-danger py-2 mb-3">
+                    <ul class="mb-0 small">
+                        @foreach (var err in allErrors)
+                        {
+                            <li>@err</li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+
+        <!-- Transport Type -->
+        <div class="mb-3">
+            <label class="form-label fw-medium">
+                Transport Type <span class="text-danger">*</span>
+            </label>
+            <div class="d-flex align-items-center gap-2">
+                <select asp-for="TransPortTypeId"
+                        asp-items="@ViewBag.TransportTypes"
+                        class="form-select">
+                    <option value="">-- Select --</option>
+                </select>
+                <span asp-validation-for="TransPortTypeId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="mb-3 col-md-4">
+            <label>From Location</label>
+            <input type="hidden" asp-for="FromPortId" id="FromPortId" />
+            <input type="text"
+                   id="FromPortSearchText"
+                   name="FromPort"
+                   value="@Model.FromPortName"
+                   class="form-control"
+                   placeholder="Search From Port..."
+                   autocomplete="off"
+                   hx-get="@Url.Action("SearchLocations", "Locations")"
+                   hx-trigger="keyup changed delay:400ms"
+                   hx-target="#originSearchResults"
+                   hx-swap="innerHTML"
+                   hx-vals='js:{
+                            term: document.getElementById("FromPortSearchText").value,
+                            targetHiddenInputId: "FromPortId",
+                            targetTextInputId: "FromPortSearchText"
+                       }' />
+
+            <div id="originSearchResults"
+                 class="position-relative">
+            </div>
+            <span asp-validation-for="FromPortId" class="text-danger small"></span>
+        </div>
+
+
+
+        <div class="mb-3 col-md-4">
+            <label>To Location</label>
+            <input type="hidden" asp-for="ToPortId" id="ToPortId" />
+            <input type="text"
+                   id="ToPortSearchText"
+                   name="ToPort"
+                   value="@Model.ToPortName"
+                   class="form-control"
+                   placeholder="Search To Port..."
+                   autocomplete="off"
+                   hx-get="@Url.Action("SearchLocations", "Locations")"
+                   hx-trigger="keyup changed delay:400ms"
+                   hx-target="#destinationSearchResults"
+                   hx-swap="innerHTML"
+                   hx-vals='js:{
+                            term: document.getElementById("ToPortSearchText").value,
+                            targetHiddenInputId: "ToPortId",
+                            targetTextInputId: "ToPortSearchText"
+                       }' />
+
+            <div id="destinationSearchResults"
+                 class="position-relative">
+            </div>
+            <span asp-validation-for="ToPortId" class="text-danger small"></span>
+        </div>
+
+        <!-- DistanceKM -->
+        <div class="mb-3">
+            <label class="form-label fw-medium">Distance-KM</label>
+            <input type="text"
+                   name="DistanceKM"
+                   value="@Model.DistanceKM"
+                   class="form-control @(ViewData.ModelState.ContainsKey("DistanceKM") && ViewData.ModelState["DistanceKM"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   required />
+        </div>
+
+
+        <!-- DistanceNM -->
+        <div class="mb-3">
+            <label class="form-label fw-medium">Distance-NM</label>
+            <input type="text"
+                   name="DistanceNM"
+                   value="@Model.DistanceNM"
+                   class="form-control @(ViewData.ModelState.ContainsKey("DistanceNM") && ViewData.ModelState["DistanceNM"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   required />
+        </div>
+
+
+        <!-- Days -->
+        <div class="mb-3">
+            <label class="form-label fw-medium">Transit Days</label>
+            <input type="text"
+                   name="AvgDays"
+                   value="@Model.AvgDays"
+                   class="form-control @(ViewData.ModelState.ContainsKey("AvgDays") && ViewData.ModelState["AvgDays"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   required />
+        </div>
+
+        <!-- Days -->
+        <div class="mb-3">
+            <label class="form-label fw-medium">Transit Hours</label>
+            <input type="text"
+                   name="AvgHours"
+                   value="@Model.AvgHours"
+                   class="form-control @(ViewData.ModelState.ContainsKey("AvgHours") && ViewData.ModelState["AvgHours"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   required />
+        </div>
+
+        <!-- Days -->
+        <div class="mb-3">
+            <label class="form-label fw-medium">Source</label>
+            <input type="text"
+                   name="Source"
+                   value="@Model.Source"
+                   class="form-control @(ViewData.ModelState.ContainsKey("Source") && ViewData.ModelState["Source"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   required />
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i> Save
+        </button>
+    </div>
+</form>

@@ -1,0 +1,106 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.ViewModels
+@model PagedResultDto<PaymentDocumentListItemVm>
+
+@{
+    ViewData["Title"] = "Payment Documents";
+}
+
+<div class="container-fluid" dir="ltr">
+    <div class="card-header d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">Payment Documents</h3>
+
+@*         <button type="button"
+                class="btn btn-outline-danger"
+                hx-get="@Url.Action("ChequeInfo", "ApiIr")"
+                hx-target="#apiIrModalBody"
+                hx-swap="innerHTML"
+                data-bs-toggle="modal"
+                data-bs-target="#apiIrModal">
+            <i class="bi bi-bank"></i>
+            استعلام چک برگشتی
+        </button>
+ *@
+
+
+        <button type="button"
+                class="btn btn-primary btn-sm"
+                title="Create New Payment"
+                hx-get="@Url.Action("Create", "PaymentDocuments")"
+                hx-target="#paymentDocumentModalContent"
+                hx-swap="innerHTML"
+                data-bs-toggle="modal"
+                data-bs-target="#paymentDocumentModal">
+            <i class="bi bi-plus-lg me-1"></i>
+            New Payment
+        </button>
+
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            @await Html.PartialAsync("_SearchForm", ViewBag.Search as PaymentDocumentSearchVm)
+        </div>
+    </div>
+
+    <div id="payment-document-list"
+         hx-get="@Url.Action("List", "PaymentDocuments")"
+         hx-trigger="load, paymentDocumentChanged from:body"
+         hx-include="#paymentDocumentSearchForm"
+         hx-target="#payment-document-list"
+         hx-swap="innerHTML">
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="globalModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="globalModalContent">
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade"
+     id="paymentDocumentModal"
+     tabindex="-1"
+     aria-hidden="true"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false">
+
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="paymentDocumentModalContent">
+            <!-- _CreateEditModal is loaded here -->
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        document.body.addEventListener('hidden.bs.modal', function (evt) {
+            if (evt.target.id === 'paymentDocumentModal') {
+                document.getElementById('paymentDocumentModalContent').innerHTML = '';
+            }
+        });
+    </script>
+
+
+    <script>
+        document.body.addEventListener('htmx:afterSwap', function (event) {
+            if (event.detail.target.id !== 'payment-document-usage-panel') {
+                return;
+            }
+
+            event.detail.target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        });
+    </script>
+
+
+}

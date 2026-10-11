@@ -1,0 +1,625 @@
+﻿@using ShipRate.Application.DTOs.Base_Info
+@using ShipRate.WebApp.ViewModels
+@model PersonCreateUpdateDto
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+}
+
+<style>
+    .person-form-wrapper {
+        direction: ltr;
+        background-color: #f5f7fb;
+        font-family: inherit;
+    }
+
+    .bl-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: #ffffff;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 12px 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 6px 6px 0 0;
+    }
+
+    .bl-topbar-title h1 {
+        font-size: 17px;
+        margin: 0;
+        font-weight: 700;
+        color: #111827;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .bl-card {
+        background: #ffffff;
+        border: 1px solid #d1d9e0;
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
+        margin-bottom: 14px;
+    }
+
+    .bl-card-header {
+        padding: 9px 15px;
+        border-bottom: 1px solid #d1d9e0;
+        background: #fbfdff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+        .bl-card-header h2 {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 0;
+            color: #1f2937;
+            letter-spacing: .2px;
+        }
+
+    .excel-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0;
+        border: 1px solid #d1d9e0;
+        background-color: #d1d9e0;
+    }
+
+    .excel-field {
+        display: flex;
+        align-items: stretch;
+        background-color: #ffffff;
+        border: 0.5px solid #d1d9e0;
+        min-height: 40px;
+    }
+
+    .span-2 {
+        grid-column: span 2;
+    }
+
+    .span-3 {
+        grid-column: span 3;
+    }
+
+    .excel-field label {
+        background-color: #eef6ff;
+        color: #374151;
+        padding: 7px 12px;
+        font-size: 13.5px;
+        font-weight: 600;
+        min-width: 155px;
+        max-width: 155px;
+        border-right: 1px solid #d1d9e0;
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        margin: 0;
+        user-select: none;
+    }
+
+    .excel-field input,
+    .excel-field select,
+    .excel-field textarea {
+        flex: 1;
+        border: none !important;
+        border-radius: 0 !important;
+        background-color: #ffffff;
+        padding: 6px 10px;
+        font-size: 14px;
+        color: #111827;
+        outline: none !important;
+        box-shadow: none !important;
+        width: 100%;
+        min-height: 38px;
+    }
+
+        .excel-field input:focus,
+        .excel-field select:focus,
+        .excel-field textarea:focus {
+            background-color: #fff9c4 !important;
+        }
+
+    .services-strip {
+        background-color: #fbfdff;
+        border-top: 1px solid #d1d9e0;
+        padding: 10px 14px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px 24px;
+        align-items: center;
+    }
+
+    .service-check-item {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #374151;
+        cursor: pointer;
+        margin: 0;
+        user-select: none;
+    }
+
+        .service-check-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #0d6efd;
+        }
+
+    .excel-field input.is-invalid,
+    .excel-field select.is-invalid {
+        background-color: #fff1f2 !important;
+        border-bottom: 2px solid #dc3545 !important;
+    }
+
+    @@media (max-width: 992px) {
+        .excel-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .span-2, .span-3 {
+            grid-column: span 1;
+        }
+    }
+</style>
+
+<div class="person-form-wrapper p-3">
+    <!-- Topbar -->
+    <div class="bl-topbar mb-3">
+        <div class="bl-topbar-title">
+            <h1>
+                <i class="bi @(isCreateMode ? "bi-plus-circle" : "bi-pencil-square") text-primary"></i>
+                <span>@(isCreateMode ? "Add Person" : "Edit Person")</span>
+            </h1>
+        </div>
+        <button type="button" class="btn-close" onclick="AppModal.close()" aria-label="Close"></button>
+    </div>
+
+    <form hx-post="@Url.Action(isCreateMode ? "Create" : "Edit", "Persons")"
+          hx-target="#app-modal-content"
+          hx-swap="innerHTML">
+
+        @if (!isCreateMode)
+        {
+            <input type="hidden" asp-for="Id" />
+        }
+
+        @await Html.PartialAsync("_ModelStateError")
+
+        <!-- ۱. اطلاعات عمومی و هویتی (General & Identity Info) -->
+        <div class="bl-card">
+            <div class="bl-card-header">
+                <h2><i class="bi bi-person-vcard text-primary me-2"></i>Identification & General Information</h2>
+            </div>
+            <div class="excel-grid">
+                <!-- Personality Type -->
+                <div class="excel-field">
+                    <label asp-for="PersonalityTypeId">Personality Type <span class="text-danger ms-1">*</span></label>
+                    <select asp-for="PersonalityTypeId"
+                            asp-items="@ViewBag.PersonalityTypes"
+                            class="@(ViewData.ModelState.ContainsKey("PersonalityTypeId") && ViewData.ModelState["PersonalityTypeId"]!.Errors.Any() ? "is-invalid" : "")">
+                    </select>
+                </div>
+
+                <!-- Country -->
+                <div class="excel-field">
+                    <label asp-for="CountryId">Country <span class="text-danger ms-1">*</span></label>
+                    <select asp-for="CountryId"
+                            asp-items="@ViewBag.Countries"
+                            class="@(ViewData.ModelState.ContainsKey("CountryId") && ViewData.ModelState["CountryId"]!.Errors.Any() ? "is-invalid" : "")">
+                    </select>
+                </div>
+
+                <!-- National ID -->
+                <div class="excel-field">
+                    <label>National ID</label>
+                    <input type="text"
+                           name="NationalId"
+                           value="@Model.NationalID"
+                           class="@(ViewData.ModelState.ContainsKey("NationalId") && ViewData.ModelState["NationalId"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="20" />
+                </div>
+
+                <!-- Person Name -->
+                <div class="excel-field">
+                    <label>Name <span class="text-danger ms-1">*</span></label>
+                    <input type="text"
+                           name="PersonName"
+                           value="@Model.PersonName"
+                           class="@(ViewData.ModelState.ContainsKey("PersonName") && ViewData.ModelState["PersonName"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="200" />
+                </div>
+
+                <!-- Local Name (Persian Name) -->
+                <div class="excel-field span-2">
+                    <label>Local Name</label>
+                    <input type="text"
+                           name="PersonPersianName"
+                           value="@Model.PersonPersianName"
+                           class="@(ViewData.ModelState.ContainsKey("PersonPersianName") && ViewData.ModelState["PersonPersianName"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="200" />
+                </div>
+
+                <!-- Real Person Fields (Conditional) -->
+                <div class="excel-field" data-show-if="PersonalityTypeId = 2">
+                    <label>First Name</label>
+                    <input type="text"
+                           name="FirstName"
+                           value="@Model.FirstName"
+                           class="@(ViewData.ModelState.ContainsKey("FirstName") && ViewData.ModelState["FirstName"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="35" />
+                </div>
+
+                <div class="excel-field" data-show-if="PersonalityTypeId = 2">
+                    <label>Last Name</label>
+                    <input type="text"
+                           name="LastName"
+                           value="@Model.LastName"
+                           class="@(ViewData.ModelState.ContainsKey("LastName") && ViewData.ModelState["LastName"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="50" />
+                </div>
+
+                <div class="excel-field" data-show-if="PersonalityTypeId = 2">
+                    <label>Birth Date</label>
+                    <input type="date"
+                           asp-for="BirthDate"
+                           class="@(ViewData.ModelState.ContainsKey("BirthDate") && ViewData.ModelState["BirthDate"]!.Errors.Any() ? "is-invalid" : "")" />
+                </div>
+
+                <!-- Legal / Registration Fields -->
+                <div class="excel-field">
+                    <label>Economic Code</label>
+                    <input type="text"
+                           name="EcoCode"
+                           value="@Model.EcoCode"
+                           class="@(ViewData.ModelState.ContainsKey("EcoCode") && ViewData.ModelState["EcoCode"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="20" />
+                </div>
+
+                <div class="excel-field">
+                    <label>Registration No</label>
+                    <input type="text"
+                           name="RegNo"
+                           value="@Model.RegNo"
+                           class="@(ViewData.ModelState.ContainsKey("RegNo") && ViewData.ModelState["RegNo"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="20" />
+                </div>
+
+                <div class="excel-field">
+                    <label>Registration Date</label>
+                    <input type="date"
+                           asp-for="PersonRegDate"
+                           class="@(ViewData.ModelState.ContainsKey("PersonRegDate") && ViewData.ModelState["PersonRegDate"]!.Errors.Any() ? "is-invalid" : "")" />
+                </div>
+            </div>
+        </div>
+
+        <!-- ۲. اطلاعات تماس و آدرس‌ها (Contact & Address Details) -->
+        <div class="bl-card">
+            <div class="bl-card-header">
+                <h2><i class="bi bi-geo-alt text-primary me-2"></i>Contact & Address Information</h2>
+            </div>
+            <div class="excel-grid">
+                <div class="excel-field span-3">
+                    <label>Address</label>
+                    <input type="text"
+                           name="Address"
+                           value="@Model.Address"
+                           class="@(ViewData.ModelState.ContainsKey("Address") && ViewData.ModelState["Address"]!.Errors.Any() ? "is-invalid" : "")"
+                           placeholder="Full English Address..."
+                           maxlength="200" />
+                </div>
+
+                <div class="excel-field span-3">
+                    <label>Address (فارسی)</label>
+                    <input type="text"
+                           name="PersianAddress"
+                           value="@Model.PersianAddress"
+                           class="@(ViewData.ModelState.ContainsKey("PersianAddress") && ViewData.ModelState["PersianAddress"]!.Errors.Any() ? "is-invalid" : "")"
+                           placeholder="آدرس کامل به فارسی..."
+                           maxlength="200" />
+                </div>
+
+                <div class="excel-field">
+                    <label>Zip Code</label>
+                    <input type="text"
+                           name="ZipCode"
+                           value="@Model.ZipCode"
+                           class="@(ViewData.ModelState.ContainsKey("ZipCode") && ViewData.ModelState["ZipCode"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="20" />
+                </div>
+
+                <div class="excel-field">
+                    <label>Phone</label>
+                    <input type="text"
+                           name="Phone"
+                           value="@Model.Phone"
+                           class="@(ViewData.ModelState.ContainsKey("Phone") && ViewData.ModelState["Phone"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="50" />
+                </div>
+
+                <div class="excel-field">
+                    <label>Mobile</label>
+                    <input type="text"
+                           name="Mobile"
+                           value="@Model.Mobile"
+                           class="@(ViewData.ModelState.ContainsKey("Mobile") && ViewData.ModelState["Mobile"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="20" />
+                </div>
+
+                <div class="excel-field">
+                    <label>Fax</label>
+                    <input type="text"
+                           name="FaxNo"
+                           value="@Model.FaxNo"
+                           class="@(ViewData.ModelState.ContainsKey("FaxNo") && ViewData.ModelState["FaxNo"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="50" />
+                </div>
+
+                <div class="excel-field span-2">
+                    <label>Email Address</label>
+                    <input type="email"
+                           name="EmailAddress"
+                           value="@Model.EmailAddress"
+                           class="@(ViewData.ModelState.ContainsKey("EmailAddress") && ViewData.ModelState["EmailAddress"]!.Errors.Any() ? "is-invalid" : "")"
+                           placeholder="e.g. info@company.com"
+                           maxlength="35" />
+                </div>
+            </div>
+        </div>
+
+        <!-- ۳. نقش‌های عمومی و اختصاصی (Roles) -->
+        <div class="bl-card">
+            <div class="bl-card-header">
+                <h2><i class="bi bi-shield-check text-primary me-2"></i>Roles & Assignments</h2>
+            </div>
+
+            <!-- General Roles -->
+            <div class="p-2 border-bottom bg-light">
+                <span class="text-muted fw-bold small text-uppercase ms-2">General Roles</span>
+            </div>
+            <div class="services-strip">
+                @if (ViewBag.RoleTypes != null)
+                {
+                    foreach (var tt in ViewBag.RoleTypes)
+                    {
+                        <label class="service-check-item">
+                            <input type="checkbox"
+                                   name="SelectedRoleTypes"
+                                   value="@tt.Id"
+                                   @(Model.SelectedRoleTypes != null && Model.SelectedRoleTypes.Contains((int)tt.Id) ? "checked" : "") />
+                            <span>@tt.RoleTypeName</span>
+                        </label>
+                    }
+                }
+            </div>
+
+            <!-- Special Roles -->
+            <div class="p-2 border-bottom bg-light">
+                <span class="text-muted fw-bold small text-uppercase ms-2">Special Roles</span>
+            </div>
+            <div class="services-strip">
+                <label class="service-check-item">
+                    <input type="checkbox"
+                           name="IsAgent"
+                           value="@(Model.IsAgent ? "true" : "false")"
+                           onchange="handleCheckboxChange(this)"
+                           @(Model.IsAgent ? "checked" : "") />
+                    <span>Agent</span>
+                </label>
+                <label class="service-check-item">
+                    <input type="checkbox"
+                           name="IsCarrier"
+                           value="@(Model.IsCarrier ? "true" : "false")"
+                           onchange="handleCheckboxChange(this)"
+                           @(Model.IsCarrier ? "checked" : "") />
+                    <span>Carrier</span>
+                </label>
+                <label class="service-check-item">
+                    <input type="checkbox"
+                           name="IsCourierCompany"
+                           value="@(Model.IsCourierCompany ? "true" : "false")"
+                           onchange="handleCheckboxChange(this)"
+                           @(Model.IsCourierCompany ? "checked" : "") />
+                    <span>Courier Company</span>
+                </label>
+                <label class="service-check-item">
+                    <input type="checkbox"
+                           name="IsGPSProvider"
+                           value="@(Model.IsGPSProvider ? "true" : "false")"
+                           onchange="handleCheckboxChange(this)"
+                           @(Model.IsGPSProvider ? "checked" : "") />
+                    <span>GPS Provider</span>
+                </label>
+                <label class="service-check-item">
+                    <input type="checkbox"
+                           name="IsDriver"
+                           value="@(Model.IsDriver ? "true" : "false")"
+                           onchange="handleCheckboxChange(this)"
+                           @(Model.IsDriver ? "checked" : "") />
+                    <span>Driver</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- ۴. اطلاعات Agent (Conditional) -->
+        <div class="bl-card" data-show-if="IsAgent = true">
+            <div class="bl-card-header">
+                <h2><i class="bi bi-briefcase text-primary me-2"></i>Agent Information</h2>
+            </div>
+            <div class="excel-grid">
+                <div class="excel-field">
+                    <label asp-for="Agent.CompanyId">Company <span class="text-danger ms-1">*</span></label>
+                    <select asp-for="Agent.CompanyId" asp-items="@ViewBag.Companies">
+                        <option value="">-- Select Company --</option>
+                    </select>
+                </div>
+                <div class="excel-field span-2">
+                    <label asp-for="Agent.ParentId">Parent Agent</label>
+                    <select asp-for="Agent.ParentId" asp-items="@ViewBag.Agents">
+                        <option value="">-- Select Parent --</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- ۵. اطلاعات Carrier (Conditional) -->
+        <div class="bl-card" data-show-if="IsCarrier = true">
+            <div class="bl-card-header">
+                <h2><i class="bi bi-truck text-primary me-2"></i>Carrier Information</h2>
+            </div>
+            <div class="excel-grid">
+                <div class="excel-field">
+                    <label asp-for="Carrier.CarrierTypeId">Carrier Type <span class="text-danger ms-1">*</span></label>
+                    <select asp-for="Carrier.CarrierTypeId" asp-items="@ViewBag.CarrierTypes">
+                        <option value="">-- Select Type --</option>
+                    </select>
+                </div>
+
+                <div class="excel-field">
+                    <label>Carrier Code <span class="text-danger ms-1">*</span></label>
+                    <input type="text"
+                           name="Carrier.CarrierCode"
+                           value="@Model.Carrier?.CarrierCode"
+                           class="@(ViewData.ModelState.ContainsKey("CarrierCode") && ViewData.ModelState["CarrierCode"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="20" required />
+                </div>
+
+                <div class="excel-field">
+                    <label>AWB Prefix</label>
+                    <input type="text"
+                           name="Carrier.AWBPrefix"
+                           value="@Model.Carrier?.AWBPrefix"
+                           class="@(ViewData.ModelState.ContainsKey("AWBPrefix") && ViewData.ModelState["AWBPrefix"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="20" />
+                </div>
+
+                <div class="excel-field">
+                    <label>Booking Email <span class="text-danger ms-1">*</span></label>
+                    <input type="email"
+                           name="Carrier.BookingEmail"
+                           value="@Model.Carrier?.BookingEmail"
+                           class="@(ViewData.ModelState.ContainsKey("BookingEmail") && ViewData.ModelState["BookingEmail"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="50" required />
+                </div>
+
+                <div class="excel-field">
+                    <label>Operating Region <span class="text-danger ms-1">*</span></label>
+                    <input type="text"
+                           name="Carrier.OperatingRegion"
+                           value="@Model.Carrier?.OperatingRegion"
+                           class="@(ViewData.ModelState.ContainsKey("OperatingRegion") && ViewData.ModelState["OperatingRegion"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="50" required />
+                </div>
+
+                <div class="excel-field">
+                    <label>Tracking URL <span class="text-danger ms-1">*</span></label>
+                    <input type="text"
+                           name="Carrier.TrackingUrl"
+                           value="@Model.Carrier?.TrackingUrl"
+                           class="@(ViewData.ModelState.ContainsKey("TrackingUrl") && ViewData.ModelState["TrackingUrl"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="100" required />
+                </div>
+            </div>
+        </div>
+
+        <!-- ۶. اطلاعات Courier Company (Conditional) -->
+        <div class="bl-card" data-show-if="IsCourierCompany = true">
+            <div class="bl-card-header">
+                <h2><i class="bi bi-box2 text-primary me-2"></i>Courier Company Information</h2>
+            </div>
+            <div class="excel-grid">
+                <div class="excel-field span-3">
+                    <label>Remarks</label>
+                    <input type="text"
+                           name="CourierCompany.Remarks"
+                           value="@Model.CourierCompany?.Remarks"
+                           class="@(ViewData.ModelState.ContainsKey("Remarks") && ViewData.ModelState["Remarks"]!.Errors.Any() ? "is-invalid" : "")"
+                           placeholder="Notes regarding courier..." />
+                </div>
+            </div>
+        </div>
+
+        <!-- ۷. اطلاعات GPS Provider (Conditional) -->
+        <div class="bl-card" data-show-if="IsGPSProvider = true">
+            <div class="bl-card-header">
+                <h2><i class="bi bi-broadcast-pin text-primary me-2"></i>GPS Provider Information</h2>
+            </div>
+            <div class="excel-grid">
+                <div class="excel-field span-2">
+                    <label>Site Address</label>
+                    <input type="text"
+                           name="GPSProviderDto.SiteAddress"
+                           value="@Model.GPSProviderDto?.SiteAddress"
+                           class="@(ViewData.ModelState.ContainsKey("SiteAddress") && ViewData.ModelState["SiteAddress"]!.Errors.Any() ? "is-invalid" : "")"
+                           placeholder="https://..." />
+                </div>
+                <div class="excel-field">
+                    <label>Remarks</label>
+                    <input type="text"
+                           name="GPSProviderDto.Remarks"
+                           value="@Model.GPSProviderDto?.Remarks"
+                           class="@(ViewData.ModelState.ContainsKey("Remarks") && ViewData.ModelState["Remarks"]!.Errors.Any() ? "is-invalid" : "")" />
+                </div>
+            </div>
+        </div>
+
+        <!-- ۸. اطلاعات Driver (Conditional) -->
+        <div class="bl-card" data-show-if="IsDriver = true">
+            <div class="bl-card-header">
+                <h2><i class="bi bi-person-badge text-primary me-2"></i>Driver Information</h2>
+            </div>
+            <div class="excel-grid">
+                <div class="excel-field">
+                    <label asp-for="Driver.CarrierId">Carrier <span class="text-danger ms-1">*</span></label>
+                    <select asp-for="Driver.CarrierId" asp-items="@ViewBag.Carriers">
+                        <option value="">-- Select Carrier --</option>
+                    </select>
+                </div>
+
+                <div class="excel-field">
+                    <label>Passport No</label>
+                    <input type="text"
+                           name="Driver.PassportNo"
+                           value="@Model.Driver?.PassportNo"
+                           class="@(ViewData.ModelState.ContainsKey("PassportNo") && ViewData.ModelState["PassportNo"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="30" />
+                </div>
+
+                <div class="excel-field">
+                    <label>License Number</label>
+                    <input type="text"
+                           name="Driver.LicenseNumber"
+                           value="@Model.Driver?.LicenseNumber"
+                           class="@(ViewData.ModelState.ContainsKey("LicenseNumber") && ViewData.ModelState["LicenseNumber"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="30" />
+                </div>
+
+                <div class="excel-field">
+                    <label>Smart Card No</label>
+                    <input type="text"
+                           name="Driver.SmartCardNo"
+                           value="@Model.Driver?.SmartCardNo"
+                           class="@(ViewData.ModelState.ContainsKey("SmartCardNo") && ViewData.ModelState["SmartCardNo"]!.Errors.Any() ? "is-invalid" : "")"
+                           maxlength="30" />
+                </div>
+            </div>
+        </div>
+
+        <!-- دکمه‌های فوتر -->
+        <div class="d-flex justify-content-end gap-2 pt-3 border-top mt-3">
+            <button type="button" class="btn btn-light border px-3 py-1 fw-semibold" style="font-size: .88rem;" onclick="AppModal.close()">Cancel</button>
+            <button type="submit" class="btn btn-primary px-3 py-1 fw-semibold shadow-sm" style="font-size: .88rem;">
+                <i class="bi bi-check-lg me-1"></i> @(isCreateMode ? "Save Person" : "Update Person")
+            </button>
+        </div>
+    </form>
+</div>

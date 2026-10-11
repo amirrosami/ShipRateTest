@@ -1,0 +1,35 @@
+﻿@model ShipRate.Application.ViewModels.JobPartyDetailsVm
+
+<div class="modal fade" id="jobPartyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Job Party Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body text-start" dir="ltr">
+                <div class="row g-3">
+                    <div class="col-md-4"><strong>Sequence No:</strong> @Model.SequenceNo</div>
+                    <div class="col-md-4"><strong>Party:</strong> @Model.PartyName</div>
+                    <div class="col-md-4"><strong>Role Type:</strong> @Model.RoleTypeName</div>
+
+                    <div class="col-md-4"><strong>Primary Role:</strong> @(Model.IsPrimaryRole ? "Yes" : "No")</div>
+                    <div class="col-md-4"><strong>Active:</strong> @(Model.IsActive ? "Yes" : "No")</div>
+                    <div class="col-md-4"></div>
+
+                    <div class="col-md-4"><strong>Contact Name:</strong> @Model.ContactName</div>
+                    <div class="col-md-4"><strong>Contact Email:</strong> @Model.ContactEmail</div>
+                    <div class="col-md-4"><strong>Contact Phone:</strong> @Model.ContactPhone</div>
+
+                    <div class="col-md-6"><strong>Created At:</strong> @Model.CreatedAt</div>
+                    <div class="col-md-6"><strong>Updated At:</strong> @Model.UpdatedAt</div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

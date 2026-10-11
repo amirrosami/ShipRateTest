@@ -1,0 +1,78 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model SettlementHeaderCreateDto
+
+<div class="modal-header">
+    <h5 class="modal-title">New Settlement</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<form hx-post="@Url.Action("Create", "Settlements")"
+      hx-target="#mainModalBody"
+      hx-swap="innerHTML">
+
+    @Html.AntiForgeryToken()
+
+    <div class="modal-body">
+
+        <div class="alert alert-info">
+            First save settlement header, then you can add settlement items and payment allocations.
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-md-4">
+                <label class="form-label">Company</label>
+                <select asp-for="CompanyId" class="form-select" asp-items="ViewBag.Companies">
+                    <option value="">Select...</option>
+                </select>
+                <span asp-validation-for="CompanyId" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Settlement Date</label>
+                <input asp-for="SettlementDate" type="date" class="form-control" />
+                <span asp-validation-for="SettlementDate" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Currency</label>
+                <select asp-for="CurrencyId" class="form-select" asp-items="ViewBag.Currencies">
+                    <option value="">Select...</option>
+                </select>
+                <span asp-validation-for="CurrencyId" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Party</label>
+
+                <input type="hidden" asp-for="PartyId" id="CreatePartyId" />
+                <input type="text"
+                       asp-for="PartyName"
+                       name="PartyNameSearch"
+                       id="CreatePartyName"
+                       class="form-control"
+                       autocomplete="off"
+                       hx-get="@Url.Action("Parties", "Lookup")"
+                       hx-trigger="keyup changed delay:400ms"
+                       hx-target="#createPartyResults"
+                       hx-include="#CreatePartyName"
+                       hx-vals='{"targetId":"CreatePartyId","targetText":"CreatePartyName"}' />
+
+                <div id="createPartyResults"></div>
+            </div>
+            <div class="col-md-12">
+                <label class="form-label">Remarks</label>
+                <textarea asp-for="Remarks" class="form-control" rows="2"></textarea>
+                <span asp-validation-for="Remarks" class="text-danger small"></span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save Header</button>
+    </div>
+
+</form>

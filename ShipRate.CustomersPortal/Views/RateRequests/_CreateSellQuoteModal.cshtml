@@ -1,0 +1,225 @@
+﻿@using ShipRate.WebAppCustomers.ViewModels
+@model CreateSellQuoteViewModel
+
+<div class="modal-content border-0 shadow-lg">
+    <div class="modal-header bg-primary text-white py-2">
+        <h6 class="modal-title"><i class="bi bi-file-earmark-plus me-2"></i>Create Sell Quotation from Buy Quote</h6>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    </div>
+
+    <form hx-post="@Url.Action("SaveSellQuote")" hx-target="#SellQuotesListContainer">
+        @Html.AntiForgeryToken()
+
+        <div class="modal-body p-3 bg-light">
+            @Html.HiddenFor(m => m.BuyQuoteId)
+            @Html.HiddenFor(m => m.RateRequestId)
+
+            <!-- بخش فیلدهای اطلاعاتی هدر -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-body p-2">
+                    <div class="row g-2">
+                        <div class="col-md-3">
+                            <label class="small fw-bold">Service Name</label>
+                            <input asp-for="ServiceName" class="form-control form-control-sm" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small fw-bold">Vehicle(s)</label>
+                            <input asp-for="VehicleNames" class="form-control form-control-sm" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small fw-bold">Movement #</label>
+                            <input asp-for="MovementNumbers" class="form-control form-control-sm" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small fw-bold">Valid Until</label>
+                            <input asp-for="ValidUntil" type="date" class="form-control form-control-sm"
+                                   value="@(Model.ValidUntil?.ToString("yyyy-MM-dd"))" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small fw-bold">ETD</label>
+                            <input asp-for="ETD" type="date" class="form-control form-control-sm"
+                                   value="@(Model.ETD?.ToString("yyyy-MM-dd"))" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small fw-bold">ETA</label>
+                            <input asp-for="ETA" type="date" class="form-control form-control-sm"
+                                   value="@(Model.ETA?.ToString("yyyy-MM-dd"))" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="small fw-bold">Remarks</label>
+                            <textarea asp-for="Remarks" class="form-control form-control-sm" rows="15"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- جدول آیتم‌ها -->
+            <div class="table-responsive bg-white rounded shadow-sm">
+                <table class="table table-sm align-middle" id="sellItemsTable">
+                    <thead class="table-dark small">
+                        <tr>
+                            <th style="width:20%">Charge Type</th>
+                            <th style="width:15%">Size Type</th>
+                            <th class="text-center" style="width:5%">Qty</th>
+                            <th style="width:12%">Currency</th>
+                            <th class="text-end" style="width:10%">Buy Rate</th>
+                            <th class="text-end" style="width:10%">Sell Rate</th>
+                            <th class="text-end" style="width:10%">Profit</th>
+                            <th class="text-end" style="width:13%">Total Sell</th>
+                            <th style="width:5%"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsBody">
+                        @for (int i = 0; i < Model.Items.Count; i++)
+                        {
+                            <tr class="item-row">
+                                <td>
+                                    @*<input type="hidden" name="Items[@i].ChargeTypeId" value="@Model.Items[i].ChargeTypeId" />
+                                    <input type="hidden" name="Items[@i].ChargeTypeName" value="@Model.Items[i].ChargeTypeName" />
+                                    <span class="small fw-bold">@Model.Items[i].ChargeTypeName</span> *@
+                                    <select name="Items[@i].ChargeTypeId" class="form-select form-select-sm">
+                                        <option value="">Select...</option>
+                                        @foreach (var ct in ViewBag.ChargeTypes)
+                                        {
+                                            <option value="@ct.Id" selected="@(Model.Items[i].ChargeTypeId == ct.Id)">@ct.ChargeTypes</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td>
+                                    @*<input type="hidden" name="Items[@i].ContainerSizeTypeId" value="@Model.Items[i].ContainerSizeTypeId" />
+                                    <input type="hidden" name="Items[@i].SizeTypeName" value="@Model.Items[i].SizeTypeName" />
+                                    <span class="small fw-bold">@Model.Items[i].SizeTypeName</span> *@
+
+                                    <select name="Items[@i].ContainerSizeTypeId" class="form-select form-select-sm">
+                                        <option value="">Select...</option>
+                                        @foreach (var ct in ViewBag.ContainerSizeTypes)
+                                        {
+                                            <option value="@ct.Id" selected="@(Model.Items[i].ContainerSizeTypeId == ct.Id)">@ct.ShortName</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td>
+                                    <input name="Items[@i].Quantity" class="form-control form-control-sm text-center qty-input"
+                                           value="@Model.Items[i].Quantity" />
+                                </td>
+                                <td>
+                                    <select name="Items[@i].CurrencyId" class="form-select form-select-sm">
+                                        <option value="">Select...</option>
+                                        @foreach (var c in ViewBag.Currencies)
+                                        {
+                                            <option value="@c.Id" selected="@(Model.Items[i].CurrencyId == c.Id)">@c.CurrencyCode</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td class="text-end small text-muted">
+                                    <span class="buy-rate">@Model.Items[i].BuyUnitRate.Value.ToString("N2")</span>
+                                    <input type="hidden" name="Items[@i].BuyUnitRate" value="@Model.Items[i].BuyUnitRate" />
+                                </td>
+                                <td>
+                                    <input name="Items[@i].SellUnitRate" class="form-control form-control-sm text-end sell-rate-input border-primary fw-bold"
+                                           value="@Model.Items[i].SellUnitRate" />
+                                </td>
+                                <td class="text-end small fw-bold profit-val">0.00</td>
+                                <td class="text-end small fw-bold sell-total-val text-primary">0.00</td>
+                                <td class="text-center">
+                                    @if (i >= Model.Items.Count)
+                                    { @* فقط برای ردیف‌های جدید دکمه حذف بگذاریم *@
+                                        <button type="button" class="btn btn-link text-danger p-0" onclick="removeRow(this)"><i class="bi bi-trash"></i></button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="p-2 border-top bg-light">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addNewRow()">
+                        <i class="bi bi-plus-circle me-1"></i> Add Extra Charge
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer py-1">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm px-4">Save Quotation</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    let rowCount = @Model.Items.Count;
+
+    function addNewRow() {
+        const tbody = document.getElementById('itemsBody');
+        const tr = document.createElement('tr');
+        tr.className = 'item-row bg-warning-subtle';
+        tr.innerHTML = `
+            <td>
+                <select name="Items[${rowCount}].ChargeTypeId" class="form-select form-select-sm">
+                    <option value="">Select...</option>
+                    @foreach (var ct in ViewBag.ChargeTypes)
+                        {
+                                <option value="@ct.Id">@ct.ChargeTypeName</option>
+                        }
+                </select>
+            </td>
+            <td>
+                <select name="Items[${rowCount}].ContainerSizeTypeId" class="form-select form-select-sm">
+                    <option value="">Select...</option>
+                    @foreach (var ct in ViewBag.ContainerSizeTypes)
+                    {
+                            <option value="@ct.Id">@ct.ShortName</option>
+                    }
+                </select>
+            </td>
+            <td><input name="Items[${rowCount}].Quantity" class="form-control form-control-sm text-center qty-input" value="1" /></td>
+            <td>
+                <select name="Items[${rowCount}].CurrencyId" class="form-select form-select-sm">
+                    <option value="">Select...</option>
+                    @foreach (var c in ViewBag.Currencies)
+                    {
+                            <option value="@c.Id">@c.CurrencyCode</option>
+                    }
+                </select>
+            </td>
+            <td class="text-end small text-muted"><span class="buy-rate">0.00</span><input type="hidden" name="Items[${rowCount}].BuyUnitRate" value="0" /></td>
+            <td><input name="Items[${rowCount}].SellUnitRate" class="form-control form-control-sm text-end sell-rate-input border-primary fw-bold" value="0" /></td>
+            <td class="text-end small fw-bold profit-val">0.00</td>
+            <td class="text-end small fw-bold sell-total-val text-primary">0.00</td>
+            <td class="text-center"><button type="button" class="btn btn-link text-danger p-0" onclick="removeRow(this)"><i class="bi bi-trash"></i></button></td>
+        `;
+        tbody.appendChild(tr);
+        rowCount++;
+        attachEvents();
+    }
+    function removeRow(btn) {
+        btn.closest('tr').remove();
+        calculateRow();
+    }
+
+    function attachEvents() {
+        document.querySelectorAll('.qty-input, .sell-rate-input').forEach(input => {
+            input.removeEventListener('input', calculateRow);
+            input.addEventListener('input', calculateRow);
+        });
+        calculateRow();
+    }
+
+    function calculateRow() {
+        document.querySelectorAll('.item-row').forEach(row => {
+            const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+            const buy = parseFloat(row.querySelector('.buy-rate').innerText.replace(/,/g, '')) || 0;
+            const sell = parseFloat(row.querySelector('.sell-rate-input').value) || 0;
+
+            const totalSell = qty * sell;
+            const profit = (sell - buy) * qty;
+
+            row.querySelector('.sell-total-val').innerText = totalSell.toLocaleString(undefined, { minimumFractionDigits: 2 });
+            const profitCell = row.querySelector('.profit-val');
+            profitCell.innerText = profit.toLocaleString(undefined, { minimumFractionDigits: 2 });
+            profitCell.className = 'text-end small fw-bold profit-val ' + (profit >= 0 ? 'text-success' : 'text-danger');
+        });
+    }
+
+    attachEvents();
+</script>

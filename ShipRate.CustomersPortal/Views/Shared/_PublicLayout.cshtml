@@ -1,0 +1,42 @@
+﻿@using System.Globalization
+@using ShipRate.WebAppCustomers
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
+@{
+    var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isFa = culture == "fa";
+    var lang = isFa ? "fa" : "en";
+    var dir = isFa ? "rtl" : "ltr";
+}
+<!DOCTYPE html>
+<html lang="@lang" dir="@dir">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - ShipRate</title>
+    <!-- استایل‌های عمومی Bootstrap و غیره -->
+    @if (isFa)
+    {
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
+    }
+    else
+    {
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    }
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">ShipRate</a>
+            <div class="d-flex gap-2">
+                <!-- لینک‌های عمومی -->
+                <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary">@Localizer["Login"]</a>
+                <a asp-controller="Account" asp-action="Register" class="btn btn-primary">@Localizer["Register"]</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mt-4">
+        @RenderBody()
+    </main>
+</body>
+</html>

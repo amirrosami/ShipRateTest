@@ -1,0 +1,188 @@
+﻿@using ShipRate.Application.DTOs.Base_Info
+@model BankAccountDto
+@{
+    string CreateEditBankAccount = ViewBag.CreateEditBankAccount;
+    bool isCreateMode = false;
+    if (CreateEditBankAccount == "Create") isCreateMode = true;
+}
+<form hx-post="@Url.Action(isCreateMode?"CreateBankAccount":"EditBankAccount", "Persons")"
+      hx-target="#app-modal-content-second"
+      hx-swap="innerHTML">
+
+    <div class="modal-header bg-primary text-white">
+        <input type="hidden" asp-for="PersonId" />
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add Bank Account</h5>
+        }
+        else
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Edit Bank Account</h5>
+            <input type="hidden" asp-for="Id" />
+        }
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    </div>
+
+
+
+
+    <div class="modal-body row">
+        @Html.AntiForgeryToken()
+        @if (!ViewData.ModelState.IsValid)
+        {
+            var allErrors = ViewData.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            if (allErrors.Any())
+            {
+                <div class="alert alert-danger py-2 mb-3">
+                    <ul class="mb-0 small">
+                        @foreach (var err in allErrors)
+                        {
+                            <li>@err</li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+
+
+
+        <!-- Bank -->
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                Bank<span class="text-danger">*</span>
+            </label>
+            <div class="d-flex align-items-center gap-2">
+                <select asp-for="BankId"
+                        asp-items="@ViewBag.Banks"
+                        class="form-select">
+                    <option value="">-- Select --</option>
+                </select>
+                <span asp-validation-for="BankId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Title -->
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                Bank Account Title <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="BankAccountTitle"
+                   value="@Model.BankAccountTitle"
+                   class="form-control @(ViewData.ModelState.ContainsKey("BankAccountTitle") && ViewData.ModelState["BankAccountTitle"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="100" required />
+        </div>
+        <!-- Account Number -->
+
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                Bank Account Number<span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="AccountNumber"
+                   value="@Model.AccountNumber"
+                   class="form-control @(ViewData.ModelState.ContainsKey("AccountNumber") && ViewData.ModelState["AccountNumber"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="40" required />
+        </div>
+
+        <!-- IBAN -->
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                IBAN(Sheba)<span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="IBAN"
+                   value="@Model.IBAN"
+                   class="form-control @(ViewData.ModelState.ContainsKey("IBAN") && ViewData.ModelState["IBAN"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="100" required />
+        </div>
+
+        <!-- Currency -->
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                Currency<span class="text-danger">*</span>
+            </label>
+            <div class="d-flex align-items-center gap-2">
+                <select asp-for="CurrencyId"
+                        asp-items="@ViewBag.Currencies"
+                        class="form-select">
+                    <option value="">-- Select --</option>
+                </select>
+                <span asp-validation-for="CurrencyId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Currency -->
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                Purpose<span class="text-danger">*</span>
+            </label>
+            <div class="d-flex align-items-center gap-2">
+                <select asp-for="BankAccountPurposeId"
+                        asp-items="@ViewBag.BankAccountPurposes"
+                        class="form-select">
+                    <option value="">-- Select --</option>
+                </select>
+                <span asp-validation-for="BankAccountPurposeId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Branch No -->
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                Branch No<span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="BranchNo"
+                   value="@Model.BranchNo"
+                   class="form-control @(ViewData.ModelState.ContainsKey("BranchNo") && ViewData.ModelState["BranchNo"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="10" required />
+        </div>
+
+        <!-- Branch Name -->
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                Branch Name<span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="BranchName"
+                   value="@Model.BranchName"
+                   class="form-control @(ViewData.ModelState.ContainsKey("BranchName") && ViewData.ModelState["BranchName"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="100" required />
+        </div>
+
+        <!-- Branch Address -->
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                Branch Address<span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="BranchAddress"
+                   value="@Model.BranchAddress"
+                   class="form-control @(ViewData.ModelState.ContainsKey("BranchAddress") && ViewData.ModelState["BranchAddress"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="200" required />
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>

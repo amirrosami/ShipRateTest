@@ -1,0 +1,184 @@
+﻿@using ShipRate.Application.ViewModels
+@model DeliveryOrderBLSummaryVm
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        BL Information(Summary)
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-lg-6">
+                <div class="card border-1 shipment-card">
+                    <div class="table-responsive">
+                        <table class="table table-bordered mb-0 shipment-info-table">
+                            <tbody>
+                                <tr>
+                                    <th class="bg-light-subtle w-25">BL No</th>
+                                    <td class="fw-bold text-primary">@Model.BLNo</td>
+                                    <th class="bg-light-subtle w-25">Reference No</th>
+                                    <td>@Model.ReferenceNo</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light-subtle">Booking No</th>
+                                    <td>@Model.BookingNo</td>
+                                    <th class="bg-light-subtle">Carrier</th>
+                                    <td>@Model.CarrierName</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light-subtle">Vessel</th>
+                                    <td>@Model.VesselName</td>
+                                    <th class="bg-light-subtle">Voyage</th>
+                                    <td>@Model.VoyageNumber</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light-subtle">POL (Origin)</th>
+                                    <td>@Model.POL</td>
+                                    <th class="bg-light-subtle">POD (Dest.)</th>
+                                    <td>@Model.POD</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light-subtle">Issue Date</th>
+                                    <td>@Model.IssueDate</td>
+                                    <th class="bg-light-subtle">Package Count</th>
+                                    <td>@Model.PackageCount</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light-subtle">Gross Weight</th>
+                                    <td>@Model.GrossWeightKg <small class="text-muted">KG</small></td>
+                                    <th class="bg-light-subtle">Containers</th>
+                                    <td><span class="badge bg-secondary">@Model.ContainerCount Unit(s)</span></td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light-subtle">Consignee</th>
+                                    <td colspan="3" class="small text-uppercase">@Model.ConsigneeText</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light-subtle">Notify Party</th>
+                                    <td colspan="3" class="small text-uppercase">@Model.NotifyText</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="border rounded h-100">
+                    <div class="px-3 py-2 border-bottom bg-light fw-semibold">
+                        Cargo / Packages
+                    </div>
+
+                    @if (Model.Cargos == null || Model.Cargos.Count == 0)
+                    {
+                        <div class="p-3 text-muted small">
+                            No cargo information found.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive" style="max-height: 320px;">
+                            <table class="table table-sm table-hover mb-0 align-middle">
+                                <thead class="table-light sticky-top">
+                                    <tr>
+                                        <th>Package</th>
+                                        <th>Count</th>
+                                        <th>Gross</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Cargos)
+                                    {
+                                        <tr title="@(item.DescriptionOfGoods ?? "-")">
+                                            <td>@(item.PackageTypeName ?? "-")</td>
+                                            <td>@item.PackageCount</td>
+                                            <td>@item.GrossWeight</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+
+
+            <div class="col-lg-3">
+                <div class="border rounded h-100">
+                    <div class="px-3 py-2 border-bottom bg-light fw-semibold">
+                        Containers
+                    </div>
+
+                    @if (Model.Containers == null || Model.Containers.Count == 0)
+                    {
+                        <div class="p-3 text-muted small">
+                            No containers found.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive" style="max-height: 320px;">
+                            <table class="table table-sm table-hover mb-0 align-middle">
+                                <thead class="table-light sticky-top">
+                                    <tr>
+                                        <th>Container</th>
+                                        <th>SizeType</th>
+                                        <th>Packages</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Containers)
+                                    {
+                                        <tr title="Seal: @(item.SealNo ?? "-")">
+                                            <td class="fw-semibold">@item.ContainerNo</td>
+                                            <td>@(item.ContainerType ?? "-")</td>
+                                            <td>@(item.PackageCount)</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .shipment-card,
+    .shipment-card .table-responsive,
+    .shipment-info-table {
+        border-radius: 0 !important;
+    }
+
+    .shipment-info-table {
+        margin-bottom: 0;
+        border-color: #0d6efd !important;
+    }
+
+        .shipment-info-table th {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #555;
+            vertical-align: middle;
+            border: 1px solid #0d6efd !important;
+        }
+
+        .shipment-info-table td {
+            font-size: 0.85rem;
+            vertical-align: middle;
+            border: 1px solid #0d6efd !important;
+        }
+
+    .shipment-card {
+        border: 1px solid #0d6efd !important;
+    }
+
+    .bg-light-subtle {
+        background-color: #f8f9fa !important;
+    }
+
+    .card-header {
+        border-radius: 0 !important;
+    }
+</style>

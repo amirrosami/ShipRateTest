@@ -1,0 +1,155 @@
+﻿@using Microsoft.Extensions.Localization
+@using ShipRate.Application.ViewModels
+@using ShipRate.Domain.Entities.Finance
+@using ShipRate.WebAppCustomers
+@using System.Globalization
+@model CreateOnlinePaymentVm
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isFa = culture == "fa";
+    var lang = isFa ? "fa" : "en";
+    var dir = isFa ? "rtl" : "ltr";
+}
+
+            <div class="modal-header">
+    <h5 class="modal-title">@(isFa ? "پرداخت فاکتور ها" : "Pay Selected Invoices")</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="paySelectedForm"
+          hx-post="@Url.Action("CreatePayment", "Invoices")"
+                      hx-target="#app-modal-content"
+                      hx-swap="innerHTML">
+
+                    @Html.AntiForgeryToken()
+        <div class="card" dir="@dir">
+            <div class="table-responsive">
+          <table class="table table-bordered table-hover table-striped mb-0  align-middle">
+                        <thead>
+                            <tr>
+                            <th>@Localizer["InvoiceNo"]</th>
+                            <th>@Localizer["Date"]</th>
+                            <th class="text-end">@Localizer["Total"]</th>
+                                <th class="text-end">@(isFa ? "باقیمانده" : "Remaining")</th>
+                                <th style="width: 180px;">@(isFa ? "مبلغ پرداختی" :"Pay Amount")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @for (int i = 0; i < Model.Items.Count; i++)
+                        {
+                            <tr>
+                                <td>
+                                    @Model.Items[i].InvoiceNo
+                            <input type="hidden" name="Items[@i].InvoiceNo" value="@Model.Items[i].InvoiceNo" />
+                            <input type="hidden" name="Items[@i].InvoiceId" value="@Model.Items[i].InvoiceId" />
+                            <input type="hidden" name="Items[@i].InvoiceDate" value="@Model.Items[i].InvoiceDate" />
+
+                                </td>
+                                <td>@Model.Items[i].InvoiceDate.ToString("yyyy-MM-dd")</td>
+                                <td class="text-end">@Model.Items[i].Total</td>
+                                <td class="text-end">@Model.Items[i].RemainAmount
+                                <input type="hidden" name="Items[@i].RemainAmount" value="@Model.Items[i].RemainAmount" />
+                            <input type="hidden" name="Items[@i].Total" value="@Model.Items[i].Total" />
+
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           name="Items[@i].PaymentAmount"
+                                           class="form-control payment-amount"
+                                           min="0"
+                                           max="@Model.Items[i].RemainAmount"
+                                           step="1"
+                                           value="@Model.Items[i].PaymentAmount"
+                                           required />
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div>
+                            <strong>Total Payment: </strong>
+                            <span class="badge text-bg-info" id="modalTotalPayment">0</span>
+                        </div>
+                        <label class="form-label small fw-bold mb-2"></label>
+                        <div class="list-group">
+                            @foreach (var terminal in (List<IPGTerminal>)ViewBag.OnlineGateways)
+                            {
+                            <label class="list-group-item d-flex align-items-center justify-content-between py-3 opacity-50 " style="cursor:pointer ">
+                            <div class="d-flex align-items-center">
+                                <input class="form-check-input me-3" type="radio" asp-for="IPGTerminalId" value="@terminal.Id" />
+                                <div>
+                                    <i class="bi fs-4 me-2 text-secondary"></i>
+                                    <span>@terminal.IPGTerminalName</span>
+                                </div>
+                            </div>
+                        </label>
+                    }
+                </div>
+
+
+                        <div>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+                            <button type="submit" class="btn btn-outline-success">@(isFa ? "ادامه پرداخت" : "Confirm Payment")</button>
+                        </div>
+                    </div>
+                </form>
+
+               
+            </div>
+      
+
+<script>
+    (function () {
+        function updateModalTotal() {
+            let total = 0;
+            document.querySelectorAll('#paySelectedForm .payment-amount').forEach(function (input) {
+                const value = parseFloat(input.value || '0');
+                if (!isNaN(value)) {
+                    total += value;
+                }
+            });
+
+            const totalElement = document.getElementById('modalTotalPayment');
+            if (totalElement) {
+                totalElement.textContent = total;
+            }
+        }
+
+        function validateInputs() {
+            let valid = true;
+
+            document.querySelectorAll('#paySelectedForm .payment-amount').forEach(function (input) {
+                const value = parseFloat(input.value || '0');
+                const max = parseFloat(input.getAttribute('max') || '0');
+
+                if (isNaN(value) || value <= 0 || value > max) {
+                    input.classList.add('is-invalid');
+                    valid = false;
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            });
+
+            return valid;
+        }
+
+        document.querySelectorAll('#paySelectedForm .payment-amount').forEach(function (input) {
+            input.addEventListener('input', updateModalTotal);
+        });
+
+        document.getElementById('paySelectedForm')?.addEventListener('submit', function (e) {
+            if (!validateInputs()) {
+                e.preventDefault();
+                alert('Payment amount must be greater than 0 and not more than remaining amount.');
+            }
+        });
+
+        updateModalTotal();
+    })();
+</script>

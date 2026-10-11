@@ -1,0 +1,82 @@
+﻿@using ShipRate.Application.ViewModels
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@using ShipRate.WebAppCustomers
+@inject IStringLocalizer<SharedResource> Localizer
+@model CargoDetailDetailsVm
+
+@{
+    var isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var direction = isRtl ? "rtl" : "ltr";
+    var textAlign = isRtl ? "text-end" : "text-start";
+}
+
+<div class="modal-header">
+    <h5 class="modal-title">@Localizer["CargoDetail"]</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["Close"]"></button>
+</div>
+
+<div class="modal-body @textAlign" dir="@direction">
+    <dl class="row">
+        <dt class="col-sm-4">@Localizer["Seq"]</dt>
+        <dd class="col-sm-8">@Model.Sequence</dd>
+
+        <dt class="col-sm-4">@Localizer["CargoDescription"]</dt>
+        <dd class="col-sm-8">@Model.CargoDescription</dd>
+
+        <dt class="col-sm-4">@Localizer["PackageType"]</dt>
+        <dd class="col-sm-8">@Model.PackageTypeName</dd>
+
+        <dt class="col-sm-4">@Localizer["PkgCount"]</dt>
+        <dd class="col-sm-8">@Model.PackageCount</dd>
+
+        <dt class="col-sm-4">@Localizer["GrossWeightShort"]</dt>
+        <dd class="col-sm-8">@Model.GrossWeight @Model.WeightUnitName</dd>
+
+        <dt class="col-sm-4">@Localizer["NetWeightShort"]</dt>
+        <dd class="col-sm-8">@Model.NetWeight @Model.WeightUnitName</dd>
+
+        <dt class="col-sm-4">@Localizer["Volume"]</dt>
+        <dd class="col-sm-8">@Model.Volume @Model.VolumeUnitName</dd>
+
+        <dt class="col-sm-4">@Localizer["Dimensions"]</dt>
+        <dd class="col-sm-8">
+            @Model.Length x @Model.Width x @Model.Height @Model.DimensionUnitName
+        </dd>
+
+        <dt class="col-sm-4">@Localizer["HSCode"]</dt>
+        <dd class="col-sm-8">@Model.HSCode</dd>
+
+        <dt class="col-sm-4">@Localizer["DangerousGoods"]</dt>
+        <dd class="col-sm-8">@(Model.IsDG? Localizer["Yes"] : Localizer["No"])</dd>
+
+        <dt class="col-sm-4">@Localizer["DGClass"]</dt>
+        <dd class="col-sm-8">@Model.DGClassName</dd>
+
+        <dt class="col-sm-4">@Localizer["UNNumber"]</dt>
+        <dd class="col-sm-8">@Model.UNNumber</dd>
+
+        <dt class="col-sm-4">@Localizer["TemperatureControlled"]</dt>
+        <dd class="col-sm-8">@(Model.IsTemperatureControlled? Localizer["Yes"] : Localizer["No"])</dd>
+
+        <dt class="col-sm-4">@Localizer["Temperature"]</dt>
+        <dd class="col-sm-8">
+            @Localizer["Min"]: @Model.MinTemp,
+            @Localizer["Normal"]: @Model.NormalTemp,
+            @Localizer["Max"]: @Model.MaxTemp
+            @Model.TempUnitName
+        </dd>
+
+        <dt class="col-sm-4">@Localizer["MarksAndNumbers"]</dt>
+        <dd class="col-sm-8">@Model.MarksAndNumbers</dd>
+
+        <dt class="col-sm-4">@Localizer["Remarks"]</dt>
+        <dd class="col-sm-8">@Model.Remarks</dd>
+    </dl>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+        @Localizer["Close"]
+    </button>
+</div>

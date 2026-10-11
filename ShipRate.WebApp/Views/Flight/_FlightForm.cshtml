@@ -1,0 +1,117 @@
+﻿@using ShipRate.WebApp.ViewModels.FlightVms
+@model FlightFormViewModel
+
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+}
+
+<form hx-post="@Url.Action(isCreateMode ? "Create" : "Edit", "Flight")"
+      hx-target="#app-modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header form-caption-bg text-white">
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title">
+                <i class="bi bi-plus-circle me-2"></i>Add Flight
+            </h5>
+        }
+        else
+        {
+            <h5 class="modal-title">
+                <i class="bi bi-pencil-square me-2"></i>Edit Flight
+            </h5>
+            <input type="hidden" asp-for="Id" />
+        }
+
+        <button type="button"
+                class="btn-close"
+                onclick="AppModal.close()">
+        </button>
+    </div>
+
+    <div class="modal-body row">
+        @Html.AntiForgeryToken()
+
+        @await Html.PartialAsync("_ModelStateError")
+
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                Flight Number <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="FlightNumber"
+                   value="@Model.FlightNumber"
+                   class="form-control @(ViewData.ModelState.ContainsKey("FlightNumber") && ViewData.ModelState["FlightNumber"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder="" />
+        </div>
+
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                Airline <span class="text-danger">*</span>
+            </label>
+            <select asp-for="AirLineId"
+                    asp-items="@ViewBag.AirLines"
+                    class="form-select @(ViewData.ModelState.ContainsKey("AirLineId") && ViewData.ModelState["AirLineId"]!.Errors.Any() ? "is-invalid" : "")">
+                <option value="">-- Select --</option>
+            </select>
+        </div>
+
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                Origin Airport <span class="text-danger">*</span>
+            </label>
+            <select asp-for="OriginAirportId"
+                    asp-items="@ViewBag.Airports"
+                    class="form-select @(ViewData.ModelState.ContainsKey("OriginAirportId") && ViewData.ModelState["OriginAirportId"]!.Errors.Any() ? "is-invalid" : "")">
+                <option value="">-- Select --</option>
+            </select>
+        </div>
+
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                Destination Airport <span class="text-danger">*</span>
+            </label>
+            <select asp-for="DestinationAirportId"
+                    asp-items="@ViewBag.Airports"
+                    class="form-select @(ViewData.ModelState.ContainsKey("DestinationAirportId") && ViewData.ModelState["DestinationAirportId"]!.Errors.Any() ? "is-invalid" : "")">
+                <option value="">-- Select --</option>
+            </select>
+        </div>
+
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">Active</label>
+            <div class="form-check form-switch mt-2">
+                <input asp-for="IsActive"
+                       class="form-check-input @(ViewData.ModelState.ContainsKey("IsActive") && ViewData.ModelState["IsActive"]!.Errors.Any() ? "is-invalid" : "")"
+                       type="checkbox"
+                       role="switch" />
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button"
+                class="btn btn-secondary"
+                onclick="AppModal.close()">
+            Cancel
+        </button>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>
+
+

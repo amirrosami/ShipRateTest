@@ -1,0 +1,169 @@
+﻿@using ShipRate.WebApp.ViewModels.Documents
+@model DocumentIndexViewModel
+@{
+    ViewData["Title"] = "Documents Management";
+}
+
+<div class="container-fluid mt-3" dir="ltr">
+
+    @{
+        var s = Model.Search;
+    }
+
+    <div class="card mb-2">
+        <div class="card-body p-2">
+            <form id="documentSearchForm"
+                  hx-get="@Url.Action("Search", "Documents")"
+                  hx-target="#documentListContainer"
+                  hx-swap="innerHTML">
+
+                <input type="hidden" name="PageNumber" id="PageNumber" value="@s.PageNumber" />
+
+                <div class="row g-2 align-items-end">
+
+                    <div class="col-lg-2 col-md-3">
+                        <label class="form-label small mb-1">Company</label>
+                        <select class="form-select form-select-sm" name="CompanyId">
+                            <option value="">All</option>
+                            @foreach (var item in Model.Companies)
+                            {
+                                <option value="@item.Value" selected="@(s.CompanyId?.ToString() == item.Value ? "selected" : null)">
+                                    @item.Text
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-lg-2 col-md-3">
+                        <label class="form-label small mb-1">Document Type</label>
+                        <select class="form-select form-select-sm" name="DocumentTypeId">
+                            <option value="">All</option>
+                            @foreach (var item in Model.DocumentTypes)
+                            {
+                                <option value="@item.Value" selected="@(s.DocumentTypeId?.ToString() == item.Value ? "selected" : null)">
+                                    @item.Text
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-lg-2 col-md-3">
+                        <label class="form-label small mb-1">Object Type</label>
+                        <select class="form-select form-select-sm" name="ObjectTypeId">
+                            <option value="">All</option>
+                            @foreach (var item in Model.ObjectTypes)
+                            {
+                                <option value="@item.Value" selected="@(s.ObjectTypeId?.ToString() == item.Value ? "selected" : null)">
+                                    @item.Text
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-lg-2 col-md-3">
+                        <label class="form-label small mb-1">Status</label>
+                        <select class="form-select form-select-sm" name="IsActive">
+                            @foreach (var item in Model.IsActiveList)
+                            {
+                                <option value="@item.Value" selected="@(s.IsActive?.ToString().ToLower() == item.Value?.ToLower() ? "selected" : null)">
+                                    @item.Text
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-lg-2 col-md-3">
+                        <label class="form-label small mb-1">Title</label>
+                        <input class="form-control form-control-sm" name="DocumentTitle" value="@s.DocumentTitle" />
+                    </div>
+
+                    <div class="col-lg-2 col-md-3">
+                        <label class="form-label small mb-1">Doc No</label>
+                        <input class="form-control form-control-sm" name="DocumentNo" value="@s.DocumentNo" />
+                    </div>
+
+                    <div class="col-lg-2 col-md-3">
+                        <label class="form-label small mb-1">Doc Date From</label>
+                        <input class="form-control form-control-sm" type="date" name="DocumentDateFrom" value="@(s.DocumentDateFrom?.ToString("yyyy-MM-dd"))" />
+                    </div>
+
+                    <div class="col-lg-2 col-md-3">
+                        <label class="form-label small mb-1">Doc Date To</label>
+                        <input class="form-control form-control-sm" type="date" name="DocumentDateTo" value="@(s.DocumentDateTo?.ToString("yyyy-MM-dd"))" />
+                    </div>
+
+                    <div class="col-lg-2 col-md-3">
+                        <label class="form-label small mb-1">Expiry From</label>
+                        <input class="form-control form-control-sm" type="date" name="ExpiryDateFrom" value="@(s.ExpiryDateFrom?.ToString("yyyy-MM-dd"))" />
+                    </div>
+
+                    <div class="col-lg-2 col-md-3">
+                        <label class="form-label small mb-1">Expiry To</label>
+                        <input class="form-control form-control-sm" type="date" name="ExpiryDateTo" value="@(s.ExpiryDateTo?.ToString("yyyy-MM-dd"))" />
+                    </div>
+
+                    <div class="col-lg-1 col-md-2">
+                        <label class="form-label small mb-1">Size</label>
+                        <select class="form-select form-select-sm" name="PageSize"
+                                onchange="document.getElementById('PageNumber').value='1'; htmx.trigger('#documentSearchForm', 'submit')">
+                            @foreach (var item in Model.PageSizeList)
+                            {
+                                <option value="@item.Value" selected="@(s.PageSize.ToString() == item.Value ? "selected" : null)">
+                                    @item.Text
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-lg-3 col-md-4 d-flex gap-1">
+                        <button type="submit" class="btn btn-sm btn-primary"
+                                onclick="document.getElementById('PageNumber').value='1'">
+                            Search
+                        </button>
+
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="resetDocumentSearchForm()">
+                            Reset
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="documentListContainer">
+        @await Html.PartialAsync("_DocumentListPartial", Model)
+    </div>
+
+    <div id="documentDetailsContainer" class="mt-4">
+        <div class="alert alert-light border">
+            Select a document to load Attachments and Emails.
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="emailDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="emailDetailsModalContent">
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+
+    <script>
+        function resetDocumentSearchForm() {
+            const form = document.getElementById('documentSearchForm');
+            form.reset();
+            document.getElementById('PageNumber').value = '1';
+            htmx.trigger(form, 'submit');
+        }
+
+        document.body.addEventListener('showEmailModal', function () {
+            const modalElement = document.getElementById('emailDetailsModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        });
+    </script>
+}

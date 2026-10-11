@@ -1,0 +1,89 @@
+﻿@using ShipRate.WebApp.ViewModels.TaskVms
+@model TaskCreateEditViewModel
+
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.Id == 0 ? "Add New Task" : "Edit Task")</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<form hx-post="/TaskManagement/CreateTask"
+      hx-target="#tasksGridContainer"
+      hx-swap="innerHTML">
+    <div class="modal-body">
+
+
+        @Html.AntiForgeryToken()
+        @if (!ViewData.ModelState.IsValid)
+        {
+            var allErrors = ViewData.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            if (allErrors.Any())
+            {
+                <div class="alert alert-danger py-2 mb-3">
+                    <ul class="mb-0 small">
+                        @foreach (var err in allErrors)
+                        {
+                            <li>@err</li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+
+
+
+
+
+
+
+        <input type="hidden" name="TaskCategoryId" value="@Model.TaskCategoryId" />
+        <input type="hidden" name="Id" value="@Model.Id" />
+
+
+
+
+
+
+
+        <div class="mb-3">
+            <label class="form-label">Task Name *</label>
+            <input type="text" class="form-control" name="TaskName" value="@Model.TaskName" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Local Task Name</label>
+            <input type="text" class="form-control" name="LocalTaskName" value="@Model.LocalTaskName" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" name="Description" rows="2">@Model.Description</textarea>
+        </div>
+
+
+
+
+        <div class="mb-3">
+            <label class="form-label">Priority</label>
+            <select class="form-select" name="FollowUpPriorityId">
+                <option value="">-- Select Priority --</option>
+                @foreach (var p in Model.Priorities)
+                {
+                    <option value="@p.Value" selected="@(p.Value == Model.FollowUpPriorityId.ToString())">@p.Text</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Due Days</label>
+            <input type="number" class="form-control" name="DueDays" value="@Model.DueDays" />
+        </div>
+
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" name="IsActive" value="true" checked="@Model.IsActive" />
+            <label class="form-check-label">Active</label>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+</form>

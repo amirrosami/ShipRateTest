@@ -1,0 +1,168 @@
+﻿@using Microsoft.Extensions.Localization
+@using ShipRate.Application.DTOs
+@using ShipRate.Application.ViewModels
+@using ShipRate.WebAppCustomers
+@using System.Globalization
+@model PagedResultDto<PaymentDocumentListItemVm>
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isFa = culture == "fa";
+    var lang = isFa ? "fa" : "en";
+    var dir = isFa ? "rtl" : "ltr";
+}
+<div class="card" dir="ltr">
+    <div class="card-body p-0">
+        <div class="table-responsive" style="overflow-x:auto">
+            <table class="table table-hover table-striped mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>@(isFa ? "شماره سند" : "Document Number")</th>
+                        <th>@(isFa ? "تاریخ" : "Date")</th>
+                        <th>@(isFa ? "شخص" : "Person")</th>
+                        <th>@(isFa ? "شرکت" : "Company")</th>
+                        <th>@(isFa ? "روش پرداخت" : "Payment Method")</th>
+                        <th>@(isFa ? "مبلغ" : "Amount")</th>
+                        <th>@(isFa ? "ارز" : "Currency")</th>
+                        <th>@(isFa ? "شماره پیگیری" : "Tracking Number")</th>
+                        <th class="text-end">@(isFa ? "عملیات" : "Actions")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items != null && Model.Items.Any())
+                    {
+                        var rowNumber = ((Model.PageNumber - 1) * Model.PageSize) + 1;
+                        foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>@rowNumber</td>
+                                <td>@item.DocumentNumber</td>
+                                <td>@item.DocumentDateShamsi</td>
+                                <td>@item.PersonName</td>
+                                <td>@item.CompanyName</td>
+                                <td>@item.PaymentMethodTitle</td>
+                                <td>@item.Amount.ToString("N0")</td>
+                                <td>@item.CurrencyTitle</td>
+                                <td>@item.TrackingNumber</td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button"
+                                                class="btn btn-outline-info"
+                                                title="@(isFa ? "جزئیات" : "Details")"
+                                                hx-get="@Url.Action("Details", "PaymentDocuments", new { id = item.Id })"
+                                                hx-target="#globalModalContent"
+                                                hx-swap="innerHTML"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#globalModal">
+                                            @(isFa ? "جزئیات" : "Details")
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-outline-success"
+                                                title="@(isFa ? "رسید پرداخت" : "Settlement")"
+                                                hx-get="@Url.Action("GetSettlment", "PaymentDocuments", new { id = item.Id })"
+                                                hx-target="#globalModalContent"
+                                                hx-swap="innerHTML"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#globalModal">
+                                            @(isFa ? "تسویه" : "Settlement")
+                                        </button>
+
+                                        @* <button type="button"
+                                                class="btn btn-outline-warning"
+                                                title="@(isFa ? "ویرایش" : "Edit")"
+                                                hx-get="@Url.Action("Edit", "PaymentDocuments", new { id = item.Id })"
+                                                hx-target="#globalModalContent"
+                                                hx-swap="innerHTML"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#globalModal">
+                                            @(isFa ? "ویرایش" : "Edit")
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-outline-danger"
+                                                title="@(isFa ? "حذف" : "Delete")"
+                                                hx-get="@Url.Action("Delete", "PaymentDocuments", new { id = item.Id })"
+                                                hx-target="#globalModalContent"
+                                                hx-swap="innerHTML"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#globalModal">
+                                            @(isFa ? "حذف" : "Delete")
+                                        </button> *@
+                                    </div>
+                                </td>
+                            </tr>
+                            rowNumber++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="10" class="text-center py-4 text-muted">
+                                @(isFa ? "هیچ سند پرداختی یافت نشد." : "No payment documents found.")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @if (Model.TotalCount > Model.PageSize)
+    {
+        var totalPages = (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize);
+
+        int visiblePages = 5;
+        int startPage = Math.Max(1, Model.PageNumber - (visiblePages / 2));
+        int endPage = Math.Min(totalPages, startPage + visiblePages - 1);
+
+        if (endPage - startPage + 1 < visiblePages)
+        {
+            startPage = Math.Max(1, endPage - visiblePages + 1);
+        }
+
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <div>
+                @(isFa ? "تعداد کل" : "Total"): <strong>@Model.TotalCount</strong>
+            </div>
+
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                        <button class="page-link"
+                                hx-get="@Url.Action("List", "PaymentDocuments", new { page = 1, pageSize = Model.PageSize })"
+                                hx-target="#payment-document-list"
+                                hx-include="#paymentDocumentSearchForm">
+                            «
+                        </button>
+                    </li>
+
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                            <button type="button"
+                                    class="page-link"
+                                    hx-get="@Url.Action("List", "PaymentDocuments", new { page = i, pageSize = Model.PageSize })"
+                                    hx-target="#payment-document-list"
+                                    hx-include="#paymentDocumentSearchForm"
+                                    hx-swap="innerHTML">
+                                @i
+                            </button>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.PageNumber == totalPages ? "disabled" : "")">
+                        <button class="page-link"
+                                hx-get="@Url.Action("List", "PaymentDocuments", new { page = totalPages, pageSize = Model.PageSize })"
+                                hx-target="#payment-document-list"
+                                hx-include="#paymentDocumentSearchForm">
+                            »
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>

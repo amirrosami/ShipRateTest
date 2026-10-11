@@ -1,0 +1,26 @@
+﻿@using ShipRate.Application.DTOs.Messaging
+@model IReadOnlyCollection<MessagingMessageDto>
+
+@if (Model is null || !Model.Any())
+{
+    <div id="noMessagesPlaceholder" class="conversation-empty-state">
+        <div class="conversation-empty-icon">
+            <span>💬</span>
+        </div>
+
+        <div class="conversation-empty-title">
+            No messages yet
+        </div>
+
+        <div class="conversation-empty-text">
+            Start the conversation by sending the first message.
+        </div>
+    </div>
+}
+else
+{
+    foreach (var message in Model.OrderBy(x => x.SentAt))
+    {
+        @await Html.PartialAsync("_ConversationMessage", message)
+    }
+}

@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="08/30/2026 12:00:00" ReportInfo.Modified="10/01/2026 09:38:55" ReportInfo.CreatorVersion="2026.1.0.0">
+  <Dictionary>
+    <TableDataSource Name="InvoiceHeader" ReferenceName="TaxInvoiceData.InvoiceHeader" DataType="System.Int32" Enabled="true">
+      <Column Name="InvoiceNo" DataType="System.String"/>
+      <Column Name="InvoiceDatePersian" DataType="System.String"/>
+      <Column Name="InvoiceModelName" DataType="System.String"/>
+      <Column Name="CurrencyName" DataType="System.String"/>
+      <Column Name="SellerName" DataType="System.String"/>
+      <Column Name="SellerEconomicCode" DataType="System.String"/>
+      <Column Name="SellerNationalId" DataType="System.String"/>
+      <Column Name="SellerAddress" DataType="System.String"/>
+      <Column Name="SellerPhone" DataType="System.String"/>
+      <Column Name="BuyerName" DataType="System.String"/>
+      <Column Name="BuyerEconomicCode" DataType="System.String"/>
+      <Column Name="BuyerNationalId" DataType="System.String"/>
+      <Column Name="BuyerAddress" DataType="System.String"/>
+      <Column Name="BuyerPhone" DataType="System.String"/>
+      <Column Name="TotalFirst" DataType="System.Decimal"/>
+      <Column Name="TotalDiscount" DataType="System.Decimal"/>
+      <Column Name="TotalTax" DataType="System.Decimal"/>
+      <Column Name="FinalAmount" DataType="System.Decimal"/>
+      <Column Name="CompanyLogo" DataType="System.Byte[]"/>
+    </TableDataSource>
+    <TableDataSource Name="InvoiceItems" ReferenceName="TaxInvoiceData.InvoiceItems" DataType="System.Int32" Enabled="true">
+      <Column Name="Row" DataType="System.Int32"/>
+      <Column Name="ChargeTitle" DataType="System.String"/>
+      <Column Name="Qty" DataType="System.Decimal"/>
+      <Column Name="UnitPrice" DataType="System.Decimal"/>
+      <Column Name="AmountBeforeDiscount" DataType="System.Decimal"/>
+      <Column Name="Discount" DataType="System.Decimal"/>
+      <Column Name="TaxAmount" DataType="System.Decimal"/>
+      <Column Name="Total" DataType="System.Decimal"/>
+    </TableDataSource>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" LeftMargin="8" TopMargin="8" RightMargin="8" BottomMargin="8" Watermark.Font="Microsoft Sans Serif, 60pt">
+    <PageHeaderBand Name="PageHeader1" Width="733.32" Height="225">
+      <ShapeObject Name="HeaderBox" Width="733.32" Height="70" Border.Color="DimGray" Shape="RoundRectangle"/>
+      <PictureObject Name="LogoPic" Left="652.6" Top="8" Width="70" Height="54" DataColumn="InvoiceHeader.CompanyLogo"/>
+      <TextObject Name="TxtTitle" Left="120" Top="8" Width="490" Height="24" Text="اعلامیه بدهی " HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 12pt, style=Bold"/>
+      <TextObject Name="TxtDateLabel" Left="14.1" Top="32" Width="125" Height="18" Text="تاریخ: [InvoiceHeader.InvoiceDatePersian]" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt"/>
+      <TextObject Name="TxtCurrLabel" Left="14.1" Top="52" Width="125" Height="15" Text="واحد پول: [InvoiceHeader.CurrencyName]" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.5pt"/>
+      <ShapeObject Name="SellerBox" Top="75" Width="733.32" Height="70" Border.Color="DimGray"/>
+      <TextObject Name="SellerTitle" Top="75" Width="733.32" Height="18" Border.Lines="Bottom" Fill.Color="Gainsboro" Text="مشخصات فروشنده" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8.5pt, style=Bold"/>
+      <TextObject Name="TxtSellerName" Left="370" Top="96" Width="355" Height="18" Text="نام شخص حقیقی/حقوقی: [InvoiceHeader.SellerName]" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt"/>
+      <TextObject Name="TxtSellerEco" Left="190" Top="96" Width="125.86" Height="18" Text="کد اقتصادی: [InvoiceHeader.SellerEconomicCode]" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7pt"/>
+      <TextObject Name="TxtSellerNat" Left="10" Top="96" Width="175" Height="18" Text="شناسه ملی/کد ملی: [InvoiceHeader.SellerNationalId]" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7pt"/>
+      <TextObject Name="TxtSellerAddr" Left="190" Top="120" Width="535" Height="20" Text="نشانی: [InvoiceHeader.SellerAddress]" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt"/>
+      <TextObject Name="TxtSellerPhone" Left="10" Top="120" Width="175" Height="20" Text="تلفن/نمابر: [InvoiceHeader.SellerPhone]" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7pt"/>
+      <ShapeObject Name="BuyerBox" Top="150" Width="733.32" Height="70" Border.Color="DimGray"/>
+      <TextObject Name="BuyerTitle" Top="150" Width="733.32" Height="18" Border.Lines="Bottom" Fill.Color="Gainsboro" Text="مشخصات خریدار" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8.5pt, style=Bold"/>
+      <TextObject Name="TxtBuyerName" Left="370" Top="171" Width="355" Height="18" Text="نام شخص حقیقی/حقوقی: [InvoiceHeader.BuyerName]" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt"/>
+      <TextObject Name="TxtBuyerEco" Left="190" Top="171" Width="125.86" Height="21.78" Text="کد اقتصادی: [InvoiceHeader.BuyerEconomicCode]" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7pt"/>
+      <TextObject Name="TxtBuyerNat" Left="10" Top="171" Width="175" Height="21.78" Text="شناسه ملی/کد ملی: [InvoiceHeader.BuyerNationalId]" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7pt"/>
+      <TextObject Name="TxtBuyerAddr" Left="190" Top="195" Width="535" Height="20" Text="نشانی: [InvoiceHeader.BuyerAddress]" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt"/>
+      <TextObject Name="TxtBuyerPhone" Left="10" Top="195" Width="175" Height="20" Text="تلفن/نمابر: [InvoiceHeader.BuyerPhone]" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7pt"/>
+    </PageHeaderBand>
+    <ColumnHeaderBand Name="ColumnHeader1" Top="227.22" Width="733.32" Height="24">
+      <TableObject Name="TableHead" Width="733.32" Height="24" Border.Lines="All">
+        <TableColumn Name="Col8" Width="100"/>
+        <TableColumn Name="Col7" Width="80"/>
+        <TableColumn Name="Col6" Width="75"/>
+        <TableColumn Name="Col5" Width="90"/>
+        <TableColumn Name="Col4" Width="85"/>
+        <TableColumn Name="Col3" Width="50"/>
+        <TableColumn Name="Col2" Width="218.32"/>
+        <TableColumn Name="Col1" Width="35"/>
+        <TableRow Name="RowHead" Height="24">
+          <TableCell Name="Cell8" Border.Lines="All" Text="مبلغ نهایی" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+          <TableCell Name="Cell7" Border.Lines="All" Text="مالیات و عوارض" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+          <TableCell Name="Cell6" Border.Lines="All" Text="تخفیف" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="مبلغ کل" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="مبلغ واحد" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="تعداد" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="شرح کالا یا خدمات" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+          <TableCell Name="Cell1" Border.Lines="All" Text="ردیف" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </ColumnHeaderBand>
+    <DataBand Name="Data1" Top="253.44" Width="733.32" Height="22" DataSource="InvoiceItems">
+      <TableObject Name="TableData" Width="733.32" Height="22" Border.Lines="All">
+        <TableColumn Name="ColD8" Width="100"/>
+        <TableColumn Name="ColD7" Width="80"/>
+        <TableColumn Name="ColD6" Width="75"/>
+        <TableColumn Name="ColD5" Width="90"/>
+        <TableColumn Name="ColD4" Width="85"/>
+        <TableColumn Name="ColD3" Width="50"/>
+        <TableColumn Name="ColD2" Width="218.32"/>
+        <TableColumn Name="ColD1" Width="35"/>
+        <TableRow Name="RowData" Height="22">
+          <TableCell Name="CD8" Border.Lines="All" Text="[InvoiceItems.Total]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Tahoma, 8pt, style=Bold"/>
+          <TableCell Name="CD7" Border.Lines="All" Text="[InvoiceItems.TaxAmount]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Tahoma, 8pt"/>
+          <TableCell Name="CD6" Border.Lines="All" Text="[InvoiceItems.Discount]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Tahoma, 8pt"/>
+          <TableCell Name="CD5" Border.Lines="All" Text="[InvoiceItems.AmountBeforeDiscount]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Tahoma, 8pt"/>
+          <TableCell Name="CD4" Border.Lines="All" Text="[InvoiceItems.UnitPrice]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Tahoma, 8pt"/>
+          <TableCell Name="CD3" Border.Lines="All" Text="[InvoiceItems.Qty]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 8pt"/>
+          <TableCell Name="CD2" Border.Lines="All" Text="[InvoiceItems.ChargeTitle]" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt"/>
+          <TableCell Name="CD1" Border.Lines="All" Text="[InvoiceItems.Row]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 8pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="277.67" Width="733.32" Height="140">
+      <TableObject Name="TableSummary" Width="733.32" Height="22" Border.Lines="All">
+        <TableColumn Name="ColS5" Width="100"/>
+        <TableColumn Name="ColS4" Width="80"/>
+        <TableColumn Name="ColS3" Width="75"/>
+        <TableColumn Name="ColS2" Width="90"/>
+        <TableColumn Name="ColS1" Width="388.32"/>
+        <TableRow Name="RowSum" Height="22">
+          <TableCell Name="CS5" Border.Lines="All" Text="[InvoiceHeader.FinalAmount]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Tahoma, 8.5pt, style=Bold"/>
+          <TableCell Name="CS4" Border.Lines="All" Text="[InvoiceHeader.TotalTax]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Tahoma, 8pt, style=Bold"/>
+          <TableCell Name="CS3" Border.Lines="All" Text="[InvoiceHeader.TotalDiscount]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Tahoma, 8pt, style=Bold"/>
+          <TableCell Name="CS2" Border.Lines="All" Text="[InvoiceHeader.TotalFirst]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Tahoma, 8pt, style=Bold"/>
+          <TableCell Name="CS1" Border.Lines="All" Text="مجموع کل([InvoiceHeader.CurrencyName])" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+      <ShapeObject Name="SignBox" Top="28" Width="733.32" Height="75" Border.Color="DimGray"/>
+    </ReportSummaryBand>
+    <PageFooterBand Name="PageFooter1" Top="419.89" Width="733.32" Height="20">
+      <TextObject Name="TxtPageNo" Left="10" Top="2" Width="160.48" Height="15" Text="صفحه [Page#] از [TotalPages#]" Font="Tahoma, 7.5pt"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

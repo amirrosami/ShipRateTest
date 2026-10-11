@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="03/30/2026 12:00:00" ReportInfo.Modified="09/22/2026 09:12:10" ReportInfo.CreatorVersion="2026.1.0.0">
+	<Dictionary>
+		<TableDataSource Name="DOHeader" ReferenceName="DOHeader" DataType="System.Int32" Enabled="true">
+			<Column Name="DeliveryOrderId" DataType="System.Guid"/>
+			<Column Name="DONo" DataType="System.String"/>
+			<Column Name="DoDate" DataType="System.String"/>
+			<Column Name="ExpiryDate" DataType="System.String"/>
+			<Column Name="ArrivalDate" DataType="System.String"/>
+			<Column Name="ClearanceTypeName" DataType="System.String"/>
+			<Column Name="BLReleaseTypeName" DataType="System.String"/>
+			<Column Name="OriginalBLCount" DataType="System.String"/>
+			<Column Name="Status" DataType="System.String"/>
+			<Column Name="FinalizedAt" DataType="System.String"/>
+			<Column Name="Remarks" DataType="System.String"/>
+			<Column Name="BLNo" DataType="System.String"/>
+			<Column Name="BLDate" DataType="System.String"/>
+			<Column Name="ConsigneeName" DataType="System.String"/>
+			<Column Name="ShipperName" DataType="System.String"/>
+			<Column Name="VesselVoyage" DataType="System.String"/>
+			<Column Name="PortOfDischargeName" DataType="System.String"/>
+			<Column Name="PlaceOfDeliveryName" DataType="System.String"/>
+			<Column Name="ContainerCount" DataType="System.Int32"/>
+			<Column Name="VesselName" DataType="System.String"/>
+			<Column Name="VoyageNo" DataType="System.String"/>
+			<Column Name="FinalDestination" DataType="System.String"/>
+			<Column Name="GoodsDescription" DataType="System.String"/>
+		</TableDataSource>
+		<TableDataSource Name="Containers" ReferenceName="Containers" DataType="System.Int32" Enabled="true">
+			<Column Name="RowIndex" DataType="System.Int32"/>
+			<Column Name="ContainerNo" DataType="System.String"/>
+			<Column Name="SizeAndType" DataType="System.String"/>
+			<Column Name="SealNo" DataType="System.String"/>
+			<Column Name="PackageCount" DataType="System.Int32"/>
+			<Column Name="GrossWeight" DataType="System.Decimal"/>
+			<Column Name="NetWeight" DataType="System.Decimal"/>
+			<Column Name="Measurement" DataType="System.String"/>
+			<Column Name="CntOwnType" DataType="System.String"/>
+			<Column Name="MovementType" DataType="System.String"/>
+			<Column Name="PackageType" DataType="System.String"/>
+		</TableDataSource>
+
+		<!-- تعریف متغیرهای تجمیعی (Totals) استاندارد FastReport -->
+		<Total Name="TotalCntCount" TotalType="Count" Evaluator="DataContainers" ResetOnReprint="true" ResetAfter="GroupFooterContainers"/>
+		<Total Name="TotalPackageCount" Expression="[Containers.PackageCount]" Evaluator="DataContainers" ResetOnReprint="true" ResetAfter="GroupFooterContainers"/>
+		<Total Name="TotalGrossWeight" Expression="[Containers.GrossWeight]" Evaluator="DataContainers" ResetOnReprint="true" ResetAfter="GroupFooterContainers"/>
+		<Total Name="TotalNetWeight" Expression="[Containers.NetWeight]" Evaluator="DataContainers" ResetOnReprint="true" ResetAfter="GroupFooterContainers"/>
+	</Dictionary>
+
+	<ReportPage Name="Page1" RawPaperSize="9" LeftMargin="12" TopMargin="12" RightMargin="12" BottomMargin="12" Watermark.Font="Arial, 60pt">
+		<ReportTitleBand Name="ReportTitle1" Width="703.08" Height="255.15">
+			<TextObject Name="Text6" Left="18.9" Top="8.85" Width="82.75" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="250, 250, 250" Text="No:" VertAlign="Center" Font="Tahoma, 7pt"/>
+			<TextObject Name="Text38" Left="18.9" Top="27.75" Width="82.75" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="250, 250, 250" Text="Date:" VertAlign="Center" Font="Tahoma, 7pt"/>
+			<TextObject Name="Text10" Left="18.9" Top="45.75" Width="82.75" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="250, 250, 250" Text="Expiry Date:" VertAlign="Center" Font="Tahoma, 7pt"/>
+			<ShapeObject Name="Shape1" Top="75.6" Width="680.4" Height="179.55" CanGrow="true"/>
+			<TextObject Name="Text1" Left="264.6" Top="18.9" Width="201.55" Height="28" Text="Delivery Order" HorzAlign="Center" Font="Segoe UI, 18pt, style=Bold"/>
+			<TextObject Name="Text3" Left="560" Width="143.08" Height="24" Border.Lines="All" Border.Color="100, 180, 100" Text="[DOHeader.Status]" HorzAlign="Center" VertAlign="Center" Font="Segoe UI, 9pt, style=Bold"/>
+			<TextObject Name="Text7" Left="92.2" Top="8.85" Width="134.95" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Text=" [DOHeader.DONo]" VertAlign="Center" Font="Segoe UI, 8pt, style=Bold"/>
+			<TextObject Name="Text9" Left="92.55" Top="27.75" Width="138.03" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Text=" [DOHeader.DoDate]" VertAlign="Center" Font="Segoe UI, 8pt, style=Bold"/>
+			<TextObject Name="Text11" Left="92.2" Top="45.75" Width="163.3" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Text=" [DOHeader.ExpiryDate]" VertAlign="Center" Font="Segoe UI, 8pt, style=Bold"/>
+			<TextObject Name="Text12" Left="340.55" Top="168.6" Width="130" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="250, 250, 250" Text=" Arrival Date" VertAlign="Center" Font="Segoe UI, 8pt"/>
+			<TextObject Name="Text13" Left="423.3" Top="168.6" Width="204.18" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Text=" [DOHeader.ArrivalDate]" VertAlign="Center" Font="Segoe UI, 8pt, style=Bold"/>
+			<TextObject Name="Text25" Left="18.9" Top="128.85" Width="63.85" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="250, 250, 250" Text=" BL No:" VertAlign="Center" Font="Segoe UI, 8pt"/>
+			<TextObject Name="Text26" Left="111.1" Top="128.85" Width="220" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Text=" [DOHeader.BLNo]" VertAlign="Center" Font="Segoe UI, 8pt, style=Bold"/>
+			<TextObject Name="Text29" Left="18.9" Top="109.05" Width="82.75" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="250, 250, 250" Text=" GOODS TO:" VertAlign="Center" Font="Segoe UI, 8pt"/>
+			<TextObject Name="Text30" Left="111.1" Top="109.05" Width="541.3" Height="18" Border.Lines="All" Border.Color="222, 226, 230" CanGrow="true" Text=" [DOHeader.ConsigneeName]" VertAlign="Center" Font="Segoe UI, 8pt, style=Bold"/>
+			<TextObject Name="Text33" Left="18.9" Top="145.95" Width="82.75" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="250, 250, 250" Text=" Vessel:" VertAlign="Center" Font="Segoe UI, 8pt"/>
+			<TextObject Name="Text39" Left="340.2" Top="145.95" Width="82.75" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="250, 250, 250" Text=" Voyage No:" VertAlign="Center" Font="Segoe UI, 8pt"/>
+			<TextObject Name="Text40" Left="18.9" Top="164.85" Width="101.65" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="250, 250, 250" Text=" Final Destination:" VertAlign="Center" Font="Segoe UI, 8pt"/>
+			<TextObject Name="Text41" Left="18.9" Top="85.05" Width="186.7" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="250, 250, 250" Text="TO THE DIRECTOR OF CSUTOMS:" VertAlign="Center" Font="Tahoma, 7pt"/>
+			<TextObject Name="Text42" Left="340.2" Top="85.05" Width="309.55" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="250, 250, 250" Text="PLEASE DELIVER THE UNDERDETERMINED " VertAlign="Center" Font="Tahoma, 7pt"/>
+			<TextObject Name="Text43" Left="113.4" Top="151.2" Width="217.35" Height="18.9" Text="[DOHeader.VesselName]" Font="Tahoma, 8pt, style=Bold"/>
+			<TextObject Name="Text44" Left="425.25" Top="151.2" Width="170.1" Height="18.9" Text="[DOHeader.VoyageNo]" Font="Tahoma, 8pt, style=Bold"/>
+			<TextObject Name="Text45" Left="112.81" Top="170.68" Width="217.35" Height="18.9" Text="[DOHeader.FinalDestination]" Font="Segoe UI, 8pt, style=Bold"/>
+			<TextObject Name="Text46" Left="18.9" Top="183.75" Width="139.45" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="250, 250, 250" Text=" Description Of Goods:" VertAlign="Center" Font="Segoe UI, 8pt"/>
+			<TextObject Name="Text47" Left="160.65" Top="189" Width="472.5" Height="66.15" CanGrow="true" Text="[DOHeader.GoodsDescription]" Font="Segoe UI, 8pt, style=Bold"/>
+		</ReportTitleBand>
+
+		<GroupHeaderBand Name="GroupHeaderContainers" Condition="1" Top="257.37" Width="703.08" Height="42.3" Guides="9.45" RepeatOnEveryPage="true">
+			<TextObject Name="Text37" Top="5" Width="703.08" Height="18" Text="Containers" HorzAlign="Center" Font="Segoe UI, 9pt, style=Bold"/>
+			<TextObject Name="TH_C1" Top="24" Width="30" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="248, 249, 250" Text="#" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+			<TextObject Name="TH_C2" Left="30" Top="24" Width="111.1" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="248, 249, 250" Text="Container No" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+			<TextObject Name="TH_C3" Left="141" Top="24" Width="61.65" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="248, 249, 250" Text="Size/Type" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+			<TextObject Name="Text48" Left="202.15" Top="24" Width="71.1" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="248, 249, 250" Text="Own Type" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+			<TextObject Name="TH_C4" Left="273.25" Top="24" Width="93.75" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="248, 249, 250" Text="Seal No" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+			<TextObject Name="TH_C5" Left="367" Top="24" Width="51.65" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="248, 249, 250" Text="Packages" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+			<TextObject Name="Text51" Left="418.65" Top="24" Width="63.35" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="248, 249, 250" Text="Package Type" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+			<TextObject Name="TH_C6" Left="482" Top="24" Width="80.55" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="248, 249, 250" Text="Gross Weight" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+			<TextObject Name="TH_C7" Left="562.55" Top="24" Width="71.7" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="248, 249, 250" Text="Net Weight" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+			<TextObject Name="TH_C8" Left="634.25" Top="24" Width="65.48" Height="18" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="248, 249, 250" Text="Move Type" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+
+			<DataBand Name="DataContainers" Top="301.89" Width="703.08" Height="18.9" DataSource="Containers">
+				<TextObject Name="TD_C1" Width="30" Height="18.9" Border.Lines="All" Border.Color="222, 226, 230" Text="[Containers.RowIndex]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+				<TextObject Name="TD_C2" Left="30" Width="111.1" Height="18.9" Border.Lines="All" Border.Color="222, 226, 230" Text="[Containers.ContainerNo]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+				<TextObject Name="TD_C3" Left="141" Width="61.65" Height="18.9" Border.Lines="All" Border.Color="222, 226, 230" Text="[Containers.SizeAndType]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+				<TextObject Name="Text49" Left="202.65" Width="70.6" Height="18.9" Border.Lines="All" Border.Color="222, 226, 230" Text="[Containers.CntOwnType]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+				<TextObject Name="TD_C4" Left="273.25" Width="93.75" Height="18.9" Border.Lines="All" Border.Color="222, 226, 230" Text="[Containers.SealNo]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+				<TextObject Name="TD_C5" Left="367" Width="51.65" Height="18.9" Border.Lines="All" Border.Color="222, 226, 230" Text="[Containers.PackageCount]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+				<TextObject Name="Text52" Left="418.65" Width="63.35" Height="18.9" Border.Lines="All" Border.Color="222, 226, 230" Text="[Containers.PackageType]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+				<TextObject Name="TD_C6" Left="482" Width="80.55" Height="18.9" Border.Lines="All" Border.Color="222, 226, 230" Text="[Containers.GrossWeight]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+				<TextObject Name="TD_C7" Left="562.55" Width="71.7" Height="18.9" Border.Lines="All" Border.Color="222, 226, 230" Text="[Containers.NetWeight]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+				<TextObject Name="Text50" Left="634.25" Width="65.48" Height="18.9" Border.Lines="All" Border.Color="222, 226, 230" Text="[Containers.MovementType]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+			</DataBand>
+
+			<GroupFooterBand Name="GroupFooterContainers" Top="323.01" Width="703.08" Height="20" Guides="0">
+				<TextObject Name="TextTotalTitle" Width="30" Height="20" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="240, 242, 245" Text="Total" HorzAlign="Center" VertAlign="Center" Font="Segoe UI, 7.5pt, style=Bold"/>
+				<TextObject Name="TextTotalCntCount" Left="30" Width="337" Height="20" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="240, 242, 245" Text="Total Containers: [TotalCntCount]" HorzAlign="Left" VertAlign="Center" Font="Segoe UI, 7.5pt, style=Bold"/>
+				<TextObject Name="TextTotalPackages" Left="367" Width="51.65" Height="20" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="240, 242, 245" Text="[TotalPackageCount]" HorzAlign="Center" VertAlign="Center" Font="Segoe UI, 7.5pt, style=Bold"/>
+				<TextObject Name="TextBlankPkgType" Left="418.65" Width="63.35" Height="20" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="240, 242, 245" Text="" VertAlign="Center" Font="Tahoma, 7pt"/>
+				<TextObject Name="TextTotalGross" Left="482" Width="80.55" Height="20" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="240, 242, 245" Text="[TotalGrossWeight]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," HorzAlign="Center" VertAlign="Center" Font="Segoe UI, 7.5pt, style=Bold"/>
+				<TextObject Name="TextTotalNet" Left="562.55" Width="71.7" Height="20" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="240, 242, 245" Text="[TotalNetWeight]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," HorzAlign="Center" VertAlign="Center" Font="Segoe UI, 7.5pt, style=Bold"/>
+				<TextObject Name="TextBlankMoveType" Left="634.25" Width="65.48" Height="20" Border.Lines="All" Border.Color="222, 226, 230" Fill.Color="240, 242, 245" Text="" VertAlign="Center" Font="Tahoma, 7pt"/>
+			</GroupFooterBand>
+		</GroupHeaderBand>
+
+		<PageFooterBand Name="PageFooter1" Top="345.23" Width="703.08" Height="20">
+			<TextObject Name="TextFooter" Top="2" Width="300" Height="16" Text="Generated by ShipRate" Font="Segoe UI, 8pt" TextFill.Color="DarkGray"/>
+			<TextObject Name="TextPageNo" Left="503.08" Top="2" Width="200" Height="16" Text="Page [Page#] of [TotalPages#]" HorzAlign="Right" Font="Segoe UI, 8pt" TextFill.Color="DarkGray"/>
+		</PageFooterBand>
+	</ReportPage>
+</Report>

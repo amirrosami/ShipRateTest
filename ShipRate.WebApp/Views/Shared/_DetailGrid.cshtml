@@ -1,0 +1,75 @@
+﻿@using ShipRate.WebApp.Controllers
+@using ShipRate.WebApp.ViewModels
+@model DetailGridViewModel
+
+
+<div class="card shadow-sm">
+    <div class="d-flex justify-content-between align-items-center" style="background-color:floralwhite">
+        <span>@Model.MasterTitle</span>
+        <span>
+            <i class="bi bi-building me-2"></i>
+             @Model.MasterDisplayValue
+        </span>
+        <button type="button"
+                class="btn btn-outline-primary m-1"
+                hx-get="@Url.Action(Model.CreateAction, Model.Controller)"
+                hx-target="#app-modal-content"
+                hx-swap="innerHTML"
+                hx-include="#detail-container">
+            <i class="bi bi-plus-lg me-1"></i>New
+        </button>
+    </div>
+
+    <div class="card-body p-1">  
+        <div class="table-responsive" style="overflow-x:auto">
+        <table class="table table-hover align-middle mb-0">
+
+                <thead class="form-caption-bg shadow-sm">
+                    <tr class="form-caption-bg shadow-sm text-white">
+                        <td class="form-caption-bg shadow-sm text-white">#</td>
+            @foreach (var col in Model.Columns)
+            {    
+                <th class="form-caption-bg shadow-sm text-white">
+                        @col.DisplayName
+                </th>
+            }
+
+                 <th class="form-caption-bg shadow-sm text-white text-center" style="width:160px;">Actions</th>
+                </tr>
+        </thead>
+        <tbody>
+            @await Html.PartialAsync(Model.DetailGridPartialName ,Model)
+        </tbody>
+    </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@* 
+<div class="card shadow-sm">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <span>
+            <i class="bi bi-building me-2"></i>
+            Cities — <strong id="selectedTerritoryLabel">Select a territory above</strong>
+        </span>
+        <button type="button" class="btn btn-sm btn-success"
+                id="btnAddCity" style="display:none;"
+                hx-target="#appModal .modal-content"
+                hx-swap="innerHTML">
+            <i class="bi bi-plus-lg me-1"></i>Add City
+        </button>
+    </div>
+    <div class="card-body p-0"
+         id="citiesGridContainer"
+         hx-trigger="citiesChanged from:body"
+         hx-swap="innerHTML">
+        <div class="text-center text-muted py-4">
+            <i class="bi bi-arrow-up-circle me-1"></i>
+            Select a territory above to view cities.
+        </div>
+    </div>
+</div> *@

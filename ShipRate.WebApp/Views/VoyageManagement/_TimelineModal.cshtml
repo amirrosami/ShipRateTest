@@ -1,0 +1,91 @@
+﻿@using ShipRate.Application.DTOs
+@model VoyageMonitoringDetailsDto
+@* <div class="modal fade show" style="display:block;" tabindex="-1"> *@
+
+
+<div class="modal-header">
+    <h5 class="modal-title">Voyage Timeline</h5>
+    <button type="button"
+            class="btn-close"
+            aria-label="Close"
+            data-bs-dismiss="modal">
+    </button>
+</div>
+
+<div class="modal-body">
+    <div class="row g-2 mb-3">
+        <div class="col-md-3">
+            <strong>Vessel</strong>
+            <div>@Model.VesselName</div>
+        </div>
+        <div class="col-md-3">
+            <strong>Shipping Line</strong>
+            <div>@Model.ShippingLineName</div>
+        </div>
+        <div class="col-md-3">
+            <strong>Port</strong>
+            <div>@Model.PortName</div>
+        </div>
+        <div class="col-md-3">
+            <strong>Terminal</strong>
+            <div>@Model.TerminalName</div>
+        </div>
+
+        <div class="col-md-3">
+            <strong>Voyage In</strong>
+            <div>@Model.VoyageNoIn</div>
+        </div>
+        <div class="col-md-3">
+            <strong>Voyage Out</strong>
+            <div>@Model.VoyageNoOut</div>
+        </div>
+        <div class="col-md-3">
+            <strong>ETA</strong>
+            <div>@Model.ETA?.ToString("yyyy-MM-dd HH:mm")</div>
+        </div>
+        <div class="col-md-3">
+            <strong>ATA</strong>
+            <div>@Model.ATA?.ToString("yyyy-MM-dd HH:mm")</div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+            <thead class="table-light">
+                <tr>
+                    <th>Event</th>
+                    <th>Date Time</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Events != null && Model.Events.Any())
+                {
+                    foreach (var item in Model.Events)
+                    {
+                        <tr>
+                            <td>@item.EventTypeName</td>
+                            <td>@item.EventDateTime.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@item.Remarks</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" class="text-center">No events found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button"
+            data-bs-dismiss="modal">
+        Close
+    </button>
+</div>
+
+

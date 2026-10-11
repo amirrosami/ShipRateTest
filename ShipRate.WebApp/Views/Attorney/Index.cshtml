@@ -1,0 +1,221 @@
+﻿@{
+    ViewData["Title"] = "Attorney Management";
+}
+
+<div class="container-fluid mt-4">
+
+    <!-- ══════════ Search Panel ══════════ -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light d-flex align-items-center">
+            <i class="bi bi-funnel text-primary me-2"></i>
+            <strong>Search Filters</strong>
+        </div>
+        <div class="card-body">
+            <form hx-get="@Url.Action("AttorneyList")"
+                  hx-target="#attorney-list-container"
+                  hx-swap="innerHTML"
+                  hx-trigger="submit"
+                  hx-include="this">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-person text-primary me-1"></i> Client Name
+                        </label>
+                        <input type="text" name="ClientName"
+                               class="form-control" placeholder="Search client…" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-briefcase text-primary me-1"></i> Lawyer Name
+                        </label>
+                        <input type="text" name="LawyerName"
+                               class="form-control" placeholder="Search lawyer…" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-hash text-primary me-1"></i> Doc No
+                        </label>
+                        <input type="text" name="DocNo"
+                               class="form-control" placeholder="Document number…" />
+                    </div>
+
+                    <div class="col-md-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">
+                            <i class="bi bi-search me-1"></i> Search
+                        </button>
+                        <button type="reset" class="btn btn-outline-secondary flex-fill"
+                                hx-get="@Url.Action("AttorneyList")"
+                                hx-target="#attorney-list-container"
+                                hx-swap="innerHTML">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ══════════ Attorney Grid ══════════ -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>
+                <i class="bi bi-file-earmark-text me-2"></i>
+                Attorney List
+            </span>
+            <button class="btn btn-sm btn-light"
+                    hx-get="@Url.Action("CreateAttorney")"
+                    hx-target="#appModal .modal-content"
+                    hx-swap="innerHTML"
+                    data-bs-toggle="modal"
+                    data-bs-target="#appModal">
+                <i class="bi bi-plus-lg me-1"></i> New Attorney
+            </button>
+        </div>
+        <div class="card-body p-0"
+             id="attorney-list-container"
+             hx-get="@Url.Action("AttorneyList")"
+             hx-trigger="load, attorneyChanged from:body"
+             hx-swap="innerHTML">
+        </div>
+    </div>
+
+    <!-- ══════════ Lawyers Grid ══════════ -->
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>
+                <i class="bi bi-people me-2"></i>
+                Lawyers
+                <small id="lawyer-panel-title" class="ms-2 opacity-75">— Select an attorney above</small>
+            </span>
+            <button class="btn btn-sm btn-light"
+                    id="btnAddLawyer"
+                    style="display:none;"
+                    data-bs-toggle="modal"
+                    data-bs-target="#appModal">
+                <i class="bi bi-person-plus me-1"></i> Add Lawyer
+            </button>
+        </div>
+        <div class="card-body p-0" id="lawyer-list-container">
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-arrow-up-circle" style="font-size:2rem;"></i>
+                <p class="mt-2">Select an attorney from the grid above to view lawyers.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ══════════ Modal ══════════ -->
+<div class="modal fade" id="appModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // ── Select Attorney → Load Lawyers ──
+        let selectedAttorneyId = null;
+
+        document.body.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-select-attorney');
+            if (!btn) return;
+
+            selectedAttorneyId = btn.dataset.id;
+            const docNo = btn.dataset.docno;
+
+            // Highlight selected row
+            document.querySelectorAll('#attorney-list-container tr').forEach(r => r.classList.remove('table-active'));
+            btn.closest('tr').classList.add('table-active');
+
+            // Update lawyer panel title
+            document.getElementById('lawyer-panel-title').textContent = '— ' + docNo;
+
+            // Show Add Lawyer button
+            const addBtn = document.getElementById('btnAddLawyer');
+            addBtn.style.display = '';
+            addBtn.setAttribute('hx-get', '/Attorney/AddLawyer?attorneyId=' + selectedAttorneyId);
+            addBtn.setAttribute('hx-target', '#appModal .modal-content');
+            addBtn.setAttribute('hx-swap', 'innerHTML');
+            htmx.process(addBtn);
+
+            // Load lawyers
+            htmx.ajax('GET', '/Attorney/LawyerList?attorneyId=' + selectedAttorneyId, '#lawyer-list-container');
+        });
+
+        // ── Refresh lawyers after change ──
+        document.body.addEventListener('lawyersChanged', function () {
+            if (selectedAttorneyId) {
+                htmx.ajax('GET', '/Attorney/LawyerList?attorneyId=' + selectedAttorneyId, '#lawyer-list-container');
+            }
+        });
+
+        // ── Close Modal ──
+        document.body.addEventListener('closeModal', function () {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('appModal'));
+            if (modal) modal.hide();
+        });
+
+        // ── Toast ──
+        document.body.addEventListener('showToast', function () {
+            const toastEl = document.getElementById('appToast');
+            if (toastEl) {
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            }
+        });
+
+        // ── Confirm Delete ──
+        document.body.addEventListener('click', function (e) {
+            const btn = e.target.closest('[hx-delete]');
+            if (btn && !btn.dataset.confirmed) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (confirm('Are you sure you want to delete this item?')) {
+                    btn.dataset.confirmed = 'true';
+                    btn.click();
+                }
+            }
+        });
+
+
+        document.body.addEventListener('attorneyListChanged', function () {
+                // بستن مودال
+                const modalEl = document.getElementById('appModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+
+                // رفرش لیست
+                htmx.ajax('GET', '/Attorney/AttorneyList', {
+                    target: '#attorney-list-container',
+                    swap: 'innerHTML'
+                });
+            });
+
+
+
+        document.body.addEventListener('lawyerListChanged', function () {
+                // بستن مودال
+                const modalEl = document.getElementById('appModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+
+                // رفرش لیست وکلا
+                const selectedAttorneyId = document.querySelector('#attorney-list-container tr.table-active')?.dataset?.attorneyId;
+                if (selectedAttorneyId) {
+                    htmx.ajax('GET', '/Attorney/LawyerList?attorneyId=' + selectedAttorneyId, {
+                        target: '#lawyer-list-container',
+                        swap: 'innerHTML'
+                    });
+                }
+            });
+
+
+
+    </script>
+}

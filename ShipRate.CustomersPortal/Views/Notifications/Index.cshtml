@@ -1,0 +1,117 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.Notif
+@model PagedResultDto<NotificationListItemDto>
+
+@{
+    ViewData["Title"] = "Notifications";
+}
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Notifications</h5>
+
+@*         <button type="button"
+                class="btn btn-primary"
+                hx-get="@Url.Action("Create", "Notifications")"
+                hx-target="#notificationModalContent"
+                hx-swap="innerHTML"
+                data-bs-toggle="modal"
+                data-bs-target="#notificationModal">
+            Create Notification
+        </button>
+ *@
+
+
+
+ </div>
+
+    <div class="card-body">
+        @if (Model.Items == null || !Model.Items.Any())
+        {
+            <div class="alert alert-info mb-0">
+                No notifications found.
+            </div>
+        }
+        else
+        {
+            <div class="list-group">
+                @foreach (var item in Model.Items)
+                {
+                    <div class="list-group-item @(item.IsRead ? "" : "list-group-item-light")">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="d-flex align-items-center mb-1">
+                                    <i class="@(string.IsNullOrWhiteSpace(item.IconCssClass) ? "bx bx-bell" : item.IconCssClass) me-2"></i>
+                                    <h6 class="mb-0">@item.Title</h6>
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(item.Message))
+                                {
+                                    <p class="mb-1">@item.Message</p>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(item.ReferenceNo))
+                                {
+                                    <small class="text-muted d-block">
+                                        Ref: @item.ReferenceNo
+                                    </small>
+                                }
+
+                                <small class="text-muted">
+                                    @item.CreatedAt.ToString("yyyy-MM-dd HH:mm")
+                                </small>
+                            </div>
+
+                            <div class="text-end">
+                                @if (!item.IsRead)
+                                {
+                                    <form method="post"
+                                          action="@Url.Action("MarkAsRead", "Notifications")">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden"
+                                               name="userNotificationId"
+                                               value="@item.UserNotificationId" />
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-primary">
+                                            Mark as Read
+                                        </button>
+                                    </form>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(item.TargetUrl))
+                                {
+                                    <a href="@item.TargetUrl"
+                                       class="btn btn-sm btn-label-secondary mt-2">
+                                        Open
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<div class="modal fade"
+     id="notificationModal"
+     tabindex="-1"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" id="notificationModalContent"></div>
+    </div>
+</div>
+
+<script>
+    document.body.addEventListener('notificationCreated', function () {
+        var modalElement = document.getElementById('notificationModal');
+        var modal = bootstrap.Modal.getInstance(modalElement);
+        if (modal) {
+            modal.hide();
+        }
+
+        location.reload();
+    });
+</script>

@@ -1,0 +1,27 @@
+@using ShipRate.Application.JobsViewModels
+@model JobDetailsVm
+
+<div class="subhead">Job details</div>
+<div class="info-grid">
+    @{
+        var job = new[] { ("Job Number", Model.JobNumber), ("Transport Type", Model.TransportTypeName), ("Trade type", Model.TradeTypeName), ("Load type", Model.LoadTypeName), ("Incoterm", Model.Incoterm), ("Cargo handling type", Model.CargohandlingTypeName), ("Cargo nature", Model.CargoNatureName), ("Cargo ready date", Model.CargoReadyDate.ToString()) };
+    }
+@foreach(var x in job)
+{
+    <div class="info-item">
+        <div class="l">@x.Item1</div>
+        <div class="v">@x.Item2</div>
+    </div>
+}
+</div>
+@* <div class="subhead">Cargo summary</div>
+<div class="info-grid">
+@{ var cargo = new[]{("Total packages",$"{Model.TotalPackages} cartons"),("Gross weight",Model.GrossWeight),("Volume",Model.Volume),("Chargeable weight",Model.ChargeableWeight),("Containers",Model.ContainerSummary),("Goods description",Model.GoodsDescription)}; }
+@foreach(var x in cargo)
+{
+    <div class="info-item">
+        <div class="l">@x.Item1</div>
+        <div class="v">@x.Item2</div>
+    </div>
+}
+</div> *@

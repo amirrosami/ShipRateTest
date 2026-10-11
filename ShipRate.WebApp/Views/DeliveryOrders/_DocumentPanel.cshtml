@@ -1,0 +1,24 @@
+﻿@using ShipRate.Application.ViewModels
+@model DeliveryOrderDocumentPanelVm
+
+<div class="card shadow-sm border-0 mt-3">
+    <div class="card-header bg-white border-bottom">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h6 class="mb-0">Documents</h6>
+                <small class="text-muted">Upload one or more files for each document type.</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="row g-3">
+            @foreach (var item in Model.Cards)
+            {
+                <div class="col-12 col-sm-4 col-lg-2">
+                    <partial name="_DocumentUploadCard" model="item" />
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,156 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model IReadOnlyList<PettyCashRechargeListItemDto>
+
+@{
+    var pettyCashId = (Guid)ViewBag.PettyCashId;
+}
+
+<div class="card mb-3" dir="ltr"
+     hx-get="@Url.Action("Recharges", "PettyCash", new { pettyCashId })"
+     hx-trigger="rechargeChanged from:body"
+     hx-swap="innerHTML">
+    <div class="card-header d-flex justify-content-between">
+        <span>Recharges</span>
+        <div>
+            <button class="btn btn-sm btn-success"
+                    hx-get="@Url.Action("CreateRecharge", "PettyCash", new { pettyCashId })"
+                    hx-target="#pettyModalBody"
+                    data-bs-toggle="modal"
+                    data-bs-target="#pettyModal">
+                Add
+            </button>
+            <button class="btn btn-sm btn-outline-secondary"
+                    type="button"
+                    onclick="this.closest('.card').remove()">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-sm table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th class="text-end">Amount</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th style="width:210px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.RechargeDate?.ToString("yyyy-MM-dd")</td>
+                        <td class="text-end">@item.RechargeAmount.ToString("N2")</td>
+                        <td>@item.Description</td>
+                        <td>@item.StatusName</td>
+                        <td>
+
+                            @{
+                                var isApproved = item.StatusId == 3;
+                                var isCharged = item.StatusId == 4;
+                                var isRejected = item.StatusId == 9;
+                                var isFinalStatus = isCharged || isRejected;
+                            }
+
+
+
+
+                            <!-- Edit Recharge -->
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-primary"
+                                    title="Edit Recharge"
+                                    aria-label="Edit"
+                                    hx-get="@Url.Action("EditRecharge", "PettyCash", new { id = item.Id })"
+                                    hx-target="#pettyModalBody"
+                                    hx-swap="innerHTML"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#pettyModal">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+
+
+                            <form class="d-inline"
+                                  hx-post="@Url.Action("ApproveRecharge", "PettyCash", new { id = item.Id, pettyCashId = item.PettyCashId })"
+                                  hx-confirm="Approve this recharge?"
+                                  hx-swap="none">
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-success"
+                                        title="Approve Recharge"
+                                        aria-label="Approve Recharge"
+                                        @(isApproved || isFinalStatus ? "disabled" : "")>
+                                    <i class="bi bi-check-circle"></i>
+                                </button>
+                            </form>
+
+                            <form class="d-inline"
+                                  hx-post="@Url.Action("RejectRecharge", "PettyCash", new { id = item.Id, pettyCashId = item.PettyCashId })"
+                                  hx-confirm="Reject this recharge?"
+                                  hx-swap="none">
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-warning"
+                                        title="Reject Recharge"
+                                        aria-label="Reject Recharge"
+                                        @(isRejected || isCharged ? "disabled" : "")>
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                            </form>
+
+                            <form class="d-inline"
+                                  hx-post="@Url.Action("ChargeRecharge", "PettyCash", new { id = item.Id, pettyCashId = item.PettyCashId })"
+                                  hx-confirm="Charge this recharge?"
+                                  hx-swap="none">
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-info"
+                                        title="Charge Recharge"
+                                        aria-label="Charge Recharge"
+                                        @(isCharged || isRejected ? "disabled" : "")>
+                                    <i class="bi bi-cash-coin"></i>
+                                </button>
+                            </form>
+
+
+
+
+
+                            <!-- Delete Recharge -->
+                            <form class="d-inline"
+                                  hx-post="@Url.Action("DeleteRecharge", "PettyCash", new { id = item.Id, pettyCashId = item.PettyCashId })"
+                                  hx-confirm="Are you sure you want to delete this recharge?"
+                                  hx-swap="none">
+                                @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                        class="btn btn-sm btn-outline-danger"
+                                        title="@(isCharged ? "Cannot delete: Already Charged" : "Delete Recharge")"
+                                        aria-label="Delete"
+                                        @(isCharged ? "disabled" : "")>
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+
+                            <!-- Recharge Documents -->
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    hx-get="/DocumentManager/Index?objectId=@item.Id&objectTypeId=252"
+                                    hx-target="#document-manager-content"
+                                    hx-swap="innerHTML"
+                                    data-bs-toggle="modal"
+                                    title="Documents"
+                                    data-bs-target="#documentManagerModal">
+                                <i class="bi bi-paperclip"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

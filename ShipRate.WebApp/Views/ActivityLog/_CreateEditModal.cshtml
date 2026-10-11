@@ -1,0 +1,146 @@
+﻿@using ShipRate.Application.ViewModels
+@model ActivityLogUpsertFormVm
+
+<div class="modal fade text-start" id="activityLogEditorModal" tabindex="-1" aria-labelledby="editorModalLabel" aria-hidden="true" dir="ltr" data-bs-backdrop="static" data-keyboard="false"  >
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <form hx-post="@(Model.Id.HasValue ? Url.Action("Edit") : Url.Action("Create"))"
+                  hx-swap="none">
+
+                @Html.AntiForgeryToken()
+
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="editorModalLabel">
+                        @(Model.Id.HasValue ? "Edit Activity Event" : "Create Activity Event")
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="EntityTypeId" />
+                    <input type="hidden" asp-for="EntityId" />
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="EventTypeId" class="form-label small fw-bold">Event Type</label>
+                            <select asp-for="EventTypeId" asp-items="Model.EventTypes" class="form-select">
+                                <option value="">-- Select Event Type --</option>
+                            </select>
+                            <span asp-validation-for="EventTypeId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="ActivityDateTime" class="form-label small fw-bold">Event Date & Time</label>
+                            <input asp-for="ActivityDateTime" type="datetime-local" class="form-control" />
+                            <span asp-validation-for="ActivityDateTime" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Title" class="form-label small fw-bold">Title</label>
+                            <input asp-for="Title" class="form-control" placeholder="" />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Description" class="form-label small fw-bold">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder=""></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="ExternalReferenceNo" class="form-label small fw-bold">Reference</label>
+                            <input asp-for="ExternalReferenceNo" class="form-control" placeholder="" />
+                            <span asp-validation-for="ExternalReferenceNo" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <div id="visibleForCustomersBox"
+                                 class="border rounded-3 p-3 bg-light shadow-sm transition-all">
+
+                                <div class="d-flex align-items-start gap-3">
+                                    <input asp-for="VisibleForCustomers"
+                                           id="VisibleForCustomers"
+                                           class="form-check-input mt-1"
+                                           type="checkbox"
+                                           style="width: 2.6rem; height: 1.4rem;" />
+
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                                            <label asp-for="VisibleForCustomers"
+                                                   class="form-check-label fw-bold fs-5 mb-0">
+                                                Visible for Customers
+                                            </label>
+
+                                            <span id="visibleBadge"
+                                                  class="badge bg-secondary d-none">
+                                                Not visible
+                                            </span>
+                                        </div>
+
+                                        <div class="text-muted small mt-1">
+                                            If enabled, this event will be visible to customers.
+                                            Please make sure the information is final before turning this on.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span asp-validation-for="VisibleForCustomers" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="InternalNote" class="form-label small fw-bold">Internal Note(Only Visible Internally)</label>
+                            <textarea asp-for="InternalNote" class="form-control" rows="3" placeholder=""></textarea>
+                            <span asp-validation-for="InternalNote" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<style>
+    #visibleForCustomersBox {
+        transition: all .2s ease-in-out;
+    }
+
+        #visibleForCustomersBox.is-enabled {
+            background: #eefaf1;
+            border-color: #2fb344 !important;
+            box-shadow: 0 0 0 .15rem rgba(47, 179, 68, .12);
+        }
+
+    #visibleBadge.bg-secondary {
+        background-color: #6c757d !important;
+    }
+
+    #visibleBadge.bg-success {
+        background-color: #2fb344 !important;
+    }
+</style>
+
+<script>
+    (function () {
+        const checkbox = document.getElementById('VisibleForCustomers');
+        const box = document.getElementById('visibleForCustomersBox');
+        const badge = document.getElementById('visibleBadge');
+
+        function updateState() {
+            const enabled = checkbox.checked;
+
+            box.classList.toggle('is-enabled', enabled);
+            badge.classList.toggle('d-none', false);
+            badge.classList.toggle('bg-success', enabled);
+            badge.classList.toggle('bg-secondary', !enabled);
+            badge.textContent = enabled ? 'Visible to customers' : 'Not visible';
+        }
+
+        if (checkbox) {
+            checkbox.addEventListener('change', updateState);
+            updateState();
+        }
+    })();
+</script>

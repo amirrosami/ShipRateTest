@@ -1,0 +1,18 @@
+﻿@using ShipRate.WebApp.ViewModels
+@model dynamic
+
+<div class="col-md-2">
+    <select name="locationType"
+            asp-items="@ViewBag.LocationTypes"
+            class="form-select form-select-sm"
+            hx-post="Locations/List"
+            hx-trigger="change"
+            hx-target="#table-container"
+            hx-swap="innerHTML"
+            hx-include="#grid-filters, #table-sort-info">
+        <option class="text-dark" value="0" selected>-- Location Type --</option>
+    </select>
+</div>
+
+
+

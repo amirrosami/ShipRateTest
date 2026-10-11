@@ -1,0 +1,139 @@
+﻿@using ShipRate.Domain.Entities.Security
+@model List<ApplicationRole>
+
+@{
+    ViewData["Title"] = "Roles Management";
+}
+
+<div class="content-header">
+    <h1>
+        <i class="bi bi-shield-check"></i> Manage Roles 
+    </h1>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-right"></i> Return To userts List
+    </a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        <i class="bi bi-check-circle"></i> @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        <i class="bi bi-exclamation-triangle"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-plus-circle"></i> New Role
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="CreateRole" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label for="roleName" class="form-label">Role Name</label>
+                        <input type="text"
+                               class="form-control"
+                               id="roleName"
+                               name="roleName"
+                               required />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-check-lg"></i> Create Role
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-list-ul"></i> Roles List
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (Model.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Role Name</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < Model.Count; i++)
+                                {
+                                    var role = Model[i];
+                                    <tr>
+                                        <td>@(i + 1)</td>
+                                        <td>
+                                            <span class="badge bg-@(role.Name == "Admin" ? "danger" : "primary") fs-6">
+                                                @role.Name
+                                            </span>
+                                            @if (role.Name == "Admin" || role.Name == "User")
+                                            {
+                                                <span class="badge bg-secondary">Base Role</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (role.Name != "Admin" && role.Name != "Manager" && role.Name != "Sales Manager" && role.Name != "Sales User" && role.Name != "Customer" && role.Name != "External Party")
+                                            {
+                                                <form asp-action="DeleteRole"
+                                                      asp-route-id="@role.Id"
+                                                      method="post"
+                                                      style="display:inline;"
+                                                      onsubmit="return confirm('Are you sure you want to remove role : @role.Name ');">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        <i class="bi bi-trash"></i> Delete
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-sm btn-secondary" disabled>
+                                                    <i class="bi bi-lock"></i> Protected
+                                                </button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> No Roles Defined!!!!
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+</style>

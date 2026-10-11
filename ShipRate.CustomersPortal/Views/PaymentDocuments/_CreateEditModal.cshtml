@@ -1,0 +1,218 @@
+﻿@using ShipRate.Application.ViewModels
+@model PaymentDocumentCreateEditVm
+@{
+    var isEdit = Model.Id!=Guid.Empty;
+    var actionName = isEdit ? "Edit" : "Create";
+    var modalTitle = isEdit ? "Edit Payment Document" : "New Payment Document";
+    var chequeSectionStyle = Model.PaymentMethodId == 3 ? "" : "display:none;";
+}
+<div class="modal-header" dir="ltr">
+    <h5 class="modal-title">@modalTitle</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body" dir="ltr">
+    <form id="paymentDocumentForm"
+          hx-post="@Url.Action(actionName, "PaymentDocuments")"
+          hx-target="#globalModalContent"
+          hx-swap="innerHTML">
+
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label asp-for="CompanyId" class="form-label">Company</label>
+                <select asp-for="CompanyId" asp-items="Model.Companies" class="form-select">
+                    <option value="">Select company</option>
+                </select>
+                <span asp-validation-for="CompanyId" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="BranchId" class="form-label">Branch</label>
+                <select asp-for="BranchId" asp-items="Model.Branches" class="form-select">
+                    <option value="">Select Branch</option>
+                </select>
+                <span asp-validation-for="BranchId" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="DocumentNumber" class="form-label">Document Number</label>
+                <input asp-for="DocumentNumber" class="form-control" />
+                <span asp-validation-for="DocumentNumber" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="DocumentDateShamsi" class="form-label">Document Date</label>
+                <input asp-for="DocumentDateShamsi" class="form-control" placeholder="yyyy/MM/dd" />
+                <span asp-validation-for="DocumentDateShamsi" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="FinanceDirectionId" class="form-label">Finance Direction</label>
+                <select asp-for="FinanceDirectionId" asp-items="Model.FinanceDirections" class="form-select">
+                    <option value="">Select direction</option>
+                </select>
+                <span asp-validation-for="FinanceDirectionId" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Amount" class="form-label">Amount</label>
+                <input asp-for="Amount" class="form-control money-input" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="CurrencyId" class="form-label">Currency</label>
+                <select asp-for="CurrencyId" asp-items="Model.Currencies" class="form-select">
+                    <option value="">Select currency</option>
+                </select>
+                <span asp-validation-for="CurrencyId" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-8">
+                <label asp-for="PersonId" class="form-label">Party</label>
+                <input type="hidden"
+                       asp-for="PersonId"
+                       id="PersonId" />
+                <input type="text"
+                       id="CPartySearchText"
+                       name="CParty"
+                       value="@Model.PersonName"
+                       class="form-control"
+                       placeholder="Search Party..."
+                       autocomplete="off"
+                       hx-get="@Url.Action("SearchParties", "JobParty")"
+                       hx-trigger="keyup changed delay:400ms"
+                       hx-target="#partySearchResults"
+                       hx-swap="innerHTML"
+                       hx-vals='js:{
+                            term: document.getElementById("CPartySearchText").value,
+                            targetHiddenInputId: "PersonId",
+                            targetTextInputId: "CPartySearchText"
+                       }' />
+
+                <div id="partySearchResults"
+                     class="position-relative">
+                </div>
+                <span asp-validation-for="PersonId" class="text-danger small"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="PaymentMethodId" class="form-label">Payment Method</label>
+                <select asp-for="PaymentMethodId" asp-items="Model.PaymentMethods" class="form-select" id="paymentMethodSelect">
+                    <option value="">Select payment method</option>
+                </select>
+                <span asp-validation-for="PaymentMethodId" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="TrackingNumber" class="form-label">Tracking Number</label>
+                <input asp-for="TrackingNumber" class="form-control" />
+                <span asp-validation-for="TrackingNumber" class="text-danger"></span>
+            </div>
+            <div class="col-md-12">
+                <label asp-for="Description" class="form-label">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="2"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <div id="cheque-section" style="@chequeSectionStyle">
+            <h6 class="mb-3">Cheque Information</h6>
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label asp-for="Cheque.ChequeNumber" class="form-label">Cheque Number</label>
+                    <input asp-for="Cheque.ChequeNumber" class="form-control" />
+                    <span asp-validation-for="Cheque.ChequeNumber" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="Cheque.ChequeDateShamsi" class="form-label">Cheque Date</label>
+                    <input asp-for="Cheque.ChequeDateShamsi" class="form-control" placeholder="yyyy/MM/dd" />
+                    <span asp-validation-for="Cheque.ChequeDateShamsi" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="Cheque.ChequeTypeId" class="form-label">Cheque Type</label>
+                    <select asp-for="Cheque.ChequeTypeId" asp-items="Model.ChequeTypes" class="form-select">
+                        <option value="">Select cheque type</option>
+                    </select>
+                    <span asp-validation-for="Cheque.ChequeTypeId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="Cheque.ChequePurposeId" class="form-label">Cheque Purpose</label>
+                    <select asp-for="Cheque.ChequePurposeId" asp-items="Model.ChequePurposes" class="form-select">
+                        <option value="">Select cheque purpose</option>
+                    </select>
+                    <span asp-validation-for="Cheque.ChequePurposeId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="Cheque.BankId" class="form-label">Bank</label>
+                    <select asp-for="Cheque.BankId"
+                            asp-items="Model.Banks"
+                            class="form-select"
+                            id="bankSelect"
+                            hx-get="@Url.Action("BankAccounts", "PaymentDocuments")"
+                            hx-trigger="change"
+                            hx-target="#bankAccountContainer"
+                            hx-include="#bankSelect"
+                            hx-swap="innerHTML">
+                        <option value="">Select bank</option>
+                    </select>
+                    <span asp-validation-for="Cheque.BankId" class="text-danger"></span>
+                </div>
+
+                @*<div class="col-md-4" id="bankAccountContainer">
+                    <label asp-for="Cheque.BankAccountId" class="form-label">Bank Account</label>
+                    <select asp-for="Cheque.BankAccountId" asp-items="Model.BankAccounts" class="form-select">
+                        <option value="">Select bank account</option>
+                    </select>
+                    <span asp-validation-for="Cheque.BankAccountId" class="text-danger"></span>
+                </div> *@
+                <div class="col-md-4">
+                    <label asp-for="Cheque.BankAccountNo" class="form-label">Bank Account No</label>
+                    <input asp-for="Cheque.BankAccountNo" class="form-control" />
+                    <span asp-validation-for="Cheque.BankAccountNo" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Cheque.AccountHolderName" class="form-label">Account Holder Name</label>
+                    <input asp-for="Cheque.AccountHolderName" class="form-control" />
+                    <span asp-validation-for="Cheque.AccountHolderName" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Cheque.Description" class="form-label">Cheque Description</label>
+                    <textarea asp-for="Cheque.Description" class="form-control" rows="2"></textarea>
+                    <span asp-validation-for="Cheque.Description" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer" dir="ltr">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    <button type="submit" form="paymentDocumentForm" class="btn btn-primary">
+        @(isEdit ? "Save Changes" : "Create")
+    </button>
+</div>
+
+<script>
+    (function () {
+        const paymentMethodSelect = document.getElementById('paymentMethodSelect');
+        const chequeSection = document.getElementById('cheque-section');
+
+        function toggleChequeSection() {
+            if (!paymentMethodSelect || !chequeSection) return;
+
+            if (paymentMethodSelect.value === '3') {
+                chequeSection.style.display = '';
+            } else {
+                chequeSection.style.display = 'none';
+            }
+        }
+
+        if (paymentMethodSelect) {
+            paymentMethodSelect.addEventListener('change', toggleChequeSection);
+            toggleChequeSection();
+        }
+    })();
+</script>

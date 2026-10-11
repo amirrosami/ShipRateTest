@@ -1,0 +1,553 @@
+﻿@using ShipRate.Application.ViewModels
+@model CreateDeliveryOrderPageVm
+@{
+    var isEditMode = Model.DeliveryOrderId.HasValue && Model.DeliveryOrderId.Value != Guid.Empty;
+    ViewData["Title"] = isEditMode ? "Edit Delivery Order" : "Create Delivery Order";
+    var isFinalized = Model.StatusText == "Approved" || Model.StatusText == "Cancelled";
+}
+
+<style>
+    body {
+        background: #f5f7fb;
+    }
+
+    /* استایل گرید اکسل */
+    .excel-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0; /* حذف گپ بین سلول‌ها برای چسبیده شدن */
+        border: 1px solid #d1d9e0; /* حاشیه دور کل گرید */
+        background-color: #fff;
+    }
+
+    .excel-field {
+        display: flex; /* لیبل و اینپوت کنار هم */
+        border: 0.5px solid #d1d9e0; /* مرز بین سلول‌ها */
+        background-color: #fff;
+        align-items: stretch; /* ارتفاع یکسان */
+        min-height: 46px; /* ارتفاع افزایش یافته سلول‌ها */
+    }
+
+        /* استایل لیبل (سمت چپ - آبی روشن) */
+        .excel-field label {
+            background-color: #eef6ff; /* آبی بسیار ملایم */
+            color: #4a5568;
+            padding: 8px 12px;
+            font-size: 15px; /* فونت بزرگتر */
+            font-weight: 600;
+            min-width: 155px; /* عرض هماهنگ با فونت */
+            max-width: 155px;
+            border-right: 1px solid #d1d9e0;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin: 0;
+            user-select: none;
+        }
+
+    .excel-field-control {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-width: 0;
+        position: relative;
+    }
+
+    /* استایل ورودی‌ها (سمت راست - سفید) */
+    .excel-field input,
+    .excel-field select,
+    .excel-field textarea {
+        flex: 1;
+        border: none !important;
+        border-radius: 0 !important;
+        background-color: #ffffff;
+        padding: 8px 12px; /* فضای تنفس و پدینگ بیشتر */
+        font-size: 14px; /* فونت بزرگتر */
+        outline: none !important;
+        box-shadow: none !important;
+        width: 100%;
+        color: #111827;
+    }
+
+        /* استایل فوکوس (زرد ملایم) */
+        .excel-field input:focus,
+        .excel-field select:focus,
+        .excel-field textarea:focus {
+            background-color: #fff9c4 !important; /* زرد ملایم هنگام فوکوس */
+        }
+
+    /* سلکتور Select2 داخل excel-field */
+    .excel-field .select2-container--bootstrap-5.select2-container--focus .select2-selection,
+    .excel-field .select2-container--bootstrap-5.select2-container--open .select2-selection,
+    .excel-field .select2-container--default.select2-container--focus .select2-selection,
+    .excel-field .select2-container--default.select2-container--open .select2-selection {
+        background-color: #fff9c4 !important;
+        border-color: #ffe082 !important;
+    }
+
+    .select2-dropdown .select2-search__field:focus {
+        background-color: #fff9c4 !important;
+        border-color: #ffe082 !important;
+    }
+
+    /* فیلد تمام‌عرض */
+    .span-3 {
+        grid-column: span 3;
+    }
+
+    /* پیام‌های خطای ولیدیشن */
+    .excel-validation-msg {
+        font-size: 12px;
+        color: #dc2626;
+        padding: 0 10px 3px 10px;
+        line-height: 1.1;
+    }
+
+    @@media (max-width: 992px) {
+        .excel-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .span-3 {
+            grid-column: span 1;
+        }
+    }
+</style>
+
+<div class="container-fluid py-2" dir="ltr">
+    <div class="card-header  d-flex justify-content-between align-items-center mb-2">
+        <h4 class="mb-0">@ViewData["Title"]</h4>
+@*         <div class="d-flex gap-2">
+            @if (!isFinalized)
+            {
+                <button type="button"
+                        class="btn btn-outline-secondary btn-sm"
+                        hx-post="@Url.Action("SaveDraft", "DeliveryOrders")"
+                        hx-include="#deliveryOrderCreateForm"
+                        hx-target="#saveDraftResult">
+                    <i class="bi bi-save"></i> Save Draft
+                </button>
+                <button type="button"
+                        id="btnFinalize"
+                        class="btn btn-success btn-sm"
+                        @(isEditMode ? "" : "disabled")
+                        hx-post="@Url.Action("Finalize", "DeliveryOrders")"
+                        hx-include="#deliveryOrderCreateForm"
+                        hx-target="#finalizeResult"
+                        hx-swap="innerHTML">
+                    Finalize DO
+                </button>
+            }
+
+            <a id="detailsButton"
+               class="btn btn-outline-secondary btn-sm @(isEditMode ? "" : "d-none")"
+               href="@(isEditMode? Url.Action("Details", "DeliveryOrders", new { id = Model.DeliveryOrderId }) : "#")">
+                Details
+            </a>
+
+            <a id="printButton"
+               class="btn btn-outline-dark btn-sm @(isFinalized ? "" : "d-none")"
+               href="@(isEditMode? Url.Action("Print", "DeliveryOrders", new { id = Model.DeliveryOrderId }) : "#")"
+               target="_blank">
+                Print
+            </a>
+        </div>
+ *@    </div>
+
+    <form id="deliveryOrderCreateForm" autocomplete="off">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" asp-for="DeliveryOrderId" id="DeliveryOrderId" />
+        <input type="hidden" asp-for="BLId" id="BLId" />
+
+        <fieldset @(isFinalized ? "disabled" : "")>
+            <div class="row g-2">
+                <div class="col-12">
+                    @if (false)
+                    {
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-3">
+                                <label asp-for="BLNo" class="form-label">Transport Doc (BL) No</label>
+                                <div class="input-group">
+                                    <input asp-for="BLNo" id="BLNo" class="form-control" readonly />
+                                    @if (!isFinalized && !isEditMode)
+                                    {
+                                        <button type="button"
+                                                class="btn btn-outline-primary"
+                                                hx-get="@Url.Action("BLSearchModal", "DeliveryOrders")"
+                                                hx-target="#globalModalContent"
+                                                hx-swap="innerHTML"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#globalModal">
+                                            Select BL
+                                        </button>
+                                    }
+                                </div>
+                                <span asp-validation-for="BLId" class="text-danger small d-block" style="height:0;"></span>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="col-auto mb-1" id="saveDraftResult">
+                        @* محل قرارگیری Alert *@
+                    </div>
+
+                    <!-- شروع ساختار چسبیده Excel Grid -->
+                    <div class="excel-grid">
+
+                        <!-- فیلد 1 -->
+                        <div class="excel-field">
+                            <label asp-for="DOOperationalModeId" title="Operational Mode">Operational Mode</label>
+                            <div class="excel-field-control">
+                                <select asp-for="DOOperationalModeId" asp-items="Model.DOOperationalModes">
+                                    <option value="">Select...</option>
+                                </select>
+                                <span asp-validation-for="DOOperationalModeId" class="excel-validation-msg"></span>
+                            </div>
+                        </div>
+
+                        <!-- فیلد 2 -->
+                        <div class="excel-field">
+                            <label asp-for="DONo" title="DO No">DO No</label>
+                            <div class="excel-field-control">
+                                <input asp-for="DONo" />
+                                <span asp-validation-for="DONo" class="excel-validation-msg"></span>
+                            </div>
+                        </div>
+
+                        <!-- فیلد 3 -->
+                        <div class="excel-field">
+                            <label asp-for="DoDate" title="DO Date">DO Date</label>
+                            <div class="excel-field-control">
+                                <input asp-for="DoDate" type="date" value="@Model.DoDate.ToString("yyyy-MM-dd")" />
+                                <span asp-validation-for="DoDate" class="excel-validation-msg"></span>
+                            </div>
+                        </div>
+
+                        <!-- فیلد 4 -->
+                        <div class="excel-field">
+                            <label asp-for="ArrivalDate" title="Arrival Date">Arrival Date</label>
+                            <div class="excel-field-control">
+                                <input asp-for="ArrivalDate" type="date" value="@Model.ArrivalDate?.ToString("yyyy-MM-dd")" />
+                                <span asp-validation-for="ArrivalDate" class="excel-validation-msg"></span>
+                            </div>
+                        </div>
+
+                        <!-- فیلد 5 -->
+                        <div class="excel-field">
+                            <label asp-for="CarrierId" title="Carrier">Carrier</label>
+                            <div class="excel-field-control">
+                                <select asp-for="CarrierId" asp-items="Model.Carriers">
+                                    <option value="">Select...</option>
+                                </select>
+                                <span asp-validation-for="CarrierId" class="excel-validation-msg"></span>
+                            </div>
+                        </div>
+
+                        <!-- فیلد 6 -->
+                        <div class="excel-field">
+                            <label asp-for="CarrierAgentId" title="Carrier Agent">Carrier Agent</label>
+                            <div class="excel-field-control">
+                                <select asp-for="CarrierAgentId" asp-items="Model.Agents">
+                                    <option value="">Select...</option>
+                                </select>
+                                <span asp-validation-for="CarrierAgentId" class="excel-validation-msg"></span>
+                            </div>
+                        </div>
+
+                        <!-- فیلد 7 -->
+                        <div class="excel-field">
+                            <label asp-for="ExternalIssuerId" title="External Issuer">External Issuer</label>
+                            <div class="excel-field-control">
+                                <select asp-for="ExternalIssuerId" asp-items="Model.ExternalIssuers">
+                                    <option value="">Select...</option>
+                                </select>
+                                <span asp-validation-for="ExternalIssuerId" class="excel-validation-msg"></span>
+                            </div>
+                        </div>
+
+                        <!-- فیلد 8 -->
+                        <div class="excel-field">
+                            <label asp-for="ExternalIssuerText" title="External Issuer Text">External Issuer Text</label>
+                            <div class="excel-field-control">
+                                <input asp-for="ExternalIssuerText" />
+                                <span asp-validation-for="ExternalIssuerText" class="excel-validation-msg"></span>
+                            </div>
+                        </div>
+
+                        <!-- فیلد 9 -->
+                        <div class="excel-field">
+                            <label asp-for="ReceivedAtDateTime" title="Received Date Time">Received Date Time</label>
+                            <div class="excel-field-control">
+                                <input asp-for="ReceivedAtDateTime" type="date" value="@Model.ExpiryDate" />
+                                <span asp-validation-for="ReceivedAtDateTime" class="excel-validation-msg"></span>
+                            </div>
+                        </div>
+
+                        <!-- فیلد 10 -->
+                        <div class="excel-field">
+                            <label asp-for="ReceivedByUserId" title="Received By User">Received By User</label>
+                            <div class="excel-field-control">
+                                <select asp-for="ReceivedByUserId" asp-items="Model.Users">
+                                    <option value="">Select...</option>
+                                </select>
+                                <span asp-validation-for="ReceivedByUserId" class="excel-validation-msg"></span>
+                            </div>
+                        </div>
+
+                        <!-- فیلد 11 -->
+                        <div class="excel-field">
+                            <label asp-for="ReceiveMethodId" title="Receive Method">Receive Method</label>
+                            <div class="excel-field-control">
+                                <select asp-for="ReceiveMethodId" asp-items="Model.ReceiveMethods">
+                                    <option value="">Select...</option>
+                                </select>
+                                <span asp-validation-for="ReceiveMethodId" class="excel-validation-msg"></span>
+                            </div>
+                        </div>
+
+                        <!-- فیلد 12 -->
+                        <div class="excel-field">
+                            <label asp-for="ExpiryDate" title="Expiry Date">Expiry Date</label>
+                            <div class="excel-field-control">
+                                <input asp-for="ExpiryDate" type="date" value="@Model.ExpiryDate?.ToString("yyyy-MM-dd")" />
+                                <span asp-validation-for="ExpiryDate" class="excel-validation-msg"></span>
+                            </div>
+                        </div>
+
+                        <!-- فیلد 13 -->
+                        <div class="excel-field">
+                            <label asp-for="ClearanceTypeId" title="Clearance Type">
+                                Clearance Type <span class="text-danger ms-1">*</span>
+                            </label>
+                            <div class="excel-field-control">
+                                <select asp-for="ClearanceTypeId" asp-items="Model.ClearanceTypes" required>
+                                    <option value="">Select...</option>
+                                </select>
+                                <span asp-validation-for="ClearanceTypeId" class="excel-validation-msg"></span>
+                            </div>
+                        </div>
+
+                        <!-- فیلد 14 -->
+                        <div class="excel-field">
+                            <label asp-for="TIPId" title="TIP">TIP</label>
+                            <div class="excel-field-control">
+                                <select asp-for="TIPId" asp-items="Model.TIPs">
+                                    <option value="">Select...</option>
+                                </select>
+                                <span asp-validation-for="TIPId" class="excel-validation-msg"></span>
+                            </div>
+                        </div>
+
+                        <!-- فیلد 15 -->
+                        <div class="excel-field">
+                            <label asp-for="BLReleaseTypeId" title="BL Release Type">BL Release Type</label>
+                            <div class="excel-field-control">
+                                <select asp-for="BLReleaseTypeId" asp-items="Model.BLReleaseTypes">
+                                    <option value="">Select...</option>
+                                </select>
+                                <span asp-validation-for="BLReleaseTypeId" class="excel-validation-msg"></span>
+                            </div>
+                        </div>
+
+                        <!-- فیلد 16 -->
+                        <div class="excel-field">
+                            <label asp-for="OriginalBLCount" title="Original BL Count">Original BL Count</label>
+                            <div class="excel-field-control">
+                                <input asp-for="OriginalBLCount" type="number" min="0" />
+                                <span asp-validation-for="OriginalBLCount" class="excel-validation-msg"></span>
+                            </div>
+                        </div>
+
+                        <!-- پر کردن دو سلول باقیمانده ردیف جهت تقارن گرید ۳ ستونه -->
+                        <div class="excel-field" style="background-color: #fafbfc;"></div>
+                        <div class="excel-field" style="background-color: #fafbfc;"></div>
+
+                        <!-- فیلد 17 (سرتاسری) Remarks -->
+                        <div class="excel-field span-3">
+                            <label asp-for="Remarks" title="Remarks">Remarks</label>
+                            <div class="excel-field-control">
+                                <textarea asp-for="Remarks" rows="2"></textarea>
+                                <span asp-validation-for="Remarks" class="excel-validation-msg"></span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- پایان Excel Grid -->
+
+                </div>
+            </div>
+        </fieldset>
+    </form>
+    <div class="d-flex gap-2">
+        @if (!isFinalized)
+        {
+            <button type="button"
+                    class="btn btn-outline-primary btn-sm"
+                    hx-post="@Url.Action("SaveDraft", "DeliveryOrders")"
+                    hx-include="#deliveryOrderCreateForm"
+                    hx-target="#saveDraftResult">
+                <i class="bi bi-save"></i> Save
+            </button>
+@*             <button type="button"
+                    id="btnFinalize"
+                    class="btn btn-success btn-sm"
+                    @(isEditMode ? "" : "disabled")
+                    hx-post="@Url.Action("Finalize", "DeliveryOrders")"
+                    hx-include="#deliveryOrderCreateForm"
+                    hx-target="#finalizeResult"
+                    hx-swap="innerHTML">
+                Finalize DO
+            </button>
+ *@        }
+
+@*         <a id="detailsButton"
+           class="btn btn-outline-secondary btn-sm @(isEditMode ? "" : "d-none")"
+           href="@(isEditMode? Url.Action("Details", "DeliveryOrders", new { id = Model.DeliveryOrderId }) : "#")">
+            Details
+        </a>
+
+        <a id="printButton"
+           class="btn btn-outline-dark btn-sm @(isFinalized ? "" : "d-none")"
+           href="@(isEditMode? Url.Action("Print", "DeliveryOrders", new { id = Model.DeliveryOrderId }) : "#")"
+           target="_blank">
+            Print
+        </a>
+ *@    </div>
+
+
+
+
+</div>
+
+<div id="finalizeResult" class="mt-2"></div>
+<div class="modal fade" id="globalModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="globalModalContent">
+        </div>
+    </div>
+</div>
+
+<!-- کانتینر پنل مستندات -->
+<div id="documentPanelContainer" class="mt-3">
+    @if (Model.DeliveryOrderId.HasValue && Model.DeliveryOrderId.Value != Guid.Empty)
+    {
+        <!-- بارگذاری خودکار پنل مستندات پس از ذخیره اولیه یا در صفحه ویرایش -->
+        <div hx-get="@Url.Action("DocumentPanel", "DeliveryOrders", new { deliveryOrderId = Model.DeliveryOrderId.Value })"
+             hx-trigger="load"
+             hx-swap="outerHTML">
+            <div class="text-center py-3">
+                <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
+                <span class="ms-2 text-muted">Loading documents...</span>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function selectBL(blId, blNo) {
+            document.getElementById('BLId').value = blId;
+            document.getElementById('BLNo').value = blNo;
+
+            htmx.ajax('GET', '@Url.Action("BLSummary", "DeliveryOrders")?blId=' + blId, {
+                target: '#blSummaryContainer',
+                swap: 'innerHTML'
+            });
+
+            htmx.ajax('GET', '@Url.Action("GetBlCharges", "DeliveryOrders")?blId=' + blId, {
+                target: '#bl-charges-container',
+                swap: 'innerHTML'
+            });
+
+            htmx.ajax('GET', '@Url.Action("GetBlInvoices", "DeliveryOrders")?blId=' + blId, {
+                target: '#bl-invoices-container',
+                swap: 'innerHTML'
+            });
+            bootstrap.Modal.getInstance(document.getElementById('globalModal')).hide();
+        }
+
+        document.body.addEventListener('fillBLDetails', function(evt) {
+            const data = evt.detail.value;
+            if(data.arrivalDate) {
+                document.getElementById('ArrivalDate').value = data.arrivalDate;
+            }
+        });
+
+        document.body.addEventListener('htmx:afterSwap', function (evt) {
+            if (evt.target.id !== 'saveDraftResult') {
+                return;
+            }
+
+            const successNode = evt.target.querySelector('[data-save-success="true"]');
+            if (!successNode) {
+                return;
+            }
+
+            const deliveryOrderId = successNode.getAttribute('data-delivery-order-id');
+            if (!deliveryOrderId) {
+                return;
+            }
+
+            document.getElementById('DeliveryOrderId').value = deliveryOrderId;
+
+            const finalizeButton = document.getElementById('btnFinalize');
+            if (finalizeButton) {
+                finalizeButton.disabled = false;
+            }
+
+            const detailsButton = document.getElementById('detailsButton');
+            if (detailsButton) {
+                detailsButton.href = '/DeliveryOrders/Details/' + deliveryOrderId;
+                detailsButton.classList.remove('d-none');
+            }
+
+            // لود مجدد پنل مستندات پس از اولین ذخیره موقت موفق
+            htmx.ajax('GET', '@Url.Action("DocumentPanel", "DeliveryOrders")?deliveryOrderId=' + deliveryOrderId, {
+                target: '#documentPanelContainer',
+                swap: 'innerHTML'
+            });
+        });
+
+        document.body.addEventListener('htmx:afterSwap', function (evt) {
+            if (evt.target.id !== 'finalizeResult') {
+                return;
+            }
+
+            const successNode = evt.target.querySelector('[data-finalize-success="true"]');
+            if (!successNode) {
+                return;
+            }
+
+            const deliveryOrderId = document.getElementById('DeliveryOrderId').value;
+
+            document.querySelectorAll('#deliveryOrderCreateForm input, #deliveryOrderCreateForm select, #deliveryOrderCreateForm textarea, #deliveryOrderCreateForm button')
+                .forEach(function (el) {
+                    if (el.id !== 'btnNewDo') {
+                        el.disabled = true;
+                    }
+                });
+
+            const detailsButton = document.getElementById('detailsButton');
+            if (detailsButton) {
+                detailsButton.href = '/DeliveryOrders/Details/' + deliveryOrderId;
+                detailsButton.classList.remove('d-none');
+            }
+
+            const printButton = document.getElementById('printButton');
+            if (printButton) {
+                printButton.href = '/DeliveryOrders/Print/' + deliveryOrderId;
+                printButton.classList.remove('d-none');
+            }
+
+            const detailsUrl = successNode.getAttribute('data-details-url');
+            if (detailsUrl) {
+                window.location.href = detailsUrl;
+            }
+        });
+    </script>
+}

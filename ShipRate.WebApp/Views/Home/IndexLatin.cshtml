@@ -1,0 +1,291 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div style="margin-bottom: 1.5rem;">
+    <h1 style="font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.5rem;">Dashboard Overview</h1>
+    <p style="color: var(--gray-500); font-size: 0.95rem;">Welcome back! Here's what's happening with your system today.</p>
+</div>
+
+<!-- STATS CARDS -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-value">1,842</div>
+        <div class="stat-label">Total Users</div>
+        <div class="stat-change up">
+            <i class="fas fa-arrow-up"></i>
+            <span>12% from last month</span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon success">
+            <i class="fas fa-user-check"></i>
+        </div>
+        <div class="stat-value">1,654</div>
+        <div class="stat-label">Active Users</div>
+        <div class="stat-change up">
+            <i class="fas fa-arrow-up"></i>
+            <span>8% increase</span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon warning">
+            <i class="fas fa-user-tag"></i>
+        </div>
+        <div class="stat-value">24</div>
+        <div class="stat-label">User Roles</div>
+        <div class="stat-change">
+            <i class="fas fa-minus"></i>
+            <span>No change</span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon danger">
+            <i class="fas fa-key"></i>
+        </div>
+        <div class="stat-value">156</div>
+        <div class="stat-label">Permissions</div>
+        <div class="stat-change down">
+            <i class="fas fa-arrow-down"></i>
+            <span>3 removed</span>
+        </div>
+    </div>
+</div>
+
+<!-- RECENT USERS TABLE -->
+<div class="data-table-wrapper">
+    <div class="table-header">
+        <h2 class="table-title">Recent Users</h2>
+        <div class="table-actions">
+            <button class="btn-secondary">
+                <i class="fas fa-download" style="margin-right: 0.5rem;"></i>
+                Export
+            </button>
+            <button class="btn-primary">
+                <i class="fas fa-plus" style="margin-right: 0.5rem;"></i>
+                Add User
+            </button>
+        </div>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Last Login</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <div class="user-cell">
+                        <div class="user-cell-avatar" style="background: #0066FF;">JD</div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--gray-900);">John Doe</div>
+                            <div style="font-size: 0.8rem; color: var(--gray-500);">ID: 1001</div>
+                        </div>
+                    </div>
+                </td>
+                <td>john.doe@company.com</td>
+                <td>Administrator</td>
+                <td><span class="badge active">Active</span></td>
+                <td>2 hours ago</td>
+                <td>
+                    <button class="icon-btn" style="width: 32px; height: 32px;">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="user-cell">
+                        <div class="user-cell-avatar" style="background: #10B981;">SM</div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--gray-900);">Sarah Miller</div>
+                            <div style="font-size: 0.8rem; color: var(--gray-500);">ID: 1002</div>
+                        </div>
+                    </div>
+                </td>
+                <td>sarah.miller@company.com</td>
+                <td>Manager</td>
+                <td><span class="badge active">Active</span></td>
+                <td>5 hours ago</td>
+                <td>
+                    <button class="icon-btn" style="width: 32px; height: 32px;">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="user-cell">
+                        <div class="user-cell-avatar" style="background: #F59E0B;">MC</div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--gray-900);">Michael Chen</div>
+                            <div style="font-size: 0.8rem; color: var(--gray-500);">ID: 1003</div>
+                        </div>
+                    </div>
+                </td>
+                <td>michael.chen@company.com</td>
+                <td>Developer</td>
+                <td><span class="badge pending">Pending</span></td>
+                <td>Yesterday</td>
+                <td>
+                    <button class="icon-btn" style="width: 32px; height: 32px;">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="user-cell">
+                        <div class="user-cell-avatar" style="background: #8B5CF6;">EJ</div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--gray-900);">Emily Johnson</div>
+                            <div style="font-size: 0.8rem; color: var(--gray-500);">ID: 1004</div>
+                        </div>
+                    </div>
+                </td>
+                <td>emily.johnson@company.com</td>
+                <td>Support</td>
+                <td><span class="badge active">Active</span></td>
+                <td>1 day ago</td>
+                <td>
+                    <button class="icon-btn" style="width: 32px; height: 32px;">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="user-cell">
+                        <div class="user-cell-avatar" style="background: #EF4444;">DW</div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--gray-900);">David Wilson</div>
+                            <div style="font-size: 0.8rem; color: var(--gray-500);">ID: 1005</div>
+                        </div>
+                    </div>
+                </td>
+                <td>david.wilson@company.com</td>
+                <td>Analyst</td>
+                <td><span class="badge inactive">Inactive</span></td>
+                <td>3 days ago</td>
+                <td>
+                    <button class="icon-btn" style="width: 32px; height: 32px;">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="user-cell">
+                        <div class="user-cell-avatar" style="background: #EC4899;">LB</div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--gray-900);">Lisa Brown</div>
+                            <div style="font-size: 0.8rem; color: var(--gray-500);">ID: 1006</div>
+                        </div>
+                    </div>
+                </td>
+                <td>lisa.brown@company.com</td>
+                <td>Designer</td>
+                <td><span class="badge active">Active</span></td>
+                <td>4 hours ago</td>
+                <td>
+                    <button class="icon-btn" style="width: 32px; height: 32px;">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ACTIVITY LOG -->
+<div class="data-table-wrapper">
+    <div class="table-header">
+        <h2 class="table-title">Recent Activity</h2>
+        <div class="table-actions">
+            <button class="btn-secondary">View All</button>
+        </div>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Action</th>
+                <th>User</th>
+                <th>Resource</th>
+                <th>Timestamp</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div style="width: 32px; height: 32px; border-radius: 8px; background: #ECFDF5; color: #10B981; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <span style="font-weight: 500;">User Created</span>
+                    </div>
+                </td>
+                <td>Admin</td>
+                <td>John Doe</td>
+                <td>2 minutes ago</td>
+                <td><span class="badge active">Success</span></td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div style="width: 32px; height: 32px; border-radius: 8px; background: #E6F0FF; color: #0066FF; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <span style="font-weight: 500;">Permission Granted</span>
+                    </div>
+                </td>
+                <td>Sarah Miller</td>
+                <td>Edit Reports</td>
+                <td>15 minutes ago</td>
+                <td><span class="badge active">Success</span></td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div style="width: 32px; height: 32px; border-radius: 8px; background: #FEE2E2; color: #EF4444; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-ban"></i>
+                        </div>
+                        <span style="font-weight: 500;">Access Denied</span>
+                    </div>
+                </td>
+                <td>Michael Chen</td>
+                <td>Admin Panel</td>
+                <td>1 hour ago</td>
+                <td><span class="badge inactive">Failed</span></td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div style="width: 32px; height: 32px; border-radius: 8px; background: #FEF3C7; color: #F59E0B; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <span style="font-weight: 500;">Role Updated</span>
+                    </div>
+                </td>
+                <td>Admin</td>
+                <td>Manager Role</td>
+                <td>3 hours ago</td>
+                <td><span class="badge active">Success</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

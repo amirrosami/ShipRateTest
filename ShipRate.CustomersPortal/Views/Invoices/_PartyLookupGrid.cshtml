@@ -1,0 +1,80 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model PagedResultVm<PartyLookupRowVm>
+
+@{
+    var filter = ViewBag.Filter as PartyLookupFilterVm ?? new PartyLookupFilterVm();
+    string BuildUrl(int page) =>
+        Url.Action("PartyLookupList", "Invoices", new
+        {
+            Search = filter.Search,
+            PageNumber = page,
+            PageSize = filter.PageSize
+        }) ?? "";
+}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Party Name</th>
+                <th style="width:120px;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Items.Any())
+            {
+                foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.PersonName</td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-sm btn-primary party-select-btn"
+                                    data-party-id="@item.Id"
+                                    data-party-name="@item.PersonName">
+                                Select
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center text-muted">No data found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination mb-0">
+            <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
+                <a class="page-link"
+                   hx-get="@BuildUrl(Model.PageNumber - 1)"
+                   hx-target="#party-lookup-grid-container"
+                   hx-swap="innerHTML">Previous</a>
+            </li>
+
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                    <a class="page-link"
+                       hx-get="@BuildUrl(i)"
+                       hx-target="#party-lookup-grid-container"
+                       hx-swap="innerHTML">@i</a>
+                </li>
+            }
+
+            <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")">
+                <a class="page-link"
+                   hx-get="@BuildUrl(Model.PageNumber + 1)"
+                   hx-target="#party-lookup-grid-container"
+                   hx-swap="innerHTML">Next</a>
+            </li>
+        </ul>
+    </nav>
+}

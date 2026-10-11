@@ -1,0 +1,122 @@
+﻿@using ShipRate.Application.ViewModels
+@model DeliveryOrderDocumentCardVm
+
+@{
+    // بررسی وجود فایل برای تغییر استایل
+    bool hasFiles = Model.Attachments != null && Model.Attachments.Any();
+
+    // تعریف رنگ‌ها بر اساس وضعیت فایل
+    string cardBgClass = hasFiles ? "bg-success-subtle" : "bg-light-subtle";
+    string headerBg = hasFiles ? "#2e7d32" : "#455a64"; // سبز تیره در صورت وجود فایل / زغالی در حالت خالی
+    string dropzoneBg = hasFiles ? "#e8f5e9" : "#fdfdfd";
+}
+
+<style>
+    .upload-dropzone-mini {
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        min-height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        border: 1px dashed #ced4da !important;
+    }
+
+        .upload-dropzone-mini:hover {
+            background-color: #f0f7ff !important;
+            border-color: #0d6efd !important;
+        }
+
+    .doc-header-custom {
+        color: #ffffff !important;
+        padding: 4px 8px !important;
+        border-bottom: 2px solid rgba(0,0,0,0.1);
+        transition: background-color 0.3s ease;
+    }
+
+    .doc-card-border {
+        border: 1px solid #e0e0e0 !important;
+        transition: all 0.3s ease;
+    }
+
+        /* افکت درخشش ملایم برای کارت‌های دارای فایل */
+        .doc-card-border.has-files {
+            border-color: #a5d6a7 !important;
+            box-shadow: 0 2px 4px rgba(46, 125, 50, 0.1) !important;
+        }
+
+    .file-row {
+        padding: 1px 6px;
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(0,0,0,0.05);
+        margin-bottom: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+</style>
+
+<div id="doc-card-@Model.DocumentTypeId" class="card h-100 shadow-xs rounded-2 overflow-hidden doc-card-border @(hasFiles ? "has-files" : "")">
+
+    <!-- هدر: رنگ آن بر اساس متغیر headerBg تغییر می‌کند -->
+    <div class="card-header doc-header-custom border-0" style="background-color: @headerBg !important;">
+        <div class="fw-bold text-truncate text-uppercase d-flex align-items-center"
+             style="font-size: 0.62rem; letter-spacing: 0.5px;" title="@Model.DocumentTypeName">
+
+            @if (hasFiles)
+            {
+                <i class="bi bi-check-circle-fill me-1 text-white" style="font-size: 0.75rem;"></i>
+            }
+            else
+            {
+                <i class="bi bi-file-earmark-arrow-up-fill me-1 text-warning" style="font-size: 0.75rem;"></i>
+            }
+
+            @Model.DocumentTypeName
+        </div>
+    </div>
+
+    <!-- بدنه کارت: رنگ پس‌زمینه بر اساس cardBgClass تغییر می‌کند -->
+    <div class="card-body p-2 @cardBgClass">
+        <form hx-post="@Url.Action("UploadDocumentFiles", "DeliveryOrders")"
+              hx-target="#doc-card-@Model.DocumentTypeId"
+              hx-swap="outerHTML"
+              enctype="multipart/form-data"
+              class="m-0">
+
+            <input type="hidden" name="deliveryOrderId" value="@Model.DeliveryOrderId" />
+            <input type="hidden" name="documentTypeId" value="@Model.DocumentTypeId" />
+
+            <!-- بخش انتخاب فایل -->
+            <label class="upload-dropzone-mini w-100 rounded-1 mb-1" style="background-color: @dropzoneBg;">
+                <i class="bi bi-plus-lg text-primary small"></i>
+                <span class="fw-bold text-muted" style="font-size: 0.68rem;">Select Files</span>
+                <input type="file" name="files" multiple class="d-none" onchange="this.form.requestSubmit()" />
+            </label>
+
+            <!-- لیست فایل‌ها -->
+            @if (hasFiles)
+            {
+                <div class="mt-1 border-top border-success-subtle pt-1">
+                    @foreach (var file in Model.Attachments)
+                    {
+                        <div class="file-row rounded-1">
+                            <div class="text-truncate" style="max-width: 70%;">
+                                <span class="text-dark fw-medium" style="font-size: 0.65rem;" title="@file.FileName">
+                                    <i class="bi bi-paperclip small text-success"></i> @file.FileName
+                                </span>
+                            </div>
+                            <a class="text-primary fw-bold text-decoration-none"
+                               style="font-size: 0.6rem;"
+                               href="@Url.Action("DownloadDocumentAttachment", "DeliveryOrders", new { id = file.Id })"
+                               target="_blank">
+                                VIEW
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+        </form>
+    </div>
+</div>

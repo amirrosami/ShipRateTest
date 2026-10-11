@@ -1,0 +1,151 @@
+﻿@using ShipRate.Application.ViewModels
+@model List<CargoDetailListItemVm>
+
+<style>
+    /* ۱. فعال‌سازی اسکرول افقی با گیر نکردن به عرض viewport */
+    .table-responsive {
+        overflow-x: auto;
+        max-width: 100%;
+        display: block; /* مهم برای برخی مرورگرها */
+    }
+
+    /* ۲. فشرده‌بند فلگ‌های OverSized / DG / Temp عوض از نوشت اضافی
+       تا پهنای ستون ثابت بماند */
+    .badge-flag {
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        width: 100%;
+        text-align: center;
+        display: inline-block;
+        margin-bottom: 0.15rem;
+    }
+
+    .description-cell {
+        max-width: 250px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+</style>
+
+
+<div class="table-responsive" dir="ltr" style="overflow-x: auto;">
+    <table class="table table-sm table-bordered table-hover align-middle" style="min-width: 1200px;">
+        <thead class="table-light">
+            <tr>
+                <th style="width:70px;">Seq</th>
+                <th>Description</th>
+                <th>HS Code</th>
+                <th>Package Type</th>
+                <th style="min-width:80px;">#Pkg</th>
+                <th>Gross W.</th>
+                <th>Net W.</th>
+                <th>Volume</th>
+                <!-- سه ستون جدید قبل از رفتن به Flags -->
+                <th style="width:70px;" title="Is OverSized">OverSized</th>
+                <th style="width:70px;" title="Is DG">Is DG</th>
+                <th style="width:70px;" title="Is Temperature Controlled">Temp Ctrl</th>
+                <th style="width:160px;">Flags</th>
+                <th style="width:130px;" class="text-center">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="13" class="text-center text-muted">
+                        No cargo details found.
+                    </td>
+                </tr>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Sequence</td>
+                        <td class="description-cell" title="@item.CargoDescription">@item.CargoDescription</td>
+                        <td>@item.HSCode</td>
+                        <td>@item.PackageTypeName</td>
+                        <td>@item.PackageCount</td>
+                        <td>@item.GrossWeight @item.WeightUnitName</td>
+                        <td>@item.NetWeight @item.WeightUnitName</td>
+                        <td>@item.Volume @item.VolumeUnitName</td>
+
+                        <td class="text-center">
+                            @if (item.IsOverSized)
+                            {
+                                <span class="badge bg-danger">✕</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">–</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @if (item.IsDG)
+                            {
+                                <span class="badge bg-danger">DG</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">–</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @if (item.IsTemperatureControlled)
+                            {
+                                <span class="badge bg-info text-dark">Temp</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">–</span>
+                            }
+                        </td>
+
+                        <td>
+                            @if (item.IsFragile)
+                            {
+                                <span class="badge bg-warning text-dark">Fragile</span>
+                            }
+                            @if (item.IsPerishable)
+                            {
+                                <span class="badge bg-success">Perishable</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-info"
+                                    title="Details"
+                                    hx-get="@Url.Action("Details", "CargoDetails", new { id = item.Id })"
+                                    hx-target="#modalContainer"
+                                    hx-swap="innerHTML">
+                                <i class="bi bi-eye"></i>
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-primary"
+                                    title="Edit"
+                                    hx-get="@Url.Action("Edit", "CargoDetails", new { id = item.Id })"
+                                    hx-target="#modalContainer"
+                                    hx-swap="innerHTML">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    title="Delete"
+                                    hx-get="@Url.Action("Delete", "CargoDetails", new { id = item.Id })"
+                                    hx-target="#modalContainer"
+                                    hx-swap="innerHTML">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

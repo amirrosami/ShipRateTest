@@ -1,0 +1,528 @@
+﻿@using Microsoft.Extensions.Localization
+@using ShipRate.Application.DTOs
+@using ShipRate.Application.JobsViewModels
+@using ShipRate.WebAppCustomers
+@using ShipRate.WebAppCustomers.ViewModels
+@using System.Globalization
+@model ServiceRequestIndexDto
+@inject IStringLocalizer<SharedResource> Localizer
+
+@functions {
+    public (string BadgeClass, string IconClass) GetServiceRequestTypeBadge(int requestType)
+    {
+        return requestType switch
+        {
+            1 => (
+                "badge-subtle-primary text-primary",
+                "bi bi-pencil-square" // FontAwesome: fa-solid fa-file-pen
+               
+            ),
+            2 => (
+                "badge-subtle-info text-info",
+                "bi bi-boxes" // FontAwesome: fa-solid fa-cubes-stacked
+              
+            ),
+           3 => (
+                "badge-subtle-warning text-warning",
+                "bi bi-distribute-vertical" // FontAwesome: fa-solid fa-scissors یا fa-arrows-split-up-and-left
+                
+            ),
+           4 => (
+                "badge-subtle-secondary text-secondary",
+                "bi bi-file-earmark-diff" // FontAwesome: fa-solid fa-file-lines
+                
+            ),
+            5 => (
+                "badge-subtle-danger text-danger",
+                "bi bi-shield-check" // FontAwesome: fa-solid fa-passport یا fa-building-columns
+                
+            ),
+           99 or _ => (
+                "badge-subtle-dark text-muted",
+                "bi bi-three-dots" // FontAwesome: fa-solid fa-ellipsis
+               
+            )
+        };
+    }
+}
+
+@functions {
+    public (string BadgeClass, string IconClass) GetStatusBadge(int status)
+    {
+        return status switch
+        {
+            1 => ("badge-subtle-success text-warning", "bi bi-check-circle-fill"),
+            2 => ("badge-subtle-warning text-success", "bi bi-clock-history"),
+            3 => ("badge-subtle-danger text-danger", "bi bi-x-circle-fill"),
+            4 => ("badge-subtle-secondary text-secondary", "bi bi-pencil-square"),
+            _ => ("badge-subtle-light text-muted", "bi bi-question-circle")
+        };
+    }
+}
+@{
+    var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isFa = culture == "fa";
+    var lang = isFa ? "fa" : "en";
+    var dir = isFa ? "rtl" : "ltr";
+}
+<style>
+    .btn-xs {
+        padding: 0.15rem 0.4rem;
+        font-size: 1rem;
+        line-height: 1;
+    }
+
+    .table-responsive {
+        overflow-x: scroll !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+        /* نمایش همیشگی scrollbar در مرورگرهای مختلف */
+        .table-responsive::-webkit-scrollbar {
+            height: 12px;
+            -webkit-appearance: none;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background-color: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background-color: #888;
+            border-radius: 10px;
+        }
+
+            .table-responsive::-webkit-scrollbar-thumb:hover {
+                background-color: #555;
+            }
+
+    /* برای Firefox */
+    .table-responsive {
+        scrollbar-width: thin;
+        scrollbar-color: #888 #f1f1f1;
+    }
+
+</style>
+
+<input type="hidden"
+       name="PageNumber"
+       value="@Model.Search.PageNumber" />
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover table-striped mb-0   ">
+            <thead class="table-primary">
+                <tr>
+                    <th scope="col">Request NO</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Subject</th>
+                    <th scope="col">Request Date</th>
+                    <th scope="col">Created By</th>
+                    <th scope="col">Status</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var r in Model.Result.Items)
+                {
+                    <tr>
+                        <td class="sr-cell-num">@r.RequestNo</td>
+                        <td>
+                            @{
+                                var (requestbadgeClass, requesticonClass) = GetServiceRequestTypeBadge(r.RequestTypeId);
+                            }
+                            <span class="badge @requestbadgeClass d-inline-flex align-items-center gap-1 py-1 px-2">
+                                <i class="@requesticonClass"></i>
+                                <span style="font-size: 1rem;">@r.RequestTypeName</span>
+                            </span>
+                        </td>
+                        <td class="sr-cell-bl">@r.Subject</td>
+                        <td class="sr-cell-date">@r.RequestDate.ToString("dd MMM yyyy")</td>
+                        <td>@r.CreateUserName</td>
+                        <td>
+                            @{
+                                var (badgeClass, iconClass) = GetStatusBadge(r.StatusId);
+                            }
+                            <span class="badge @badgeClass d-inline-flex align-items-center gap-1 py-1 px-2">
+                                <i class="@iconClass"></i>
+                                <span style="font-size: 1rem;">@r.StatusName</span>
+                            </span>
+                        </td>
+                        <td class="text-end text-nowrap">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button class="btn btn-outline-primary px-2"
+                                        hx-swap="innerHTML"
+                                        title="Detail"
+                                        hx-get="/ServiceRequest/EditRequest/@r.Id"
+                                        hx-target="#app-modal-content">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                @if (r.StatusId == 1 || r.StatusId == 4)
+                                {
+                                    <button class="btn btn-outline-primary px-2"
+                                            hx-swap="innerHTML"
+                                            title="Submit"
+                                            hx-get="/ServiceRequest/SubmitRequest/@r.Id"
+                                            hx-target="#app-modal-content">
+                                        <i class="bi bi-check-circle"></i>
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <div class="card-footer d-flex justify-content-between align-items-center">
+
+        <div>
+            @Localizer["Total"]: @Model.Result.TotalCount
+        </div>
+
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+
+                @{
+                    var currentPage = Model.Result.PageNumber;
+                    var totalPages = (int)Math.Ceiling((double)Model.Result.TotalCount / Model.Result.PageSize);
+                    var startPage = Math.Max(1, currentPage - 2);
+                    var endPage = Math.Min(totalPages, currentPage + 2);
+                }
+
+                @if (currentPage > 1)
+                {
+                    <li class="page-item">
+                        <button class="page-link"
+                                hx-get="/ServiceRequest/List?PageNumber=1"
+                                hx-target="#tableContainer"
+                                hx-push-url="true">
+                            @Localizer["First"]
+                        </button>
+                    </li>
+                    <li class="page-item">
+                        <button class="page-link"
+                                hx-get="/ServiceRequest/List?PageNumber=@(currentPage - 1)"
+                                hx-target="#tableContainer"
+                                hx-push-url="true">
+                            @Localizer["Previous"]
+                        </button>
+                    </li>
+                }
+
+                @for (int i = startPage; i <= endPage; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <button class="page-link"
+                                hx-get="/ServiceRequest/List?PageNumber=@i"
+                                hx-target="#tableContainer"
+                                hx-push-url="true">
+                            @i
+                        </button>
+                    </li>
+                }
+
+                @if (currentPage < totalPages)
+                {
+                    <li class="page-item">
+                        <button class="page-link"
+                                hx-get="/ServiceRequest/List?PageNumber=@(currentPage + 1)"
+                                hx-target="#tableContainer"
+                                hx-push-url="true">
+                            @Localizer["Next"]
+                        </button>
+                    </li>
+                    <li class="page-item">
+                        <button class="page-link"
+                                hx-get="/ServiceRequest/List?PageNumber=@totalPages"
+                                hx-target="#tableContainer"
+                                hx-push-url="true">
+                            @Localizer["Last"]
+                        </button>
+                    </li>
+                }
+
+            </ul>
+        </nav>
+
+    </div>
+
+</div>
+
+
+
+
+@* @model List<ShipRate.Application.ViewModels.ServiceRequestListItem>
+
+@if (!Model.Any())
+{
+    <div class="sr-empty">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+            <rect x="6" y="6" width="28" height="28" rx="4" stroke="currentColor" stroke-width="1.5" />
+            <path d="M13 20h14M13 14h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+        <p>No service requests yet.</p>
+        <span>Click <strong>New Request</strong> to get started.</span>
+    </div>
+}
+else
+{
+    <div class="sr-table-wrap">
+        <table class="sr-table" role="table">
+            <thead>
+                <tr>
+                    <th scope="col">Request #</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">B/L Number</th>
+                    <th scope="col">Job Ref</th>
+                    <th scope="col">Created</th>
+                    <th scope="col">Created By</th>
+                    <th scope="col">Status</th>
+                    <th scope="col"><span class="sr-only">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="sr-row"
+                        hx-get="@Url.Action("Detail", "ServiceRequest", new { id = item.Id })"
+                        hx-target="#modal-content"
+                        hx-trigger="click"
+                        onclick="openModal(); setModalTitle('@Html.Raw(item.RequestNumber + " — " + item.Type.ToString())')"
+                        tabindex="0"
+                        role="button"
+                        aria-label="View details for @item.RequestNumber">
+                        <td class="sr-cell-num">@item.RequestNumber</td>
+                        <td><span class="type-badge type-@item.Type.ToString().ToLower()">@FormatType(item.Type)</span></td>
+                        <td class="sr-cell-bl">@item.BLNumber</td>
+                        <td class="sr-cell-job">@item.JobRef</td>
+                        <td class="sr-cell-date">@item.CreatedAt.ToString("dd MMM yyyy")</td>
+                        <td>@item.CreatedBy</td>
+                        <td><span class="status-badge status-@item.Status.ToString().ToLower()">@FormatStatus(item.Status)</span></td>
+                        <td>
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="row-chevron">
+                                <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@functions {
+    string FormatType(ShipRate.Application.ViewModels.ServiceRequestType t) => t switch
+    {
+        ShipRate.Application.ViewModels.ServiceRequestType.BLAmendment => "BL Amendment",
+        ShipRate.Application.ViewModels.ServiceRequestType.Consolidation => "Consolidation",
+        ShipRate.Application.ViewModels.ServiceRequestType.Split => "Split",
+        _ => t.ToString()
+    };
+
+    string FormatStatus(ShipRate.Application.ViewModels.ServiceRequestStatus s) => s switch
+    {
+        ShipRate.Application.ViewModels.ServiceRequestStatus.Pending => "Pending",
+        ShipRate.Application.ViewModels.ServiceRequestStatus.InReview => "In Review",
+        ShipRate.Application.ViewModels.ServiceRequestStatus.Approved => "Approved",
+        ShipRate.Application.ViewModels.ServiceRequestStatus.Rejected => "Rejected",
+        _ => s.ToString()
+    };
+}
+
+<style>
+    .sr-empty {
+        text-align: center;
+        padding: 64px 24px;
+        color: var(--c-muted);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .sr-empty svg {
+            opacity: .4;
+            margin-bottom: 8px;
+        }
+
+        .sr-empty p {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--c-text);
+        }
+
+        .sr-empty span {
+            font-size: .875rem;
+        }
+
+    .sr-table-wrap {
+        overflow-x: auto;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .sr-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--c-surface);
+        font-size: .875rem;
+        color: var(--c-text);
+    }
+
+        .sr-table thead th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: .75rem;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: var(--c-muted);
+            background: var(--c-raised);
+            border-bottom: 1px solid var(--c-border);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            white-space: nowrap;
+        }
+
+    .sr-row td {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--c-border);
+        vertical-align: middle;
+    }
+
+    .sr-row:last-child td {
+        border-bottom: none;
+    }
+
+    .sr-row {
+        cursor: pointer;
+        transition: background var(--transition);
+    }
+
+        .sr-row:hover {
+            background: var(--c-raised);
+        }
+
+        .sr-row:focus-visible {
+            outline: 2px solid var(--c-accent);
+            outline-offset: -2px;
+        }
+
+    .sr-cell-num {
+        font-weight: 500;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    .sr-cell-bl {
+        font-famil2px;
+    }
+
+    .sr-cell-num {
+        font-weight: 500;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    .sr-cell-bl {
+        font-family: monospace;
+        font-size: .8rem;
+        white-space: nowrap;
+    }
+
+    .sr-cell-job {
+        whi.sr-row:hover .row-chevron {
+            color: var(--c-muted);
+        }
+
+        .type-badge, .status-badge {
+            display: inline-block;
+            padding: 3px 9px;
+            border-radius: 99px;
+            font-size: .75rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .type-blamendment {
+            background: oklch(94% 0.06 255);
+            color: oklch(38% 0.18 255);
+        }
+
+        .type-consolidation {
+            background: oklch(94% 0.06 220);
+            color: oklch(38% 0.16 220);
+        }
+
+        .type-split {
+            background: oklch(94% 0.06 300);
+            color: oklch(38% 0.16 300);
+        }
+
+        .status-pending {
+            background: oklch(94% 0.07 60);
+            color: oklch(40% 0.14 60);
+        }
+
+        .status-inreview {
+            background: oklch(94% 0.06 220);
+            color: oklch(38% 0.16 220);
+        }
+
+        .status-approved {
+            background: oklch(94% 0.07 145);
+            color: oklch(36% 0.14 145);
+        }
+
+        .status-rejected {
+            background: oklch(94% 0.07 25);
+            color: oklch(40% 0.18 25);
+        }
+
+        @@media (prefers-color-scheme: dark) {
+            .type-blamendment {
+                background: oklch(28% 0.08 255);
+                color: oklch(78% 0.14 255);
+            }
+
+            .type-consolidation {
+                background: oklch(28% 0.08 220);
+                color: oklch(78% 0.14 220);
+            }
+
+            .type-split {
+                background: oklch(28% 0.08 300);
+                color: oklch(78% 0.14 300);
+            }
+
+            .status-pending {
+                background: oklch(28% 0.07 60);
+                color: oklch(78% 0.12 60);
+            }
+
+            .status-inreview {
+                background: oklch(28% 0.07 220);
+                color: oklch(78% 0.12 220);
+            }
+
+            .status-approved {
+                background: oklch(28% 0.07 145);
+                color: oklch(78% 0.12 145);
+            }
+
+            .status-rejected {
+                background: oklch(28% 0.07 25);
+                color: oklch(78% 0.12 25);
+            }
+        }
+</style> *@

@@ -1,0 +1,284 @@
+﻿@using ShipRate.Application.ViewModels
+@model TIRCarnetIndexVm
+
+@{
+    ViewData["Title"] = "TIR Carnets";
+}
+
+<div class="container-fluid ltr-page" dir="ltr">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="mb-0">TIR Carnets</h4>
+            <div class="text-muted small">Manage TIR Carnets, Assignments and Usages</div>
+        </div>
+
+        <button type="button"
+                class="btn btn-primary"
+                hx-get="@Url.Action("Create", "TIRCarnets")"
+                hx-target="#mainModalContent"
+                hx-swap="innerHTML">
+            <i class="bi bi-plus-lg"></i>
+            New TIR Carnet
+        </button>
+    </div>
+
+
+    <div class="card mb-3 shadow-sm">
+        <div class="card-header py-2 d-flex justify-content-between align-items-center">
+            <div class="fw-semibold small">
+                Search Filters
+            </div>
+
+            <button class="btn btn-sm btn-outline-secondary"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#advancedSearch"
+                    aria-expanded="false"
+                    aria-controls="advancedSearch">
+                Advanced
+            </button>
+        </div>
+
+        <div class="card-body py-2">
+            <form id="tirCarnetSearchForm"
+                  hx-get="@Url.Action("Search", "TIRCarnets")"
+                  hx-target="#tirCarnetsGridContainer"
+                  hx-swap="innerHTML"
+                  hx-push-url="true">
+
+                <input type="hidden" name="PageNumber" id="PageNumber" value="@Model.Search.PageNumber" />
+                <input type="hidden" name="SortColumn" id="SortColumn" value="@Model.Search.SortColumn" />
+                <input type="hidden" name="SortDirection" id="SortDirection" value="@Model.Search.SortDirection" />
+
+                <div class="row g-2 align-items-end">
+
+                    <div class="col-lg-3 col-md-4">
+                        <label class="form-label small mb-1">TIR Carnet No.</label>
+                        <input type="text"
+                               name="TIRCarnetNumber"
+                               value="@Model.Search.TIRCarnetNumber"
+                               class="form-control form-control-sm"
+                               autocomplete="off" />
+                    </div>
+
+                    <div class="col-lg-2 col-md-4">
+                        <label class="form-label small mb-1">Status</label>
+                        <select name="StatusId" class="form-select form-select-sm">
+                            <option value="">All</option>
+                            @foreach (var item in Model.Search.Statuses)
+                            {
+                                <option value="@item.Value" selected="@(Model.Search.StatusId?.ToString() == item.Value)">
+                                    @item.Text
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-lg-2 col-md-4">
+                        <label class="form-label small mb-1">Active</label>
+                        <select name="IsActive" class="form-select form-select-sm">
+                            <option value="">All</option>
+                            <option value="true" selected="@(Model.Search.IsActive == true)">Active</option>
+                            <option value="false" selected="@(Model.Search.IsActive == false)">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-2 col-md-4">
+                        <label class="form-label small mb-1">Page Size</label>
+                        <select name="PageSize" class="form-select form-select-sm">
+                            <option value="10" selected="@(Model.Search.PageSize == 10)">10</option>
+                            <option value="20" selected="@(Model.Search.PageSize == 20)">20</option>
+                            <option value="50" selected="@(Model.Search.PageSize == 50)">50</option>
+                            <option value="100" selected="@(Model.Search.PageSize == 100)">100</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-3 col-md-8">
+                        <div class="d-flex gap-2 justify-content-end">
+                            <button type="submit" class="btn btn-sm btn-primary px-4">
+                                Search
+                            </button>
+
+                            <a href="@Url.Action("Index", "TIRCarnets")" class="btn btn-sm btn-outline-secondary px-3">
+                                Reset
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="collapse mt-2" id="advancedSearch">
+                    <div class="border rounded bg-light p-2">
+
+                        <div class="row g-2">
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label small mb-1">Issuing Country</label>
+                                <select name="IssuingCountryId" class="form-select form-select-sm">
+                                    <option value="">All</option>
+                                    @foreach (var item in Model.Search.Countries)
+                                    {
+                                        <option value="@item.Value" selected="@(Model.Search.IssuingCountryId?.ToString() == item.Value)">
+                                            @item.Text
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label small mb-1">Issuing Association</label>
+                                <select name="IssuingAssociationId" class="form-select form-select-sm">
+                                    <option value="">All</option>
+                                    @foreach (var item in Model.Search.Associations)
+                                    {
+                                        <option value="@item.Value" selected="@(Model.Search.IssuingAssociationId?.ToString() == item.Value)">
+                                            @item.Text
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label small mb-1">Issue From</label>
+                                <input type="date"
+                                       name="IssueDateFrom"
+                                       value="@(Model.Search.IssueDateFrom?.ToString("yyyy-MM-dd"))"
+                                       class="form-control form-control-sm" />
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label small mb-1">Issue To</label>
+                                <input type="date"
+                                       name="IssueDateTo"
+                                       value="@(Model.Search.IssueDateTo?.ToString("yyyy-MM-dd"))"
+                                       class="form-control form-control-sm" />
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label small mb-1">Expiry From</label>
+                                <input type="date"
+                                       name="ExpiryDateFrom"
+                                       value="@(Model.Search.ExpiryDateFrom?.ToString("yyyy-MM-dd"))"
+                                       class="form-control form-control-sm" />
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label small mb-1">Expiry To</label>
+                                <input type="date"
+                                       name="ExpiryDateTo"
+                                       value="@(Model.Search.ExpiryDateTo?.ToString("yyyy-MM-dd"))"
+                                       class="form-control form-control-sm" />
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+
+
+
+
+    <div id="tirCarnetsGridContainer">
+        @await Html.PartialAsync("_TIRCarnetsGrid", Model.Result)
+    </div>
+
+    <div id="assignmentsPanelContainer" class="mt-3"></div>
+
+</div>
+
+<div class="modal fade" id="mainModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="mainModalContent">
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const mainModalElement = document.getElementById('mainModal');
+        const mainModal = new bootstrap.Modal(mainModalElement);
+
+        document.body.addEventListener('htmx:afterSwap', function (event) {
+            if (event.detail.target.id === 'mainModalContent') {
+                const form = event.detail.target.querySelector('form');
+                if (form && typeof $ !== 'undefined' && $.validator && $.validator.unobtrusive) {
+                    $(form).removeData("validator");
+                    $(form).removeData("unobtrusiveValidation");
+                    $.validator.unobtrusive.parse(form);
+                }
+
+                mainModal.show();
+            }
+        });
+
+        document.body.addEventListener('htmx:beforeSwap', function (event) {
+            if (event.detail.xhr.status === 204) {
+                event.detail.shouldSwap = false;
+                mainModal.hide();
+                document.getElementById('mainModalContent').innerHTML = '';
+            }
+
+            if (event.detail.xhr.status === 422) {
+                event.detail.shouldSwap = true;
+                event.detail.isError = false;
+            }
+        });
+
+        document.body.addEventListener('tirCarnetChanged', function () {
+            htmx.trigger('#tirCarnetSearchForm', 'submit');
+            document.getElementById('assignmentsPanelContainer').innerHTML = '';
+        });
+
+        document.body.addEventListener('tirAssignmentsChanged', function (event) {
+            const tirCarnetId = event.detail.tirCarnetId;
+
+            htmx.ajax('GET',
+                '@Url.Action("Assignments", "TIRCarnets")' + '?tirCarnetId=' + tirCarnetId,
+                {
+                    target: '#assignmentsPanelContainer',
+                    swap: 'innerHTML'
+                });
+
+            htmx.trigger('#tirCarnetSearchForm', 'submit');
+        });
+
+        document.body.addEventListener('tirUsagesChanged', function (event) {
+            const tirAssignmentId = event.detail.tirAssignmentId;
+
+            htmx.ajax('GET',
+                '@Url.Action("Usages", "TIRCarnets")' + '?tirAssignmentId=' + tirAssignmentId,
+                {
+                    target: '#usagesPanelContainer',
+                    swap: 'innerHTML'
+                });
+        });
+
+        function setPage(pageNumber) {
+            document.getElementById('PageNumber').value = pageNumber;
+            htmx.trigger('#tirCarnetSearchForm', 'submit');
+        }
+
+        function setSort(column) {
+            const sortColumn = document.getElementById('SortColumn');
+            const sortDirection = document.getElementById('SortDirection');
+
+            if (sortColumn.value === column) {
+                sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn.value = column;
+                sortDirection.value = 'asc';
+            }
+
+            document.getElementById('PageNumber').value = 1;
+            htmx.trigger('#tirCarnetSearchForm', 'submit');
+        }
+    </script>
+}

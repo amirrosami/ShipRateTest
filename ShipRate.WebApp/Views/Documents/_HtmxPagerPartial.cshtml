@@ -1,0 +1,75 @@
+﻿@using ShipRate.WebApp.ViewModels.Documents
+@model DocumentIndexViewModel
+
+@{
+    var totalCount = Model.Result.TotalCount;
+    var pageSize = Model.Result.PageSize;
+    var pageNumber = Model.Result.PageNumber;
+
+    var totalPages = pageSize > 0
+        ? (int)Math.Ceiling(totalCount / (double)pageSize)
+        : 0;
+
+    if (totalPages == 0)
+        totalPages = 1;
+
+    var startPage = Math.Max(1, pageNumber - 2);
+    var endPage = Math.Min(totalPages, pageNumber + 2);
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2" dir="ltr">
+    <div>
+        Showing page <strong>@pageNumber</strong> of <strong>@totalPages</strong> |
+        Total records: <strong>@totalCount</strong>
+    </div>
+
+    <nav>
+        <ul class="pagination pagination-sm mb-0">
+            <li class="page-item @(pageNumber <= 1 ? "disabled" : "")">
+                <button class="page-link"
+                        @(pageNumber <= 1 ? "disabled" : "")
+                        onclick="setPageAndSearch(1)">
+                    First
+                </button>
+            </li>
+
+            <li class="page-item @(pageNumber <= 1 ? "disabled" : "")">
+                <button class="page-link"
+                        @(pageNumber <= 1 ? "disabled" : "")
+                        onclick="setPageAndSearch(@(pageNumber - 1))">
+                    Prev
+                </button>
+            </li>
+
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <li class="page-item @(i == pageNumber ? "active" : "")">
+                    <button class="page-link" onclick="setPageAndSearch(@i)">@i</button>
+                </li>
+            }
+
+            <li class="page-item @(pageNumber >= totalPages ? "disabled" : "")">
+                <button class="page-link"
+                        @(pageNumber >= totalPages ? "disabled" : "")
+                        onclick="setPageAndSearch(@(pageNumber + 1))">
+                    Next
+                </button>
+            </li>
+
+            <li class="page-item @(pageNumber >= totalPages ? "disabled" : "")">
+                <button class="page-link"
+                        @(pageNumber >= totalPages ? "disabled" : "")
+                        onclick="setPageAndSearch(@totalPages)">
+                    Last
+                </button>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<script>
+    function setPageAndSearch(page) {
+        document.getElementById('PageNumber').value = page;
+        htmx.trigger('#documentSearchForm', 'submit');
+    }
+</script>

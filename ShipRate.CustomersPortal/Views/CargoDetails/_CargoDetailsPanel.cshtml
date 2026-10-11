@@ -1,0 +1,43 @@
+﻿@model List<CargoDetailListItemVm>
+@using Microsoft.Extensions.Localization
+@using ShipRate.Application.ViewModels
+@using ShipRate.WebAppCustomers
+@using System.Globalization
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    var isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var direction = isRtl ? "rtl" : "ltr";
+    var textAlign = isRtl ? "text-end" : "text-start";
+}
+@{
+    var filter = ViewBag.Filter as CargoDetailFilterVm ?? new CargoDetailFilterVm();
+}
+
+<div id="filters">
+<input type="hidden" name="RateRequestId" value="@filter.RateRequestId"/>
+</div>
+<div id="cargoDetailsPanel" class="card" dir="ltr">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">Cargo Details</h6>
+
+        <button type="button"
+                class="btn btn-sm btn-primary"
+                hx-get="@Url.Action("Create", "CargoDetails", filter)"
+                hx-target="#app-modal-content-second"
+                hx-swap="innerHTML">
+            <i class="bi bi-plus-lg"></i>
+            @Localizer["AddNewCargo"]
+        </button>
+    </div>
+
+    <div class="card-body">
+        <div id="cargodetaillists"
+             hx-get="@Url.Action("List", "CargoDetails")"
+             hx-trigger="load"
+             hx-swap="innerHTML"
+             hx-target="#cargodetaillists"
+             hx-include="#filters">
+        </div>
+    </div>
+</div>

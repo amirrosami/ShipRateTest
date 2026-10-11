@@ -1,0 +1,86 @@
+﻿@using ShipRate.Application.DTOs.AppTasks
+@model AppTaskDetailsDto
+
+@if (Model.CanAssign)
+{
+    <form hx-post="@Url.Action("Assign", "AppTasks")"
+          hx-target="#appTaskDrawerContent"
+          hx-swap="innerHTML"
+          class="mb-3">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="AppTaskId" value="@Model.Id" />
+
+        <div class="row g-2">
+
+            <div class="col-md-12">
+                <label class="form-label">Assign To</label>
+
+                <select name="AssignedToUserId" class="form-select" required>
+                    <option value="">Select user...</option>
+
+                    @if (Model.Users != null && Model.Users.Any())
+                    {
+                        foreach (var user in Model.Users)
+                        {
+                            <option value="@user.Value">@user.Text</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Notes</label>
+                <textarea name="Notes"
+                      class="form-control"
+                      rows="4"
+                      placeholder="Write assignment notes..."></textarea>
+            </div>
+
+        </div>
+
+        <div class="mt-3 d-flex justify-content-end">
+            <button type="submit" class="btn btn-sm btn-outline-primary">
+                Assign
+            </button>
+        </div>
+    </form>
+
+    <hr />
+}
+
+@if (Model.Assignments == null || !Model.Assignments.Any())
+{
+    <div class="text-muted">No assignment history.</div>
+}
+else
+{
+    <div class="vstack gap-2">
+        @foreach (var item in Model.Assignments)
+        {
+            <div class="border rounded p-2">
+                <div class="d-flex justify-content-between">
+                    <strong>@(item.AssignedToUserName ?? "-")</strong>
+                    <small class="text-muted">@item.AssignedDate.ToString("yyyy/MM/dd HH:mm")</small>
+                </div>
+
+                <div class="small text-muted">
+                    By: @(item.AssignedByUserName ?? "-")
+
+                    @if (item.IsCurrent)
+                    {
+                        <span class="badge bg-primary ms-1">Current</span>
+                    }
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(item.Notes))
+                {
+                    <div class="mt-2 small">
+                        @item.Notes
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}

@@ -1,0 +1,119 @@
+﻿@using ShipRate.Application.ViewModels
+@model DemurrageRuleBatchFormVm
+
+<form hx-post="@Url.Action("SaveDemurrageRules", "TariffBooks")"
+      hx-target="#mainModalContent"
+      hx-swap="innerHTML">
+
+    <input type="hidden" asp-for="TariffBookId" />
+
+    <div class="px-4 py-3">
+
+        <div class="alert alert-info border-start border-4 border-primary mb-4">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label text-muted mb-1">Tariff</label>
+                    <div class="fw-semibold text-primary">
+                        @Model.TariffBookTitle
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label text-muted mb-1">Currency</label>
+                    <div class="fw-semibold text-success">
+                        @Model.CurrencyTitle
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label text-muted mb-1">Valid From</label>
+                    <div class="fw-semibold text-dark">
+                        @(Model.ValidFrom?.ToString("yyyy/MM/dd") ?? "-")
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label text-muted mb-1">Valid To</label>
+                    <div class="fw-semibold text-dark">
+                        @(Model.ValidTo?.ToString("yyyy/MM/dd") ?? "-")
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        <div class="row g-3 align-items-end mb-4">
+            <div class="col-md-6">
+                <label asp-for="ContainerSizeTypeId" class="form-label fw-semibold">Container Size Type</label>
+                <select asp-for="ContainerSizeTypeId"
+                        asp-items="Model.ContainerSizeTypes"
+                        class="form-select"
+                        hx-get="@Url.Action("DemurrageRulesGrid", "TariffBooks")"
+                        hx-target="#demurrageRulesGrid"
+                        hx-swap="innerHTML"
+                        hx-include="[name='TariffBookId'], [name='ContainerSizeTypeId']">
+                    <option value="">Select...</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <div class="d-flex gap-2 justify-content-md-end">
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            onclick="copyDemurrageStepsToClipboardArea()">
+                        Copy Steps
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-outline-primary"
+                            hx-post="@Url.Action("PasteDemurrageRulesGrid", "TariffBooks")"
+                            hx-target="#demurrageRulesGrid"
+                            hx-swap="innerHTML"
+                            hx-include="[name='TariffBookId'], [name='ContainerSizeTypeId'], [name='PastedStepsText']">
+                        Paste Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <textarea name="PastedStepsText"
+                  id="PastedStepsText"
+                  class="d-none"></textarea>
+
+        <div id="demurrageRulesGrid">
+            @await Html.PartialAsync("_DemurrageRuleStepsGrid", Model)
+        </div>
+
+    </div>
+
+    <div class="modal-footer px-4">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+</form>
+
+<script>
+    function copyDemurrageStepsToClipboardArea() {
+        const rows = document.querySelectorAll('#demurrageRulesGrid tbody tr');
+        const lines = [];
+
+        rows.forEach(row => {
+            const fromInput = row.querySelector('[name$=".FromDay"], [name$=".From"]');
+            const toInput = row.querySelector('[name$=".ToDay"], [name$=".To"]');
+            const amountInput = row.querySelector('[name$=".Amount"], [name$=".AmountPerDay"]');
+
+            if (!fromInput || !toInput || !amountInput) {
+                return;
+            }
+            const from = fromInput.value?.trim();
+            const to = toInput.value?.trim();
+            const amount = amountInput.value?.trim();
+
+            if (from || to || amount) {
+                lines.push(`${from}\t${to}\t${amount}`);
+            }
+        });
+
+        document.getElementById('PastedStepsText').value = lines.join('\n');
+    }
+</script>

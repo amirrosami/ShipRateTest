@@ -1,0 +1,208 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@using ShipRate.Application.DTOs
+@inject Microsoft.AspNetCore.Authorization.IAuthorizationService AuthorizationService
+@model PagedResultDto<ShipRate.Application.DTOs.CountryDto>
+
+@{
+    ViewData["Title"] = "مدیریت کشورها";
+}
+
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    var tokens = Antiforgery.GetAndStoreTokens(Context);
+}
+
+<meta name="csrf-token" content="@tokens.RequestToken" />
+
+<div class="container-fluid">
+    <!-- ✅ هدر صفحه -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="fas fa-globe"></i> مدیریت کشورها</h2>
+            <p class="text-muted">مدیریت کامل اطلاعات کشورها</p>
+        </div>
+    </div>
+
+    <!-- ✅ کارت‌های آماری -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-flag fa-2x text-primary mb-2"></i>
+                    <h5 class="card-title">کل کشورها</h5>
+                    <h2 id="totalCountries" class="text-primary">0</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                    <h5 class="card-title">فعال</h5>
+                    <h2 id="activeCountries" class="text-success">0</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-city fa-2x text-info mb-2"></i>
+                    <h5 class="card-title">کل شهرها</h5>
+                    <h2 id="totalCities" class="text-info">0</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-users fa-2x text-warning mb-2"></i>
+                    <h5 class="card-title">جمعیت کل</h5>
+                    <h2 id="totalPopulation" class="text-warning">0</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ جستجو و دکمه‌ها -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                <input type="text" id="searchBox" class="form-control"
+                       placeholder="جستجو در نام یا کد کشور...">
+            </div>
+        </div>
+        <div class="col-md-6 text-end">
+            <button class="btn btn-primary" onclick="openCreateModal()">
+                <i class="fas fa-plus"></i> افزودن کشور جدید
+            </button>
+            <button class="btn btn-secondary" onclick="loadCountries()">
+                <i class="fas fa-sync-alt"></i> بارگذاری مجدد
+            </button>
+        </div>
+    </div>
+
+    <!-- ✅ جدول کشورها -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped" id="countriesTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th data-sort="name" style="cursor: pointer;">
+                                <i class="fas fa-sort"></i> نام کشور
+                            </th>
+                            <th data-sort="code" style="cursor: pointer;">
+                                <i class="fas fa-sort"></i> کد
+                            </th>
+                            <th>پایتخت</th>
+                            <th data-sort="population" style="cursor: pointer;">
+                                <i class="fas fa-sort"></i> جمعیت
+                            </th>
+                            <th>مساحت</th>
+                            <th>تعداد شهرها</th>
+                            <th>وضعیت</th>
+                            <th class="text-center">عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="countriesTableBody">
+                        <tr>
+                            <td colspan="8" class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">در حال بارگذاری...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ✅ صفحه‌بندی -->
+            <nav aria-label="صفحه‌بندی کشورها">
+                <ul class="pagination justify-content-center" id="pagination"></ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ Modal افزودن/ویرایش -->
+<div class="modal fade" id="countryModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalTitle">
+                    <i class="fas fa-plus-circle"></i> افزودن کشور
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="countryForm">
+                    <input type="hidden" id="countryId" value="0" />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                نام کشور <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="name"
+                                   placeholder="مثال: ایران">
+                            <div class="invalid-feedback" id="nameError"></div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                کد کشور <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control text-uppercase" id="code"
+                                   maxlength="10" placeholder="مثال: IR">
+                            <div class="invalid-feedback" id="codeError"></div>
+                            <small class="text-muted">کد یکتای کشور (حداکثر 10 کاراکتر)</small>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">پایتخت</label>
+                            <input type="text" class="form-control" id="capital"
+                                   placeholder="مثال: تهران">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">جمعیت</label>
+                            <input type="number" class="form-control" id="population"
+                                   placeholder="مثال: 83000000">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">مساحت (کیلومتر مربع)</label>
+                            <input type="number" step="0.01" class="form-control" id="area"
+                                   placeholder="مثال: 1648195">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">وضعیت</label>
+                            <div class="form-check form-switch mt-2">
+                                <input type="checkbox" class="form-check-input" id="isActive" checked>
+                                <label class="form-check-label">فعال</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> انصراف
+                </button>
+                <button type="button" class="btn btn-primary" onclick="saveCountry()">
+                    <i class="fas fa-save"></i> ذخیره
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/country-management.js"></script>
+}

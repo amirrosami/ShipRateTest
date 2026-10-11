@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="2026-03-01" ReportInfo.Modified="2026-03-01">
+	<Dictionary>
+		<TableDataSource Name="Settlement" ReferenceName="SettlementDataSet.Settlement" DataType="System.Int32" Enabled="true">
+			<Column Name="CompanyName" DataType="System.String"/>
+			<Column Name="CompanyLogoPath" DataType="System.String"/>
+			<Column Name="SettlementNo" DataType="System.Int32"/>
+			<Column Name="SettlementDate" DataType="System.String"/>
+			<Column Name="PartyName" DataType="System.String"/>
+			<Column Name="CurrencyName" DataType="System.String"/>
+			<Column Name="StatusName" DataType="System.String"/>
+			<Column Name="Remarks" DataType="System.String"/>
+			<Column Name="TotalAmount" DataType="System.Decimal"/>
+			<Column Name="TotalAllocated" DataType="System.Decimal"/>
+			<Column Name="RemainingAmount" DataType="System.Decimal"/>
+		</TableDataSource>
+		<TableDataSource Name="Items" ReferenceName="SettlementDataSet.Items" DataType="System.Int32" Enabled="true">
+			<Column Name="RowIndex" DataType="System.Int32"/>
+			<Column Name="InvoiceNo" DataType="System.String"/>
+			<Column Name="ChargeTitle" DataType="System.String"/>
+			<Column Name="Amount" DataType="System.Decimal"/>
+			<Column Name="CoveredAmount" DataType="System.Decimal"/>
+			<Column Name="RemainingAmount" DataType="System.Decimal"/>
+			<Column Name="Remarks" DataType="System.String"/>
+		</TableDataSource>
+		<TableDataSource Name="Payments" ReferenceName="SettlementDataSet.Payments" DataType="System.Int32" Enabled="true">
+			<Column Name="RowIndex" DataType="System.Int32"/>
+			<Column Name="DocumentNo" DataType="System.String"/>
+			<Column Name="DocumentDate" DataType="System.String"/>
+			<Column Name="PaymentMethod" DataType="System.String"/>
+			<Column Name="AllocatedAmount" DataType="System.Decimal"/>
+			<Column Name="SettledInItemCurrency" DataType="System.Decimal"/>
+			<Column Name="ExchangeRate" DataType="System.Decimal"/>
+			<Column Name="Remarks" DataType="System.String"/>
+		</TableDataSource>
+	</Dictionary>
+	<ReportPage Name="Page1" RawPaperSize="9" LeftMargin="10" TopMargin="10" RightMargin="10" BottomMargin="10" RightToLeft="true">
+
+		<!-- سربرگ گزارش و اطلاعات کلی سند -->
+		<PageHeaderBand Name="PageHeader1" Width="718.2" Height="140">
+			<ShapeObject Name="HeaderBox" Left="0" Top="0" Width="718.2" Height="80" Border.Lines="All" Border.Color="120, 144, 156" Border.Width="1.5" Fill.Color="248, 249, 250"/>
+
+			<!-- لوگوی شرکت -->
+			<PictureObject Name="CompanyLogo" Left="10" Top="8" Width="95" Height="64" SizeMode="Zoom" DataColumn="Settlement.CompanyLogoPath"/>
+
+			<!-- عنوان گزارش و نام شرکت -->
+			<TextObject Name="TxtTitle" Left="190" Top="10" Width="338.2" Height="30" Text="رسید تسویه حساب و دریافت / پرداخت" Font="IRANSans, 13pt, style=Bold" HorzAlign="Center" VertAlign="Center" RightToLeft="true"/>
+			<TextObject Name="TxtCompanyName" Left="190" Top="42" Width="338.2" Height="22" Text="[Settlement.CompanyName]" Font="IRANSans, 10pt, style=Bold" TextFill.Color="55, 71, 79" HorzAlign="Center" VertAlign="Center" RightToLeft="true"/>
+
+			<!-- شماره و تاریخ سند -->
+			<TextObject Name="TxtNo" Left="535" Top="10" Width="170" Height="20" Text="شماره سند: [Settlement.SettlementNo]" Font="IRANSans, 8.5pt, style=Bold" RightToLeft="true"/>
+			<TextObject Name="TxtDate" Left="535" Top="32" Width="170" Height="20" Text="تاریخ سند: [Settlement.SettlementDate]" Font="IRANSans, 8.5pt" RightToLeft="true"/>
+			<TextObject Name="TxtStatus" Left="535" Top="54" Width="170" Height="20" Text="وضعیت: [Settlement.StatusName]" Font="IRANSans, 8.5pt" RightToLeft="true"/>
+
+			<!-- کادر اطلاعات طرف حساب و ارز -->
+			<TableObject Name="PartyTable" Left="0" Top="86" Width="718.2" Height="48" Border.Lines="All" Border.Color="200, 200, 200">
+				<TableColumn Name="Col1" Width="359.1"/>
+				<TableColumn Name="Col2" Width="359.1"/>
+				<TableRow Name="RowMeta1" Height="24">
+					<TableCell Name="CellParty" Text=" طرف حساب / مشتری: [Settlement.PartyName]" Font="IRANSans, 9pt, style=Bold" VertAlign="Center" RightToLeft="true"/>
+					<TableCell Name="CellCurrency" Text=" ارز تسویه: [Settlement.CurrencyName]" Font="IRANSans, 9pt, style=Bold" VertAlign="Center" RightToLeft="true"/>
+				</TableRow>
+				<TableRow Name="RowMeta2" Height="24">
+					<TableCell Name="CellRemarks" ColSpan="2" Text=" توضیحات: [Settlement.Remarks]" Font="IRANSans, 8.5pt" VertAlign="Center" RightToLeft="true"/>
+					<TableCell Name="CellEmpty2"/>
+				</TableRow>
+			</TableObject>
+		</PageHeaderBand>
+
+		<!-- بخش اول: اقلام تسویه شده -->
+		<DataBand Name="DataItems" Top="145" Width="718.2" Height="22" DataSource="Items">
+			<TableObject Name="ItemsDataTable" Left="0" Top="0" Width="718.2" Height="22" Border.Lines="All" Border.Color="200, 200, 200">
+				<TableColumn Name="ColD1" Width="35"/>
+				<TableColumn Name="ColD2" Width="100"/>
+				<TableColumn Name="ColD3" Width="170"/>
+				<TableColumn Name="ColD4" Width="105"/>
+				<TableColumn Name="ColD5" Width="105"/>
+				<TableColumn Name="ColD6" Width="105"/>
+				<TableColumn Name="ColD7" Width="98.2"/>
+				<TableRow Name="RowD1" Height="22">
+					<TableCell Name="CellD1" Text="[Items.RowIndex]" Font="IRANSans, 8pt" HorzAlign="Center" VertAlign="Center"/>
+					<TableCell Name="CellD2" Text="[Items.InvoiceNo]" Font="IRANSans, 8pt" HorzAlign="Center" VertAlign="Center"/>
+					<TableCell Name="CellD3" Text="[Items.ChargeTitle]" Font="IRANSans, 8pt" VertAlign="Center" RightToLeft="true"/>
+					<TableCell Name="CellD4" Text="[Items.Amount]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Font="IRANSans, 8pt" HorzAlign="Right" VertAlign="Center"/>
+					<TableCell Name="CellD5" Text="[Items.CoveredAmount]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Font="IRANSans, 8pt" HorzAlign="Right" VertAlign="Center"/>
+					<TableCell Name="CellD6" Text="[Items.RemainingAmount]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Font="IRANSans, 8pt" HorzAlign="Right" VertAlign="Center"/>
+					<TableCell Name="CellD7" Text="[Items.Remarks]" Font="IRANSans, 7.5pt" VertAlign="Center" RightToLeft="true"/>
+				</TableRow>
+			</TableObject>
+
+			<DataHeaderBand Name="DataHeaderItems" Width="718.2" Height="48">
+				<TextObject Name="LblSec1" Left="0" Top="4" Width="718.2" Height="18" Text="الف) اقلام تسویه شده (فاکتورها و هزینه‌ها)" Font="IRANSans, 8.5pt, style=Bold" TextFill.Color="33, 33, 33" RightToLeft="true"/>
+				<TableObject Name="ItemsHeaderTable" Left="0" Top="24" Width="718.2" Height="24" Border.Lines="All" Border.Color="120, 144, 156" Fill.Color="227, 242, 253">
+					<TableColumn Name="ColH1" Width="35"/>
+					<TableColumn Name="ColH2" Width="100"/>
+					<TableColumn Name="ColH3" Width="170"/>
+					<TableColumn Name="ColH4" Width="105"/>
+					<TableColumn Name="ColH5" Width="105"/>
+					<TableColumn Name="ColH6" Width="105"/>
+					<TableColumn Name="ColH7" Width="98.2"/>
+					<TableRow Name="RowH1" Height="24">
+						<TableCell Name="CellH1" Text="ردیف" Font="IRANSans, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center"/>
+						<TableCell Name="CellH2" Text="شماره فاکتور" Font="IRANSans, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center"/>
+						<TableCell Name="CellH3" Text="شرح آیتم / هزینه" Font="IRANSans, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center"/>
+						<TableCell Name="CellH4" Text="مبلغ کل" Font="IRANSans, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center"/>
+						<TableCell Name="CellH5" Text="مبلغ تسویه شده" Font="IRANSans, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center"/>
+						<TableCell Name="CellH6" Text="مانده آیتم" Font="IRANSans, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center"/>
+						<TableCell Name="CellH7" Text="توضیحات" Font="IRANSans, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center"/>
+					</TableRow>
+				</TableObject>
+			</DataHeaderBand>
+		</DataBand>
+
+		<!-- بخش دوم: اسناد و ابزارهای پرداخت -->
+		<DataBand Name="DataPayments" Top="225" Width="718.2" Height="22" DataSource="Payments">
+			<TableObject Name="PayDataTable" Left="0" Top="0" Width="718.2" Height="22" Border.Lines="All" Border.Color="200, 200, 200">
+				<TableColumn Name="ColPD1" Width="35"/>
+				<TableColumn Name="ColPD2" Width="105"/>
+				<TableColumn Name="ColPD3" Width="85"/>
+				<TableColumn Name="ColPD4" Width="120"/>
+				<TableColumn Name="ColPD5" Width="110"/>
+				<TableColumn Name="ColPD6" Width="110"/>
+				<TableColumn Name="ColPD7" Width="153.2"/>
+				<TableRow Name="RowPD1" Height="22">
+					<TableCell Name="CellPD1" Text="[Payments.RowIndex]" Font="IRANSans, 8pt" HorzAlign="Center" VertAlign="Center"/>
+					<TableCell Name="CellPD2" Text="[Payments.DocumentNo]" Font="IRANSans, 8pt" HorzAlign="Center" VertAlign="Center"/>
+					<TableCell Name="CellPD3" Text="[Payments.DocumentDate]" Font="IRANSans, 8pt" HorzAlign="Center" VertAlign="Center"/>
+					<TableCell Name="CellPD4" Text="[Payments.PaymentMethod]" Font="IRANSans, 8pt" HorzAlign="Center" VertAlign="Center" RightToLeft="true"/>
+					<TableCell Name="CellPD5" Text="[Payments.AllocatedAmount]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Font="IRANSans, 8pt" HorzAlign="Right" VertAlign="Center"/>
+					<TableCell Name="CellPD6" Text="[Payments.SettledInItemCurrency]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Font="IRANSans, 8pt" HorzAlign="Right" VertAlign="Center"/>
+					<TableCell Name="CellPD7" Text="[Payments.Remarks]" Font="IRANSans, 7.5pt" VertAlign="Center" RightToLeft="true"/>
+				</TableRow>
+			</TableObject>
+
+			<DataHeaderBand Name="DataHeaderPayments" Width="718.2" Height="48">
+				<TextObject Name="LblSec2" Left="0" Top="4" Width="718.2" Height="18" Text="ب) اسناد و ابزارهای پرداخت / دریافت متصل" Font="IRANSans, 8.5pt, style=Bold" TextFill.Color="33, 33, 33" RightToLeft="true"/>
+				<TableObject Name="PayHeaderTable" Left="0" Top="24" Width="718.2" Height="24" Border.Lines="All" Border.Color="120, 144, 156" Fill.Color="239, 235, 233">
+					<TableColumn Name="ColPH1" Width="35"/>
+					<TableColumn Name="ColPH2" Width="105"/>
+					<TableColumn Name="ColPH3" Width="85"/>
+					<TableColumn Name="ColPH4" Width="120"/>
+					<TableColumn Name="ColPH5" Width="110"/>
+					<TableColumn Name="ColPH6" Width="110"/>
+					<TableColumn Name="ColPH7" Width="153.2"/>
+					<TableRow Name="RowPH1" Height="24">
+						<TableCell Name="CellPH1" Text="ردیف" Font="IRANSans, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center"/>
+						<TableCell Name="CellPH2" Text="شماره سند پرداخت" Font="IRANSans, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center"/>
+						<TableCell Name="CellPH3" Text="تاریخ سند" Font="IRANSans, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center"/>
+						<TableCell Name="CellPH4" Text="روش پرداخت" Font="IRANSans, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center"/>
+						<TableCell Name="CellPH5" Text="مبلغ مصرفی" Font="IRANSans, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center"/>
+						<TableCell Name="CellPH6" Text="پوشش به ارز سند" Font="IRANSans, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center"/>
+						<TableCell Name="CellPH7" Text="توضیحات" Font="IRANSans, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center"/>
+					</TableRow>
+				</TableObject>
+			</DataHeaderBand>
+		</DataBand>
+
+		<!-- جمع‌بندی نهایی و کادر امضاها -->
+		<ReportSummaryBand Name="ReportSummary1" Top="280" Width="718.2" Height="130">
+			<TableObject Name="SummaryTable" Left="178.2" Top="10" Width="540" Height="48" Border.Lines="All" Border.Color="120, 144, 156">
+				<TableColumn Name="SumCol1" Width="180"/>
+				<TableColumn Name="SumCol2" Width="180"/>
+				<TableColumn Name="SumCol3" Width="180"/>
+				<TableRow Name="SumRow1" Height="24">
+					<TableCell Name="SumCell1" Text="مجموع مبالغ اقلام تسویه:" Font="IRANSans, 8.5pt, style=Bold" VertAlign="Center" RightToLeft="true" Fill.Color="245, 245, 245"/>
+					<TableCell Name="SumCell2" Text="مجموع مبالغ پرداخت شده:" Font="IRANSans, 8.5pt, style=Bold" VertAlign="Center" RightToLeft="true" Fill.Color="245, 245, 245"/>
+					<TableCell Name="SumCell3" Text="مانده نهایی سند:" Font="IRANSans, 8.5pt, style=Bold" VertAlign="Center" RightToLeft="true" Fill.Color="245, 245, 245"/>
+				</TableRow>
+				<TableRow Name="SumRow2" Height="24">
+					<TableCell Name="SumVal1" Text="[Settlement.TotalAmount] [Settlement.CurrencyName]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Font="IRANSans, 9pt, style=Bold" HorzAlign="Center" VertAlign="Center"/>
+					<TableCell Name="SumVal2" Text="[Settlement.TotalAllocated] [Settlement.CurrencyName]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Font="IRANSans, 9pt, style=Bold" HorzAlign="Center" VertAlign="Center" TextFill.Color="27, 94, 32"/>
+					<TableCell Name="SumVal3" Text="[Settlement.RemainingAmount] [Settlement.CurrencyName]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Font="IRANSans, 9pt, style=Bold" HorzAlign="Center" VertAlign="Center" TextFill.Color="183, 28, 28"/>
+				</TableRow>
+			</TableObject>
+
+			<TextObject Name="TxtSign1" Left="40" Top="75" Width="160" Height="20" Text="تنظیم کننده (امور مالی)" Font="IRANSans, 8.5pt, style=Bold" HorzAlign="Center" RightToLeft="true"/>
+			<TextObject Name="TxtSign2" Left="280" Top="75" Width="160" Height="20" Text="تأیید کننده مدیریت مالی" Font="IRANSans, 8.5pt, style=Bold" HorzAlign="Center" RightToLeft="true"/>
+			<TextObject Name="TxtSign3" Left="510" Top="75" Width="160" Height="20" Text="امضاء و مهر طرف حساب" Font="IRANSans, 8.5pt, style=Bold" HorzAlign="Center" RightToLeft="true"/>
+		</ReportSummaryBand>
+
+		<!-- پاورقی صفحه -->
+		<PageFooterBand Name="PageFooter1" Top="420" Width="718.2" Height="20">
+			<TextObject Name="TxtPageNo" Left="0" Top="0" Width="718.2" Height="18" Text="صفحه [Page#] از [TotalPages#] - سامانه جامع ShipRate" Font="IRANSans, 7.5pt" TextFill.Color="158, 158, 158" HorzAlign="Center" VertAlign="Center" RightToLeft="true"/>
+		</PageFooterBand>
+	</ReportPage>
+</Report>

@@ -1,0 +1,571 @@
+﻿@using ShipRate.Application.ViewModels
+@model TransportDocumentUpsertVm
+
+
+<style>
+    input:focus,
+    select:focus {
+        background-color: #fff9c4 !important; /* زرد ملایم */
+    }
+</style>
+
+
+
+@{
+    var cargoDetailOptions = Model.CargoDetails?
+        .Select((cargo, index) => new SelectListItem
+        {
+            Value = cargo.Id.ToString(),
+            Text = $"{index + 1}. {cargo.MarksAndNumbers} - {cargo.CargoDescription}"
+        })
+        .ToList() ?? new List<SelectListItem>();
+
+    ViewData["CargoDetailOptions"] = cargoDetailOptions;
+}
+
+
+<div class="bl-section">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="bl-section-title mb-0">8)Containers:</h6>
+        <div class="bl-section-actions">
+            <button type="button" class="btn btn-sm btn-light" id="addContainerLine">
+                + Add Container
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="importFromBooking">
+                Import From Booking
+            </button>
+            @*             <button type="button" class="btn btn-sm btn-outline-secondary" id="autoAllocate">
+                Auto Allocate
+            </button>
+ *@        </div>
+    </div>
+
+    @* Source selects برای استفاده در JavaScript هنگام اضافه کردن ردیف جدید *@
+    <div class="d-none">
+        <select id="ContainerSizeTypeId_Source" asp-items="Model.ContainerSizeTypes">
+            <option value="">--</option>
+        </select>
+    </div>
+    <div class="d-none">
+        <select id="FullMTId_Source" asp-items="Model.FullMTs">
+            <option value="">--</option>
+        </select>
+    </div>
+    <div class="d-none">
+        <select id="LoadTypeId_Source" asp-items="Model.LoadTypes">
+            <option value="">--</option>
+        </select>
+    </div>
+
+
+    <div class="d-none">
+        <select id="CntOwnTypeId_Source" asp-items="Model.CntOwnTypes">
+            <option value="">--</option>
+        </select>
+    </div>
+    <div>
+        <table class="table table-bordered table-sm bl-table align-middle">
+            <thead>
+                <tr>
+                    <th style="width:50px;">Seq</th>
+                    <th>Container No</th>
+                    <th>SizeType</th>
+                    <th>FullMT</th>
+                    <th>OwnType</th>
+                    <th>Seal No</th>
+                    <th>#Pkg</th>
+                    <th>Gross W.</th>
+                    <th>Tare W.</th>
+                    <th>Net W.</th>
+                    <th>CBM</th>
+                    <th>Move.T.</th>
+                    <th>Exp.Per</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody id="containerBody">
+                @await Html.PartialAsync("_ContainersList", Model)
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    window.rowIndexes = window.rowIndexes || {};
+    window.rowIndexes.containers = @(Model.Containers?.Count ?? 0);
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+
+    function getSelectOptionsHtml(selector) {
+        const sourceSelect = document.querySelector(selector);
+
+        if (!sourceSelect) {
+            return '<option value="">-- Select --</option>';
+        }
+
+        return Array.from(sourceSelect.options)
+            .map(option => {
+                const value = option.value ?? '';
+                const text = option.text ?? '';
+                const selected = option.selected ? ' selected' : '';
+                return `<option value="${escapeHtml(value)}"${selected}>${escapeHtml(text)}</option>`;
+            })
+            .join('');
+    }
+
+    function toggleContainerAllocationRow(containerIndex) {
+        const allocationRow = document.getElementById(`containerAllocationRow_${containerIndex}`);
+        if (!allocationRow) return;
+
+        allocationRow.classList.toggle('d-none');
+    }
+
+    function getNextAllocationIndex(containerIndex) {
+        const body = document.getElementById(`containerAllocationBody_${containerIndex}`);
+        if (!body) return 0;
+
+        const rows = body.querySelectorAll('.container-allocation-item-row');
+        if (!rows.length) return 0;
+
+        let maxIndex = -1;
+
+        rows.forEach(row => {
+            const index = parseInt(row.dataset.allocationIndex || '-1', 10);
+            if (index > maxIndex) {
+                maxIndex = index;
+            }
+        });
+
+        return maxIndex + 1;
+    }
+
+    function syncContainerTotals(containerIndex) {
+        const allocationBody = document.getElementById(`containerAllocationBody_${containerIndex}`);
+        if (!allocationBody) return;
+
+        const allocationRows = allocationBody.querySelectorAll('.container-allocation-item-row');
+
+        let totalPackageCount = 0;
+        let totalGrossWeight = 0;
+        let totalNetWeight = 0;
+        let totalVolumeCBM = 0;
+
+        allocationRows.forEach(row => {
+            totalPackageCount += parseFloat(row.querySelector('.allocation-package-count')?.value || 0);
+            totalGrossWeight += parseFloat(row.querySelector('.allocation-gross-weight')?.value || 0);
+            totalNetWeight += parseFloat(row.querySelector('.allocation-net-weight')?.value || 0);
+            totalVolumeCBM += parseFloat(row.querySelector('.allocation-volume-cbm')?.value || 0);
+        });
+
+        const containerRow = document.getElementById(`containerRow_${containerIndex}`);
+        if (!containerRow) return;
+
+        const packageInput = containerRow.querySelector(`[name="Containers[${containerIndex}].TotalPackageCount"]`);
+        const grossInput = containerRow.querySelector(`[name="Containers[${containerIndex}].TotalGrossWeight"]`);
+        const netInput = containerRow.querySelector(`[name="Containers[${containerIndex}].TotalNetWeight"]`);
+        const volumeInput = containerRow.querySelector(`[name="Containers[${containerIndex}].TotalVolumeCBM"]`);
+
+        if (packageInput) packageInput.value = totalPackageCount;
+        if (grossInput) grossInput.value = totalGrossWeight.toFixed(2);
+        if (netInput) netInput.value = totalNetWeight.toFixed(2);
+        if (volumeInput) volumeInput.value = totalVolumeCBM.toFixed(3);
+    }
+
+    function addContainerAllocationRow(containerIndex) {
+        const allocationBody = document.getElementById(`containerAllocationBody_${containerIndex}`);
+        if (!allocationBody) return;
+
+        const emptyRow = allocationBody.querySelector('.empty-container-allocation-row');
+        if (emptyRow) {
+            emptyRow.remove();
+        }
+        const cargoOptionsHtml = document.getElementById('cargoDetailOptionsTemplate')?.innerHTML ?? '';
+        const allocationIndex = getNextAllocationIndex(containerIndex);
+        const newAllocationRowHtml = `
+            <tr class="container-allocation-item-row"
+                data-container-index="${containerIndex}"
+                data-allocation-index="${allocationIndex}">
+
+                    <td>
+                        <input type="hidden"
+                               name="Containers[${containerIndex}].CargoAllocations[${allocationIndex}].Id"
+                               value="" />
+
+                        <input type="hidden"
+                               name="Containers[${containerIndex}].CargoAllocations[${allocationIndex}].BLContainerId"
+                               value="" />
+
+                        <select name="Containers[${containerIndex}].CargoAllocations[${allocationIndex}].CargoDetailId"
+                                class="form-select form-select-sm allocation-cargo-detail-id">
+                            ${cargoOptionsHtml}
+                        </select>
+                    </td>
+
+
+                <td>
+                    <input type="number"
+                           name="Containers[${containerIndex}].CargoAllocations[${allocationIndex}].PackageCount"
+                           value="0"
+                           min="0"
+                           class="form-control form-control-sm allocation-package-count" />
+                </td>
+
+                <td>
+                    <input type="number"
+                           name="Containers[${containerIndex}].CargoAllocations[${allocationIndex}].GrossWeight"
+                           value="0"
+                           min="0"
+                           step="0.01"
+                           class="form-control form-control-sm allocation-gross-weight" />
+                </td>
+
+                <td>
+                    <input type="number"
+                           name="Containers[${containerIndex}].CargoAllocations[${allocationIndex}].NetWeight"
+                           value="0"
+                           min="0"
+                           step="0.01"
+                           class="form-control form-control-sm allocation-net-weight" />
+                </td>
+
+                <td>
+                    <input type="number"
+                           name="Containers[${containerIndex}].CargoAllocations[${allocationIndex}].VolumeCBM"
+                           value="0"
+                           min="0"
+                           step="0.001"
+                           class="form-control form-control-sm allocation-volume-cbm" />
+                </td>
+
+                <td>
+                    <button type="button"
+                            class="btn btn-sm btn-danger remove-container-allocation-row-btn"
+                            data-container-index="${containerIndex}"
+                            data-allocation-index="${allocationIndex}">
+                        Remove
+                    </button>
+                </td>
+            </tr>
+        `;
+
+        allocationBody.insertAdjacentHTML('beforeend', newAllocationRowHtml);
+        syncContainerTotals(containerIndex);
+    }
+
+    function addContainerRow() {
+        const i = window.rowIndexes.containers++;
+        const containerBody = document.getElementById('containerBody');
+
+        if (!containerBody) {
+            return;
+        }
+
+
+
+
+    // پیدا کردن آخرین سطر موجود برای کپی اطلاعات
+        const existingRows = containerBody.querySelectorAll('.container-row');
+        let lastRow = null;
+        let nextSeq = 1; // مقدار پیش‌فرض Seq
+
+        if (existingRows.length > 0) {
+            lastRow = existingRows[existingRows.length - 1];
+
+            // محاسبه Seq بعدی (اگر آخرین مقدار عددی باشد، یکی به آن اضافه می‌کنیم)
+            const lastSeqInput = lastRow.querySelector('input[name*=".Seq"]');
+            const lastSeqVal = parseInt(lastSeqInput?.value);
+            if (!isNaN(lastSeqVal)) {
+                nextSeq = lastSeqVal + 1;
+            }
+        }
+
+        // گرفتن مقادیر (اگر سطر قبلی وجود داشته باشد)
+        const getDefaultValue = (selector, attribute = 'value') => {
+            if (!lastRow) return '';
+            const input = lastRow.querySelector(selector);
+            return input ? input[attribute] : '';
+        };
+
+
+
+
+
+
+
+
+
+
+
+
+
+        const sizeTypeOptions = getSelectOptionsHtml('#ContainerSizeTypeId_Source');
+        const fullMtOptions = getSelectOptionsHtml('#FullMTId_Source');
+        const cntOwnTypeOptions = getSelectOptionsHtml('#CntOwnTypeId_Source');
+        const loadTypeOptions = getSelectOptionsHtml('#LoadTypeId_Source');
+
+        const blId = '@Model.Id';
+
+        const newRowHtml = `
+            <tr id="containerRow_${i}" class="container-row">
+
+                <td>
+                    <input name="Containers[${i}].Seq"
+                           class="form-control form-control-sm text-center"  style="width: 50px;"  value="${nextSeq}" />
+                </td>
+
+
+                <td>
+                    <input type="hidden" name="Containers[${i}].Id" value="00000000-0000-0000-0000-000000000000" />
+                    <input type="hidden" name="Containers[${i}].BLId" value="${blId}" />
+
+                    <input name="Containers[${i}].ContainerNumber"
+                           class="form-control form-control-sm text-uppercase container-validator" value="" maxlength="11" />
+                </td>
+
+                <td>
+                    <select name="Containers[${i}].ContainerSizeTypeId"
+                            class="form-select form-select-sm">
+                            ${getSelectWithSelected(sizeTypeOptions, getDefaultValue('select[name*=".ContainerSizeTypeId"]'))}
+                    </select>
+                </td>
+
+                <td>
+                    <select name="Containers[${i}].FullMTId"
+                            class="form-select form-select-sm">
+                            ${getSelectWithSelected(fullMtOptions, getDefaultValue('select[name*=".FullMTId"]'))}
+                    </select>
+                </td>
+
+                <td>
+                    <select name="Containers[${i}].CntOwnTypeId"
+                            class="form-select form-select-sm">
+                            ${getSelectWithSelected(cntOwnTypeOptions, getDefaultValue('select[name*=".CntOwnTypeId"]'))}
+                    </select>
+                </td>
+
+
+                <td>
+                    <input name="Containers[${i}].SealNumber"
+                           class="form-control form-control-sm" />
+                </td>
+
+
+
+                <td>
+                    <input name="Containers[${i}].TotalPackageCount"
+                           type="number"
+                           min="0"
+                           value="0"
+                           class="form-control form-control-sm"    value="${getDefaultValue('input[name*=".TotalPackageCount"]')}"   />
+                </td>
+
+                <td>
+                    <input name="Containers[${i}].TotalGrossWeight"
+                           type="number"
+                           step="0.01"
+                           value="0"
+                           class="form-control form-control-sm"   value="${getDefaultValue('input[name*=".TotalGrossWeight"]')}" />
+                </td>
+
+                <td>
+                    <input name="Containers[${i}].TareWeight"
+                           type="number"
+                           value="0"
+                           class="form-control form-control-sm" value="${getDefaultValue('input[name*=".TareWeight"]')}" />
+                </td>
+                <td>
+                    <input name="Containers[${i}].TotalNetWeight"
+                           type="number"
+                           step="0.01"
+                           value="0"
+                           class="form-control form-control-sm" value="${getDefaultValue('input[name*=".TotalNetWeight"]')}" />
+                </td>
+
+                <td>
+                    <input name="Containers[${i}].TotalVolumeCBM"
+                           type="number"
+                           step="0.001"
+                           value="0"
+                           class="form-control form-control-sm" value="${getDefaultValue('input[name*=".TotalVolumeCBM"]')}"/>
+                </td>
+                <td>
+                    <select name="Containers[${i}].LoadTypeId"
+                            class="form-select form-select-sm">
+                            ${getSelectWithSelected(loadTypeOptions, getDefaultValue('select[name*=".LoadTypeId"]'))}
+                    </select>
+                </td>
+                <td>
+                    <input name="Containers[${i}].ExportPermission"
+                           type="text"
+                           class="form-control form-control-sm" value="${getDefaultValue('input[name*=".ExportPermission"]')}" />
+                </td>
+
+                <td class="text-nowrap">
+                    <button type="button"
+                            class="btn btn-sm btn-outline-primary toggle-container-allocation-btn"
+                            title="Allocation"
+                            data-index="${i}">
+                        <i class="bi bi-distribute-vertical"></i>
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-sm btn-danger remove-container-row-btn"
+                            title="Remove"
+                            data-index="${i}">
+                            <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+
+            <tr id="containerAllocationRow_${i}"
+                class="container-allocation-row d-none"
+                data-container-index="${i}">
+                <td colspan="100">
+                    <div class="border rounded bg-light p-3 my-2">
+
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong>Cargo Allocations</strong>
+                                <span class="text-muted small">
+                                    - Container ${i + 1}
+                                </span>
+                            </div>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-secondary add-container-allocation-row-btn"
+                                    data-container-index="${i}">
+                                + Add Allocation
+                            </button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm mb-0 align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="min-width:160px;">Cargo</th>
+                                        <th style="min-width:100px;">#Pkg</th>
+                                        <th style="min-width:120px;">Gross Weight</th>
+                                        <th style="min-width:120px;">Net Weight</th>
+                                        <th style="min-width:100px;">CBM</th>
+                                        <th style="width:90px;">Actions</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="containerAllocationBody_${i}"
+                                       data-container-index="${i}">
+                                    <tr class="empty-container-allocation-row">
+                                        <td colspan="9" class="text-center text-muted py-3">
+                                            No cargo allocations yet.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="small text-muted mt-2">
+                            Allocation totals can be synced with container summary fields after Auto Allocate or manual editing.
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `;
+
+        containerBody.insertAdjacentHTML('beforeend', newRowHtml);
+    }
+
+    function getSelectWithSelected(optionsHtml, selectedValue) {
+        if (!selectedValue) return optionsHtml;
+        // یک div موقت برای دستکاری HTML
+        const div = document.createElement('div');
+        div.innerHTML = optionsHtml;
+        const options = div.querySelectorAll('option');
+        options.forEach(opt => {
+            if (opt.value == selectedValue) {
+                opt.setAttribute('selected', 'selected');
+            } else {
+                opt.removeAttribute('selected');
+            }
+        });
+        return div.innerHTML;
+    }
+
+
+
+    document.getElementById('addContainerLine')?.addEventListener('click', function () {
+        addContainerRow();
+    });
+
+    document.addEventListener('click', function (event) {
+        const toggleButton = event.target.closest('.toggle-container-allocation-btn');
+        if (toggleButton) {
+            const containerIndex = toggleButton.dataset.index;
+            toggleContainerAllocationRow(containerIndex);
+            return;
+        }
+
+        const removeContainerButton = event.target.closest('.remove-container-row-btn');
+        if (removeContainerButton) {
+            const containerIndex = removeContainerButton.dataset.index;
+
+            document.getElementById(`containerRow_${containerIndex}`)?.remove();
+            document.getElementById(`containerAllocationRow_${containerIndex}`)?.remove();
+            return;
+        }
+
+        const addAllocationButton = event.target.closest('.add-container-allocation-row-btn');
+        if (addAllocationButton) {
+            const containerIndex = addAllocationButton.dataset.containerIndex;
+            addContainerAllocationRow(containerIndex);
+            return;
+        }
+
+        const removeAllocationButton = event.target.closest('.remove-container-allocation-row-btn');
+        if (removeAllocationButton) {
+            const allocationRow = removeAllocationButton.closest('.container-allocation-item-row');
+            const containerIndex = removeAllocationButton.dataset.containerIndex;
+            const allocationBody = document.getElementById(`containerAllocationBody_${containerIndex}`);
+
+            allocationRow?.remove();
+
+            if (allocationBody && !allocationBody.querySelector('.container-allocation-item-row')) {
+                allocationBody.insertAdjacentHTML('beforeend', `
+                    <tr class="empty-container-allocation-row">
+                        <td colspan="9" class="text-center text-muted py-3">
+                            No cargo allocations yet.
+                        </td>
+                    </tr>
+                `);
+            }
+
+            syncContainerTotals(containerIndex);
+        }
+    });
+
+    document.addEventListener('input', function (event) {
+        if (
+            event.target.matches('.allocation-package-count') ||
+            event.target.matches('.allocation-gross-weight') ||
+            event.target.matches('.allocation-net-weight') ||
+            event.target.matches('.allocation-volume-cbm')
+        ) {
+            const allocationRow = event.target.closest('.container-allocation-item-row');
+            if (!allocationRow) return;
+
+            const containerIndex = allocationRow.dataset.containerIndex;
+            syncContainerTotals(containerIndex);
+        }
+    });
+</script>
+
+
+
+

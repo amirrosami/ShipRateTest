@@ -1,0 +1,106 @@
+﻿@using ShipRate.Application.ViewModels
+@model PagerVm
+
+
+@{
+    var prevDisabled = Model.Page <= 1;
+    var nextDisabled = Model.Page >= Model.TotalPages;
+
+    var startPage = Math.Max(1, Model.Page - 2);
+    var endPage = Math.Min(Model.TotalPages, Model.Page + 2);
+
+    var includeAttr = string.IsNullOrWhiteSpace(Model.IncludeFormSelector)
+        ? ""
+        : $"hx-include=\"{Model.IncludeFormSelector}\"";
+}
+
+<nav aria-label="Grid paging" dir="ltr">
+    <ul class="pagination pagination-sm mb-0">
+
+        <li class="page-item @(prevDisabled ? "disabled" : "")">
+            <button type="button"
+                    class="page-link"
+                    hx-get="@Model.Url"
+                    hx-target="@Model.Target"
+                    hx-swap="innerHTML"
+                    @Html.Raw(includeAttr)
+                    hx-vals='{"Page": @(Model.Page - 1), "PageSize": @Model.PageSize}'
+                    @(prevDisabled ? "disabled" : "")>
+                Previous
+            </button>
+        </li>
+
+        @if (startPage > 1)
+        {
+            <li class="page-item">
+                <button type="button"
+                        class="page-link"
+                        hx-get="@Model.Url"
+                        hx-target="@Model.Target"
+                        hx-swap="innerHTML"
+                        @Html.Raw(includeAttr)
+                        hx-vals='{"Page": 1, "PageSize": @Model.PageSize}'>
+                    1
+                </button>
+            </li>
+
+            @if (startPage > 2)
+            {
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+            }
+        }
+
+        @for (var i = startPage; i <= endPage; i++)
+        {
+            <li class="page-item @(i == Model.Page ? "active" : "")">
+                <button type="button"
+                        class="page-link"
+                        hx-get="@Model.Url"
+                        hx-target="@Model.Target"
+                        hx-swap="innerHTML"
+                        @Html.Raw(includeAttr)
+                        hx-vals='{"Page": @i, "PageSize": @Model.PageSize}'>
+                    @i
+                </button>
+            </li>
+        }
+
+        @if (endPage < Model.TotalPages)
+        {
+            @if (endPage < Model.TotalPages - 1)
+            {
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+            }
+
+            <li class="page-item">
+                <button type="button"
+                        class="page-link"
+                        hx-get="@Model.Url"
+                        hx-target="@Model.Target"
+                        hx-swap="innerHTML"
+                        @Html.Raw(includeAttr)
+                        hx-vals='{"Page": @Model.TotalPages, "PageSize": @Model.PageSize}'>
+                    @Model.TotalPages
+                </button>
+            </li>
+        }
+
+        <li class="page-item @(nextDisabled ? "disabled" : "")">
+            <button type="button"
+                    class="page-link"
+                    hx-get="@Model.Url"
+                    hx-target="@Model.Target"
+                    hx-swap="innerHTML"
+                    @Html.Raw(includeAttr)
+                    hx-vals='{"Page": @(Model.Page + 1), "PageSize": @Model.PageSize}'
+                    @(nextDisabled ? "disabled" : "")>
+                Next
+            </button>
+        </li>
+
+    </ul>
+</nav>

@@ -1,0 +1,79 @@
+﻿@using ShipRate.Application.DTOs.Notif
+@model NotificationRuleDetailsDto
+
+<div class="modal-header">
+    <h5 class="modal-title">Notification Rule Details</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body" dir="ltr">
+    <dl class="row">
+        <dt class="col-sm-4">Activity Type</dt>
+        <dd class="col-sm-8">@Model.ActivityType</dd>
+
+        <dt class="col-sm-4">Entity Type</dt>
+        <dd class="col-sm-8">@Model.EntityTypeName</dd>
+
+        <dt class="col-sm-4">Should Notify</dt>
+        <dd class="col-sm-8">@Model.ShouldNotify</dd>
+
+        <dt class="col-sm-4">Recipient Mode</dt>
+        <dd class="col-sm-8">@Model.RecipientModeName</dd>
+
+        <dt class="col-sm-4">Title Template</dt>
+        <dd class="col-sm-8">@Model.TitleTemplate</dd>
+
+        <dt class="col-sm-4">Message Template</dt>
+        <dd class="col-sm-8">@Model.MessageTemplate</dd>
+
+        <dt class="col-sm-4">Target Url Template</dt>
+        <dd class="col-sm-8">@Model.TargetUrlTemplate</dd>
+
+        <dt class="col-sm-4">Is Active</dt>
+        <dd class="col-sm-8">@Model.IsActive</dd>
+
+        <dt class="col-sm-4">Users</dt>
+        <dd class="col-sm-8">
+            @if (Model.Users.Any())
+            {
+                <ul class="mb-0">
+                    @foreach (var user in Model.Users)
+                    {
+                        <li>@user</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <span>-</span>
+            }
+        </dd>
+
+        <dt class="col-sm-4">User Types</dt>
+        <dd class="col-sm-8">
+            @if (Model.UserTypes.Any())
+            {
+                <ul class="mb-0">
+                    @foreach (var item in Model.UserTypes)
+                    {
+                        <li>@item</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <span>-</span>
+            }
+        </dd>
+
+        <dt class="col-sm-4">Created At</dt>
+        <dd class="col-sm-8">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</dd>
+
+        <dt class="col-sm-4">Updated At</dt>
+        <dd class="col-sm-8">@(Model.UpdatedAt.HasValue? Model.UpdatedAt.Value.ToString("yyyy-MM-dd HH:mm") : "-")</dd>
+    </dl>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+</div>

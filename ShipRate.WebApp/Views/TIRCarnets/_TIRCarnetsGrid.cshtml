@@ -1,0 +1,190 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.ViewModels
+@model PagedResultDto<TIRCarnetListItemVm>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>TIR Carnets List</span>
+        <span class="text-muted small">
+            Total: @Model.TotalCount
+        </span>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 40px;">#</th>
+
+                        <th>
+                            <button type="button" class="btn btn-link p-0 text-decoration-none" onclick="setSort('TIRCarnetNumber')">
+                                TIR Carnet Number
+                            </button>
+                        </th>
+
+                        <th>
+                            <button type="button" class="btn btn-link p-0 text-decoration-none" onclick="setSort('IssuingCountry')">
+                                Issuing Country
+                            </button>
+                        </th>
+
+                        <th>
+                            <button type="button" class="btn btn-link p-0 text-decoration-none" onclick="setSort('IssuingAssociation')">
+                                Issuing Association
+                            </button>
+                        </th>
+
+                        <th>
+                            <button type="button" class="btn btn-link p-0 text-decoration-none" onclick="setSort('IssueDate')">
+                                Issue Date
+                            </button>
+                        </th>
+
+                        <th>
+                            <button type="button" class="btn btn-link p-0 text-decoration-none" onclick="setSort('ExpiryDate')">
+                                Expiry Date
+                            </button>
+                        </th>
+
+                        <th>Currency</th>
+                        <th>Value</th>
+                        <th>Status</th>
+                        <th>Active</th>
+                        <th style="width: 320px;">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model.Items == null || !Model.Items.Any())
+                    {
+                        <tr>
+                            <td colspan="11" class="text-center py-4 text-muted">
+                                No records found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        var rowNo = ((Model.PageNumber - 1) * Model.PageSize) + 1;
+
+                        foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>@rowNo</td>
+                                <td>@item.TIRCarnetNumber</td>
+                                <td>@item.IssuingCountryName</td>
+                                <td>@item.IssuingAssociationName</td>
+                                <td>@item.IssueDate.ToString("yyyy-MM-dd")</td>
+                                <td>@item.ExpiryDate.ToString("yyyy-MM-dd")</td>
+                                <td>@item.CurrencyName</td>
+                                <td>@item.GuaranteeAmount.ToString("N2")</td>
+                                <td>
+                                    <span class="badge bg-info text-dark">@item.StatusTitle</span>
+                                </td>
+                                <td>
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge bg-success">Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">No</span>
+                                    }
+                                </td>
+
+                                <td class="text-nowrap">
+                                    <div class="btn-group btn-group-sm" role="group" aria-label="TIR Carnet Actions">
+
+                                        <button type="button"
+                                                class="btn btn-outline-primary"
+                                                title="Edit TIR Carnet"
+                                                aria-label="Edit TIR Carnet"
+                                                hx-get="@Url.Action("Edit", "TIRCarnets", new { id = item.Id })"
+                                                hx-target="#mainModalContent"
+                                                hx-swap="innerHTML">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-outline-danger"
+                                                title="Delete TIR Carnet"
+                                                aria-label="Delete TIR Carnet"
+                                                hx-get="@Url.Action("Delete", "TIRCarnets", new { id = item.Id })"
+                                                hx-target="#mainModalContent"
+                                                hx-swap="innerHTML">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-outline-secondary"
+                                                title="View Assignments"
+                                                aria-label="View Assignments"
+                                                hx-get="@Url.Action("Assignments", "TIRCarnets", new { tirCarnetId = item.Id })"
+                                                hx-target="#assignmentsPanelContainer"
+                                                hx-swap="innerHTML">
+                                            <i class="bi bi-diagram-3"></i>
+                                        </button>
+
+                                    </div>
+                                </td>
+
+
+                            </tr>
+
+                            rowNo++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="card-footer">
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+
+                    <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                        <button type="button" class="page-link" onclick="setPage(1)" @(Model.HasPreviousPage ? null : "disabled")>
+                            First
+                        </button>
+                    </li>
+
+                    <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                        <button type="button" class="page-link" onclick="setPage(@(Model.PageNumber - 1))" @(Model.HasPreviousPage ? null : "disabled")>
+                            Prev
+                        </button>
+                    </li>
+
+                    @{
+                        var startPage = Math.Max(1, Model.PageNumber - 2);
+                        var endPage = Math.Min(Model.TotalPages, Model.PageNumber + 2);
+                    }
+
+                    @for (var i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                            <button type="button" class="page-link" onclick="setPage(@i)">
+                                @i
+                            </button>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                        <button type="button" class="page-link" onclick="setPage(@(Model.PageNumber + 1))" @(Model.HasNextPage ? null : "disabled")>
+                            Next
+                        </button>
+                    </li>
+
+                    <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                        <button type="button" class="page-link" onclick="setPage(@Model.TotalPages)" @(Model.HasNextPage ? null : "disabled")>
+                            Last
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>

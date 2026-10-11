@@ -1,0 +1,538 @@
+﻿@using ShipRate.Application.ViewModels
+@model SellQuoteEmailVm
+
+@{
+    Layout = null;
+
+    string quoteDate = Model.QuoteDate.ToString("dd MMM yyyy");
+
+    string validUntil = Model.ResponseDueDate.HasValue
+        ? Model.ResponseDueDate.Value.ToString("dd MMM yyyy")
+        : "-";
+
+    string cargoReadyDate = Model.CargoReadyDate.HasValue
+        ? Model.CargoReadyDate.Value.ToString("dd MMM yyyy")
+        : "-";
+
+    var groupedTotals = Model.SellQuoteItems?
+        .GroupBy(x => x.CurrencyCode)
+        .Select(g => new
+        {
+            Currency = g.Key,
+            Total = g.Sum(x => x.TotalAmount)
+        })
+        .ToList();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freight Quotation - @Model.QuoteNo</title>
+</head>
+
+<body style="margin:0; padding:0; background-color:#eef2f7; font-family:Arial, Helvetica, sans-serif; color:#1f2937;">
+
+    <!-- Main Background -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"
+           style="width:100%; background-color:#eef2f7; padding:30px 10px;">
+        <tr>
+            <td align="center">
+
+                <!-- Main Email Container -->
+                <table width="850" cellpadding="0" cellspacing="0" border="0"
+                       style="width:850px; max-width:850px; background-color:#ffffff; border-collapse:collapse; border:1px solid #d9e2ec; border-radius:10px; overflow:hidden;">
+
+                    <!-- Top Accent -->
+                    <tr>
+                        <td style="height:7px; line-height:7px; font-size:7px; background-color:#0f766e;">
+                            &nbsp;
+                        </td>
+                    </tr>
+
+                    <!-- Company Header -->
+                    <tr>
+                        <td style="padding:24px 32px; background-color:#ffffff; border-bottom:1px solid #e5e7eb;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                                <tr>
+                                    <!-- Company Logo -->
+                                    <td width="145" valign="middle" style="padding-right:18px;">
+                                        @if (!string.IsNullOrWhiteSpace(Model.CompanyLogoSource))
+                                        {
+                                            <img src="@Model.CompanyLogoSource"
+                                                 alt="@Model.CompanyName"
+                                                 width="120"
+                                                 style="display:block;
+                                                            max-width:120px;
+                                                            max-height:65px;
+                                                            width:auto;
+                                                            height:auto;
+                                                            border:0;
+                                                            outline:none;
+                                                            text-decoration:none;" />
+                                        }
+                                    </td>
+
+                                    <!-- Company Name -->
+                                    <td valign="middle">
+                                        <div style="font-size:20px; line-height:1.4; font-weight:bold; color:#134e4a;">
+                                            @Model.CompanyName
+                                        </div>
+
+                                        @if (!string.IsNullOrWhiteSpace(Model.DepartmentName))
+                                        {
+                                            <div style="font-size:12px; line-height:1.6; color:#64748b; margin-top:3px;">
+                                                @Model.DepartmentName
+                                            </div>
+                                        }
+                                    </td>
+
+                                    <!-- Label -->
+                                    <td valign="middle" align="right">
+                                        <div style="display:inline-block; background-color:#ecfdf5; border:1px solid #99f6e4; color:#0f766e; padding:8px 12px; font-size:11px; font-weight:bold; letter-spacing:0.8px; text-transform:uppercase;">
+                                            Freight Quotation
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Main Title + Quote Information -->
+                    <tr>
+                        <td style="padding:30px 32px 26px 32px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                                <tr>
+                                    <td valign="top" style="width:56%; padding-right:20px;">
+                                        <div style="font-size:28px; line-height:1.3; font-weight:bold; color:#134e4a; margin-bottom:10px;">
+                                            Freight Quotation
+                                        </div>
+
+                                        <div style="font-size:14px; color:#475569; line-height:1.8;">
+                                            Dear <strong style="color:#0f172a;">@Model.CustomerName</strong>,
+                                            <br />
+                                            We are pleased to submit our best freight offer for your shipment.
+                                        </div>
+                                    </td>
+
+                                    <td valign="top" style="width:44%;">
+                                        <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                                               style="border-collapse:collapse; background-color:#f8fafc; border:1px solid #dbe4ee;">
+                                            <tr>
+                                                <td style="width:43%; padding:10px 12px; color:#64748b; font-size:12px; border-bottom:1px solid #e2e8f0;">
+                                                    Quote No.
+                                                </td>
+                                                <td style="padding:10px 12px; font-size:13px; font-weight:bold; color:#0f172a; border-bottom:1px solid #e2e8f0;">
+                                                    @Model.QuoteNo
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:10px 12px; color:#64748b; font-size:12px; border-bottom:1px solid #e2e8f0;">
+                                                    Quote Date
+                                                </td>
+                                                <td style="padding:10px 12px; font-size:13px; font-weight:bold; color:#0f172a; border-bottom:1px solid #e2e8f0;">
+                                                    @quoteDate
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:10px 12px; color:#64748b; font-size:12px;">
+                                                    Valid Until
+                                                </td>
+                                                <td style="padding:10px 12px; font-size:13px; font-weight:bold; color:#b45309;">
+                                                    @validUntil
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Route Card -->
+                    <tr>
+                        <td style="padding:0 32px 28px 32px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                                   style="border-collapse:collapse; background-color:#f0fdfa; border:1px solid #99f6e4;">
+                                <tr>
+                                    <td width="39%" align="center" valign="middle" style="padding:22px 12px;">
+                                        <div style="font-size:10px; color:#0f766e; font-weight:bold; text-transform:uppercase; letter-spacing:1px; margin-bottom:7px;">
+                                            Origin
+                                        </div>
+                                        <div style="font-size:19px; font-weight:bold; color:#134e4a; line-height:1.4;">
+                                            @(Model.Origin ?? "-")
+                                        </div>
+                                    </td>
+
+                                    <td width="22%" align="center" valign="middle" style="padding:18px 8px; border-left:1px solid #ccfbf1; border-right:1px solid #ccfbf1;">
+                                        <div style="font-size:11px; color:#0f766e; font-weight:bold; margin-bottom:6px;">
+                                            @(Model.TransportType ?? "-")
+                                        </div>
+                                        <div style="font-size:28px; color:#0f766e; line-height:1;">
+                                            &#10230;
+                                        </div>
+                                        <div style="font-size:11px; color:#64748b; margin-top:7px;">
+                                            @(Model.ServiceType ?? "-")
+                                        </div>
+                                    </td>
+
+                                    <td width="39%" align="center" valign="middle" style="padding:22px 12px;">
+                                        <div style="font-size:10px; color:#0f766e; font-weight:bold; text-transform:uppercase; letter-spacing:1px; margin-bottom:7px;">
+                                            Destination
+                                        </div>
+                                        <div style="font-size:19px; font-weight:bold; color:#134e4a; line-height:1.4;">
+                                            @(Model.Destination ?? "-")
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Intro -->
+                    <tr>
+                        <td style="padding:0 32px 22px 32px;">
+                            <div style="font-size:14px; color:#475569; line-height:1.8;">
+                                Thank you for your inquiry. Based on the shipment information provided,
+                                please find our quotation details below.
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Shipment Summary -->
+                    <tr>
+                        <td style="padding:0 32px 28px 32px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                                <tr>
+                                    <td style="padding:0 0 10px 0;">
+                                        <div style="font-size:17px; font-weight:bold; color:#134e4a; border-bottom:2px solid #99f6e4; padding-bottom:9px;">
+                                            Shipment Summary
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                                               style="border-collapse:collapse; font-size:13px; border:1px solid #dbe4ee;">
+                                            <tr>
+                                                <td style="width:25%; padding:11px; background-color:#f8fafc; border:1px solid #e2e8f0; font-weight:bold; color:#334155;">Transport Type</td>
+                                                <td style="width:25%; padding:11px; border:1px solid #e2e8f0;">@(Model.TransportType ?? "-")</td>
+                                                <td style="width:25%; padding:11px; background-color:#f8fafc; border:1px solid #e2e8f0; font-weight:bold; color:#334155;">Service Type</td>
+                                                <td style="width:25%; padding:11px; border:1px solid #e2e8f0;">@(Model.ServiceType ?? "-")</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:11px; background-color:#f8fafc; border:1px solid #e2e8f0; font-weight:bold; color:#334155;">Cargo Type</td>
+                                                <td style="padding:11px; border:1px solid #e2e8f0;">@(Model.CargoType ?? "-")</td>
+                                                <td style="padding:11px; background-color:#f8fafc; border:1px solid #e2e8f0; font-weight:bold; color:#334155;">Incoterm</td>
+                                                <td style="padding:11px; border:1px solid #e2e8f0;">@(Model.Incoterm ?? "-")</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:11px; background-color:#f8fafc; border:1px solid #e2e8f0; font-weight:bold; color:#334155;">Cargo Ready Date</td>
+                                                <td style="padding:11px; border:1px solid #e2e8f0;">@cargoReadyDate</td>
+                                                <td style="padding:11px; background-color:#f8fafc; border:1px solid #e2e8f0; font-weight:bold; color:#334155;">Commodity</td>
+                                                <td style="padding:11px; border:1px solid #e2e8f0;">@(Model.Commodity ?? "-")</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:11px; background-color:#f8fafc; border:1px solid #e2e8f0; font-weight:bold; color:#334155;">Gross Weight</td>
+                                                <td style="padding:11px; border:1px solid #e2e8f0;">@(Model.GrossWeight?.ToString("N2") ?? "-")</td>
+                                                <td style="padding:11px; background-color:#f8fafc; border:1px solid #e2e8f0; font-weight:bold; color:#334155;">Chargeable Weight</td>
+                                                <td style="padding:11px; border:1px solid #e2e8f0;">@(Model.ChargeableWeight?.ToString("N2") ?? "-")</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:11px; background-color:#f8fafc; border:1px solid #e2e8f0; font-weight:bold; color:#334155;">Volume</td>
+                                                <td style="padding:11px; border:1px solid #e2e8f0;">@(Model.Volume?.ToString("N2") ?? "-")</td>
+                                                <td style="padding:11px; background-color:#f8fafc; border:1px solid #e2e8f0; font-weight:bold; color:#334155;">Packages</td>
+                                                <td style="padding:11px; border:1px solid #e2e8f0;">
+                                                    @(Model.PackageCount?.ToString() ?? "-")
+                                                    @if (!string.IsNullOrWhiteSpace(Model.PackageSummary))
+                                                    {
+                                                        <span> / @Model.PackageSummary</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Container Details -->
+                    @if (Model.Containers?.Any() == true)
+                    {
+                        <tr>
+                            <td style="padding:0 32px 28px 32px;">
+                                <div style="font-size:17px; font-weight:bold; color:#134e4a; border-bottom:2px solid #99f6e4; padding-bottom:9px; margin-bottom:12px;">
+                                    Container Details
+                                </div>
+
+                                <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                                       style="border-collapse:collapse; font-size:13px; border:1px solid #dbe4ee;">
+                                    <tr>
+                                        <th align="left" style="padding:12px; background-color:#134e4a; color:#ffffff; border:1px solid #134e4a;">Size Type</th>
+                                        <th align="center" style="padding:12px; background-color:#134e4a; color:#ffffff; border:1px solid #134e4a;">Count</th>
+                                    </tr>
+
+                                    @foreach (var cnt in Model.Containers)
+                                    {
+                                        <tr>
+                                            <td style="padding:11px; border:1px solid #e2e8f0;">@(cnt.SizeTypeName ?? "-")</td>
+                                            <td align="center" style="padding:11px; border:1px solid #e2e8f0; font-weight:bold;">@cnt.Counts</td>
+                                        </tr>
+                                    }
+                                </table>
+                            </td>
+                        </tr>
+                    }
+
+                    <!-- Cargo Details -->
+                    @if (Model.CargoDetails?.Any() == true)
+                    {
+                        <tr>
+                            <td style="padding:0 32px 28px 32px;">
+                                <div style="font-size:17px; font-weight:bold; color:#134e4a; border-bottom:2px solid #99f6e4; padding-bottom:9px; margin-bottom:12px;">
+                                    Cargo Details
+                                </div>
+
+                                @foreach (var cargo in Model.CargoDetails)
+                                {
+                                    <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                                           style="border-collapse:collapse; font-size:13px; border:1px solid #dbe4ee; margin-bottom:12px;">
+                                        <tr>
+                                            <td style="width:25%; padding:11px; background-color:#f8fafc; border:1px solid #e2e8f0; font-weight:bold;">Gross Weight</td>
+                                            <td style="width:25%; padding:11px; border:1px solid #e2e8f0;">@(cargo.GrossWeight?.ToString("N2") ?? "-") @cargo.WeightUnitName</td>
+                                            <td style="width:25%; padding:11px; background-color:#f8fafc; border:1px solid #e2e8f0; font-weight:bold;">Net Weight</td>
+                                            <td style="width:25%; padding:11px; border:1px solid #e2e8f0;">@(cargo.NetWeight?.ToString("N2") ?? "-") @cargo.WeightUnitName</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding:11px; background-color:#f8fafc; border:1px solid #e2e8f0; font-weight:bold;">Volume</td>
+                                            <td style="padding:11px; border:1px solid #e2e8f0;">@(cargo.Volume?.ToString("N2") ?? "-") @cargo.VolumeUnitName</td>
+                                            <td style="padding:11px; background-color:#f8fafc; border:1px solid #e2e8f0; font-weight:bold;">Package Type</td>
+                                            <td style="padding:11px; border:1px solid #e2e8f0;">@(cargo.PackageTypeName ?? "-")</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding:11px; background-color:#f8fafc; border:1px solid #e2e8f0; font-weight:bold;">Dimensions</td>
+                                            <td style="padding:11px; border:1px solid #e2e8f0;">@cargo.Length x @cargo.Width x @cargo.Height @cargo.DimensionUnitName</td>
+                                            <td style="padding:11px; background-color:#f8fafc; border:1px solid #e2e8f0; font-weight:bold;">DG</td>
+                                            <td style="padding:11px; border:1px solid #e2e8f0;">
+                                                @(cargo.IsDG ? $"Yes - {cargo.DGClassName} {cargo.UNNumber}" : "No")
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding:11px; background-color:#f8fafc; border:1px solid #e2e8f0; font-weight:bold;">Description</td>
+                                            <td colspan="3" style="padding:11px; border:1px solid #e2e8f0;">@(cargo.CargoDescription ?? "-")</td>
+                                        </tr>
+                                    </table>
+                                }
+                            </td>
+                        </tr>
+                    }
+
+                    <!-- Charges -->
+                    <tr>
+                        <td style="padding:0 32px 28px 32px;">
+                            <div style="font-size:17px; font-weight:bold; color:#134e4a; border-bottom:2px solid #99f6e4; padding-bottom:9px; margin-bottom:12px;">
+                                Quotation Charges
+                            </div>
+
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                                   style="border-collapse:collapse; font-size:13px; border:1px solid #dbe4ee;">
+                                <tr>
+                                    <th align="center" style="padding:12px 8px; background-color:#134e4a; color:#ffffff; border:1px solid #134e4a;">#</th>
+                                    <th align="left" style="padding:12px 8px; background-color:#134e4a; color:#ffffff; border:1px solid #134e4a;">Charge</th>
+                                    <th align="left" style="padding:12px 8px; background-color:#134e4a; color:#ffffff; border:1px solid #134e4a;">Size / Type</th>
+                                    <th align="right" style="padding:12px 8px; background-color:#134e4a; color:#ffffff; border:1px solid #134e4a;">Qty</th>
+                                    <th align="right" style="padding:12px 8px; background-color:#134e4a; color:#ffffff; border:1px solid #134e4a;">Unit Rate</th>
+                                    <th align="right" style="padding:12px 8px; background-color:#134e4a; color:#ffffff; border:1px solid #134e4a;">Total</th>
+                                    <th align="center" style="padding:12px 8px; background-color:#134e4a; color:#ffffff; border:1px solid #134e4a;">Currency</th>
+                                </tr>
+
+                                @if (Model.SellQuoteItems?.Any() == true)
+                                {
+                                    foreach (var item in Model.SellQuoteItems.OrderBy(x => x.LineNumber))
+                                    {
+                                        <tr>
+                                            <td align="center" style="padding:11px 8px; border:1px solid #e2e8f0;">@item.LineNumber</td>
+                                            <td style="padding:11px 8px; border:1px solid #e2e8f0; font-weight:bold; color:#334155;">@(item.ChargeTypeName ?? "-")</td>
+                                            <td style="padding:11px 8px; border:1px solid #e2e8f0;">@(item.SizeTypeName ?? "-")</td>
+                                            <td align="right" style="padding:11px 8px; border:1px solid #e2e8f0;">@item.Counts.ToString("N2")</td>
+                                            <td align="right" style="padding:11px 8px; border:1px solid #e2e8f0;">@item.UnitRate.ToString("N2")</td>
+                                            <td align="right" style="padding:11px 8px; border:1px solid #e2e8f0; font-weight:bold; color:#0f766e;">@item.TotalAmount.ToString("N2")</td>
+                                            <td align="center" style="padding:11px 8px; border:1px solid #e2e8f0;">@item.CurrencyCode</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="7" align="center" style="padding:18px; border:1px solid #e2e8f0; color:#64748b;">
+                                            No quotation charges available.
+                                        </td>
+                                    </tr>
+                                }
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Totals -->
+                    @if (groupedTotals?.Any() == true)
+                    {
+                        <tr>
+                            <td style="padding:0 32px 28px 32px;">
+                                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                    <tr>
+                                        <td style="width:52%;"></td>
+                                        <td style="width:48%;">
+                                            <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                                                   style="border-collapse:collapse; font-size:14px; border:1px solid #99f6e4;">
+                                                <tr>
+                                                    <td colspan="2" style="background-color:#0f766e; color:#ffffff; padding:12px 14px; font-weight:bold;">
+                                                        Total Quotation Amount
+                                                    </td>
+                                                </tr>
+
+                                                @foreach (var total in groupedTotals)
+                                                {
+                                                    <tr>
+                                                        <td style="padding:12px 14px; border:1px solid #ccfbf1; background-color:#f0fdfa; color:#334155;">
+                                                            @total.Currency
+                                                        </td>
+                                                        <td align="right" style="padding:12px 14px; border:1px solid #ccfbf1; background-color:#f0fdfa; color:#134e4a; font-weight:bold; font-size:16px;">
+                                                            @total.Total.ToString("N2")
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    }
+
+                    <!-- Important Notes -->
+                    <tr>
+                        <td style="padding:0 32px 28px 32px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                                   style="background-color:#fffbeb; border:1px solid #fde68a; border-collapse:collapse;">
+                                <tr>
+                                    <td style="padding:16px 20px;">
+                                        <div style="font-size:15px; font-weight:bold; color:#92400e; margin-bottom:8px;">
+                                            Important Notes
+                                        </div>
+
+                                        <ul style="margin:0; padding-left:20px; font-size:13px; color:#78350f; line-height:1.9;">
+                                            <li>Rates are subject to space, equipment, and carrier availability at the time of booking.</li>
+                                            <li>Any change in shipment details may affect the quoted rates.</li>
+                                            <li>Local charges, duties, taxes, demurrage, detention, storage, inspection, or third-party charges are excluded unless specifically mentioned.</li>
+                                            <li>Quotation validity is until <strong>@validUntil</strong>.</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Remarks -->
+                    @if (!string.IsNullOrWhiteSpace(Model.Remarks))
+                    {
+                        <tr>
+                            <td style="padding:0 32px 28px 32px;">
+                                <div style="font-size:17px; font-weight:bold; color:#134e4a; border-bottom:2px solid #99f6e4; padding-bottom:9px; margin-bottom:12px;">
+                                    Remarks
+                                </div>
+
+                                <div style="background-color:#f8fafc; border-left:5px solid #0f766e; padding:15px 18px; color:#334155; font-size:14px; line-height:1.8; white-space:pre-line;">
+                                    @Model.Remarks
+                                </div>
+                            </td>
+                        </tr>
+                    }
+
+                    <!-- Confirmation -->
+                    <tr>
+                        <td style="padding:0 32px 30px 32px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                                   style="border-collapse:collapse; background-color:#eef2ff; border:1px solid #c7d2fe;">
+                                <tr>
+                                    <td style="padding:18px 20px; font-size:14px; color:#3730a3; line-height:1.8;">
+                                        <strong>Ready to proceed?</strong><br />
+                                        Should you wish to proceed with this quotation, kindly confirm by replying to this email.
+                                        We will be pleased to arrange the next steps for booking and shipment coordination.
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Footer / Contact -->
+                    <tr>
+                        <td style="padding:24px 32px; background-color:#f8fafc; border-top:1px solid #dbe4ee;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td valign="top">
+                                        <div style="font-size:13px; color:#475569; margin-bottom:6px;">
+                                            Best Regards,
+                                        </div>
+                                        <div style="font-size:16px; color:#134e4a; font-weight:bold;">
+                                            @Model.CompanyName
+                                        </div>
+                                        @if (!string.IsNullOrWhiteSpace(Model.DepartmentName))
+                                        {
+                                            <div style="font-size:12px; color:#64748b; margin-top:4px;">
+                                                @Model.DepartmentName
+                                            </div>
+                                        }
+                                    </td>
+
+                                    <td align="right" valign="top">
+                                        <div style="font-size:12px; color:#475569; line-height:1.9;">
+                                            @if (!string.IsNullOrWhiteSpace(Model.CompanyEmail))
+                                            {
+                                                <span>Email: @Model.CompanyEmail<br /></span>
+                                            }
+                                            @if (!string.IsNullOrWhiteSpace(Model.CompanyTel))
+                                            {
+                                                <span>Tel: @Model.CompanyTel<br /></span>
+                                            }
+                                            @if (!string.IsNullOrWhiteSpace(Model.CompanyWebsite))
+                                            {
+                                                <span>Website: @Model.CompanyWebsite</span>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Disclaimer -->
+                    <tr>
+                        <td style="padding:14px 32px; background-color:#ffffff; color:#94a3b8; font-size:11px; line-height:1.7; border-top:1px solid #f1f5f9;">
+                            This quotation is provided based on the information available at the time of issuance and is subject to final carrier confirmation, operational feasibility, and applicable terms and conditions.
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    @* فقط برای Preview در Modal؛ هنگام ارسال واقعی ایمیل نباید ارسال شود. *@
+    @if (Model.IsPreview)
+    {
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                Close
+            </button>
+
+            @if (Model.canSendEmail)
+            {
+                <button type="button" class="btn btn-primary" id="btnSendSellQuoteEmail">
+                    Send Email
+                </button>
+            }
+        </div>
+    }
+</body>
+</html>

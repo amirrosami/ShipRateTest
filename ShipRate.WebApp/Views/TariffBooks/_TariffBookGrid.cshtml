@@ -1,0 +1,146 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.ViewModels
+@model PagedResultDto<TariffBookListItemVm>
+
+<div class="card border-0 shadow-sm" dir="ltr">
+    <div class="card-header bg-white py-2 px-3 d-flex justify-content-between align-items-center">
+        <strong class="fs-6">Tariff Books</strong>
+
+        <button type="button"
+                class="btn btn-sm btn-primary py-0 px-2"
+                hx-get="@Url.Action("Create", "TariffBooks")"
+                hx-target="#mainModalContent"
+                hx-swap="innerHTML"
+                hx-include="#SelectedTariffTypeId"
+                data-bs-toggle="modal"
+                data-bs-target="#mainModal">
+            <i class="bi bi-plus-lg me-1"></i>Add New
+        </button>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover table-striped mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th class="py-2">Code</th>
+                        <th class="py-2">Name</th>
+                        <th class="py-2">Tariff Type</th>
+                        <th class="py-2">Party</th>
+                        <th class="py-2">Currency</th>
+                        <th class="py-2">Status</th>
+                        <th class="py-2">Valid From</th>
+                        <th class="py-2">Valid To</th>
+                        <th class="py-2" style="width: 130px;">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model == null || !Model.Items.Any())
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center text-muted py-3">
+                                No tariff books found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.Items)
+                        {
+                            <tr id="tariff-book-row-@item.Id">
+                                <td class="py-2">@item.Code</td>
+                                <td class="py-2">@item.Name</td>
+                                <td class="py-2">@item.TariffTypeName</td>
+                                <td class="py-2">@item.PartyName</td>
+                                <td class="py-2">@item.CurrencyName</td>
+                                <td class="py-2">
+                                    <span class="badge bg-secondary">
+                                        @item.StatusName
+                                    </span>
+                                </td>
+                                <td class="py-2">@item.ValidFrom.ToString("yyyy-MM-dd")</td>
+                                <td class="py-2">
+                                    @(item.ValidTo.HasValue? item.ValidTo.Value.ToString("yyyy-MM-dd") : "-")
+                                </td>
+
+                                <td class="py-2">
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button"
+                                                class="btn btn-outline-primary py-0 px-2"
+                                                hx-get="@Url.Action("RulesGrid", "TariffBooks", new { tariffBookId = item.Id })"
+                                                hx-target="#tariffRulesGrid"
+                                                hx-swap="innerHTML"
+                                                hx-on::after-request="document.querySelector('#tariffRuleCoveragesGrid').innerHTML = '';">
+                                            Select
+                                        </button>
+                                        @if (item.StatusId == -1)
+                                        {
+                                            <button type="button"
+                                            class="btn btn-outline-primary py-0 px-2"
+                                            hx-post="@Url.Action("Activate", "TariffBooks", new { tariffBookId = item.Id })"
+                                            hx-confirm="Are you sure you want to activate this tariff book?"
+                                            hx-target="#tariffBooksGrid"
+                                            hx-swap="innerHTML"
+                                            hx-vals='{
+                                                                "TariffTypeId": "@item.TariffTypeId",
+                                                                "Page": "@Model.PageNumber",
+                                                                "PageSize": "@Model.PageSize"
+                                                     }'>
+                                                Activate
+                                            </button>
+                                        }
+
+                                        <button type="button"
+                                                class="btn btn-outline-secondary py-0 px-2"
+                                                hx-get="@Url.Action("Edit", "TariffBooks", new { id = item.Id })"
+                                                hx-target="#mainModalContent"
+                                                hx-swap="innerHTML"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#mainModal">
+                                            Edit
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-outline-danger py-0 px-2"
+                                                hx-get="@Url.Action("Delete", "TariffBooks", new { id = item.Id })"
+                                                hx-target="#mainModalContent"
+                                                hx-swap="innerHTML"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#mainModal">
+                                            Delete
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                hx-get="/DocumentManager/Index?objectId=@item.Id&objectTypeId=450"
+                                                hx-target="#document-manager-content"
+                                                hx-swap="innerHTML"
+                                                title="Attachments"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#documentManagerModal">
+                                            <i class="bi bi-folder2-open me-1"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @if (Model != null && Model.TotalPages > 1)
+    {
+        <div class="card-footer bg-white py-2 px-3">
+            @await Html.PartialAsync("_Pager", new PagerVm
+            {
+                Page = Model.PageNumber,
+                PageSize = Model.PageSize,
+                TotalPages = Model.TotalPages,
+                Target = "#tariffBooksGrid",
+                Url = Url.Action("Grid", "TariffBooks")!,
+                IncludeFormSelector = "#SelectedTariffTypeId"
+                })
+    </div>
+        }
+</div>

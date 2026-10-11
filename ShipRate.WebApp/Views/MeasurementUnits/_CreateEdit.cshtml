@@ -1,0 +1,121 @@
+﻿@using ShipRate.Application.DTOs.Base_Info
+@using ShipRate.Application.DTOs.Cargo
+@model MeasurementUnitCreateDTO
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+}
+
+<form hx-post="@Url.Action(isCreateMode?"Create":"Edit", "MeasurementUnits")"
+      hx-target="#app-modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header form-caption-bg  text-white">
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add Measurement Unit</h5>
+        }
+        else
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Edit Measurement Unit</h5>
+            <input type="hidden" asp-for="Id" />
+        }
+
+
+        <button type="button"
+                class="btn-close"
+                onclick="AppModal.close()">
+        </button>
+    </div>
+
+
+    <div class="modal-body row">
+
+        @Html.AntiForgeryToken()
+        @if (!ViewData.ModelState.IsValid)
+        {
+            var allErrors = ViewData.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            if (allErrors.Any())
+            {
+                <div class="alert alert-danger py-2 mb-1">
+                    <ul class="mb-0 small">
+                        @foreach (var err in allErrors)
+                        {
+                            <li>@err</li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+
+        <div class="mb-3 col-md-4">
+            <label class="form-label fw-medium">
+                Category <span class="text-danger">*</span>
+            </label>
+            <div class="d-flex align-items-center gap-2">
+                <select asp-for="CategoryId"
+                        asp-items="@ViewBag.Categories"
+                        class="form-select">
+                    <option value="">-- Select --</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Title -->
+        <div class="mb-3 col-md-4">
+            <label class="form-label fw-medium">
+                Name <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="UnitName"
+                   value="@Model.UnitName"
+                   class="form-control @(ViewData.ModelState.ContainsKey("Title") && ViewData.ModelState["Title"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="45" required />
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3 col-md-4">
+            <label class="form-label fw-medium">Local Name</label>
+            <input type="text"
+                   name="UnitLocalName"
+                   value="@Model.UnitLocalName"
+                   class="form-control @(ViewData.ModelState.ContainsKey("LocalName") && ViewData.ModelState["LocalName"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="45" required />
+        </div>
+
+
+        <!-- IsActive -->
+        <div class="form-check form-switch">
+            <input type="checkbox"
+                   class="form-check-input"
+                   name="IsActive"
+                   value="true"
+                   id="createIsActive"
+                   @(Model.IsActive ? "checked" : "") />
+            <label class="form-check-label" for="IsActive">Active</label>
+        </div>
+    </div>
+
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="AppModal.close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>
+
+

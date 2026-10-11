@@ -1,0 +1,52 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model InvoiceEditVm
+
+
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.Id.HasValue ? "Edit Invoice" : "New Invoice")</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<input type="hidden" asp-for="JobId" />
+<div class="modal-body">
+    <div id="invoice-header-form-container">
+        @await Html.PartialAsync("_InvoiceHeaderForm", Model)
+    </div>
+
+    @if (Model.Id.HasValue)
+    {
+        <hr />
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0">Invoice Items</h6>
+            <button type="button"
+                    class="btn btn-sm btn-primary"
+                    hx-get="@Url.Action("ItemForm", "Invoices", new { invoiceId = Model.Id })"
+                    hx-target="#invoice-item-form-container"
+                    hx-swap="innerHTML">
+                Add Item
+            </button>
+        </div>
+
+        <div id="invoice-item-form-container">
+            @await Html.PartialAsync("_InvoiceItemPlaceholder")
+        </div>
+
+        <div id="invoice-items-grid-container"
+             hx-get="@Url.Action("ItemsGrid", "Invoices", new { invoiceId = Model.Id })"
+             hx-trigger="load, invoice-items-refresh from:body"
+             hx-swap="innerHTML">
+        </div>
+
+        <div id="invoice-totals-container"
+             hx-get="@Url.Action("Totals", "Invoices", new { invoiceId = Model.Id })"
+             hx-trigger="load, invoice-totals-refresh from:body"
+             hx-swap="innerHTML">
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info mt-3 mb-0">
+            Save invoice header first, then add items.
+        </div>
+    }
+</div>

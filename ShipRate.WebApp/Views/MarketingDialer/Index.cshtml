@@ -1,0 +1,114 @@
+﻿@model List<ShipRate.Domain.Entities.Marketing.MarketingCallLog>
+@{
+    ViewData["Title"] = "مرکز تماس و بازاریابی";
+}
+<style>
+    .sr-grid-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #d1d9e0;
+        font-size: 0.84rem;
+    }
+
+        .sr-grid-table th, .sr-grid-table td {
+            border: 1px solid #d1d9e0;
+            padding: 5px 8px;
+        }
+
+        .sr-grid-table th, .sr-label-cell {
+            background-color: #eef6ff;
+            color: #1e3a8a;
+            font-weight: 600;
+        }
+
+    .sr-input {
+        width: 100%;
+        padding: 3px 6px;
+        border: 1px solid #ced4da;
+        border-radius: 2px;
+        font-size: 0.85rem;
+    }
+
+        .sr-input:focus {
+            border-color: #3b82f6;
+            outline: none;
+        }
+</style>
+
+<div class="container-fluid mt-3" dir="rtl">
+    <div class="row g-3">
+
+        <!-- ستون سمت راست: فرم شماره‌گیری و نتیجه تماس -->
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-2 d-flex justify-content-between align-items-center">
+                    <span class="fw-bold"><i class="bi bi-telephone-outbound"></i> شماره‌گیر بازاریابی (سیسکو)</span>
+                    <span class="badge bg-light text-primary">داخلی: ۱۰۵</span>
+                </div>
+                <div class="card-body p-2">
+
+                    <!-- فرم شروع تماس -->
+                    <form id="dialerForm"
+                          hx-post="/MarketingDialer/InitiateCall"
+                          hx-target="#activeCallContainer"
+                          hx-swap="innerHTML">
+
+                        <table class="sr-grid-table mb-2">
+                            <tbody>
+                                <tr>
+                                    <td class="sr-label-cell" style="width: 25%;">شماره مقصد <span class="text-danger">*</span></td>
+                                    <td>
+                                        <input type="text" name="PhoneNumber" class="sr-input fw-bold text-primary" placeholder="0912... یا 021..." required autofocus dir="ltr" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="sr-label-cell">نام مشتری / شرکت</td>
+                                    <td>
+                                        <input type="text" name="CustomerName" class="sr-input" placeholder="مثلاً: شرکت کشتیرانی کاسپین" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="sr-label-cell">موضوع تماس</td>
+                                    <td>
+                                        <input type="text" name="Subject" class="sr-input" placeholder="استعلام نرخ / فریت دریایی..." />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="sr-label-cell">شماره استعلام / Quote</td>
+                                    <td>
+                                        <input type="text" name="InquiryReference" class="sr-input" placeholder="مثال: QT-2026-88" dir="ltr" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold">
+                            📞 برقراری تماس از طریق تلفن سیسکو
+                        </button>
+                    </form>
+
+                    <!-- کانتینر تایمر زنده و ثبت یادداشت تماس -->
+                    <div id="activeCallContainer" class="mt-2">
+                        <div class="alert alert-light border text-muted small text-center m-0 py-2">
+                            برای شروع شماره را وارد کرده و دکمه برقراری تماس را بزنید.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ستون سمت چپ: جدول تاریخچه تماس‌های اخیر -->
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light py-2 border-bottom">
+                    <span class="fw-bold text-secondary"><i class="bi bi-clock-history"></i> آخرین تماس‌های ثبت‌شده</span>
+                </div>
+                <div class="card-body p-0" id="recentCallsContainer">
+                    @await Html.PartialAsync("_RecentCallsGrid", Model)
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

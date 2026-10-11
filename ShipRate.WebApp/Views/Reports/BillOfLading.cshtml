@@ -1,0 +1,866 @@
+﻿@using ShipRate.Application.ViewModels
+@model BLDocumentReportVm
+
+@{
+    Layout = null;
+
+    string FormatDate(DateTime? value)
+        => value.HasValue ? value.Value.ToString("yyyy-MM-dd") : string.Empty;
+
+    string FormatDecimal(decimal? value, int decimals = 2)
+        => value.HasValue ? value.Value.ToString($"N{decimals}") : string.Empty;
+
+    string GetPartyText(BLManifestPartyVm? party)
+    {
+        if (party is null)
+        {
+            return string.Empty;
+        }
+
+        if (party.IsSameAsConsignee)
+        {
+            return "SAME AS CONSIGNEE";
+        }
+
+        var prefix = party.IsToBearer
+            ? "TO BEARER"
+            : party.IsToOrderOf
+                ? "TO ORDER OF"
+                : party.IsToOrder
+                    ? "TO ORDER"
+                    : string.Empty;
+
+        return string.IsNullOrWhiteSpace(prefix)
+            ? party.DisplayText
+            : $"{prefix}\n{party.DisplayText}";
+    }
+
+    string GetContainerText(BLDocumentContainerVm container)
+    {
+        var sealText = string.Join(
+            " / ",
+            new[] { container.SealNumber, container.SealNumber2 }
+                .Where(x => !string.IsNullOrWhiteSpace(x)));
+
+        return $"{container.ContainerNumber} / {container.ContainerSizeType ?? "-"}" +
+               $"{(string.IsNullOrWhiteSpace(sealText) ? "" : $" / Seal: {sealText}")}";
+    }
+
+    var documentStateText = Model.IsDraft
+        ? "DRAFT / NON-NEGOTIABLE"
+        : Model.IsOriginal
+            ? "ORIGINAL"
+            : "COPY";
+
+    var receivedDate = Model.ReceivedForShipmentDate ?? Model.ShippedOnBoardDate;
+}
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@Model.DocumentCaption - @Model.BLNo</title>
+
+    <style>
+        :root {
+            --ink: #111827;
+            --muted: #475569;
+            --line: #334155;
+            --light-line: #94a3b8;
+            --header-bg: #edf4f8;
+            --accent: #0b4269;
+            --draft: rgba(185, 28, 28, .12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        @@page {
+            size: A4 portrait;
+            margin: 8mm;
+        }
+
+        body {
+            margin: 0;
+            background: #e5e7eb;
+            color: var(--ink);
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10px;
+            line-height: 1.34;
+        }
+
+        .print-actions {
+            width: min(210mm, calc(100% - 24px));
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin: 14px auto 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            background: #fff;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 12px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .page {
+            position: relative;
+            width: min(210mm, calc(100% - 24px));
+            min-height: 297mm;
+            margin: 14px auto;
+            padding: 7mm;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 2px 14px rgba(15, 23, 42, .18);
+        }
+
+        .draft-watermark {
+            position: fixed;
+            z-index: 0;
+            top: 42%;
+            left: 50%;
+            color: var(--draft);
+            font-size: 54px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            pointer-events: none;
+            text-align: center;
+            text-transform: uppercase;
+            transform: translate(-50%, -50%) rotate(-34deg);
+            white-space: nowrap;
+        }
+
+        .document-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .bl-header {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            min-height: 88px;
+            border: 1px solid var(--line);
+        }
+
+        .issuer-block {
+            padding: 9px;
+            border-right: 1px solid var(--line);
+        }
+
+        .issuer-name {
+            margin: 0;
+            color: var(--accent);
+            font-size: 17px;
+            font-weight: 800;
+            line-height: 1.15;
+            text-transform: uppercase;
+        }
+
+        .issuer-details {
+            margin-top: 7px;
+            color: var(--muted);
+            font-size: 8.5px;
+            white-space: pre-line;
+        }
+
+        .title-block {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 9px;
+            text-align: center;
+        }
+
+        .document-state {
+            margin-bottom: 5px;
+            color: #b91c1c;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .document-title {
+            margin: 0;
+            color: var(--accent);
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+        }
+
+        .carrier-caption {
+            margin-top: 6px;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .reference-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-left: 1px solid var(--line);
+            border-top: 0;
+        }
+
+        .reference-item {
+            min-height: 45px;
+            border-right: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .field-label {
+            display: block;
+            padding: 3px 5px;
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--light-line);
+            color: #334155;
+            font-size: 7.5px;
+            font-weight: 800;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        .field-value {
+            display: block;
+            min-height: 22px;
+            padding: 4px 5px;
+            font-size: 9px;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+            white-space: pre-line;
+        }
+
+        .party-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-left: 1px solid var(--line);
+        }
+
+        .party-item {
+            min-height: 113px;
+            border-right: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+        }
+
+            .party-item.notify {
+                grid-column: span 2;
+                min-height: 84px;
+            }
+
+        .party-text {
+            min-height: 75px;
+            padding: 6px;
+            font-size: 9px;
+            font-weight: 600;
+            white-space: pre-line;
+            overflow-wrap: anywhere;
+        }
+
+        .route-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            border-left: 1px solid var(--line);
+        }
+
+        .route-item {
+            min-height: 48px;
+            border-right: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+        }
+
+            .route-item.full {
+                grid-column: span 2;
+            }
+
+        .cargo-grid {
+            display: grid;
+            grid-template-columns: 34% 66%;
+            border-left: 1px solid var(--line);
+        }
+
+        .cargo-item {
+            min-height: 152px;
+            border-right: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .cargo-text {
+            min-height: 120px;
+            padding: 6px;
+            font-size: 9px;
+            white-space: pre-line;
+            overflow-wrap: anywhere;
+        }
+
+        .container-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .container-table th,
+            .container-table td {
+                padding: 4px;
+                border: 1px solid var(--line);
+                vertical-align: top;
+            }
+
+            .container-table th {
+                background: var(--header-bg);
+                color: #334155;
+                font-size: 7.5px;
+                font-weight: 800;
+                line-height: 1.2;
+                text-align: center;
+                text-transform: uppercase;
+            }
+
+            .container-table td {
+                font-size: 8.5px;
+            }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .freight-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border-left: 1px solid var(--line);
+        }
+
+        .freight-item {
+            min-height: 55px;
+            border-right: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .clauses-box {
+            min-height: 76px;
+            padding: 6px;
+            border-right: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+            border-left: 1px solid var(--line);
+            font-size: 8.5px;
+            white-space: pre-line;
+            overflow-wrap: anywhere;
+        }
+
+        .signature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-left: 1px solid var(--line);
+        }
+
+        .signature-item {
+            min-height: 103px;
+            border-right: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .signature-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            min-height: 74px;
+            padding: 7px;
+            font-size: 9px;
+            white-space: pre-line;
+        }
+
+        .terms-box {
+            margin-top: 6px;
+            padding: 6px;
+            border: 1px solid var(--line);
+            color: #334155;
+            font-size: 7px;
+            line-height: 1.3;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 7.5px;
+        }
+
+        @@media print {
+            body {
+                background: #fff;
+            }
+
+            .print-actions {
+                display: none !important;
+            }
+
+            .page {
+                width: auto;
+                min-height: auto;
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+            }
+
+            .draft-watermark {
+                position: fixed;
+            }
+
+            thead {
+                display: table-header-group;
+            }
+
+            tr {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+
+        @@media (max-width: 800px) {
+            .page,
+            .print-actions {
+                width: calc(100% - 12px);
+            }
+
+            .bl-header,
+            .party-grid,
+            .route-grid,
+            .cargo-grid,
+            .signature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .issuer-block {
+                border-right: 0;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .party-item.notify,
+            .route-item.full {
+                grid-column: auto;
+            }
+
+            .reference-grid,
+            .freight-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .container-table {
+                min-width: 700px;
+            }
+
+            .container-table-wrapper {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="print-actions">
+        <a asp-controller="BL"
+           asp-action="Details"
+           asp-route-id="@Model.BLId"
+           class="btn">
+            Back to B/L
+        </a>
+
+        <button type="button"
+                class="btn btn-primary"
+                onclick="window.print()">
+            Print
+        </button>
+    </div>
+
+    @if (Model.IsDraft)
+    {
+        <div class="draft-watermark">
+            Draft / Non-Negotiable
+        </div>
+    }
+
+    <main class="page">
+        <div class="document-content">
+
+            <header class="bl-header">
+                <section class="issuer-block">
+                    <h1 class="issuer-name">
+                        @(Model.IssuerName ?? Model.CarrierName ?? "Shipping Company")
+                    </h1>
+
+                    <div class="issuer-details">
+                        @Model.IssuerAddress
+                        @(string.IsNullOrWhiteSpace(Model.IssuerTelephone) ? "" : $"Tel: {Model.IssuerTelephone}")
+                        @(string.IsNullOrWhiteSpace(Model.IssuerEmail) ? "" : $"Email: {Model.IssuerEmail}")
+                        @(string.IsNullOrWhiteSpace(Model.IssuerWebsite) ? "" : $"Web: {Model.IssuerWebsite}")
+                    </div>
+                </section>
+
+                <section class="title-block">
+                    <div class="document-state">@documentStateText</div>
+
+                    <h2 class="document-title">@Model.DocumentCaption</h2>
+
+                    <div class="carrier-caption">
+                        Carrier: @(Model.CarrierName ?? "-")
+                    </div>
+                </section>
+            </header>
+
+            <section class="reference-grid">
+                <div class="reference-item">
+                    <span class="field-label">Bill of Lading No.</span>
+                    <span class="field-value">@Model.BLNo</span>
+                </div>
+
+                <div class="reference-item">
+                    <span class="field-label">Master Bill of Lading No.</span>
+                    <span class="field-value">@(Model.MasterBLNo ?? "-")</span>
+                </div>
+
+                <div class="reference-item">
+                    <span class="field-label">Originals / Copies</span>
+                    <span class="field-value">
+                        @(Model.OriginalCount?.ToString() ?? "-") Original(s)
+                        /
+                        @(Model.CopyCount?.ToString() ?? "-") Copy(ies)
+                    </span>
+                </div>
+
+                <div class="reference-item">
+                    <span class="field-label">Issue Place / Date</span>
+                    <span class="field-value">
+                        @(Model.PlaceOfIssue ?? "-")
+                        /
+                        @FormatDate(Model.BLIssueDate)
+                    </span>
+                </div>
+            </section>
+
+            <section class="party-grid">
+                <div class="party-item">
+                    <span class="field-label">Shipper</span>
+                    <div class="party-text">@GetPartyText(Model.Shipper)</div>
+                </div>
+
+                <div class="party-item">
+                    <span class="field-label">Consignee</span>
+                    <div class="party-text">@GetPartyText(Model.Consignee)</div>
+                </div>
+
+                <div class="party-item notify">
+                    <span class="field-label">Notify Party</span>
+                    <div class="party-text">@GetPartyText(Model.NotifyParty)</div>
+                </div>
+            </section>
+
+            <section class="route-grid">
+                <div class="route-item">
+                    <span class="field-label">Place of Receipt</span>
+                    <span class="field-value">@(Model.PlaceOfReceipt ?? "-")</span>
+                </div>
+
+                <div class="route-item">
+                    <span class="field-label">Pre-Carriage By</span>
+                    <span class="field-value">@(Model.PreCarriageBy ?? "-")</span>
+                </div>
+
+                <div class="route-item">
+                    <span class="field-label">Ocean Vessel / Voyage No.</span>
+                    <span class="field-value">
+                        @(Model.MainVesselName ?? "-")
+                        /
+                        @(Model.MainVoyageNo ?? "-")
+                    </span>
+                </div>
+
+                <div class="route-item">
+                    <span class="field-label">Port of Loading</span>
+                    <span class="field-value">@(Model.PortOfLoading ?? "-")</span>
+                </div>
+
+                <div class="route-item">
+                    <span class="field-label">Port of Discharge</span>
+                    <span class="field-value">@(Model.PortOfDischarge ?? "-")</span>
+                </div>
+
+                <div class="route-item">
+                    <span class="field-label">Place of Delivery</span>
+                    <span class="field-value">@(Model.PlaceOfDelivery ?? "-")</span>
+                </div>
+
+                <div class="route-item">
+                    <span class="field-label">Received for Shipment Date</span>
+                    <span class="field-value">@FormatDate(receivedDate)</span>
+                </div>
+
+                <div class="route-item">
+                    <span class="field-label">Shipped on Board Date</span>
+                    <span class="field-value">@FormatDate(Model.ShippedOnBoardDate)</span>
+                </div>
+
+                <div class="route-item full">
+                    <span class="field-label">Final Destination / Onward Inland Routing / Origin</span>
+                    <span class="field-value">
+                        @(Model.FinalDestination ?? "-")
+                        @if (!string.IsNullOrWhiteSpace(Model.OnwardInlandRouting))
+                        {
+                            <text> / @Model.OnwardInlandRouting</text>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.PointAndCountryOfOrigin))
+                        {
+                            <text> / Origin: @Model.PointAndCountryOfOrigin</text>
+                        }
+                    </span>
+                </div>
+            </section>
+
+            <section class="cargo-grid">
+                <div class="cargo-item">
+                    <span class="field-label">Marks and Numbers</span>
+                    <div class="cargo-text">@(Model.MarksAndNumbers ?? "-")</div>
+                </div>
+
+                <div class="cargo-item">
+                    <span class="field-label">
+                        Number and Kind of Packages, Description of Goods
+                    </span>
+
+                    <div class="cargo-text">
+                        @Model.GoodsDescription
+
+                        @if (Model.TotalPackages > 0)
+                        {
+                            <text>
+
+                                TOTAL PACKAGES: @Model.TotalPackages.ToString("N0") @(Model.PackageType ?? "")
+                            </text>
+                        }
+
+                        @if (Model.GrossWeightKg.HasValue)
+                        {
+                            <text>
+                                GROSS WEIGHT: @FormatDecimal(Model.GrossWeightKg) KGS
+                            </text>
+                        }
+
+                        @if (Model.NetWeightKg.HasValue)
+                        {
+                            <text>
+                                NET WEIGHT: @FormatDecimal(Model.NetWeightKg) KGS
+                            </text>
+                        }
+
+                        @if (Model.VolumeCBM.HasValue)
+                        {
+                            <text>
+                                MEASUREMENT: @FormatDecimal(Model.VolumeCBM) CBM
+                            </text>
+                        }
+                    </div>
+                </div>
+            </section>
+
+            <section class="container-table-wrapper">
+                <table class="container-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">No.</th>
+                            <th style="width: 32%;">Container No. / Size / Seal No.</th>
+                            <th style="width: 15%;">Packages</th>
+                            <th style="width: 16%;">Gross Weight (KG)</th>
+                            <th style="width: 16%;">Measurement (CBM)</th>
+                            <th style="width: 16%;">Remarks</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (!Model.Containers.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    No container information has been registered.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var container in Model.Containers)
+                            {
+                                <tr>
+                                    <td class="text-center">@container.RowNo</td>
+                                    <td>@GetContainerText(container)</td>
+                                    <td class="text-right">
+                                        @container.TotalPackageCount.ToString("N0")
+                                    </td>
+                                    <td class="text-right">
+                                        @FormatDecimal(container.TotalGrossWeightKg)
+                                    </td>
+                                    <td class="text-right">
+                                        @FormatDecimal(container.TotalVolumeCBM)
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="freight-grid">
+                <div class="freight-item">
+                    <span class="field-label">Freight and Charges</span>
+                    <span class="field-value">@(Model.FreightTerms ?? "-")</span>
+                </div>
+
+                <div class="freight-item">
+                    <span class="field-label">Freight Payable At</span>
+                    <span class="field-value">@(Model.FreightPaymentAt ?? "-")</span>
+                </div>
+
+                <div class="freight-item">
+                    <span class="field-label">Payment / Incoterm</span>
+                    <span class="field-value">
+                        @(Model.PaymentType ?? "-")
+                        /
+                        @(Model.Incoterm ?? "-")
+                    </span>
+                </div>
+
+                <div class="freight-item">
+                    <span class="field-label">Export Reference</span>
+                    <span class="field-value">@(Model.ExportReference ?? "-")</span>
+                </div>
+
+                <div class="freight-item">
+                    <span class="field-label">Forwarding Agent Reference</span>
+                    <span class="field-value">@(Model.ForwardingAgentReference ?? "-")</span>
+                </div>
+
+                <div class="freight-item">
+                    <span class="field-label">L/C No. / Bank</span>
+                    <span class="field-value">
+                        @(Model.LCNo ?? "-")
+                        /
+                        @(Model.LCBankName ?? "-")
+                    </span>
+                </div>
+            </section>
+
+            <section>
+                <span class="field-label" style="border:1px solid var(--line); border-bottom:0;">
+                    Particulars Declared by Shipper / Clauses and Remarks
+                </span>
+
+                <div class="clauses-box">
+                    @Model.ClauseRemarks
+
+                    @if (!string.IsNullOrWhiteSpace(Model.OnBoardNotation))
+                    {
+                        <text>
+
+                            ON BOARD NOTATION:
+                            @Model.OnBoardNotation
+                        </text>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.RemarksInBL))
+                    {
+                        <text>
+
+                            REMARKS:
+                            @Model.RemarksInBL
+                        </text>
+                    }
+                </div>
+            </section>
+
+            <section class="signature-grid">
+                <div class="signature-item">
+                    <span class="field-label">
+                        Received in Apparent Good Order and Condition
+                    </span>
+
+                    <div class="signature-content">
+                        @if (Model.IsOriginal)
+                        {
+                            <text>
+                                IN WITNESS WHEREOF the number of original Bills of Lading
+                                stated above have been issued. One original Bill of Lading
+                                being accomplished, the others shall stand void.
+                            </text>
+                        }
+                        else
+                        {
+                            <text>
+                                This document is issued as a draft/copy only and is not valid
+                                for title transfer, cargo release, banking, or negotiation.
+                            </text>
+                        }
+                    </div>
+                </div>
+
+                <div class="signature-item">
+                    <span class="field-label">
+                        Signed for the Carrier / Authorized Signature
+                    </span>
+
+                    <div class="signature-content">
+                        @if (!string.IsNullOrWhiteSpace(Model.SignedByName))
+                        {
+                            <strong>@Model.SignedByName</strong>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(Model.SignedByTitle))
+                        {
+                            <br />
+                            @Model.SignedByTitle
+                        }
+
+                        <br />
+                        <br />
+                        Place of Issue: @(Model.PlaceOfIssue ?? "-")
+                        <br />
+                        Date: @FormatDate(Model.BLIssueDate)
+                    </div>
+                </div>
+            </section>
+
+            <section class="terms-box">
+                <strong>Terms and Conditions:</strong>
+                This Bill of Lading is subject to the Carrier's applicable terms and conditions,
+                tariff, limitations of liability, and all relevant international conventions and
+                mandatory laws. The Shipper declares that the particulars furnished herein are
+                correct. For a legally enforceable Original Bill of Lading, use only the approved
+                carrier template and authorized signing process.
+            </section>
+
+            <footer class="footer">
+                <span>
+                    @Model.DocumentCaption — B/L No: @Model.BLNo
+                </span>
+
+                <span>
+                    Printed: @Model.PrintedAt.ToString("yyyy-MM-dd HH:mm")
+                </span>
+            </footer>
+        </div>
+    </main>
+</body>
+</html>

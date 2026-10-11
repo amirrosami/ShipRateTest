@@ -1,0 +1,98 @@
+﻿@using ShipRate.Application.DTOs
+@model BLAmendmentFullRequestFormDto
+
+
+<form method="post"
+      hx-post="@Url.Action("SaveBLAmendmentFullRequest", "ServiceRequests")"
+      hx-target="#serviceRequestGrid"
+      hx-swap="innerHTML"
+      dir="ltr">
+
+    @Html.AntiForgeryToken()
+
+    <div class="modal-header">
+        <h5 class="modal-title">New B/L Amendment Request</h5>
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close">
+        </button>
+    </div>
+
+    <div class="modal-body">
+
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <ul class="nav nav-tabs mb-3" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active"
+                        data-bs-toggle="tab"
+                        data-bs-target="#requestInfoTab"
+                        type="button"
+                        role="tab">
+                    Request Info
+                </button>
+            </li>
+
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        data-bs-toggle="tab"
+                        data-bs-target="#blInfoTab"
+                        type="button"
+                        role="tab">
+                    B/L Info
+                </button>
+            </li>
+
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        data-bs-toggle="tab"
+                        data-bs-target="#linesTab"
+                        type="button"
+                        role="tab">
+                    Amendment Lines
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+
+            <div class="tab-pane fade show active"
+                 id="requestInfoTab"
+                 role="tabpanel">
+
+                @await Html.PartialAsync("_BLAmendmentFullRequest_RequestInfo", Model)
+            </div>
+
+            <div class="tab-pane fade"
+                 id="blInfoTab"
+                 role="tabpanel">
+
+                @await Html.PartialAsync("_BLAmendmentFullRequest_BLInfo", Model)
+            </div>
+
+            <div class="tab-pane fade"
+                 id="linesTab"
+                 role="tabpanel">
+
+                @await Html.PartialAsync("_BLAmendmentFullRequest_Lines", Model)
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal">
+            Close
+        </button>
+
+        <button type="submit"
+                class="btn btn-success">
+            Save Request
+        </button>
+    </div>
+
+</form>

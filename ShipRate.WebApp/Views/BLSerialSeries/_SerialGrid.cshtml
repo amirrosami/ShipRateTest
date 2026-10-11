@@ -1,0 +1,38 @@
+﻿@using ShipRate.Application.DTOs
+@model List<BLSerialListItemDto>
+
+<h5>Serials</h5>
+<table class="table table-sm table-hover align-middle">
+    <thead class="table-light">
+        <tr>
+            <th>Serial</th>
+            <th>Agent</th>
+            <th>BL No</th>
+            <th>Assigned At</th>
+            <th>Attached At</th>
+            <th>Active</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.SerialNumber</td>
+                    <td>@item.AgentName</td>
+                    <td>@item.BLNo</td>
+                    <td>@(item.AssignedAt?.ToString("yyyy-MM-dd HH:mm"))</td>
+                    <td>@(item.AttachedAt?.ToString("yyyy-MM-dd HH:mm"))</td>
+                    <td>@(item.IsActive ? "Yes" : "No")</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" class="text-center">No serials</td>
+            </tr>
+        }
+    </tbody>
+</table>

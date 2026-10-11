@@ -1,0 +1,194 @@
+﻿@using ShipRate.WebApp.ViewModels
+@model PostalDispatchViewModel
+@{
+    var isEdit = Model.Id.HasValue && Model.Id != Guid.Empty;
+    var title = isEdit ? "Edit Dispatch" : "New Dispatch";
+}
+
+<div class="modal fade" id="dispatchModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <form hx-post="@Url.Action("Save")"
+              hx-swap="none"
+              hx-encoding="application/x-www-form-urlencoded">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Id" value="@Model.Id" />
+
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white py-2">
+                    <h6 class="modal-title"><i class="bi bi-truck"></i> @title</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+
+                    <!-- Dispatch Fields -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label form-label-sm">Dispatch Date</label>
+                            <input type="date" name="DispatchDate" class="form-control form-control-sm"
+                                   value="@Model.DispatchDate.ToString("yyyy-MM-dd")" required />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label form-label-sm">Tracking Number</label>
+                            <input type="text" name="TrackingNumber" class="form-control form-control-sm"
+                                   value="@Model.TrackingNumber" maxlength="50" required />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label form-label-sm">Sender</label>
+                            <select name="SenderId" class="form-select form-select-sm" required>
+                                <option value="">-- Select --</option>
+                                @foreach (var s in (SelectList)ViewBag.Senders)
+                                {
+                                    <option value="@s.Value" selected="@(s.Value == Model.SenderId.ToString())">@s.Text</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label form-label-sm">Receiver</label>
+                            <select name="ReceiverId" class="form-select form-select-sm" required>
+                                <option value="">-- Select --</option>
+                                @foreach (var s in (SelectList)ViewBag.Receivers)
+                                {
+                                    <option value="@s.Value" selected="@(s.Value == Model.ReceiverId.ToString())">@s.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label form-label-sm">Courier Company</label>
+                            <select name="CourierCompanyId" class="form-select form-select-sm">
+                                <option value="">-- Select --</option>
+                                @foreach (var s in (SelectList)ViewBag.CourierCompanies)
+                                {
+                                    <option value="@s.Value" selected="@(s.Value == Model.CourierCompanyId?.ToString())">@s.Text</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label form-label-sm">Courier Method</label>
+                            <select name="CourierMethodId" class="form-select form-select-sm" required>
+                                <option value="">-- Select --</option>
+                                @foreach (var s in (SelectList)ViewBag.CourierMethods)
+                                {
+                                    <option value="@s.Value" selected="@(s.Value == Model.CourierMethodId.ToString())">@s.Text</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label form-label-sm">Status</label>
+                            <select name="StatusId" class="form-select form-select-sm" required>
+                                @foreach (var s in (SelectList)ViewBag.Statuses)
+                                {
+                                    <option value="@s.Value" selected="@(s.Value == Model.StatusId.ToString())">@s.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr class="my-2" />
+
+                    <!-- Items Section -->
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0"><i class="bi bi-box-seam"></i> Dispatch Items</h6>
+                        <button type="button" class="btn btn-sm btn-outline-success" onclick="addItemRow()">
+                            <i class="bi bi-plus-lg"></i> Add Item
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered mb-0" id="itemsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width:40px">#</th>
+                                    <th>Document Description</th>
+                                    <th>Item Reference</th>
+                                    <th style="width:80px" class="text-center">Original</th>
+                                    <th style="width:50px"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemsBody">
+                                @if (Model.Items.Any())
+                                {
+                                    @for (int i = 0; i < Model.Items.Count; i++)
+                                    {
+                                        <tr>
+                                            <td class="row-num">@(i + 1)</td>
+                                            <td>
+                                                <input type="hidden" name="Items[@i].Id" value="@Model.Items[i].Id" />
+                                                <input type="hidden" name="Items[@i].ObjectId" value="@Model.Items[i].ObjectId" />
+                                                <input type="text" name="Items[@i].DocumentDescription"
+                                                       class="form-control form-control-sm"
+                                                       value="@Model.Items[i].DocumentDescription" required />
+                                            </td>
+                                            <td>
+                                                <input type="text" name="Items[@i].ItemReference"
+                                                       class="form-control form-control-sm"
+                                                       value="@Model.Items[i].ItemReference" />
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="checkbox" name="Items[@i].IsOriginal"
+                                                       value="true"
+                                                       class="form-check-input"
+                                                       @(Model.Items[i].IsOriginal ? "checked" : "") />
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                                        onclick="removeItemRow(this)">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+                <div class="modal-footer py-2">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="bi bi-check-lg"></i> Save
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function addItemRow() {
+        var tbody = document.getElementById('itemsBody');
+        var idx = tbody.querySelectorAll('tr').length;
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+            '<td class="row-num">' + (idx + 1) + '</td>' +
+            '<td>' +
+                '<input type="hidden" name="Items[' + idx + '].Id" value="" />' +
+                '<input type="hidden" name="Items[' + idx + '].ObjectId" value="" />' +
+                '<input type="text" name="Items[' + idx + '].DocumentDescription" class="form-control form-control-sm" required />' +
+            '</td>' +
+            '<td><input type="text" name="Items[' + idx + '].ItemReference" class="form-control form-control-sm" /></td>' +
+            '<td class="text-center"><input type="checkbox" name="Items[' + idx + '].IsOriginal" value="true" class="form-check-input" /></td>' +
+            '<td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeItemRow(this)"><i class="bi bi-trash"></i></button></td>';
+        tbody.appendChild(tr);
+    }
+
+    function removeItemRow(btn) {
+        btn.closest('tr').remove();
+        reindexItems();
+    }
+
+    function reindexItems() {
+        var rows = document.querySelectorAll('#itemsBody tr');
+        rows.forEach(function (tr, i) {
+            tr.querySelector('.row-num').textContent = i + 1;
+            tr.querySelectorAll('input, select').forEach(function (inp) {
+                var name = inp.getAttribute('name');
+                if (name) {
+                    inp.setAttribute('name', name.replace(/Items\[\d+\]/, 'Items[' + i + ']'));
+                }
+            });
+        });
+    }
+</script>

@@ -1,0 +1,28 @@
+﻿@using ShipRate.Application.ViewModels
+@model CancelDeliveryOrderVm
+
+<form hx-post="@Url.Action("Cancel", "DeliveryOrders")"
+      hx-target="#cancelModalBody"
+      class="needs-validation" novalidate>
+
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.DeliveryOrderId)
+    @Html.HiddenFor(m => m.DONo)
+    @Html.HiddenFor(m => m.BLNo)
+
+    <div class="mb-3">
+        <p>You are about to cancel Delivery Order <strong>@(Model.DONo ?? "Draft")</strong> (BL: @(Model.BLNo ?? "-")).</p>
+        <span class="text-danger small"><i class="bi bi-exclamation-triangle-fill"></i> This operation will set the status to Cancelled (99) and cannot be undone.</span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CancellationReason" class="form-label fw-bold"></label>
+        <textarea asp-for="CancellationReason" class="form-control" rows="3" placeholder="Explain why this DO is being cancelled..."></textarea>
+        <span asp-validation-for="CancellationReason" class="text-danger small"></span>
+    </div>
+
+    <div class="modal-footer px-0 pb-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+    </div>
+</form>

@@ -1,0 +1,62 @@
+﻿@model ShipRate.WebApp.ViewModels.CustomersVms.CustomerEditViewModel
+
+<div class="modal-header bg-primary text-white">
+    <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit Customer</h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+
+<form hx-post="/Customers/Edit"
+      hx-target="#modal-content"
+      hx-swap="innerHTML">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <div class="modal-body">
+        <div class="mb-3">
+            <label class="form-label">Industry</label>
+            <select name="IndustryId" class="form-select">
+                <option value="">-- Select --</option>
+                @foreach (var ind in Model.Industries)
+                {
+                    <option value="@ind.Id"
+                            selected="@(ind.Id == Model.IndustryId)">@ind.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Remarks</label>
+            <textarea name="Remarks" class="form-control" rows="3">@Model.Remarks</textarea>
+        </div>
+
+        <div class="form-check mb-3">
+            <input type="checkbox" name="IsActive" value="true"
+                   class="form-check-input" @(Model.IsActive ? "checked" : "") />
+            <label class="form-check-label">Active</label>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Trade Types</label>
+            <div class="row">
+                @foreach (var tt in Model.TradeTypes)
+                {
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input type="checkbox" name="SelectedTradeTypeIds"
+                                   value="@tt.Id" class="form-check-input"
+                                   @(Model.SelectedTradeTypeIds.Contains((tt.Id)) ? "checked" : "") />
+                            <label class="form-check-label">@tt.Name</label>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>Save
+        </button>
+    </div>
+</form>

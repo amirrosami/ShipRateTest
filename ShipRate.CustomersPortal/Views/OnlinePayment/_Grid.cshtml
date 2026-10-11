@@ -1,0 +1,93 @@
+﻿@using Microsoft.Extensions.Localization
+@using ShipRate.Application.DTOs.Finance
+@using ShipRate.WebAppCustomers
+@using System.Globalization
+@model OnlinePaymentListPageVm
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isFa = culture == "fa";
+    var lang = isFa ? "fa" : "en";
+    var dir = isFa ? "rtl" : "ltr";
+}
+
+<style>
+    .btn-xs {
+        padding: 0.15rem 0.4rem;
+        font-size: 1rem;
+        line-height: 1;
+    }
+
+    .invoice-check,
+    #selectAllInvoices {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    .table-responsive {
+        overflow-x: scroll !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* ... Keep your existing scrollbar styles ... */
+</style>
+
+<div class="card" dir="@dir">
+    <div class="table-responsive">
+        <table class="table table-hover table-striped mb-0" id="invoiceTable">
+            <thead class="table-primary">
+                <tr>
+                   
+                    <th>@Localizer["RequestNo"]</th>
+                    <th>@Localizer["Status"]</th>
+                    <th>@Localizer["BankReferenceNo"]</th>
+                    <th>@Localizer["TraceNo"]</th>
+                    <th>@Localizer["TotalPayment"]</th>
+                    <th style="width:120px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Result.Items.Any())
+                {
+                    foreach (var item in Model.Result.Items)
+                    {
+                        <tr>
+                           
+                            <td>@item.RequestNo</td>
+                            <td>@item.Status</td>
+                            <td>@item.BankReferenceNo</td>
+                            <td>@item.TraceNo</td>
+                            <td>@item.TotalPayment</td>
+                            <td class="text-end text-nowrap">
+                                @* <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button"
+                                            class="btn btn-outline-primary px-2"
+                                            hx-get="@Url.Action("Items", "OnlinePayments", new { invoiceId = item.Id })"
+                                            hx-target="#invoiceitems-list-container"
+                                            hx-swap="innerHTML"
+                                            title="@Localizer["Items"]">
+                                        <i class="bi bi-list-ul"></i>
+                                    </button>
+                                </div> *@
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="15" class="text-center text-muted">@Localizer["NoDataFound"]</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-footer">
+        @await Html.PartialAsync("~/Views/OnlinePayment/_Pager.cshtml", Model)
+    </div>
+
+</div>
+

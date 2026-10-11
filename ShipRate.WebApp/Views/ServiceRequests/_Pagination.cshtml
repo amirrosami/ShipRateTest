@@ -1,0 +1,91 @@
+﻿@using ShipRate.Application.DTOs
+@model ServiceRequestIndexDto
+
+@{
+    var totalCount = Model.Result.TotalCount;
+    var pageSize = Model.Search.PageSize;
+    var currentPage = Model.Search.PageNumber;
+    var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+    if (currentPage <= 0) currentPage = 1;
+    if (totalPages <= 0) totalPages = 1;
+
+    var startPage = Math.Max(1, currentPage - 2);
+    var endPage = Math.Min(totalPages, currentPage + 2);
+
+    object BuildRoute(int page)
+    {
+        return new
+        {
+            RequestNo = Model.Search.RequestNo,
+            Subject = Model.Search.Subject,
+            RequesterName = Model.Search.RequesterName,
+            RequestTypeId = Model.Search.RequestTypeId,
+            StatusId = Model.Search.StatusId,
+            PriorityId = Model.Search.PriorityId,
+            PageNumber = page,
+            PageSize = Model.Search.PageSize
+        };
+    }
+}
+
+@if (totalPages > 1)
+{
+    <nav class="mt-3">
+        <ul class="pagination mb-0">
+            @if (currentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       hx-get="@Url.Action("Index", "ServiceRequests", BuildRoute(1))"
+                       hx-target="#serviceRequestGrid"
+                       hx-swap="innerHTML">
+                        First
+                    </a>
+                </li>
+
+                <li class="page-item">
+                    <a class="page-link"
+                       hx-get="@Url.Action("Index", "ServiceRequests", BuildRoute(currentPage - 1))"
+                       hx-target="#serviceRequestGrid"
+                       hx-swap="innerHTML">
+                        Previous
+                    </a>
+                </li>
+            }
+
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link"
+                       hx-get="@Url.Action("Index", "ServiceRequests", BuildRoute(i))"
+                       hx-target="#serviceRequestGrid"
+                       hx-swap="innerHTML">
+                        @i
+                    </a>
+                </li>
+            }
+
+            @if (currentPage < totalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       hx-get="@Url.Action("Index", "ServiceRequests", BuildRoute(currentPage + 1))"
+                       hx-target="#serviceRequestGrid"
+                       hx-swap="innerHTML">
+                        Next
+                    </a>
+                </li>
+
+                <li class="page-item">
+                    <a class="page-link"
+                       hx-get="@Url.Action("Index", "ServiceRequests", BuildRoute(totalPages))"
+                       hx-target="#serviceRequestGrid"
+                       hx-swap="innerHTML">
+                        Last
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

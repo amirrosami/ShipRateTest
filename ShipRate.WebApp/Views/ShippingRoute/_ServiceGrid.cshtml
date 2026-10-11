@@ -1,0 +1,75 @@
+﻿@using ShipRate.WebApp.ViewModels.ShippingRouteVms
+@model ServiceListViewModel
+
+<div class="table-responsive">
+    <table class="table table-sm table-hover table-bordered mb-0">
+        <thead class="table-light">
+            <tr>
+                <th style="width:50px">#</th>
+                <th>Service Name</th>
+                <th>Service Code</th>
+                <th style="width:90px" class="text-center">Status</th>
+                <th style="width:200px" class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Services.Any())
+            {
+                var idx = 0;
+                @foreach (var s in Model.Services)
+                {
+                    idx++;
+                    <tr id="service-row-@s.ShippingLineServiceId">
+                        <td>@idx</td>
+                        <td>@s.ServiceName</td>
+                        <td>@(s.ServiceCode ?? "-")</td>
+                        <td class="text-center">
+                            @if (s.IsActive)
+                            {
+                                <span class="badge badge-active">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-inactive">Inactive</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group btn-group-sm">
+
+                                <button class="btn btn-outline-primary btn-sm"
+                                        data-id="@s.ShippingLineServiceId"
+                                        data-name="@s.ServiceName"
+                                        onclick="selectService(this.dataset.id, this.dataset.name)">
+                                    <i class="bi bi-check2-circle"></i> Select
+                                </button>
+
+                                <button class="btn btn-outline-warning"
+                                        hx-get="/ShippingRoute/ServiceEdit?id=@s.ShippingLineServiceId"
+                                        hx-target="#modalBody">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                <button class="btn btn-outline-danger"
+                                        hx-delete="/ShippingRoute/ServiceDelete?id=@s.ShippingLineServiceId"
+                                        hx-confirm="Are you sure you want to delete this service?"
+                                        hx-target="#serviceGrid"
+                                        hx-swap="none">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">
+                        <i class="bi bi-inbox" style="font-size:1.5rem"></i><br />
+                        No services found for this shipping line.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

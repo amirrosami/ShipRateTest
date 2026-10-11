@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="2026-08-31" ReportInfo.Modified="2026-08-31" ReportInfo.CreatorVersion="2024.1.0.0">
+	<Dictionary>
+		<TableDataSource Name="Master" ReferenceName="DetentionDS.Master" DataType="System.Int32" Enabled="true">
+			<Column Name="DetentionId" DataType="System.Guid"/>
+			<Column Name="BLNo" DataType="System.String"/>
+			<Column Name="BookingNo" DataType="System.String"/>
+			<Column Name="CompanyName" DataType="System.String"/>
+			<Column Name="IssuerPartyName" DataType="System.String"/>
+			<Column Name="IssuedToPartyName" DataType="System.String"/>
+			<Column Name="TariffBookName" DataType="System.String"/>
+			<Column Name="TradeTypeName" DataType="System.String"/>
+			<Column Name="StatusName" DataType="System.String"/>
+			<Column Name="DetentionToDate" DataType="System.DateTime"/>
+			<Column Name="GrossAmount" DataType="System.Decimal"/>
+			<Column Name="VATAmount" DataType="System.Decimal"/>
+			<Column Name="Amount" DataType="System.Decimal"/>
+			<Column Name="CurrencyCode" DataType="System.String"/>
+			<Column Name="Remarks" DataType="System.String"/>
+			<Column Name="LogoData" DataType="System.Byte[]"/>
+			<Column Name="PrintDate" DataType="System.DateTime"/>
+		</TableDataSource>
+		<TableDataSource Name="Items" ReferenceName="DetentionDS.Items" DataType="System.Int32" Enabled="true">
+			<Column Name="ItemId" DataType="System.Guid"/>
+			<Column Name="DetentionId" DataType="System.Guid"/>
+			<Column Name="ContainerNumber" DataType="System.String"/>
+			<Column Name="ContainerSizeType" DataType="System.String"/>
+			<Column Name="StartDate" DataType="System.DateTime"/>
+			<Column Name="EndDate" DataType="System.DateTime"/>
+			<Column Name="TotalDays" DataType="System.Int32"/>
+			<Column Name="FreeDays" DataType="System.Int32"/>
+			<Column Name="LateDays" DataType="System.Int32"/>
+			<Column Name="Amount" DataType="System.Decimal"/>
+		</TableDataSource>
+		<TableDataSource Name="Details" ReferenceName="DetentionDS.Details" DataType="System.Int32" Enabled="true">
+			<Column Name="DetailId" DataType="System.Guid"/>
+			<Column Name="ItemId" DataType="System.Guid"/>
+			<Column Name="FromDate" DataType="System.DateTime"/>
+			<Column Name="ToDate" DataType="System.DateTime"/>
+			<Column Name="TotalDays" DataType="System.Int32"/>
+			<Column Name="RatePerDay" DataType="System.Decimal"/>
+			<Column Name="Amount" DataType="System.Decimal"/>
+		</TableDataSource>
+		<Relation Name="Master_Items" ReferenceName="DetentionDS.Master_Items" ParentDataSource="Master" ChildDataSource="Items" ParentColumns="DetentionId" ChildColumns="DetentionId" Enabled="true"/>
+		<Relation Name="Item_Details" ReferenceName="DetentionDS.Item_Details" ParentDataSource="Items" ChildDataSource="Details" ParentColumns="ItemId" ChildColumns="ItemId" Enabled="true"/>
+	</Dictionary>
+	<ReportPage Name="Page1" RawPaperSize="9" LeftMargin="10" TopMargin="10" RightMargin="10" BottomMargin="10" Watermark.Font="Arial, 60pt">
+
+		<!-- MASTER HEADER -->
+		<ReportTitleBand Name="ReportTitle1" Width="718.2" Height="156">
+			<ShapeObject Name="ShapeTopBar" Left="0" Top="0" Width="718.2" Height="4" Fill.Color="18, 52, 86" Border.Lines="None" Shape="Rectangle"/>
+
+			<!-- Logo (Left) -->
+			<PictureObject Name="PictureLogo" Left="10" Top="10" Width="120" Height="46" SizeMode="Zoom" DataColumn="Master.LogoData"/>
+
+			<!-- Title & Company -->
+			<TextObject Name="TextTitle" Left="140" Top="8" Width="410" Height="22" Text="DETENTION STATEMENT" HorzAlign="Center" VertAlign="Center" Font="Segoe UI, 13pt, style=Bold" TextFill.Color="18, 52, 86"/>
+			<TextObject Name="TextCompany" Left="140" Top="30" Width="410" Height="18" Text="[Master.CompanyName]" HorzAlign="Center" VertAlign="Center" Font="Segoe UI, 9pt, style=Bold" TextFill.Color="100, 115, 130"/>
+
+			<!-- Print Date Badge (Right) -->
+			<ShapeObject Name="ShapePrintBadge" Left="560" Top="10" Width="158" Height="42" Fill.Color="243, 246, 250" Border.Color="210, 220, 230" Border.Width="1" Shape="RoundRectangle"/>
+			<TextObject Name="TextPrintDateTitle" Left="565" Top="14" Width="148" Height="13" Text="PRINT DATE" HorzAlign="Center" Font="Segoe UI, 7pt, style=Bold" TextFill.Color="100, 115, 130"/>
+			<TextObject Name="TextPrintDate" Left="565" Top="27" Width="148" Height="18" Text="[FormatDateTime([Master.PrintDate], &quot;yyyy-MM-dd HH:mm&quot;)]" HorzAlign="Center" Font="Segoe UI, 8pt, style=Bold" TextFill.Color="18, 52, 86"/>
+
+			<!-- Master Info Card -->
+			<ShapeObject Name="ShapeMasterBox" Left="0" Top="60" Width="718.2" Height="86" Fill.Color="248, 250, 253" Border.Color="215, 225, 235" Border.Width="1" Shape="RoundRectangle"/>
+			<ShapeObject Name="ShapeMasterHeader" Left="0" Top="60" Width="718.2" Height="20" Fill.Color="233, 240, 248" Border.Color="215, 225, 235" Border.Lines="Bottom" Shape="Rectangle"/>
+			<TextObject Name="TextCardTitle" Left="10" Top="62" Width="200" Height="15" Text="DETENTION &amp; B/L INFORMATION" Font="Segoe UI, 7.5pt, style=Bold" TextFill.Color="18, 52, 86"/>
+
+			<!-- Master Grid Rows -->
+			<TextObject Name="L_BLNo" Left="10" Top="84" Width="75" Height="14" Text="B/L No:" Font="Segoe UI, 7.8pt, style=Bold" TextFill.Color="80, 90, 100"/>
+			<TextObject Name="V_BLNo" Left="85" Top="84" Width="150" Height="14" Text="[Master.BLNo]" Font="Segoe UI, 8.2pt, style=Bold" TextFill.Color="15, 23, 42"/>
+
+			<TextObject Name="L_Booking" Left="245" Top="84" Width="80" Height="14" Text="Booking No:" Font="Segoe UI, 7.8pt, style=Bold" TextFill.Color="80, 90, 100"/>
+			<TextObject Name="V_Booking" Left="325" Top="84" Width="145" Height="14" Text="[Master.BookingNo]" Font="Segoe UI, 8.2pt" TextFill.Color="15, 23, 42"/>
+
+			<TextObject Name="L_ToDate" Left="480" Top="84" Width="95" Height="14" Text="Detention To:" Font="Segoe UI, 7.8pt, style=Bold" TextFill.Color="80, 90, 100"/>
+			<TextObject Name="V_ToDate" Left="575" Top="84" Width="135" Height="14" Text="[FormatDateTime([Master.DetentionToDate], &quot;yyyy-MM-dd&quot;)]" Font="Segoe UI, 8.2pt, style=Bold" TextFill.Color="18, 52, 86"/>
+
+			<TextObject Name="L_Issuer" Left="10" Top="102" Width="75" Height="14" Text="Issuer:" Font="Segoe UI, 7.8pt, style=Bold" TextFill.Color="80, 90, 100"/>
+			<TextObject Name="V_Issuer" Left="85" Top="102" Width="150" Height="14" Text="[Master.IssuerPartyName]" Font="Segoe UI, 8pt" TextFill.Color="15, 23, 42"/>
+
+			<TextObject Name="L_IssuedTo" Left="245" Top="102" Width="80" Height="14" Text="Issued To:" Font="Segoe UI, 7.8pt, style=Bold" TextFill.Color="80, 90, 100"/>
+			<TextObject Name="V_IssuedTo" Left="325" Top="102" Width="145" Height="14" Text="[Master.IssuedToPartyName]" Font="Segoe UI, 8pt" TextFill.Color="15, 23, 42"/>
+
+			<TextObject Name="L_Tariff" Left="480" Top="102" Width="95" Height="14" Text="Tariff Book:" Font="Segoe UI, 7.8pt, style=Bold" TextFill.Color="80, 90, 100"/>
+			<TextObject Name="V_Tariff" Left="575" Top="102" Width="135" Height="14" Text="[Master.TariffBookName]" Font="Segoe UI, 8pt" TextFill.Color="15, 23, 42"/>
+
+			<TextObject Name="L_TradeType" Left="10" Top="120" Width="75" Height="14" Text="Trade Type:" Font="Segoe UI, 7.8pt, style=Bold" TextFill.Color="80, 90, 100"/>
+			<TextObject Name="V_TradeType" Left="85" Top="120" Width="150" Height="14" Text="[Master.TradeTypeName]" Font="Segoe UI, 8pt" TextFill.Color="15, 23, 42"/>
+
+			<TextObject Name="L_Status" Left="245" Top="120" Width="80" Height="14" Text="Status:" Font="Segoe UI, 7.8pt, style=Bold" TextFill.Color="80, 90, 100"/>
+			<TextObject Name="V_Status" Left="325" Top="120" Width="145" Height="14" Text="[Master.StatusName]" Font="Segoe UI, 8pt, style=Bold" TextFill.Color="18, 52, 86"/>
+		</ReportTitleBand>
+
+		<!-- CONTAINER ITEMS HEADER -->
+		<PageHeaderBand Name="PageHeader1" Top="160" Width="718.2" Height="24">
+			<ShapeObject Name="ShapeItemHeader" Left="0" Top="0" Width="718.2" Height="24" Fill.Color="18, 52, 86" Border.Lines="None" Shape="Rectangle"/>
+			<TextObject Name="TH_CtrNo" Left="5" Top="4" Width="120" Height="16" Text="CONTAINER NO" Font="Segoe UI, 7.8pt, style=Bold" TextFill.Color="White"/>
+			<TextObject Name="TH_Type" Left="125" Top="4" Width="60" Height="16" Text="TYPE" HorzAlign="Center" Font="Segoe UI, 7.8pt, style=Bold" TextFill.Color="White"/>
+			<TextObject Name="TH_Start" Left="185" Top="4" Width="80" Height="16" Text="START DATE" HorzAlign="Center" Font="Segoe UI, 7.8pt, style=Bold" TextFill.Color="White"/>
+			<TextObject Name="TH_End" Left="265" Top="4" Width="80" Height="16" Text="END DATE" HorzAlign="Center" Font="Segoe UI, 7.8pt, style=Bold" TextFill.Color="White"/>
+			<TextObject Name="TH_Total" Left="345" Top="4" Width="55" Height="16" Text="TOTAL" HorzAlign="Center" Font="Segoe UI, 7.8pt, style=Bold" TextFill.Color="White"/>
+			<TextObject Name="TH_Free" Left="400" Top="4" Width="55" Height="16" Text="FREE" HorzAlign="Center" Font="Segoe UI, 7.8pt, style=Bold" TextFill.Color="White"/>
+			<TextObject Name="TH_Late" Left="455" Top="4" Width="55" Height="16" Text="LATE" HorzAlign="Center" Font="Segoe UI, 7.8pt, style=Bold" TextFill.Color="White"/>
+			<TextObject Name="TH_Amount" Left="510" Top="4" Width="203.2" Height="16" Text="AMOUNT" HorzAlign="Right" Font="Segoe UI, 7.8pt, style=Bold" TextFill.Color="White"/>
+		</PageHeaderBand>
+
+		<!-- ITEMS DATA BAND -->
+		<DataBand Name="DataItems" Top="188" Width="718.2" Height="20" DataSource="Items">
+			<ShapeObject Name="ShapeItemRow" Left="0" Top="0" Width="718.2" Height="20" Fill.Color="240, 244, 248" Border.Color="210, 220, 230" Border.Lines="Bottom" Shape="Rectangle"/>
+			<TextObject Name="D_CtrNo" Left="5" Top="2" Width="120" Height="16" Text="[Items.ContainerNumber]" Font="Segoe UI, 8pt, style=Bold" TextFill.Color="18, 52, 86"/>
+			<TextObject Name="D_Type" Left="125" Top="2" Width="60" Height="16" Text="[Items.ContainerSizeType]" HorzAlign="Center" Font="Segoe UI, 8pt" TextFill.Color="15, 23, 42"/>
+			<TextObject Name="D_Start" Left="185" Top="2" Width="80" Height="16" Text="[FormatDateTime([Items.StartDate], &quot;yyyy-MM-dd&quot;)]" HorzAlign="Center" Font="Segoe UI, 8pt" TextFill.Color="15, 23, 42"/>
+			<TextObject Name="D_End" Left="265" Top="2" Width="80" Height="16" Text="[FormatDateTime([Items.EndDate], &quot;yyyy-MM-dd&quot;)]" HorzAlign="Center" Font="Segoe UI, 8pt" TextFill.Color="15, 23, 42"/>
+			<TextObject Name="D_Total" Left="345" Top="2" Width="55" Height="16" Text="[Items.TotalDays]" HorzAlign="Center" Font="Segoe UI, 8pt" TextFill.Color="15, 23, 42"/>
+			<TextObject Name="D_Free" Left="400" Top="2" Width="55" Height="16" Text="[Items.FreeDays]" HorzAlign="Center" Font="Segoe UI, 8pt, style=Bold" TextFill.Color="22, 101, 52"/>
+			<TextObject Name="D_Late" Left="455" Top="2" Width="55" Height="16" Text="[Items.LateDays]" HorzAlign="Center" Font="Segoe UI, 8pt, style=Bold" TextFill.Color="185, 28, 28"/>
+			<TextObject Name="D_Amount" Left="510" Top="2" Width="203.2" Height="16" Text="[FormatNumber([Items.Amount], 2)] [Master.CurrencyCode]" HorzAlign="Right" Font="Segoe UI, 8.2pt, style=Bold" TextFill.Color="18, 52, 86"/>
+
+			<!-- SUB-BAND: ITEM CALCULATION TIERS / DETAILS -->
+			<DataBand Name="DataDetails" Top="212" Width="718.2" Height="16" DataSource="Details" Filter="[Details.ItemId] == [Items.ItemId]">
+				<ShapeObject Name="ShapeTier" Left="40" Top="0" Width="678.2" Height="16" Fill.Color="255, 255, 255" Border.Color="235, 240, 245" Border.Lines="Bottom" Shape="Rectangle"/>
+				<TextObject Name="DT_Icon" Left="45" Top="1" Width="80" Height="14" Text="↳ Tier Period:" Font="Segoe UI, 7pt, style=Italic" TextFill.Color="120, 135, 150"/>
+				<TextObject Name="DT_Dates" Left="125" Top="1" Width="220" Height="14" Text="[FormatDateTime([Details.FromDate], &quot;yyyy-MM-dd&quot;)]  to  [FormatDateTime([Details.ToDate], &quot;yyyy-MM-dd&quot;)]" Font="Segoe UI, 7.5pt" TextFill.Color="70, 80, 90"/>
+				<TextObject Name="DT_Days" Left="345" Top="1" Width="100" Height="14" Text="[Details.TotalDays] Days" HorzAlign="Center" Font="Segoe UI, 7.5pt" TextFill.Color="70, 80, 90"/>
+				<TextObject Name="DT_Rate" Left="450" Top="1" Width="130" Height="14" Text="@ [FormatNumber([Details.RatePerDay], 2)] / Day" HorzAlign="Right" Font="Segoe UI, 7.5pt" TextFill.Color="70, 80, 90"/>
+				<TextObject Name="DT_SubAmount" Left="585" Top="1" Width="128.2" Height="14" Text="[FormatNumber([Details.Amount], 2)]" HorzAlign="Right" Font="Segoe UI, 7.5pt, style=Bold" TextFill.Color="70, 80, 90"/>
+			</DataBand>
+		</DataBand>
+
+		<!-- SUMMARY / TOTALS FOOTER -->
+		<ReportSummaryBand Name="ReportSummary1" Top="232" Width="718.2" Height="110">
+			<ShapeObject Name="ShapeTotalBox" Left="420" Top="10" Width="298.2" Height="90" Fill.Color="248, 250, 253" Border.Color="210, 220, 230" Border.Width="1" Shape="RoundRectangle"/>
+
+			<TextObject Name="TL_Gross" Left="430" Top="18" Width="130" Height="15" Text="Gross Amount:" Font="Segoe UI, 8pt" TextFill.Color="80, 90, 100"/>
+			<TextObject Name="TV_Gross" Left="560" Top="18" Width="150" Height="15" Text="[FormatNumber([Master.GrossAmount], 2)] [Master.CurrencyCode]" HorzAlign="Right" Font="Segoe UI, 8pt, style=Bold" TextFill.Color="15, 23, 42"/>
+
+			<TextObject Name="TL_VAT" Left="430" Top="38" Width="130" Height="15" Text="VAT Amount:" Font="Segoe UI, 8pt" TextFill.Color="80, 90, 100"/>
+			<TextObject Name="TV_VAT" Left="560" Top="38" Width="150" Height="15" Text="[FormatNumber([Master.VATAmount], 2)] [Master.CurrencyCode]" HorzAlign="Right" Font="Segoe UI, 8pt, style=Bold" TextFill.Color="15, 23, 42"/>
+
+			<LineObject Name="LineSum" Left="430" Top="58" Width="280" Border.Color="210, 220, 230"/>
+
+			<TextObject Name="TL_Total" Left="430" Top="66" Width="130" Height="22" Text="TOTAL AMOUNT:" Font="Segoe UI, 9pt, style=Bold" TextFill.Color="18, 52, 86"/>
+			<TextObject Name="TV_Total" Left="560" Top="66" Width="150" Height="22" Text="[FormatNumber([Master.Amount], 2)] [Master.CurrencyCode]" HorzAlign="Right" Font="Segoe UI, 10.5pt, style=Bold" TextFill.Color="18, 52, 86"/>
+
+			<!-- Remarks Box (Left Side) -->
+			<ShapeObject Name="ShapeRemarks" Left="0" Top="10" Width="405" Height="90" Fill.Color="255, 255, 255" Border.Color="220, 225, 230" Border.Width="1" Shape="RoundRectangle"/>
+			<TextObject Name="L_Remarks" Left="10" Top="15" Width="100" Height="14" Text="Remarks / Notes:" Font="Segoe UI, 7.5pt, style=Bold" TextFill.Color="100, 115, 130"/>
+			<TextObject Name="V_Remarks" Left="10" Top="32" Width="385" Height="60" Text="[Master.Remarks]" Font="Segoe UI, 8pt" TextFill.Color="50, 60, 70"/>
+		</ReportSummaryBand>
+
+		<!-- PAGE FOOTER -->
+		<PageFooterBand Name="PageFooter1" Top="346" Width="718.2" Height="20">
+			<LineObject Name="LineFooter" Left="0" Top="0" Width="718.2" Border.Color="220, 225, 230"/>
+			<TextObject Name="TextSystem" Left="0" Top="4" Width="300" Height="14" Text="ShipRate TMS System - Container Demurrage &amp; Detention" Font="Segoe UI, 7pt" TextFill.Color="140, 150, 160"/>
+			<TextObject Name="TextPages" Left="518.2" Top="4" Width="200" Height="14" Text="Page [Page#] of [TotalPages#]" HorzAlign="Right" Font="Segoe UI, 7pt" TextFill.Color="140, 150, 160"/>
+		</PageFooterBand>
+
+	</ReportPage>
+</Report>

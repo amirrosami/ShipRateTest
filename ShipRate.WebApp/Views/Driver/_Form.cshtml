@@ -1,0 +1,202 @@
+﻿@using ShipRate.WebApp.ViewModels.TransitViewModels
+@model DriverFormVM
+@{
+    var isEdit = !string.IsNullOrEmpty(Model.PersonName) && Model.Id != Guid.Empty;
+    var carriers = (List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.Carriers;
+}
+
+<!-- Validation Summary -->
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger py-2 mb-3">
+        <ul class="mb-0 small">
+            @foreach (var state in ViewData.ModelState.Values)
+            {
+                @foreach (var err in state.Errors)
+                {
+                    <li>@err.ErrorMessage</li>
+                }
+            }
+        </ul>
+    </div>
+}
+
+<form hx-post="/Driver/Save"
+      hx-target="#modalBody"
+      hx-swap="innerHTML"
+      autocomplete="off">
+
+    <input type="hidden" asp-for="Id" id="formPersonId" />
+
+    <div class="row g-3" dir="ltr">
+
+        <!-- ========== Person Selection (Create only) ========== -->
+        @if (!isEdit)
+        {
+            <div class="col-12">
+                <label class="form-label fw-semibold">Select Person <span class="text-danger">*</span></label>
+                <div class="position-relative">
+                    <input type="text" class="form-control" id="personSearchInput"
+                           placeholder="Type name to search persons..." />
+                    <div id="personSearchResults"
+                         class="list-group position-absolute w-100 shadow"
+                         style="z-index:1050; max-height:220px; overflow-y:auto; display:none;">
+                    </div>
+                </div>
+                <div id="selectedPersonBadge" class="mt-2" style="display:none;">
+                    <span class="badge bg-primary fs-6 px-3 py-2">
+                        <span id="selectedPersonName"></span>
+                        <button type="button" class="btn-close btn-close-white ms-2" style="font-size:.6rem"
+                                onclick="clearPersonSelection()"></button>
+                    </span>
+                </div>
+                <span class="text-danger small" id="personError"></span>
+            </div>
+        }
+        else
+        {
+            <!-- Edit mode: show person name read-only -->
+            <div class="col-12">
+                <label class="form-label fw-semibold">Person</label>
+                <input type="text" class="form-control" value="@Model.PersonName" readonly disabled />
+            </div>
+        }
+
+        <!-- ========== Carrier ========== -->
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">Carrier</label>
+            <select class="form-select" asp-for="CarrierId">
+                <option value="">-- Select Carrier --</option>
+                @foreach (var c in carriers)
+                {
+                    var carrierVal = Model.CarrierId?.ToString() ?? "";
+                    @:<option value="@c.Value" @(c.Value == carrierVal ? "selected" : "")>@c.Text</option>
+                }
+            </select>
+        </div>
+
+        <!-- ========== Passport No ========== -->
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">Passport No <span class="text-danger">*</span></label>
+            <input class="form-control" asp-for="PassportNo" maxlength="30" />
+            <span asp-validation-for="PassportNo" class="text-danger small"></span>
+        </div>
+
+        <!-- ========== License Number ========== -->
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">License Number <span class="text-danger">*</span></label>
+            <input class="form-control" asp-for="LicenseNumber" maxlength="30" />
+            <span asp-validation-for="LicenseNumber" class="text-danger small"></span>
+        </div>
+
+        <!-- ========== Smart Card No ========== -->
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">Smart Card No <span class="text-danger">*</span></label>
+            <input class="form-control" asp-for="SmartCardNo" maxlength="30" />
+            <span asp-validation-for="SmartCardNo" class="text-danger small"></span>
+        </div>
+
+        <!-- ========== IsActive ========== -->
+        <div class="col-md-6 d-flex align-items-end">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" asp-for="IsActive" />
+                <label class="form-check-label" asp-for="IsActive">Active</label>
+            </div>
+        </div>
+
+    </div>
+
+    <hr class="my-3" />
+
+    <!-- ========== Buttons ========== -->
+    <div class="d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-lg me-1"></i> Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" id="btnSubmitDriver">
+            <i class="bi bi-check2-circle me-1"></i>
+            @(isEdit ? "Save Changes" : "Register Driver")
+        </button>
+    </div>
+
+</form>
+
+<!-- ========== Person Live Search Script (Create mode only) ========== -->
+@if (!isEdit)
+{
+    <script>
+        (function () {
+            const searchInput = document.getElementById('personSearchInput');
+            const resultsDiv = document.getElementById('personSearchResults');
+            const hiddenId = document.getElementById('formPersonId');
+            const badge = document.getElementById('selectedPersonBadge');
+            const badgeName = document.getElementById('selectedPersonName');
+            const errorSpan = document.getElementById('personError');
+            let debounce;
+
+            searchInput.addEventListener('input', function () {
+                clearTimeout(debounce);
+                const term = this.value.trim();
+                if (term.length < 2) { resultsDiv.style.display = 'none'; return; }
+
+                debounce = setTimeout(() => {
+                    fetch('/Driver/SearchPersons?term=' + encodeURIComponent(term))
+                        .then(r => r.json())
+                        .then(data => {
+                            resultsDiv.innerHTML = '';
+                            if (data.length === 0) {
+                                resultsDiv.innerHTML = '<div class="list-group-item text-muted small">No results found</div>';
+                            } else {
+                                data.forEach(p => {
+                                    const item = document.createElement('a');
+                                    item.href = '#';
+                                    item.className = 'list-group-item list-group-item-action small';
+                                    item.innerHTML = '<strong>' + p.name + '</strong>' +
+                                        (p.nationalCode ? ' <span class="text-muted">(' + p.nationalCode + ')</span>' : '');
+                                    item.addEventListener('click', function (e) {
+                                        e.preventDefault();
+                                        selectPerson(p.id, p.name);
+                                    });
+                                    resultsDiv.appendChild(item);
+                                });
+                            }
+                            resultsDiv.style.display = 'block';
+                        });
+                }, 300);
+            });
+
+            function selectPerson(id, name) {
+                hiddenId.value = id;
+                badgeName.textContent = name;
+                badge.style.display = 'block';
+                searchInput.style.display = 'none';
+                resultsDiv.style.display = 'none';
+                errorSpan.textContent = '';
+            }
+
+            window.clearPersonSelection = function () {
+                hiddenId.value = '';
+                badge.style.display = 'none';
+                searchInput.style.display = 'block';
+                searchInput.value = '';
+                searchInput.focus();
+            };
+
+            // Validate before submit
+            document.getElementById('btnSubmitDriver').addEventListener('click', function (e) {
+                if (!hiddenId.value || hiddenId.value === '00000000-0000-0000-0000-000000000000') {
+                    e.preventDefault();
+                    errorSpan.textContent = 'Please select a person first.';
+                    searchInput.focus();
+                }
+            });
+
+            // Close dropdown on outside click
+            document.addEventListener('click', function (e) {
+                if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
+                    resultsDiv.style.display = 'none';
+                }
+            });
+        })();
+    </script>
+}

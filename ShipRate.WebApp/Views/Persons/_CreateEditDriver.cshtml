@@ -1,0 +1,97 @@
+﻿@using ShipRate.Application.DTOs.Base_Info
+@model DriverDto
+
+<form hx-post="@Url.Action("SetDriverInfo", "Persons")"
+      hx-target="#modal-content2"
+      hx-swap="innerHTML">
+
+    <div class="modal-header bg-primary text-white">
+        <input type="hidden" asp-for="PersonId" />
+        <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Define Driver Info</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body row">
+        @Html.AntiForgeryToken()
+        @if (!ViewData.ModelState.IsValid)
+        {
+            var allErrors = ViewData.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            if (allErrors.Any())
+            {
+                <div class="alert alert-danger py-2 mb-3">
+                    <ul class="mb-0 small">
+                        @foreach (var err in allErrors)
+                        {
+                            <li>@err</li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+
+        <!-- Carrier -->
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                Carrier <span class="text-danger">*</span>
+            </label>
+            <div class="d-flex align-items-center gap-2">
+                <select asp-for="CarrierId"
+                        asp-items="@ViewBag.Carriers"
+                        class="form-select">
+                    <option value="">-- Select --</option>
+                </select>
+                <span asp-validation-for="CarrierId" class="text-danger"></span>
+            </div>
+        </div>
+
+
+
+
+
+        <!-- Passport No -->
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                Passport No <span class="text-danger"></span>
+            </label>
+            <input type="text"
+                   name="PassportNo"
+                   value="@Model.PassportNo"
+                   class="form-control @(ViewData.ModelState.ContainsKey("PassportNo") && ViewData.ModelState["PassportNo"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="30" />
+        </div>
+
+        <!-- License Number -->
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                License Number <span class="text-danger"></span>
+            </label>
+            <input type="text"
+                   name="LicenseNumber"
+                   value="@Model.LicenseNumber"
+                   class="form-control @(ViewData.ModelState.ContainsKey("LicenseNumber") && ViewData.ModelState["LicenseNumber"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="30" />
+        </div>
+
+        <!-- Smart Card No -->
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                Smart Card No <span class="text-danger"></span>
+            </label>
+            <input type="text"
+                   name="SmartCardNo"
+                   value="@Model.SmartCardNo"
+                   class="form-control @(ViewData.ModelState.ContainsKey("SmartCardNo") && ViewData.ModelState["SmartCardNo"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="30" />
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+                <span>Save</span>
+        </button>
+    </div>
+</form>

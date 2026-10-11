@@ -1,0 +1,217 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.WebApp.ViewModels.FlightVms
+@model ProductDto
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+}
+
+<form hx-post="@Url.Action(isCreateMode ? "Create" : "Edit", "Products")"
+      hx-target="#app-modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header form-caption-bg text-white">
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title">
+                <i class="bi bi-plus-circle me-2"></i>Add Category
+            </h5>
+        }
+        else
+        {
+            <h5 class="modal-title">
+                <i class="bi bi-pencil-square me-2"></i>Edit Category
+            </h5>
+            <input type="hidden" asp-for="Id" />
+        }
+
+        <button type="button"
+                class="btn-close"
+                onclick="AppModal.close()">
+        </button>
+    </div>
+
+    <div class="modal-body row">
+        @Html.AntiForgeryToken()
+
+        @await Html.PartialAsync("_ModelStateError")
+
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                Category <span class="text-danger">*</span>
+            </label>
+            <div class="d-flex align-items-center gap-2">
+                <select asp-for="ProductCategoryId"
+                        asp-items="@ViewBag.Categories"
+                        class="form-select">
+                    <option value="">-- Select --</option>
+                </select>
+                <span asp-validation-for="ProductCategoryId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Code -->
+        <div class="mb-3 col-md-4">
+            <label class="form-label fw-medium">
+                Product Code <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="ProductCode"
+                   value="@Model.ProductCode"
+                   class="form-control @(ViewData.ModelState.ContainsKey("ProductCode") && ViewData.ModelState["ProductCode"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="20" required />
+        </div>
+
+        <!-- Name -->
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">Product Name</label>
+            <input type="text"
+                   name="ProductName"
+                   value="@Model.ProductName"
+                   class="form-control @(ViewData.ModelState.ContainsKey("ProductName") && ViewData.ModelState["ProductName"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="50" required />
+        </div>
+
+
+        <!-- MinStock -->
+        <div class="mb-3 col-md-4">
+            <label class="form-label fw-medium">Minimum Stock</label>
+            <input type="number"
+                   name="ProductMinStock"
+                   value="@Model.ProductMinStock"
+                   class="form-control @(ViewData.ModelState.ContainsKey("ProductMinStock") && ViewData.ModelState["ProductMinStock"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   required />
+        </div>
+
+        <div class="form-check form-switch">
+            <input type="checkbox"
+                   class="form-check-input"
+                   name="IsActive"
+                   value="true"
+                   id="createIsActive"
+                   @(Model.IsActive ? "checked" : "") />
+            <label class="form-check-label" for="createIsActive">Active</label>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button"
+                class="btn btn-secondary"
+                onclick="AppModal.close()">
+            Cancel
+        </button>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>
+
+
+
+
+
+@* @using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.Base_Info
+@model ProductDto
+
+<form hx-post="@Url.Action("Create", "Products")"
+      hx-target="#modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add Product</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    </div>
+
+    <div class="modal-body">
+        @Html.AntiForgeryToken()
+        @if (!ViewData.ModelState.IsValid)
+        {
+            var allErrors = ViewData.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            if (allErrors.Any())
+            {
+                <div class="alert alert-danger py-2 mb-3">
+                    <ul class="mb-0 small">
+                        @foreach (var err in allErrors)
+                        {
+                            <li>@err</li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+
+        <!-- Category -->
+        <div class="mb-3">
+            <label class="form-label fw-medium">
+                Category <span class="text-danger">*</span>
+            </label>
+            <div class="d-flex align-items-center gap-2">
+                <select asp-for="ProductCategoryId"
+                        asp-items="@ViewBag.Categories"
+                        class="form-select">
+                    <option value="">-- Select --</option>
+                </select>
+                <span asp-validation-for="ProductCategoryId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Code -->
+        <div class="mb-3">
+            <label class="form-label fw-medium">
+                Product Code <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="ProductCode"
+                   value="@Model.ProductCode"
+                   class="form-control @(ViewData.ModelState.ContainsKey("ProductCode") && ViewData.ModelState["ProductCode"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="20" required />
+        </div>
+
+        <!-- Name -->
+        <div class="mb-3">
+            <label class="form-label fw-medium">Product Name</label>
+            <input type="text"
+                   name="ProductName"
+                   value="@Model.ProductName"
+                   class="form-control @(ViewData.ModelState.ContainsKey("ProductName") && ViewData.ModelState["ProductName"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="50" required />
+        </div>
+
+
+        <!-- MinStock -->
+        <div class="mb-3">
+            <label class="form-label fw-medium">Minimum Stock</label>
+            <input type="number"
+                   name="ProductMinStock"
+                   value="@Model.ProductMinStock"
+                   class="form-control @(ViewData.ModelState.ContainsKey("ProductMinStock") && ViewData.ModelState["ProductMinStock"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   required />
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i> Save
+        </button>
+    </div>
+</form> *@

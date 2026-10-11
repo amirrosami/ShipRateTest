@@ -1,0 +1,64 @@
+﻿@using ShipRate.WebApp.ViewModels.CustomersVms
+@model CustomerConfirmationActionViewModel
+
+<div class="modal-header bg-warning">
+    <h5 class="modal-title">
+        <i class="bi bi-clipboard-check"></i> Confirm Customer
+    </h5>
+    <button type="button" class="btn-close" onclick="closeModal()"></button>
+</div>
+
+<form hx-post="/CustomerConfirmation/ConfirmReject"
+      hx-target="#listContainer"
+      hx-swap="innerHTML">
+
+    @Html.AntiForgeryToken()
+
+    <div class="modal-body">
+
+        <input type="hidden" name="Id" value="@Model.Id" />
+
+        <div class="mb-2">
+            <label class="form-label fw-semibold">Person</label>
+            <input class="form-control form-control-sm"
+                   value="@Model.PersonName"
+                   disabled />
+        </div>
+
+        <div class="mb-2">
+            <label class="form-label fw-semibold">Request Remarks</label>
+            <textarea class="form-control form-control-sm"
+                      rows="2"
+                      disabled>@Model.Remarks</textarea>
+        </div>
+
+        <div class="mb-2">
+            <label class="form-label fw-semibold">
+                Confirmation Remarks
+            </label>
+            <textarea class="form-control form-control-sm"
+                      name="ConfirmRemarks"
+                      rows="3"
+                      maxlength="200"></textarea>
+        </div>
+
+    </div>
+
+    <div class="modal-footer py-2">
+
+        <button type="submit"
+                name="Action"
+                value="Rejected"
+                class="btn btn-danger btn-sm">
+            <i class="bi bi-x-circle"></i> Reject
+        </button>
+
+        <button type="submit"
+                name="Action"
+                value="Confirmed"
+                class="btn btn-success btn-sm">
+            <i class="bi bi-check-circle"></i> Confirm Customer
+        </button>
+
+    </div>
+</form>

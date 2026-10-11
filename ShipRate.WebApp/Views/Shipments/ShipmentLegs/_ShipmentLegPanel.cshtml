@@ -1,0 +1,228 @@
+﻿@model ShipRate.Application.ViewModels.ShipmentLegFilterVm
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Shipment Legs</span>
+
+        <button type="button"
+                class="btn btn-sm btn-primary"
+                hx-get="@Url.Action("CreateShipmentLeg", "Shipments", new { shipmentId = Model.ShipmentId })"
+                hx-target="#modalContainer"
+                hx-swap="innerHTML">
+            <i class="bi bi-plus-lg"></i>
+            Add New Leg
+        </button>
+    </div>
+
+    <div class="card-body p-2"
+         id="shipmentLegListWrapper"
+         hx-get="@Url.Action("ShipmentLegList", "Shipments", new { shipmentId = Model.ShipmentId })"
+         hx-trigger="load, shipmentLegChanged from:body"
+         hx-target="this"
+         hx-swap="innerHTML">
+    </div>
+</div>
+<script>
+    window.activeShipmentLegForm = null;
+    window.document.addEventListener('click', function (e) {
+        // Open Voyage Lookup Modal
+        const selectVoyageButton = e.target.closest('.btn-select-voyage');
+
+        if (selectVoyageButton) {
+            e.preventDefault();
+
+            window.activeShipmentLegForm =
+                selectVoyageButton.closest('.shipment-leg-form');
+
+            const voyageModalElement =
+                window.document.getElementById('voyageLookupModal');
+
+            if (!voyageModalElement) {
+                console.error('voyageLookupModal was not found.');
+                return;
+            }
+
+            bootstrap.Modal
+                .getOrCreateInstance(voyageModalElement)
+                .show();
+
+            return;
+        }
+
+        // Clear selected Voyage
+        const clearVoyageButton = e.target.closest('.btn-clear-voyage');
+
+        if (clearVoyageButton) {
+            e.preventDefault();
+
+            const form =
+                clearVoyageButton.closest('.shipment-leg-form');
+
+            if (!form) {
+                return;
+            }
+
+            const voyageIdInput =
+                form.querySelector('.voyage-id-input');
+
+            const voyageTextInput =
+                form.querySelector('.voyage-search-input');
+
+            if (voyageIdInput) {
+                voyageIdInput.value = '';
+            }
+
+            if (voyageTextInput) {
+                voyageTextInput.value = '';
+            }
+
+            return;
+        }
+
+        // Select Voyage from search result
+        const chooseVoyageButton =
+            e.target.closest('.btn-choose-voyage');
+
+        if (chooseVoyageButton) {
+            e.preventDefault();
+
+            if (!window.activeShipmentLegForm) {
+                console.warn('Active Shipment Leg form was not found.');
+                return;
+            }
+
+            const voyageId =
+                chooseVoyageButton.dataset.voyageId ?? '';
+
+            const displayText =
+                chooseVoyageButton.dataset.displayText ?? '';
+
+            const voyageIdInput =
+                window.activeShipmentLegForm.querySelector('.voyage-id-input');
+
+            const voyageTextInput =
+                window.activeShipmentLegForm.querySelector('.voyage-search-input');
+
+            if (voyageIdInput) {
+                voyageIdInput.value = voyageId;
+            }
+
+            if (voyageTextInput) {
+                voyageTextInput.value = displayText;
+            }
+
+            const voyageModalElement =
+                window.document.getElementById('voyageLookupModal');
+
+            if (voyageModalElement) {
+                bootstrap.Modal
+                    .getOrCreateInstance(voyageModalElement)
+                    .hide();
+            }
+
+            window.activeShipmentLegForm = null;
+        }
+    });
+</script>
+
+
+<script>
+    window.activeShipmentLegForm = null;
+    window.document.addEventListener('click', function (e) {
+        // Open Voyage Lookup Modal
+        const selectTripButton = e.target.closest('.btn-select-trip');
+
+        if (selectTripButton) {
+            e.preventDefault();
+
+            window.activeShipmentLegForm =
+                selectTripButton.closest('.shipment-leg-form');
+
+            const tripModalElement =
+                window.document.getElementById('tripLookupModal');
+
+            if (!tripModalElement) {
+                console.error('tripLookup was not found.');
+                return;
+            }
+
+            bootstrap.Modal
+                .getOrCreateInstance(tripModalElement)
+                .show();
+            return;
+        }
+
+        // Clear selected Voyage
+        const clearTripButton = e.target.closest('.btn-clear-trip');
+
+        if (clearTripButton) {
+            e.preventDefault();
+
+            const form =
+                clearTripButton.closest('.shipment-leg-form');
+
+            if (!form) {
+                return;
+            }
+
+            const tripIdInput =
+                form.querySelector('.trip-id-input');
+
+            const tripTextInput =
+                form.querySelector('.trip-search-input');
+
+            if (tripIdInput) {
+                tripIdInput.value = '';
+            }
+
+            if (tripTextInput) {
+                tripTextInput.value = '';
+            }
+
+            return;
+        }
+
+        // Select Voyage from search result
+        const chooseTripButton =
+            e.target.closest('.btn-choose-trip');
+
+        if (chooseTripButton) {
+            e.preventDefault();
+
+            if (!window.activeShipmentLegForm) {
+                console.warn('Active Shipment Leg form was not found.');
+                return;
+            }
+
+            const tripId =
+                chooseTripButton.dataset.tripId ?? '';
+
+            const displayText =
+                chooseTripButton.dataset.displayText ?? '';
+
+            const tripIdInput =
+                window.activeShipmentLegForm.querySelector('.trip-id-input');
+
+            const tripTextInput =
+                window.activeShipmentLegForm.querySelector('.trip-search-input');
+
+            if (tripIdInput) {
+                tripIdInput.value = tripId;
+            }
+
+            if (tripTextInput) {
+                tripTextInput.value = displayText;
+            }
+
+            const tripModalElement =
+                window.document.getElementById('tripLookupModal');
+
+            if (tripModalElement) {
+                bootstrap.Modal
+                    .getOrCreateInstance(tripModalElement)
+                    .hide();
+            }
+            window.activeShipmentLegForm = null;
+        }
+    });
+</script>

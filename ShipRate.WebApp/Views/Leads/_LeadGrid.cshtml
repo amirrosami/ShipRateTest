@@ -1,0 +1,93 @@
+﻿@using ShipRate.Application.DTOs
+@model PagedResultDto<LeadDto>
+
+<table class="table table-sm table-hover table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Company</th>
+            <th>Contact</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Source</th>
+            <th>Assigned</th>
+            <th>Created</th>
+            <th style="width: 150px;"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var l in Model.Items)
+        {
+            <tr>
+                <td>@l.CompanyName</td>
+                <td>@l.ContactName</td>
+                <td>@l.EmailAddress</td>
+                <td>@l.Phone</td>
+                <td>@l.LeadStatusName</td>
+                <td>@l.LeadSourceName</td>
+                <td>@l.AssignedToUserName</td>
+                <td>@l.CreatedAt.ToString("yyyy-MM-dd")</td>
+                <td class="text-end text-nowrap">
+                    <button class="btn btn-sm btn-outline-secondary"
+                            hx-get="@Url.Action("ActivitiesGrid", "Leads", new { leadId = l.Id })"
+                            hx-target="#activity-grid"
+                            hx-swap="innerHTML"
+                            title="Activities">
+                        <i class="bi bi-list-task"></i>
+                    </button>
+
+                    <button class="btn btn-sm btn-outline-primary"
+                            hx-get="@Url.Action("EditForm", "Leads", new { id = l.Id })"
+                            hx-target="#lead-modal-body"
+                            hx-swap="innerHTML"
+                            data-bs-toggle="modal"
+                            data-bs-target="#leadModal"
+                            title="Edit">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+
+                    <button class="btn btn-sm btn-outline-warning"
+                            hx-get="@Url.Action("AssignModal", "Leads", new { id = l.Id })"
+                            hx-target="#assign-modal-container"
+                            hx-swap="innerHTML"
+                            title="Assign User">
+                        <i class="bi bi-person-plus"></i>
+                    </button>
+
+                    <button class="btn btn-sm btn-outline-danger"
+                            hx-delete="@Url.Action("Delete", "Leads", new { id = l.Id })"
+                            hx-confirm="Delete this lead?"
+                            hx-target="closest tr"
+                            hx-swap="outerHTML swap:1s"
+                            title="Delete">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@{
+    var totalPages = (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize);
+}
+
+@if (totalPages > 1)
+{
+    <nav>
+        <ul class="pagination pagination-sm">
+            @for (int pageNo = 1; pageNo <= totalPages; pageNo++)
+            {
+                var isActive = pageNo == Model.PageNumber ? "active" : "";
+                <li class="page-item @isActive">
+                    <a class="page-link"
+                       hx-get="@Url.Action("Grid", "Leads", new { PageNumber = pageNo, PageSize = Model.PageSize })"
+                       hx-target="#lead-grid"
+                       hx-swap="innerHTML">
+                        @pageNo
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

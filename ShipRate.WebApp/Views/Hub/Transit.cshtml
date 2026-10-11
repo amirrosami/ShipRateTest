@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["Title"] = "Transit & Road Operations Hub";
+}
+
+<div class="container-fluid py-3">
+    <div class="hub-page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="fw-bold mb-1"><i class="bi bi-truck text-primary me-2"></i>Transit & Fleet Operations</h5>
+            <span class="text-muted small">Inland road fleet, trips dispatch, GPS trackers, and TIR Carnet management</span>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <auth-policy policy="Transit.Trucks.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Truck" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-truck"></i></div>
+                    <div>
+                        <div class="hub-title">Trucks</div>
+                        <p class="hub-desc">Manage vehicle licenses, plate numbers, and maintenance specs.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Transit.Drivers.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Driver" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-person-vcard"></i></div>
+                    <div>
+                        <div class="hub-title">Drivers</div>
+                        <p class="hub-desc">Driver profiles, transit visa status, and national licenses.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Transit.Trips.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Trips" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-geo"></i></div>
+                    <div>
+                        <div class="hub-title">Trips</div>
+                        <p class="hub-desc">Dispatch road journeys, cross-border legs, and border checkpoints.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Transit.GPSDevices.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="GPSDevice" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-broadcast-pin"></i></div>
+                    <div>
+                        <div class="hub-title">GPS Devices</div>
+                        <p class="hub-desc">Hardware tracker registration, battery telemetry, and SIM status.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Transit.TIRCarnets.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="TIRCarnets" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-book"></i></div>
+                    <div>
+                        <div class="hub-title">TIR Carnets</div>
+                        <p class="hub-desc">Customs transit carnets, voucher detachments, and clearance bonds.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+    </div>
+</div>

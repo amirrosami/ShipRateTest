@@ -1,0 +1,167 @@
+﻿@using ShipRate.WebApp.ViewModels.Location
+@model LocationDeleteViewModel
+@{
+    ViewData["Title"] = $"Delete — {Model.LocationName}";
+}
+
+@await Html.PartialAsync("_LocationStyles")
+
+<div class="loc-page" style="max-width: 720px;">
+
+    <!-- ═══ Header ═══ -->
+    <div class="loc-header">
+        <div class="loc-header-left">
+            <div class="loc-header-icon" style="background: linear-gradient(135deg, #dc2626, #991b1b);">
+                🗑
+            </div>
+            <div>
+                <h1>Delete Location</h1>
+                <p>You are about to delete a location permanently</p>
+            </div>
+        </div>
+        <div class="loc-header-actions">
+            <a asp-action="Index" class="loc-btn loc-btn-outline">
+                ← Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- ═══ Error Alerts ═══ -->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="loc-alert loc-alert-danger">
+            ❌ @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <!-- ═══ Location Summary ═══ -->
+    <div class="loc-card" style="margin-bottom: 20px;">
+        <div class="loc-card-header">
+            <h2>📋 Location to Delete</h2>
+        </div>
+        <div class="loc-card-body">
+            <div class="loc-detail-grid">
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Location Code</span>
+                    <span class="loc-detail-value" style="color: var(--loc-primary); font-weight: 700;">
+                        @Model.LocationCode
+                    </span>
+                </div>
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Location Name</span>
+                    <span class="loc-detail-value">@Model.LocationName</span>
+                </div>
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Type</span>
+                    <span class="loc-detail-value">
+                        <span class="loc-badge loc-badge-primary">
+                            @(Model.LocationTypeName ?? "—")
+                        </span>
+                    </span>
+                </div>
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Country</span>
+                    <span class="loc-detail-value">@(Model.CountryName ?? "—")</span>
+                </div>
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Status</span>
+                    <span class="loc-detail-value">
+                        @if (Model.IsActive)
+                        {
+                            <span class="loc-badge loc-badge-success">
+                                <span class="loc-badge-dot"></span> Active
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="loc-badge loc-badge-danger">
+                                <span class="loc-badge-dot"></span> Inactive
+                            </span>
+                        }
+                    </span>
+                </div>
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Child Locations</span>
+                    <span class="loc-detail-value">
+                        @if (Model.ChildLocationsCount > 0)
+                        {
+                            <span class="loc-badge loc-badge-warning">
+                                @Model.ChildLocationsCount child location(s)
+                            </span>
+                        }
+                        else
+                        {
+                            <span style="color: var(--loc-gray-400);">None</span>
+                        }
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Danger Zone ═══ -->
+    <div class="loc-card">
+        <div class="loc-card-body">
+
+            @if (Model.CanDelete)
+            {
+                <!-- Can Delete -->
+                <div class="loc-danger-zone">
+                    <div class="loc-danger-icon">⚠️</div>
+                    <h3 style="font-size: 1.2rem; margin: 0 0 8px; color: var(--loc-gray-800);">
+                        Are you sure you want to delete this location?
+                    </h3>
+                    <p style="color: var(--loc-gray-500); margin: 0 0 24px; font-size: .9rem;">
+                        This action will soft-delete the location. It will be marked as deleted and
+                        will no longer appear in listings or searches.
+                    </p>
+
+                    <form asp-action="Delete" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.LocationId" />
+
+                        <div style="display: flex; gap: 12px; justify-content: center;">
+                            <a asp-action="Index" class="loc-btn loc-btn-outline loc-btn-lg">
+                                ← Cancel
+                            </a>
+                            <button type="submit" class="loc-btn loc-btn-danger loc-btn-lg">
+                                🗑 Yes, Delete This Location
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <!-- Cannot Delete -->
+                <div class="loc-danger-zone" style="border-color: var(--loc-warning);">
+                    <div class="loc-danger-icon" style="background: var(--loc-warning-light); color: var(--loc-warning);">
+                        🚫
+                    </div>
+                    <h3 style="font-size: 1.2rem; margin: 0 0 8px; color: var(--loc-gray-800);">
+                        Cannot Delete This Location
+                    </h3>
+                    <p style="color: var(--loc-gray-500); margin: 0 0 8px; font-size: .9rem;">
+                        This location has <strong>@Model.ChildLocationsCount child location(s)</strong>
+                        that depend on it as their parent.
+                    </p>
+                    <p style="color: var(--loc-gray-500); margin: 0 0 24px; font-size: .85rem;">
+                        You must first remove or reassign all child locations before deleting this one.
+                    </p>
+
+                    <div style="display: flex; gap: 12px; justify-content: center;">
+                        <a asp-action="Index" class="loc-btn loc-btn-outline loc-btn-lg">
+                            ← Back to List
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@Model.LocationId"
+                           class="loc-btn loc-btn-primary loc-btn-lg">
+                            ✏️ Edit This Location
+                        </a>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>

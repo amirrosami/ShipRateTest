@@ -1,0 +1,22 @@
+﻿@model dynamic
+
+<div class="modal fade show" style="display:block;background:rgba(0,0,0,.4)">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">@Model.Title</h5>
+
+                <button type="button"
+                        class="btn-close"
+                        onclick="document.getElementById('modal-content').innerHTML=''">
+                </button>
+            </div>
+
+            <div class="modal-body">
+                @RenderBody()
+            </div>
+
+        </div>
+    </div>
+</div>

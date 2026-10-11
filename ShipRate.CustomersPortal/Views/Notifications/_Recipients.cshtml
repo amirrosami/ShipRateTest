@@ -1,0 +1,54 @@
+﻿@using ShipRate.Application.DTOs.Notif
+@model List<NotificationRecipientDto>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Username</th>
+                <th>User Type</th>
+                <th>Status</th>
+                <th>Read At</th>
+                <th>Delivered At</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">
+                        No recipients found.
+                    </td>
+                </tr>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.FullName</td>
+                        <td>@item.UserName</td>
+                        <td>@item.UserTypeTitle</td>
+                        <td>
+                            @if (item.IsRead)
+                            {
+                                <span class="badge bg-success">Read</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Unread</span>
+                            }
+                </td>
+                <td>
+                    @(item.ReadAt.HasValue
+                                        ? item.ReadAt.Value.ToString("yyyy-MM-dd HH:mm")
+                                        : "-")
+                        </td>
+                        <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

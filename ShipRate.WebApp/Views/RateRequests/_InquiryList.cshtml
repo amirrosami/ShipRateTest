@@ -1,0 +1,199 @@
+﻿@using ShipRate.WebApp.ViewModels
+@model RateRequestInquiryListViewModel
+
+@Html.AntiForgeryToken()
+
+<style>
+    .inquiry-table {
+        font-size: 13px !important;
+    }
+
+        .inquiry-table th, .inquiry-table td {
+            padding: 0.35rem 0.5rem !important;
+            vertical-align: middle;
+        }
+
+    .inquiry-badge {
+        font-size: 11px;
+        padding: 0.25rem 0.5rem;
+    }
+</style>
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-2">
+        <h6 class="mb-0 fw-semibold">
+            <i class="bi bi-list-ul me-1"></i> Inquiries for Request: <span class="badge bg-light text-primary">@Model.RequestNo</span>
+        </h6>
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-success px-2 py-1"
+                    onclick="sendAllDraftInquiryEmails('@Model.RateRequestId')"
+                    title="Send Inquiry Email To All (Only Draft)">
+                <i class="bi bi-send me-1"></i>
+                Send Email To All
+            </button>
+            <button class="btn btn-sm btn-light text-primary fw-semibold px-2 py-1"
+                    title="Inquiry"
+                    onclick="openInquiryModal('@Model.RateRequestId')">
+                <i class="bi bi-file-earmark-text me-1"></i>
+                + Add New Inquiry
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body p-2">
+        @if (Model.Inquiries.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered table-hover inquiry-table mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="text-center" style="width: 45px;">#</th>
+                            <th>Inquiry No</th>
+                            <th>Vendor Party</th>
+                            <th>Email</th>
+                            <th>Origin</th>
+                            <th>Destination</th>
+                            <th class="text-center" style="width: 90px;">Status</th>
+                            <th>Send User</th>
+                            <th>Send Date</th>
+                            <th class="text-center" style="width: 250px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int rowNum = 0;
+                        }
+                        @foreach (var inquiry in Model.Inquiries)
+                        {
+                            rowNum++;
+                            <tr>
+                                <td class="text-center text-muted fw-bold">@rowNum</td>
+                                <td>@inquiry.RequestNo</td>
+                                <td class="fw-semibold">@inquiry.CarrierName</td>
+                                <td>@inquiry.VendorEmailAddress</td>
+                                <td>@inquiry.Origin</td>
+                                <td>@inquiry.Destination</td>
+                                <td class="text-center">
+                                    @if (inquiry.Status == "Sent")
+                                    {
+                                        <span class="badge bg-success inquiry-badge">@inquiry.Status</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary inquiry-badge">@inquiry.Status</span>
+                                    }
+                                </td>
+                                <td>@inquiry.SentByUserName</td>
+                                <td>@inquiry.SentDate?.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button type="button"
+                                                class="btn btn-outline-primary px-2"
+                                                title="Preview Email"
+                                                onclick="previewInquiryEmail('@inquiry.Id')">
+                                            <i class="bi bi-eye"></i> Preview
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-outline-success px-2"
+                                                title="Send Email"
+                                                onclick="sendInquiryEmail('@inquiry.Id')">
+                                            <i class="bi bi-envelope"></i> Send
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-primary px-2"
+                                                title="Send InApp"
+                                                hx-post="/RateRequests/SendInquiryInApp?inquiryId=@inquiry.Id"
+                                                hx-confirm="Send In App this inquiry?"
+                                                hx-target="#inquiryListContainer"
+                                                hx-swap="innerHTML">
+                                            <i class="bi bi-send-check"></i> InApp
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-outline-danger px-2"
+                                                title="Delete"
+                                                hx-delete="/RateRequests/DeleteInquiry/@inquiry.Id"
+                                                hx-confirm="Delete this inquiry?">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info py-2 px-3 mb-0 fs-7">
+                <i class="bi bi-info-circle me-1"></i> No inquiries found for this rate request.
+            </div>
+        }
+    </div>
+
+    <div id="emailPreviewContainer"></div>
+    <div class="modal fade" id="emailPreviewModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h6 class="modal-title fw-bold">Rate Inquiry Email Preview</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body p-0">
+                    <iframe id="emailPreviewFrame"
+                            style="width:100%; height:750px; border:0;">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-footer py-2 text-end bg-light">
+        <button class="btn btn-sm btn-outline-secondary px-3" onclick="document.getElementById('inquiryListContainer').innerHTML = ''">
+            <i class="bi bi-x-circle me-1"></i> Close
+        </button>
+    </div>
+</div>
+
+
+<script>
+    function previewInquiryEmail(inquiryId) {
+        const iframe = document.getElementById('emailPreviewFrame');
+        iframe.src = '/RateRequests/PreviewInquiryEmailFromService?inquiryId=' + inquiryId ;
+        const modalElement = document.getElementById('emailPreviewModal');
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+    }
+
+    function sendInquiryEmail(inquiryId) {
+        if (!confirm('Are you sure to send this email?')) {
+            return;
+        }
+
+        fetch('/RateRequests/SendInquiryEmail', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': getAntiForgeryToken()
+            },
+            body: 'inquiryId=' + inquiryId
+        })
+        .then(response => response.json())
+        .then(result => {
+            alert(result.message);
+            if (result.success) {
+                location.reload();
+            }
+        })
+        .catch(err => {
+            alert('Error in email send');
+            console.error(err);
+        });
+    }
+
+    function getAntiForgeryToken() {
+          const el = document.querySelector('input[name="__RequestVerificationToken"]');
+          return el ? el.value : '';
+      }
+</script>

@@ -1,0 +1,80 @@
+﻿@using ShipRate.Application.ViewModels
+@model CargoDetailDetailsVm
+
+<div class="modal fade" id="cargoDetailModal" tabindex="-1" aria-hidden="true" dir="ltr">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Cargo Detail Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body text-start">
+                <dl class="row">
+                    <dt class="col-sm-4">Sequence</dt>
+                    <dd class="col-sm-8">@Model.Sequence</dd>
+
+                    <dt class="col-sm-4">Description</dt>
+                    <dd class="col-sm-8">@Model.CargoDescription</dd>
+
+                    <dt class="col-sm-4">Package Type</dt>
+                    <dd class="col-sm-8">@Model.PackageTypeName</dd>
+
+                    <dt class="col-sm-4">Package Count</dt>
+                    <dd class="col-sm-8">@Model.PackageCount</dd>
+
+                    <dt class="col-sm-4">Gross Weight</dt>
+                    <dd class="col-sm-8">@Model.GrossWeight @Model.WeightUnitName</dd>
+
+                    <dt class="col-sm-4">Net Weight</dt>
+                    <dd class="col-sm-8">@Model.NetWeight @Model.WeightUnitName</dd>
+
+                    <dt class="col-sm-4">Volume</dt>
+                    <dd class="col-sm-8">@Model.Volume @Model.VolumeUnitName</dd>
+
+                    <dt class="col-sm-4">Dimensions</dt>
+                    <dd class="col-sm-8">
+                        @Model.Length x @Model.Width x @Model.Height @Model.DimensionUnitName
+                    </dd>
+
+                    <dt class="col-sm-4">HS Code</dt>
+                    <dd class="col-sm-8">@Model.HSCode</dd>
+
+                    <dt class="col-sm-4">Dangerous Goods</dt>
+                    <dd class="col-sm-8">@(Model.IsDG ? "Yes" : "No")</dd>
+
+                    <dt class="col-sm-4">DG Class</dt>
+                    <dd class="col-sm-8">@Model.DGClassName</dd>
+
+                    <dt class="col-sm-4">UN Number</dt>
+                    <dd class="col-sm-8">@Model.UNNumber</dd>
+
+                    <dt class="col-sm-4">Temperature Controlled</dt>
+                    <dd class="col-sm-8">@(Model.IsTemperatureControlled ? "Yes" : "No")</dd>
+
+                    <dt class="col-sm-4">Temperature</dt>
+                    <dd class="col-sm-8">
+                        Min: @Model.MinTemp,
+                        Normal: @Model.NormalTemp,
+                        Max: @Model.MaxTemp
+                        @Model.TempUnitName
+                    </dd>
+
+                    <dt class="col-sm-4">Marks And Numbers</dt>
+                    <dd class="col-sm-8">@Model.MarksAndNumbers</dd>
+
+                    <dt class="col-sm-4">Remarks</dt>
+                    <dd class="col-sm-8">@Model.Remarks</dd>
+                </dl>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

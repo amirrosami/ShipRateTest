@@ -1,0 +1,294 @@
+﻿@using ShipRate.Application.DTOs.Messaging
+@model MessagingConversationViewModel
+
+@{
+    ViewData["Title"] = Model.Conversation?.Subject ?? "Conversation";
+}
+<link href="~/css/conversation.css" rel="stylesheet" />
+
+<div class="conversation-page" dir="ltr">
+    <div class="conversation-layout">
+
+        <div class="conversation-hero">
+            <div>
+                <a class="conversation-back"
+                   href="@Url.Action("Index", "Messaging")">
+                    <span>←</span>
+                    <span>Back to Inbox</span>
+                </a>
+
+                <h1 class="conversation-title">
+                    @(Model.Conversation?.Subject ?? "Conversation")
+                </h1>
+
+                @if (Model.Conversation is not null)
+                {
+                    <div class="conversation-meta">
+                        <span class="meta-pill">@Model.Conversation.ScopeTitle</span>
+                        <span>/</span>
+                        <span class="meta-pill">@Model.Conversation.TypeTitle</span>
+                        <span>/</span>
+                        <span class="meta-pill">@Model.Conversation.StatusTitle</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="row g-3 g-xl-4">
+            <div class="col-12 col-xl-8">
+                <div class="chat-card">
+                    <div class="chat-card-header">
+                        <div class="chat-title-block">
+                            <h2 class="chat-card-title">Conversation</h2>
+                            <div class="chat-card-subtitle">
+                            </div>
+                        </div>
+
+                        <div class="chat-live-badge">
+                            <span class="chat-live-dot"></span>
+                            <span>Live</span>
+                        </div>
+                    </div>
+
+                    <div class="chat-card-body">
+                        <div id="conversationMessages"
+                             class="conversation-messages"
+                             hx-get="@Url.Action("ConversationMessages", "Messaging", new { id = Model.ConversationId })"
+                             hx-trigger="load"
+                             hx-swap="innerHTML">
+                            @await Html.PartialAsync("_ConversationMessages", Model.Messages)
+                        </div>
+                    </div>
+
+                    <div class="chat-card-footer">
+                        <div id="sendMessageFormHost">
+                            @await Html.PartialAsync("_SendMessageForm", Model.SendMessage)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-xl-4">
+                <div class="sidebar-stack">
+
+                    <div class="sky-card">
+                        <div class="sky-card-header">
+                            <span>Assigned To</span>
+                        </div>
+
+                        <div class="sky-card-body">
+                            <div class="assigned-box">
+                                <div class="assigned-avatar">
+                                    @(string.IsNullOrWhiteSpace(Model.AssignedToDisplayName) ? "?" : Model.AssignedToDisplayName.Substring(0, 1).ToUpper())
+                                </div>
+
+                                <div>
+                                    @if (string.IsNullOrWhiteSpace(Model.AssignedToDisplayName))
+                                    {
+                                        <div class="assigned-muted">Unassigned</div>
+                                    }
+                                    else
+                                    {
+                                        <div class="assigned-name">@Model.AssignedToDisplayName</div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="conversationParticipantsHost">
+                        @await Html.PartialAsync("_ConversationParticipants", Model.Participants)
+                    </div>
+
+                    <div class="sky-card">
+                        <div class="sky-card-header">
+                            <span>Add Participant</span>
+                        </div>
+
+                        <div class="sky-card-body">
+                            <div id="addParticipantFormHost"
+                                 hx-get="@Url.Action("AddParticipantForm", "Messaging", new { conversationId = Model.ConversationId })"
+                                 hx-trigger="messaging:participant-added from:body"
+                                 hx-swap="innerHTML">
+                                @await Html.PartialAsync("_AddParticipantForm", Model.AddParticipant)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sky-card">
+                        <div class="sky-card-header">
+                            <span>Details</span>
+                        </div>
+
+                        <div class="sky-card-body">
+                            <dl class="row details-list">
+                                <dt class="col-5">Conversation Id</dt>
+                                <dd class="col-7 small text-break">@Model.ConversationId</dd>
+
+                                @if (Model.Conversation is not null)
+                                {
+                                    <dt class="col-5">Last Message</dt>
+                                    <dd class="col-7">
+                                        @(Model.Conversation.LastMessageAt?.ToString("yyyy-MM-dd HH:mm") ?? "-")
+                                    </dd>
+
+                                    <dt class="col-5">Unread</dt>
+                                    <dd class="col-7">@Model.Conversation.UnreadCount</dd>
+                                }
+                            </dl>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        window.messagingConnection = window.messagingConnection || null;
+        window.messagingJoinedConversations = window.messagingJoinedConversations || {};
+        window.messagingHandlersRegistered = window.messagingHandlersRegistered || false;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const conversationId = '@Model.ConversationId';
+
+            function scrollConversationToBottom() {
+                const container = document.getElementById('conversationMessages');
+                if (!container) return;
+                container.scrollTop = container.scrollHeight;
+            }
+
+            function appendMessage(messageId) {
+                const container = document.getElementById('conversationMessages');
+
+                console.log('appendMessage called:', messageId);
+
+                if (!container) {
+                    console.warn('conversationMessages container not found');
+                    return;
+                }
+
+                if (container.querySelector('[data-message-id="' + messageId + '"]')) {
+                    console.log('message already exists in DOM:', messageId);
+                    return;
+                }
+
+                const placeholder = document.getElementById('noMessagesPlaceholder');
+                if (placeholder) {
+                    placeholder.remove();
+                }
+
+                const url =
+                    '@Url.Action("ConversationMessage", "Messaging")' +
+                    '?conversationId=' + encodeURIComponent(conversationId) +
+                    '&messageId=' + encodeURIComponent(messageId);
+
+                console.log('requesting message partial:', url);
+
+                htmx.ajax('GET', url, {
+                    target: '#conversationMessages',
+                    swap: 'beforeend'
+                });
+            }
+
+            if (!window.signalR || !window.htmx) {
+                console.error('SignalR or HTMX is not loaded.');
+                return;
+            }
+
+            if (!window.messagingConnection) {
+                window.messagingConnection = new signalR.HubConnectionBuilder()
+                    .withUrl('/messagingHub')
+                    .withAutomaticReconnect()
+                    .build();
+            }
+
+            if (!window.messagingHandlersRegistered) {
+                window.messagingConnection.on('messageCreated', function (payload) {
+                    console.log('messageCreated payload =', payload);
+
+                    if (!payload || !payload.conversationId || !payload.messageId) {
+                        console.warn('invalid payload');
+                        return;
+                    }
+
+                    if (payload.conversationId.toString() !== conversationId.toString()) {
+                        console.log('conversationId mismatch', payload.conversationId, conversationId);
+                        return;
+                    }
+
+                    appendMessage(payload.messageId);
+                    htmx.trigger(document.body, 'messagingChanged');
+
+                    setTimeout(scrollConversationToBottom, 100);
+                });
+
+                window.messagingConnection.on('messagingChanged', function () {
+                    console.log('messagingChanged received');
+                    htmx.trigger(document.body, 'messagingChanged');
+                });
+
+                window.messagingHandlersRegistered = true;
+            }
+
+            function joinCurrentConversation() {
+                if (window.messagingJoinedConversations[conversationId]) {
+                    return Promise.resolve();
+                }
+
+                console.log('joining conversation:', conversationId);
+
+                return window.messagingConnection.invoke('JoinConversation', conversationId)
+                    .then(function () {
+                        console.log('joined conversation:', conversationId);
+                        window.messagingJoinedConversations[conversationId] = true;
+                    })
+                    .catch(function (error) {
+                        console.error('JoinConversation failed:', error);
+                    });
+            }
+
+            if (window.messagingConnection.state === signalR.HubConnectionState.Disconnected) {
+                window.messagingConnection.start()
+                    .then(function () {
+                        console.log('SignalR connected');
+                        return joinCurrentConversation();
+                    })
+                    .catch(function (error) {
+                        console.error('Messaging SignalR connection failed:', error);
+                    });
+            } else if (window.messagingConnection.state === signalR.HubConnectionState.Connected) {
+                joinCurrentConversation();
+            }
+
+            window.messagingConnection.onreconnected(function () {
+                console.log('SignalR reconnected');
+                window.messagingJoinedConversations = {};
+                joinCurrentConversation();
+            });
+
+            document.body.addEventListener('htmx:afterSwap', function (event) {
+                if (event.target && event.target.id === 'conversationMessages') {
+                    scrollConversationToBottom();
+                }
+            });
+
+            const form = document.getElementById('messageForm');
+            if (form) {
+                form.addEventListener('htmx:beforeRequest', function () {
+                    const btn = this.querySelector('button');
+                    if (btn) btn.disabled = true;
+                });
+
+                form.addEventListener('htmx:afterRequest', function () {
+                    const btn = this.querySelector('button');
+                    if (btn) btn.disabled = false;
+                });
+            }
+        });
+    </script>
+}

@@ -1,0 +1,68 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.AppTasks
+@model PagedResultDto<AppTaskListItemDto>
+
+@{
+    var currentPage = Model.PageNumber;
+    var totalPages = Model.TotalPages;
+
+    var maxVisiblePages = 5;
+    var half = maxVisiblePages / 2;
+
+    var startPage = currentPage - half;
+    var endPage = currentPage + half;
+
+    if (startPage < 1)
+    {
+        startPage = 1;
+        endPage = Math.Min(maxVisiblePages, totalPages);
+    }
+
+    if (endPage > totalPages)
+    {
+        endPage = totalPages;
+        startPage = Math.Max(1, totalPages - maxVisiblePages + 1);
+    }
+}
+
+<nav>
+    <ul class="pagination pagination-sm mb-0 justify-content-end">
+
+        <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+            <button class="page-link"
+                    hx-get="@Url.Action("List", "AppTasks")"
+                    hx-include="#appTaskSearchForm"
+                    hx-vals='{"PageNumber":"@(currentPage - 1)"}'
+                    hx-target="#appTaskList"
+                    hx-swap="innerHTML">
+                Previous
+            </button>
+        </li>
+
+        @for (var i = startPage; i <= endPage; i++)
+        {
+            <li class="page-item @(i == currentPage ? "active" : "")">
+                <button class="page-link"
+                        hx-get="@Url.Action("List", "AppTasks")"
+                        hx-include="#appTaskSearchForm"
+                        hx-vals='{"PageNumber":"@i"}'
+                        hx-target="#appTaskList"
+                        hx-swap="innerHTML">
+                    @i
+                </button>
+            </li>
+        }
+
+        <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+            <button class="page-link"
+                    hx-get="@Url.Action("List", "AppTasks")"
+                    hx-include="#appTaskSearchForm"
+                    hx-vals='{"PageNumber":"@(currentPage + 1)"}'
+                    hx-target="#appTaskList"
+                    hx-swap="innerHTML">
+                Next
+            </button>
+        </li>
+
+    </ul>
+</nav>

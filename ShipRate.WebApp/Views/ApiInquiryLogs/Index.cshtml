@@ -1,0 +1,276 @@
+﻿@using ShipRate.Application.DTOs.ApiIr
+@model ApiInquiryLogIndexVm
+@{
+    ViewData["Title"] = "API Inquiry Logs";
+
+    var result = Model.Result;
+    var totalPages = result.TotalCount == 0
+        ? 1
+        : (int)Math.Ceiling((double)result.TotalCount / result.PageSize);
+}
+
+<div class="container-fluid py-3" dir="ltr">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white d-flex align-items-center justify-content-between">
+            <div>
+                <h5 class="mb-0">
+                    <i class="bi bi-journal-text text-primary me-2"></i>
+                    API Inquiry Logs
+                </h5>
+                <div class="small text-muted mt-1">
+                    Search and review sensitive API.ir inquiry records.
+                </div>
+            </div>
+
+            <span class="badge text-bg-secondary">
+                Total: @result.TotalCount
+            </span>
+        </div>
+
+        <div class="card-body">
+            <form method="get"
+                  asp-action="Index"
+                  class="row g-3 mb-4">
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label asp-for="Filter.UserId" class="form-label">
+                        User
+                    </label>
+
+                    <select asp-for="Filter.UserId"
+                            asp-items="Model.Users"
+                            class="form-select">
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label asp-for="Filter.ServiceName" class="form-label">
+                        Service
+                    </label>
+
+                    <select asp-for="Filter.ServiceName"
+                            asp-items="Model.Services"
+                            class="form-select">
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-2">
+                    <label asp-for="Filter.FromDateUtc" class="form-label">
+                        From Date
+                    </label>
+
+                    <input asp-for="Filter.FromDateUtc"
+                           type="date"
+                           class="form-control" />
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-2">
+                    <label asp-for="Filter.ToDateUtc" class="form-label">
+                        To Date
+                    </label>
+
+                    <input asp-for="Filter.ToDateUtc"
+                           type="date"
+                           class="form-control" />
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-2">
+                    <label asp-for="Filter.PageSize" class="form-label">
+                        Page Size
+                    </label>
+
+                    <select asp-for="Filter.PageSize" class="form-select">
+                        @foreach (var pageSize in Model.PageSizes)
+                        {
+                            <option value="@pageSize">@pageSize</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-12 col-lg-6">
+                    <label asp-for="Filter.SearchTerm" class="form-label">
+                        Search
+                    </label>
+
+                    <input asp-for="Filter.SearchTerm"
+                           class="form-control"
+                           placeholder="Service, endpoint, correlation ID, or error..." />
+                </div>
+
+                <div class="col-12 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search me-1"></i>
+                        Search
+                    </button>
+
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i>
+                        Reset
+                    </a>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-sm align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Started At (UTC)</th>
+                            <th>User</th>
+                            <th>Service</th>
+                            <th>HTTP</th>
+                            <th>API Code</th>
+                            <th>Status</th>
+                            <th>Duration</th>
+                            <th>Correlation ID</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (result.Items.Any())
+                        {
+                            @foreach (var item in result.Items)
+                            {
+                                <tr>
+                                    <td class="text-nowrap">
+                                        @item.RequestStartedAtUtc.ToString("yyyy-MM-dd HH:mm:ss")
+                                    </td>
+
+                                    <td>
+                                        @item.UserName
+                                    </td>
+
+                                    <td>
+                                        <div class="fw-semibold">@item.ServiceName</div>
+                                        <div class="small text-muted">@item.Endpoint</div>
+                                    </td>
+
+                                    <td>
+                                        @(item.HttpStatusCode?.ToString() ?? "-")
+                                    </td>
+
+                                    <td>
+                                        @(item.ApiCode?.ToString() ?? "-")
+                                    </td>
+
+                                    <td>
+                                        @if (!item.IsCompleted)
+                                        {
+                                            <span class="badge text-bg-warning">Pending</span>
+                                        }
+                                        else if (item.IsSucceeded)
+                                        {
+                                            <span class="badge text-bg-success">Succeeded</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge text-bg-danger">Failed</span>
+                                        }
+                                    </td>
+
+                                    <td class="text-nowrap">
+                                        @(item.DurationMilliseconds.HasValue
+                                            ? $"{item.DurationMilliseconds:N0} ms"
+                                            : "-")
+                                    </td>
+
+                                    <td>
+                                        <code class="small">@item.CorrelationId</code>
+                                    </td>
+
+                                    <td class="text-end">
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary"
+                                                hx-get="@Url.Action("Details", "ApiInquiryLogs", new { id = item.Id })"
+                                                hx-target="#apiInquiryLogModalBody"
+                                                hx-swap="innerHTML"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#apiInquiryLogModal">
+                                            <i class="bi bi-eye"></i>
+                                            Details
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="9" class="text-center text-muted py-4">
+                                    No inquiry logs were found.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (totalPages > 1)
+            {
+                <nav class="mt-4" aria-label="API inquiry log pages">
+                    <ul class="pagination justify-content-center flex-wrap mb-0">
+
+                        <li class="page-item @(result.PageNumber <= 1 ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-UserId="@Model.Filter.UserId"
+                               asp-route-ServiceName="@Model.Filter.ServiceName"
+                               asp-route-FromDateUtc="@Model.Filter.FromDateUtc"
+                               asp-route-ToDateUtc="@Model.Filter.ToDateUtc"
+                               asp-route-SearchTerm="@Model.Filter.SearchTerm"
+                               asp-route-PageSize="@result.PageSize"
+                               asp-route-PageNumber="@(result.PageNumber - 1)">
+                                Previous
+                            </a>
+                        </li>
+
+                        @for (var pageNumber = 1; pageNumber <= totalPages; pageNumber++)
+                        {
+                            <li class="page-item @(pageNumber == result.PageNumber ? "active" : "")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-UserId="@Model.Filter.UserId"
+                                   asp-route-ServiceName="@Model.Filter.ServiceName"
+                                   asp-route-FromDateUtc="@Model.Filter.FromDateUtc"
+                                   asp-route-ToDateUtc="@Model.Filter.ToDateUtc"
+                                   asp-route-SearchTerm="@Model.Filter.SearchTerm"
+                                   asp-route-PageSize="@result.PageSize"
+                                   asp-route-PageNumber="@pageNumber">
+                                    @pageNumber
+                                </a>
+                            </li>
+                        }
+
+                        <li class="page-item @(result.PageNumber >= totalPages ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-UserId="@Model.Filter.UserId"
+                               asp-route-ServiceName="@Model.Filter.ServiceName"
+                               asp-route-FromDateUtc="@Model.Filter.FromDateUtc"
+                               asp-route-ToDateUtc="@Model.Filter.ToDateUtc"
+                               asp-route-SearchTerm="@Model.Filter.SearchTerm"
+                               asp-route-PageSize="@result.PageSize"
+                               asp-route-PageNumber="@(result.PageNumber + 1)">
+                                Next
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="modal fade"
+     id="apiInquiryLogModal"
+     tabindex="-1"
+     aria-labelledby="apiInquiryLogModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="apiInquiryLogModalBody">
+            <div class="modal-body text-center p-5 text-muted">
+                Loading...
+            </div>
+        </div>
+    </div>
+</div>

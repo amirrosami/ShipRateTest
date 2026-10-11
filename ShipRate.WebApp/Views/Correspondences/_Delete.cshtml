@@ -1,0 +1,47 @@
+﻿@using ShipRate.Domain.Entities.DocumentStore
+@model Correspondence
+
+<div class="modal-header" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff;">
+    <h5 class="modal-title">
+        <i class="bi bi-trash me-2"></i>حذف مکاتبه
+    </h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        آیا از حذف این مکاتبه اطمینان دارید؟
+    </div>
+
+    <table class="table table-sm">
+        <tr>
+            <th style="width: 30%">شماره مکاتبه:</th>
+            <td><strong>@Model.CorrespondenceNo</strong></td>
+        </tr>
+        <tr>
+            <th>تاریخ:</th>
+            <td>@Model.CorrespondenceDate.ToString("yyyy-MM-dd")</td>
+        </tr>
+        <tr>
+            <th>موضوع:</th>
+            <td>@(Model.Subject?.SubjectTitle ?? "—")</td>
+        </tr>
+        <tr>
+            <th>متن موضوع:</th>
+            <td>@Model.SubjectFreeText</td>
+        </tr>
+    </table>
+
+    <form hx-post="@Url.Action("DeleteConfirmed", new { id = Model.Id })"
+          hx-target="#modal-content"
+          hx-swap="innerHTML">
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash me-1"></i>تایید حذف
+            </button>
+        </div>
+    </form>
+</div>

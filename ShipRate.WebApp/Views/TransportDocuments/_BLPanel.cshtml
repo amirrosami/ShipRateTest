@@ -1,0 +1,103 @@
+﻿@using ShipRate.Application.ViewModels
+@model BLManagePageVm
+
+
+
+<style>
+    /* اطمینان از قرارگیری منو بالای تمامی لایه‌ها */
+    .dropdown-menu {
+        z-index: 1060 !important;
+    }
+    
+    /* حداقل ارتفاع برای کانتینر جدول تا حتی اگر 1 ردیف باشد منو بیرون نزند */
+    #blList {
+        min-height: 500px;
+    }
+</style>
+
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Transport Documents(Including BL-CMR-AWBL-MTD-FWB-INLAND)</span>
+         <a class="btn btn-primary"
+           href="@Url.Action("Create", "TransportDocuments", new {
+               jobId = Model.Context.JobId
+           })">
+            + New Transport Document
+        </a>
+    </div>
+
+    <div id="blList"
+         hx-get="@Url.Action("List", "TransportDocuments", new {
+             jobId = Model.Context.JobId,
+             bookingId = Model.Context.BookingId,
+             shipmentId = Model.Context.ShipmentId,
+             shipmentLegId = Model.Context.ShipmentLegId
+         })"
+         hx-trigger="blSaved from:body, blDeleted from:body"
+         hx-swap="innerHTML">
+        @await Html.PartialAsync("~/Views/TransportDocuments/_BLList.cshtml", Model)
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="documentManagerModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="document-manager-content">
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+@* <div class="modal fade" id="mainModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">BL Form</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+</div>
+*@
+<script>
+    (function () {
+        document.body.addEventListener('blSaved', function () {
+            var modalEl = document.getElementById('mainModal');
+            var modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+        });
+
+        document.body.addEventListener('blDeleted', function () {
+            var modalEl = document.getElementById('mainModal');
+            var modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+        });
+    })();
+</script>
+@*  <script>
+document.addEventListener('show.bs.dropdown', function (e) {
+    const dropdownMenu = e.target.querySelector('.dropdown-menu');
+    if (dropdownMenu) {
+        document.body.appendChild(dropdownMenu);
+        dropdownMenu.dataset.popperAttached = "true";
+    }
+});
+
+document.addEventListener('hidden.bs.dropdown', function (e) {
+    const dropdownMenu = document.querySelector('[data-popper-attached="true"]');
+    if (dropdownMenu) {
+        e.target.appendChild(dropdownMenu);
+        dropdownMenu.removeAttribute('data-popper-attached');
+    }
+});
+</script> *@

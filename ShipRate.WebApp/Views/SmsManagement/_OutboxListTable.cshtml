@@ -1,0 +1,77 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Domain.Entities.Messaging
+@model IEnumerable<SmsOutboxItemDto>
+
+<div class="table-responsive" dir="ltr">
+    <table class="table table-hover table-sm align-middle border">
+        <thead class="table-light">
+            <tr>
+                <th>Recipient Mobile</th>
+                <th>Message Body</th>
+                <th>Tag</th>
+                <th>Tracking ID</th>
+                <th>Status</th>
+                <th>Created At</th>
+                <th>Retries</th>
+                <th class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="8" class="text-center py-4 text-muted">No outbox records found.</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">@item.Mobile</td>
+                        <td style="max-width: 250px;" class="text-truncate" title="@item.MessageBody">@item.MessageBody</td>
+                        <td><span class="badge bg-light text-dark border">@item.Tag</span></td>
+                        <td><code>@item.CustomerTrackingId</code></td>
+                        <td>
+                            @switch (item.Status)
+                            {
+                                case SmsDeliveryStatus.Queued:
+                                    <span class="badge bg-secondary">Queued</span>
+                                    break;
+                                case SmsDeliveryStatus.Sending:
+                                    <span class="badge bg-info text-dark">Sending</span>
+                                    break;
+                                case SmsDeliveryStatus.SentSuccessfully:
+                                    <span class="badge bg-primary">Sent to Gateway</span>
+                                    break;
+                                case SmsDeliveryStatus.Delivered:
+                                    <span class="badge bg-success">Delivered</span>
+                                    break;
+                                case SmsDeliveryStatus.Failed:
+                                    <span class="badge bg-danger" title="@item.ErrorDescription">Failed</span>
+                                    break;
+                                case SmsDeliveryStatus.PendingInQueue:
+                                    <span class="badge bg-warning text-dark">Pending Queue</span>
+                                    break;
+                            }
+                        </td>
+                        <td class="small">@item.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td><span class="badge bg-light text-dark border">@item.RetryCount</span></td>
+                        <td class="text-center">
+                            @if (item.Status == SmsDeliveryStatus.Failed)
+                            {
+                                <button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="retrySms('@item.RecipientId')">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Retry
+                                </button>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

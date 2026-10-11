@@ -1,0 +1,153 @@
+﻿
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('/fonts/vazirmatn/Vazirmatn-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('/fonts/vazirmatn/Vazirmatn-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('/fonts/vazirmatn/Vazirmatn-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
+
+
+body {
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    background: #f4f7fb;
+    color: #1f2937;
+}
+
+html[lang="fa"] body,
+html[lang="fa"] input,
+html[lang="fa"] select,
+html[lang="fa"] textarea,
+html[lang="fa"] button {
+    font-family: 'Vazirmatn', Tahoma, sans-serif;
+}
+
+.portal-shell {
+    min-height: 100vh;
+    display: flex;
+}
+
+.portal-sidebar {
+    width: 280px;
+    background: #0f172a;
+    color: #fff;
+    padding: 1.25rem 1rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    transition: all .3s ease;
+    z-index: 1040;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.brand-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #2563eb, #0ea5e9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-title {
+    font-weight: 700;
+}
+
+.brand-subtitle {
+    font-size: .82rem;
+    opacity: .7;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    color: #e5e7eb;
+    text-decoration: none;
+    padding: .85rem 1rem;
+    border-radius: .85rem;
+    transition: .2s ease;
+}
+
+    .sidebar-link:hover {
+        background: rgba(255,255,255,.08);
+        color: #fff;
+    }
+
+.portal-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.portal-topbar {
+    height: 72px;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+}
+
+.portal-page-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.portal-content {
+    padding: 1rem;
+}
+
+.card-clean {
+    border: 0;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+@media (max-width: 991.98px) {
+    .portal-sidebar {
+        position: fixed;
+        inset-inline-start: -280px;
+        top: 0;
+        height: 100vh;
+    }
+
+        .portal-sidebar.open {
+            inset-inline-start: 0;
+        }
+
+    .portal-content {
+        padding: .85rem;
+    }
+}

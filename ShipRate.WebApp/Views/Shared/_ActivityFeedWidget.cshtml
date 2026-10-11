@@ -1,0 +1,102 @@
+﻿@using ShipRate.Application.ViewModels
+@model IEnumerable<RecentActivityViewModel>
+
+<style>
+    @@keyframes fadeOutHighlight {
+        0% {
+            background-color: rgba(13, 110, 253, 0.15); /* هماهنگ با تم پرایمری یا سبز */
+            border-left: 3px solid #0d6efd;
+        }
+
+        70% {
+            background-color: rgba(13, 110, 253, 0.05);
+        }
+
+        100% {
+            background-color: transparent;
+            border-left: 3px solid transparent;
+        }
+    }
+
+    .activity-item-fresh {
+        animation: fadeOutHighlight 6s ease-out forwards;
+    }
+</style>
+
+<div class="card border-0 shadow-sm h-100">
+    <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-semibold"><i class="bi bi-activity me-1"></i>Live Activity</h6>
+        <span class="badge bg-success"><i class="bi bi-broadcast me-1"></i>Live</span>
+    </div>
+    <div class="card-body p-0">
+        @if (Model is null || !Model.Any())
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                No recent activity
+            </div>
+        }
+        else
+        {
+            <div class="list-group list-group-flush">
+                @foreach (var item in Model)
+                {
+                    var style = SeverityStyle(item.Severity);
+                    var iconClass = string.IsNullOrWhiteSpace(item.IconCssClass) ? "bi-activity" : item.IconCssClass;
+                    var freshClass = item.IsFresh ? "activity-item-fresh" : string.Empty;
+
+                    <div class="list-group-item border-0 py-3 @freshClass">
+                        <div class="d-flex gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                 style="width:36px;height:36px;background:@style.Bg;color:@style.Color;">
+                                <i class="bi @iconClass"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="fw-semibold small">@item.Title</div>
+                                    @if (item.IsFresh)
+                                    {
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-1 py-0" style="font-size: 0.65rem;">NEW</span>
+                                    }
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(item.Description))
+                                {
+                                    <small class="text-muted d-block">@item.Description</small>
+                                }
+
+                                <small class="text-muted">
+                                    @item.RelativeTime
+                                    @if (!string.IsNullOrWhiteSpace(item.PerformedByUserName))
+                                    {
+                                        <text> • @item.PerformedByUserName</text>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(item.LocationName))
+                                    {
+                                        <text> • @item.LocationName</text>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(item.SourceSystem))
+                                    {
+                                        <text> • @item.SourceSystem</text>
+                                    }
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@functions {
+    private static (string Bg, string Color) SeverityStyle(string? severity) =>
+        (severity ?? string.Empty).Trim().ToUpperInvariant() switch
+        {
+            "INFO" => ("#d1ecf1", "#0c5460"),
+            "SUCCESS" => ("#d4edda", "#155724"),
+            "WARNING" => ("#fff3cd", "#856404"),
+            "DANGER" => ("#f8d7da", "#721c24"),
+            _ => ("#cce5ff", "#004085")
+        };
+}

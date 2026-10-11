@@ -1,0 +1,260 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model SettlementReceiptReportDto
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>رسید تسویه حساب - @Model.SettlementNo</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
+
+    <style>
+        body {
+            font-family: IRANSans, Tahoma, Arial, sans-serif;
+            font-size: 12px;
+            color: #212529;
+            background-color: #f8f9fa;
+        }
+
+        .receipt-container {
+            max-width: 210mm;
+            margin: 20px auto;
+            padding: 25px;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        .table-bordered th, .table-bordered td {
+            border: 1px solid #b0bec5 !important;
+            vertical-align: middle;
+            padding: 5px 8px;
+        }
+
+        .table-header-custom {
+            background-color: #e3f2fd !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .table-header-pay {
+            background-color: #efebe9 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .header-box {
+            border: 1.5px solid #78909c;
+            border-radius: 4px;
+            padding: 12px;
+            background-color: #f8f9fa;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .print-actions {
+            max-width: 210mm;
+            margin: 15px auto 0 auto;
+        }
+
+        @@media print {
+            body {
+                background-color: #fff;
+            }
+
+            .receipt-container {
+                margin: 0;
+                padding: 0;
+                border: none;
+                box-shadow: none;
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .print-actions {
+                display: none !important;
+            }
+
+            @@page {
+                size: A4 portrait;
+                margin: 10mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- نوار دکمه‌های پرینت و بستن -->
+    <div class="print-actions d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <button onclick="window.print()" class="btn btn-primary btn-sm px-3">
+                <i class="bi bi-printer"></i> چاپ سند (Print)
+            </button>
+            <button onclick="window.close()" class="btn btn-outline-secondary btn-sm px-3 ms-1">بستن</button>
+        </div>
+@*         <span class="text-muted small">برای چاپ تمیز، گزینه Background graphics را در تنظیمات مرورگر فعال کنید.</span>
+ *@    </div>
+
+    <!-- بدنه اصلی رسید -->
+    <div class="receipt-container">
+
+        <!-- سربرگ -->
+        <div class="header-box mb-3">
+            <div class="row align-items-center">
+                <div class="col-3 text-start">
+                    @if (!string.IsNullOrEmpty(Model.CompanyLogoPath))
+                    {
+                        <img src="@Model.CompanyLogoPath" alt="Logo" style="max-height: 55px; max-width: 120px;" />
+                    }
+                </div>
+                <div class="col-6 text-center">
+                    <h5 class="fw-bold mb-1">رسید تسویه حساب و دریافت / پرداخت</h5>
+                    <div class="fw-semibold text-secondary">@Model.CompanyName</div>
+                </div>
+                <div class="col-3 text-end" style="font-size: 11px;">
+                    <div><strong>شماره سند:</strong> @Model.SettlementNo</div>
+                    <div><strong>تاریخ:</strong> @Model.SettlementDate</div>
+                    <div><strong>وضعیت:</strong> <span class="badge bg-secondary">@Model.StatusName</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- اطلاعات طرف حساب و ارز -->
+        <table class="table table-bordered mb-3">
+            <tbody>
+                <tr>
+                    <td style="width: 50%;"><strong>طرف حساب / مشتری:</strong> @Model.PartyName</td>
+                    <td style="width: 50%;"><strong>ارز تسویه:</strong> @Model.CurrencyName</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><strong>توضیحات:</strong> @(string.IsNullOrWhiteSpace(Model.Remarks) ? "---" : Model.Remarks)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- بخش اول: اقلام تسویه -->
+        <div class="fw-bold mb-1 text-dark">الف) اقلام تسویه شده (فاکتورها و هزینه‌ها)</div>
+        <table class="table table-bordered table-sm text-center mb-3">
+            <thead class="table-header-custom">
+                <tr>
+                    <th style="width: 5%;">ردیف</th>
+                    <th style="width: 15%;">شماره فاکتور</th>
+                    <th style="width: 25%;">شرح آیتم / هزینه</th>
+                    <th style="width: 15%;">مبلغ کل</th>
+                    <th style="width: 15%;">مبلغ تسویه شده</th>
+                    <th style="width: 15%;">مانده آیتم</th>
+                    <th style="width: 10%;">توضیحات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Items != null && Model.Items.Any())
+                {
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>@item.RowIndex</td>
+                            <td>@item.InvoiceNo</td>
+                            <td class="text-start">@item.ChargeTitle</td>
+                            <td class="text-end font-monospace">@item.Amount.ToString("N2")</td>
+                            <td class="text-end font-monospace">@item.CoveredAmount.ToString("N2")</td>
+                            <td class="text-end font-monospace">@item.RemainingAmount.ToString("N2")</td>
+                            <td class="text-start">@item.Remarks</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-muted py-2">موردی یافت نشد.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- بخش دوم: اسناد پرداخت -->
+        <div class="fw-bold mb-1 text-dark">ب) اسناد و ابزارهای پرداخت / دریافت متصل</div>
+        <table class="table table-bordered table-sm text-center mb-3">
+            <thead class="table-header-pay">
+                <tr>
+                    <th style="width: 5%;">ردیف</th>
+                    <th style="width: 15%;">شماره سند پرداخت</th>
+                    <th style="width: 12%;">تاریخ سند</th>
+                    <th style="width: 18%;">روش پرداخت</th>
+                    <th style="width: 15%;">مبلغ مصرفی</th>
+                    <th style="width: 15%;">پوشش به ارز سند</th>
+                    <th style="width: 20%;">توضیحات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Payments != null && Model.Payments.Any())
+                {
+                    @foreach (var pay in Model.Payments)
+                    {
+                        <tr>
+                            <td>@pay.RowIndex</td>
+                            <td>@pay.DocumentNo</td>
+                            <td>@pay.DocumentDate</td>
+                            <td>@pay.PaymentMethod</td>
+                            <td class="text-end font-monospace">@pay.AllocatedAmount.ToString("N2")</td>
+                            <td class="text-end font-monospace">@pay.SettledInItemCurrency.ToString("N2")</td>
+                            <td class="text-start">@pay.Remarks</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-muted py-2">موردی یافت نشد.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- خلاصه مبالغ -->
+        <div class="row justify-content-end mb-4">
+            <div class="col-7">
+                <table class="table table-bordered table-sm text-center mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>مجموع مبالغ اقلام</th>
+                            <th>مجموع مبالغ پرداختی</th>
+                            <th>مانده نهایی سند</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="fw-bold">
+                            <td>@Model.TotalAmount.ToString("N2") <small>@Model.CurrencyName</small></td>
+                            <td class="text-success">@Model.TotalAllocated.ToString("N2") <small>@Model.CurrencyName</small></td>
+                            <td class="text-danger">@Model.RemainingAmount.ToString("N2") <small>@Model.CurrencyName</small></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- محل امضاها -->
+        <div class="row text-center mt-5 pt-3">
+            <div class="col-4">
+                <div class="fw-bold">تنظیم کننده (امور مالی)</div>
+                <div class="mt-4 text-muted small">...................................</div>
+            </div>
+            <div class="col-4">
+                <div class="fw-bold">تأیید کننده مدیریت مالی</div>
+                <div class="mt-4 text-muted small">...................................</div>
+            </div>
+            <div class="col-4">
+                <div class="fw-bold">امضاء و مهر طرف حساب</div>
+                <div class="mt-4 text-muted small">...................................</div>
+            </div>
+        </div>
+        <!-- پاورقی -->
+        <div class="text-center text-muted border-top pt-2 mt-4" style="font-size: 10px;">
+            صفحه ۱ از ۱ - سامانه مدیریت حمل و نقل ShipRate
+        </div>
+    </div>
+
+</body>
+</html>

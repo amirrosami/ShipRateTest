@@ -1,0 +1,101 @@
+﻿@using ShipRate.Application.ViewModels
+@model UsagesPanelVm
+
+<div class="card border-dark rounded-0">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <strong>Usages</strong>
+            <span class="text-muted ms-2">Carnet: @Model.TIRCarnetNumber</span>
+            <span class="text-muted ms-2">Truck: @Model.TruckDisplay</span>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="button"
+                    class="btn btn-sm btn-primary"
+                    hx-get="@Url.Action("CreateUsage", "TIRCarnets", new { tirAssignmentId = Model.TIRAssignmentId })"
+                    hx-target="#mainModalContent"
+                    hx-swap="innerHTML">
+                New Usage
+            </button>
+
+            <button type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    onclick="document.getElementById('usagesPanelContainer').innerHTML='';">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-striped table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Volet No</th>
+                        <th>Border</th>
+                        <th>Customs Office</th>
+                        <th>In/Out</th>
+                        <th>Operation Date</th>
+                        <th>Remarks</th>
+                        <th style="width: 180px;">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model.Items == null || !Model.Items.Any())
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">
+                                No usages found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        var rowNo = 1;
+                        foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>@rowNo</td>
+                                <td>@item.VoletNo</td>
+                                <td>@item.BorderName</td>
+                                <td>@item.CustomsOfficeName</td>
+                                <td>@item.InOutName</td>
+                                <td>@item.TIRUsageUsedAt.ToString("yyyy-MM-dd")</td>
+                                <td>@item.Remarks</td>
+                                <td class="text-nowrap">
+                                    <div class="d-inline-flex gap-1">
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-light text-primary px-2"
+                                                title="Edit Usage"
+                                                aria-label="Edit Usage"
+                                                hx-get="@Url.Action("EditUsage", "TIRCarnets", new { id = item.Id })"
+                                                hx-target="#mainModalContent"
+                                                hx-swap="innerHTML">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-light text-danger px-2"
+                                                title="Delete Usage"
+                                                aria-label="Delete Usage"
+                                                hx-get="@Url.Action("DeleteUsage", "TIRCarnets", new { id = item.Id })"
+                                                hx-target="#mainModalContent"
+                                                hx-swap="innerHTML">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+
+                                    </div>
+                                </td>
+                            </tr>
+
+                            rowNo++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

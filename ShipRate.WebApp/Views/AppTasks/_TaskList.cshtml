@@ -1,0 +1,109 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.AppTasks
+@model PagedResultDto<AppTaskListItemDto>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Task List</span>
+        <small class="text-muted">@Model.TotalCount record(s)</small>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Owner</th>
+                    <th>Assignee</th>
+                    <th>Due Date</th>
+                    <th>Entity Type</th>
+                    <th>Entity Reference</th>
+                    <th style="width:90px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Items == null || !Model.Items.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            No task found.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model.Items)
+                    {
+                        <tr class="@(item.IsOverDue ? "table-warning" : "")">
+                            <td>
+                                <div class="fw-semibold">@item.Title</div>
+
+                                @if (!string.IsNullOrWhiteSpace(item.TaskDesciption))
+                                {
+                                    var shortDesc = item.TaskDesciption.Length > 80
+                                    ? item.TaskDesciption.Substring(0, 80) + "..."
+                                    : item.TaskDesciption;
+
+                                    <small class="text-muted">@shortDesc</small>
+                                }
+                            </td>
+
+                            @{
+                                var statusBadgeClass = item.TaskStatusId switch
+                                {
+                                    1 => "bg-secondary",
+                                    2 => "bg-primary",
+                                    3 => "bg-success",
+                                    4 => "bg-warning text-dark",
+                                    5 => "bg-danger",
+                                    _ => "bg-light text-dark"
+                                };
+                            }
+
+                            <td>
+                                <span class="badge @statusBadgeClass">
+                                    @item.TaskStatusName
+                                </span>
+                            </td>
+                            <td>@(item.PriorityName ?? "-")</td>
+                            <td>@(item.OwnerUserName ?? "-")</td>
+                            <td>@(item.CurrentAssignedToUserName ?? "-")</td>
+                            <td>
+                                @if (item.DueDate.HasValue)
+                                {
+                                    <span>@item.DueDate.Value.ToString("yyyy/MM/dd")</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>@(item.EntityTypeName ?? "-")</td>
+                            <td>@(item.EntityReference ?? "-")</td>
+                            <td class="text-end">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary"
+                                        hx-get="@Url.Action("Details", "AppTasks", new { id = item.Id })"
+                                        hx-target="#appTaskDrawerContent"
+                                        hx-swap="innerHTML"
+                                        data-bs-toggle="offcanvas"
+                                        data-bs-target="#appTaskDrawer">
+                                    View
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="card-footer">
+            @await Html.PartialAsync("_Pager", Model)
+        </div>
+    }
+</div>

@@ -1,0 +1,18 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model List<LookupItemVm>
+@{
+    var selectedId = ViewBag.SelectedId as string ?? "";
+}
+
+<option value="">Select...</option>
+@foreach (var item in Model)
+{
+    if (item.Value == selectedId)
+    {
+        <option value="@item.Value" selected>@item.Text</option>
+    }
+    else
+    {
+        <option value="@item.Value">@item.Text</option>
+    }
+}

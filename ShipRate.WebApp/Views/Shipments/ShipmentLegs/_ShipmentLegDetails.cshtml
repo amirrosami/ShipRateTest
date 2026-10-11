@@ -1,0 +1,61 @@
+﻿@model ShipRate.Application.ViewModels.ShipmentLegDetailsVm
+
+<div class="modal fade" id="shipmentLegModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Shipment Leg Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body text-start" dir="ltr">
+                <div class="row g-3">
+                    <div class="col-md-2"><strong>Seq:</strong> @Model.SequenceNo</div>
+                    <div class="col-md-5"><strong>From:</strong> @Model.FromLocationName</div>
+                    <div class="col-md-5"><strong>To:</strong> @Model.ToLocationName</div>
+
+                    <div class="col-md-4"><strong>Leg Type:</strong> @Model.LegTypeName</div>
+                    <div class="col-md-4"><strong>Transport Type:</strong> @Model.TransportTypeName</div>
+                    <div class="col-md-4"><strong>Status:</strong> @Model.LegStatusName</div>
+
+                    <div class="col-md-3"><strong>Carrier:</strong> @Model.CarrierName</div>
+                    <div class="col-md-3"><strong>Flight:</strong> @Model.FlightName</div>
+                    <div class="col-md-3"><strong>Flight Date:</strong> @Model.FlightDateName</div>
+                    <div class="col-md-3"><strong>Voyage:</strong> @Model.VoyageName</div>
+
+                    <div class="col-md-3"><strong>Vessel:</strong> @Model.VesselName</div>
+                    <div class="col-md-3"><strong>Trip:</strong> @Model.TripName</div>
+                    <div class="col-md-3"><strong>Truck:</strong> @Model.TruckName</div>
+                    <div class="col-md-3"><strong>Driver:</strong> @Model.DriverName</div>
+
+                    <div class="col-md-3"><strong>Planned Departure:</strong> @Model.PlannedDepartureDate</div>
+                    <div class="col-md-3"><strong>Planned Arrival:</strong> @Model.PlannedArrivalDate</div>
+                    <div class="col-md-3"><strong>Actual Departure:</strong> @Model.ActualDepartureDate</div>
+                    <div class="col-md-3"><strong>Actual Arrival:</strong> @Model.ActualArrivalDate</div>
+
+                    <div class="col-md-3"><strong>Gross Weight:</strong> @Model.GrossWeightKg</div>
+                    <div class="col-md-3"><strong>Net Weight:</strong> @Model.NetWeightKg</div>
+                    <div class="col-md-3"><strong>Chargeable Weight:</strong> @Model.ChargeableWeightKg</div>
+                    <div class="col-md-3"><strong>Volume:</strong> @Model.VolumeCBM</div>
+
+                    <div class="col-md-3"><strong>Total Packages:</strong> @Model.TotalPackages</div>
+                    <div class="col-md-3"><strong>Package Type:</strong> @Model.PackageTypeName</div>
+                    <div class="col-md-3"><strong>Active:</strong> @(Model.IsActive ? "Yes" : "No")</div>
+                    <div class="col-md-3"></div>
+
+                    <div class="col-md-6"><strong>Receipt Place Text:</strong> @Model.ReceiptPlaceText</div>
+                    <div class="col-md-6"><strong>Delivery Place Text:</strong> @Model.DeliveryPlaceText</div>
+
+                    <div class="col-12"><strong>Remarks:</strong> @Model.Remarks</div>
+
+                    <div class="col-md-6"><strong>Created At:</strong> @Model.CreatedAt</div>
+                    <div class="col-md-6"><strong>Updated At:</strong> @Model.UpdatedAt</div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

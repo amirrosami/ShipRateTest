@@ -1,0 +1,50 @@
+﻿@using ShipRate.Application.DTOs
+@model BookingFormVm
+
+@if (Model.BookingContainerTypes != null && Model.BookingContainerTypes.Any())
+{
+    for (int i = 0; i < Model.BookingContainerTypes.Count; i++)
+    {
+        <tr class="container-row">
+            <td>
+                @* فیلد مخفی برای ID *@
+                <input type="hidden" asp-for="BookingContainerTypes[i].Id" />
+
+                @* استفاده از asp-for برای انتخاب خودکار مقدار *@
+                <select asp-for="BookingContainerTypes[i].ContainerSizeTypeId"
+                        class="form-select form-select-sm"
+                        asp-items="ViewBag.ContainerSizes">
+                    <option value="">-- Select Size --</option>
+                </select>
+            </td>
+            <td>
+                <select asp-for="BookingContainerTypes[i].CntOwnTypeId"
+                        class="form-select form-select-sm"
+                        asp-items="ViewBag.OwnershipTypes">
+                    <option value="">-- Select Ownership --</option>
+                </select>
+            </td>
+            <td>
+                <input type="number" asp-for="BookingContainerTypes[i].ContainerCount"
+                       class="form-control form-control-sm text-center" min="1" />
+            </td>
+            <td>
+                <input type="number" asp-for="BookingContainerTypes[i].OverLengthCM"
+                       class="form-control form-control-sm text-end" />
+            </td>
+            <td>
+                <input type="number" asp-for="BookingContainerTypes[i].OverWidthCM"
+                       class="form-control form-control-sm text-end" />
+            </td>
+            <td>
+                <input type="number" asp-for="BookingContainerTypes[i].OverHeightCM"
+                       class="form-control form-control-sm text-end" />
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove();">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        </tr>
+    }
+}

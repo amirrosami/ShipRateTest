@@ -1,0 +1,145 @@
+﻿@{
+    ViewData["Title"] = "System Administration Hub";
+}
+
+<div class="container-fluid py-3">
+    <div class="hub-page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="fw-bold mb-1"><i class="bi bi-shield-lock-fill text-primary me-2"></i>Administration & Security Control</h5>
+            <span class="text-muted small">Manage user access rights, security policies, company settings, and audit logs</span>
+        </div>
+    </div>
+
+    <!-- Category 1: Users, Roles & Permissions -->
+    <div class="hub-section-title"><i class="bi bi-people"></i> Identity & Access Management</div>
+    <div class="row g-3 mb-3">
+        <div class="col-md-6 col-xl-4">
+            <a asp-controller="UserManagement" asp-action="Index" class="hub-card">
+                <div class="hub-icon"><i class="bi bi-person-gear"></i></div>
+                <div>
+                    <div class="hub-title">Users</div>
+                    <p class="hub-desc">Create employee logins, assign departments, and reset credentials.</p>
+                </div>
+                <i class="bi bi-chevron-right hub-arrow"></i>
+            </a>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <a asp-controller="UserManagement" asp-action="Roles" class="hub-card">
+                <div class="hub-icon"><i class="bi bi-person-badge"></i></div>
+                <div>
+                    <div class="hub-title">Roles</div>
+                    <p class="hub-desc">Configure security roles and claims-based policy definitions.</p>
+                </div>
+                <i class="bi bi-chevron-right hub-arrow"></i>
+            </a>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <a asp-controller="PermissionGroup" asp-action="Index" class="hub-card">
+                <div class="hub-icon"><i class="bi bi-ui-checks"></i></div>
+                <div>
+                    <div class="hub-title">Permission Groups</div>
+                    <p class="hub-desc">Group individual granular permissions into reusable bundles.</p>
+                </div>
+                <i class="bi bi-chevron-right hub-arrow"></i>
+            </a>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <a asp-controller="UserTeams" asp-action="Index" class="hub-card">
+                <div class="hub-icon"><i class="bi bi-microsoft-teams"></i></div>
+                <div>
+                    <div class="hub-title">Users Teams</div>
+                    <p class="hub-desc">Departmental team setups and cross-functional operations groups.</p>
+                </div>
+                <i class="bi bi-chevron-right hub-arrow"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Category 2: Communication & Company Settings -->
+    <div class="hub-section-title"><i class="bi bi-gear"></i> Communications & Company Config</div>
+    <div class="row g-3 mb-3">
+        <div class="col-md-6 col-xl-4">
+            <a asp-controller="Company" asp-action="Index" class="hub-card">
+                <div class="hub-icon"><i class="bi bi-building"></i></div>
+                <div>
+                    <div class="hub-title">Company Settings</div>
+                    <p class="hub-desc">Corporate details, tax registration numbers, and letterhead layouts.</p>
+                </div>
+                <i class="bi bi-chevron-right hub-arrow"></i>
+            </a>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <a asp-controller="Notifications" asp-action="Manage" class="hub-card">
+                <div class="hub-icon"><i class="bi bi-bell-fill"></i></div>
+                <div>
+                    <div class="hub-title">Manage Notifications</div>
+                    <p class="hub-desc">App notifications, in-system toast message center, and broadcasts.</p>
+                </div>
+                <i class="bi bi-chevron-right hub-arrow"></i>
+            </a>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <a asp-controller="NotificationRules" asp-action="Index" class="hub-card">
+                <div class="hub-icon"><i class="bi bi-sliders2"></i></div>
+                <div>
+                    <div class="hub-title">Notification Rules</div>
+                    <p class="hub-desc">Automation triggers for emailing or pinging users on status updates.</p>
+                </div>
+                <i class="bi bi-chevron-right hub-arrow"></i>
+            </a>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <a asp-controller="SmsManagement" asp-action="Index" class="hub-card">
+                <div class="hub-icon"><i class="bi bi-chat-dots"></i></div>
+                <div>
+                    <div class="hub-title">SMS Management</div>
+                    <p class="hub-desc">SMS gateway configurations, outbound message logs, and templates.</p>
+                </div>
+                <i class="bi bi-chevron-right hub-arrow"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Category 3: Audit & Diagnostic Logs -->
+    <div class="hub-section-title"><i class="bi bi-shield-check"></i> Security & Diagnostics</div>
+    <div class="row g-3">
+        <div class="col-md-6 col-xl-4">
+            <a asp-controller="AuditLog" asp-action="Index" class="hub-card">
+                <div class="hub-icon"><i class="bi bi-journal-text"></i></div>
+                <div>
+                    <div class="hub-title">Audit Log</div>
+                    <p class="hub-desc">Track changes, record updates, and deletion history across entities.</p>
+                </div>
+                <i class="bi bi-chevron-right hub-arrow"></i>
+            </a>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <a asp-controller="SecurityEvent" asp-action="Index" class="hub-card">
+                <div class="hub-icon"><i class="bi bi-shield-exclamation"></i></div>
+                <div>
+                    <div class="hub-title">Security Event Log</div>
+                    <p class="hub-desc">Failed login attempts, unauthorized access tries, and session alerts.</p>
+                </div>
+                <i class="bi bi-chevron-right hub-arrow"></i>
+            </a>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <a asp-controller="ApiInquiryLogs" asp-action="Index" class="hub-card">
+                <div class="hub-icon"><i class="bi bi-plug"></i></div>
+                <div>
+                    <div class="hub-title">API Inquiry Log</div>
+                    <p class="hub-desc">External webservice payloads, response statuses, and integration errors.</p>
+                </div>
+                <i class="bi bi-chevron-right hub-arrow"></i>
+            </a>
+        </div>
+    </div>
+</div>

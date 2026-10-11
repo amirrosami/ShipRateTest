@@ -1,0 +1,75 @@
+﻿@model ShipRate.WebApp.ViewModels.CustomersVms.CustomerSearchViewModel
+@{
+    ViewData["Title"] = "Customer Management";
+}
+
+
+<div class="container-fluid mt-3">
+    <div class="card-header">
+        <h4><i class="bi bi-people me-2"></i>Customers</h4>
+    </div>
+    <!-- Search Panel -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <form id="customerSearchForm"
+                  hx-get="/Customers/List"
+                  hx-target="#customerListContainer"
+                  hx-trigger="submit"
+                  hx-include="this">
+
+                <input type="hidden" id="PageNumber" name="Page" value="1" />
+
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Person Name</label>
+                        <input type="text" name="PersonName" class="form-control"
+                               value="@Model.PersonName" placeholder="Search..." />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Status</label>
+                        <select name="Status" class="form-select">
+                            <option value="">All</option>
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Industry</label>
+                        <select name="IndustryId" class="form-select">
+                            <option value="">All</option>
+                            @foreach (var ind in @ViewBag.Industries)
+                            {
+                                <option value="@ind.Id">@ind.IndustryName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Sales User</label>
+                        <select name="SalesUserId" class="form-select">
+                            <option value="">All</option>
+                            @foreach (var su in @ViewBag.SalesUsers)
+                            {
+                                <option value="@su.Id">@su.FullName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search me-1"></i>Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- List Container -->
+    <div id="customerListContainer"
+         hx-get="/Customers/List"
+         hx-trigger="load"
+         hx-target="this">
+        <div class="text-center p-5">
+            <div class="spinner-border text-primary"></div>
+        </div>
+    </div>
+</div>

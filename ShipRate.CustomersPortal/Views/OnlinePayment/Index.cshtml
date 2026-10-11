@@ -1,0 +1,69 @@
+﻿@using Microsoft.Extensions.Localization
+@using ShipRate.Application.DTOs.Finance
+@using ShipRate.WebAppCustomers
+@using System.Globalization
+@model OnlinePaymentListPageVm
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isFa = culture == "fa";
+    var lang = isFa ? "fa" : "en";
+    var dir = isFa ? "rtl" : "ltr";
+}
+@{
+    ViewData["Title"] = "Online Payment";
+}
+
+<div class="container-fluid py-3" dir="@dir">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">@(isFa ? "مدیریت پرداخت های آنلاین" : "Online Payments")</h3>
+
+        @* <button type="button"
+                class="btn btn-outline-success"
+                id="btnPaySelected"
+                hx-post="@Url.Action("LoadPayModal", "Invoices")"
+                hx-target="#app-modal-content"
+                hx-swap="innerHTML"
+                hx-include="#invoiceTable input.invoice-check:checked"
+                hx-on::before-request="if (document.querySelectorAll('#invoiceTable input.invoice-check:checked').length === 0) { createToast('select at least one invoice to pay', 'error'); event.preventDefault(); }"
+                >
+            @(isFa ? "پرداخت موارد اتخاب شده" : "Pay Selected Items")
+        </button> *@
+        @* <button type="button"
+                class="btn btn-primary"
+                hx-get="@Url.Action("CreateModal", "Invoices")"
+                hx-target="#invoice-modal-content"
+                hx-swap="innerHTML"
+                onclick="openInvoiceModal()">
+           + New Invoice
+        </button> *@
+    </div>
+
+    <div id="invoice-list-container"
+         hx-get="@Url.Action("List", "OnlinePayments", new { PageNumber = 1, PageSize = 10 })"
+         hx-trigger="invoice-list-refresh from:body"
+         hx-swap="innerHTML">
+        @await Html.PartialAsync("_List", Model)
+    </div>
+</div>
+
+<div id="invoiceitems-list-container">
+</div>
+
+
+<div class="modal fade" id="invoiceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="invoice-modal-content"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="partyLookupModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content" id="party-lookup-modal-content"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/invoices.js"></script>
+}

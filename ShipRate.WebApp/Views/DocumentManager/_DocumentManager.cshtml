@@ -1,0 +1,222 @@
+﻿@using ShipRate.WebApp.ViewModels
+@model DocumentManagerViewModel
+
+<div id="document-manager-content-2">
+
+    @if (Model.ObjectTypeId != 5 && Model.ObjectTypeId != 300)
+    {
+        <div class="modal-header py-2 bg-light">
+            <h6 class="modal-title">
+                <i class="bi bi-folder2-open me-1"></i>Document Manager
+            </h6>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+    }
+
+    <div class="p-2">
+
+        <!-- کانتینر فرم Inline (وقتی باز شود، گرید زیرین مخفی می‌شود) -->
+        <div id="doc-form-container"></div>
+
+        <!-- کانتینر گرید و اتچمنت‌ها -->
+        <div id="doc-grid-container">
+            <!-- Toolbar -->
+            <div class="d-flex justify-content-between align-items-center py-1 px-1 mb-2 border-bottom">
+                <span class="fw-semibold text-secondary small">
+                    <i class="bi bi-files me-1"></i>@(Model.ObjectTypeId != 5 ? "Documents for this record" : "Documents")
+                </span>
+
+                <div class="d-flex align-items-center gap-2">
+                    @if (Model.ObjectTypeId == 300)
+                    {
+                        <form class="form-check form-switch mb-0"
+                              hx-get="@Url.Action("Index", "DocumentManager")"
+                              hx-trigger="change"
+                              hx-target="#document-manager-content-2"
+                              hx-swap="outerHTML">
+                            <input type="hidden" name="objectId" value="@Model.ObjectId" />
+                            <input type="hidden" name="objectTypeId" value="@Model.ObjectTypeId" />
+
+                            <input class="form-check-input" type="checkbox" id="showSubsets" name="showSubsets" value="true" @(Model.ShowSubset ? "checked" : "") />
+                            <label class="form-check-label small" for="showSubsets">Show Subsets</label>
+                        </form>
+                    }
+
+                    <!-- New Button -->
+                    <button type="button" class="btn btn-primary btn-sm py-1 px-2"
+                            hx-get="/DocumentManager/DocumentForm?objectId=@Model.ObjectId&objectTypeId=@Model.ObjectTypeId"
+                            hx-target="#doc-form-container"
+                            hx-swap="innerHTML">
+                        <i class="bi bi-plus-lg me-1"></i>New
+                    </button>
+                </div>
+            </div>
+
+            <!-- Master Grid: Documents -->
+            <div class="table-responsive mb-2 border rounded" style="max-height: 260px; overflow-y: auto;">
+                <table class="table table-sm table-hover table-bordered mb-0 align-middle" style="font-size: 0.8rem;">
+                    <thead class="table-light sticky-top">
+                        <tr>
+                            <th style="width:30px;" class="text-center">#</th>
+                            <th>Type</th>
+                            <th>Title</th>
+                            <th>Doc No</th>
+                            <th>Date</th>
+                            <th class="text-center">IsLast</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
+                            <th>Last Edit By</th>
+                            <th>Updated At</th>
+                            <th style="width:40px;" class="text-center">Att.</th>
+                            @if (Model.ObjectTypeId == 300 && Model.ShowSubset)
+                            {
+                                <th>Obj.Type</th>
+                            }
+                            <th style="width:75px;" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Documents.Any())
+                        {
+                            var colspan = (Model.ObjectTypeId == 300 && Model.ShowSubset) ? 12 : 11;
+                            <tr><td colspan="@colspan" class="text-center text-muted py-3">No documents found.</td></tr>
+                        }
+                        @{
+                            var idx = 0;
+                        }
+                        @foreach (var doc in Model.Documents)
+                        {
+                            idx++;
+                            <tr class="doc-row" style="cursor:pointer;"
+                                hx-get="/DocumentManager/Attachments?documentId=@doc.Id"
+                                hx-target="#attachments-grid"
+                                hx-swap="innerHTML"
+                                hx-vals='{"documentId": "@doc.Id"}'
+                                data-doc-id="@doc.Id"
+                                hx-trigger="click">
+
+                                <td class="text-center">@idx</td>
+                                <td>@doc.DocumentType</td>
+                                <td>@doc.DocumentTitle</td>
+                                <td>@doc.DocumentNo</td>
+                                <td>@doc.DocumentDate.ToString("yyyy-MM-dd")</td>
+                                <td class="text-center">
+                                    @if (doc.IsLast)
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                            <i class="bi bi-check-circle"></i> Yes
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary-subtle text-secondary border">
+                                            No
+                                        </span>
+                                    }
+                                </td>
+                                <td>@doc.CreateUserName</td>
+                                <td>@doc.CreateDateTime?.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>@doc.LastEditUserName</td>
+                                <td>@doc.LastEditDateTime?.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td class="text-center">
+                                    <span class="badge bg-secondary">@doc.AttachmentCount</span>
+                                </td>
+                                @if (Model.ObjectTypeId == 300 && Model.ShowSubset)
+                                {
+                                    <td>@doc.ObjectTypeName</td>
+                                }
+                                <td class="text-center">
+                                    <button class="btn btn-xs btn-outline-primary py-0 px-1"
+                                            title="Edit"
+                                            hx-get="/DocumentManager/DocumentForm?objectId=@Model.ObjectId&objectTypeId=@Model.ObjectTypeId&id=@doc.Id"
+                                            hx-target="#doc-form-container"
+                                            hx-swap="innerHTML"
+                                            onclick="event.stopPropagation();">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-xs btn-outline-danger py-0 px-1"
+                                            title="Delete"
+                                            hx-post="/DocumentManager/DeleteDocument?id=@doc.Id&objectId=@Model.ObjectId&objectTypeId=@Model.ObjectTypeId"
+                                            hx-target="#document-manager-content-2"
+                                            hx-swap="outerHTML"
+                                            hx-confirm="Delete this document?"
+                                            onclick="event.stopPropagation();">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Detail Grids: Attachments -->
+            <div class="row g-2">
+                <div class="col-12">
+                    <div class="card border">
+                        <div class="card-header py-1 px-2 bg-light d-flex justify-content-between align-items-center">
+                            <small class="fw-bold"><i class="bi bi-paperclip me-1"></i>Attachments</small>
+                        </div>
+                        <div class="card-body p-1" id="attachments-grid">
+                            <div class="text-center text-muted py-3" style="font-size:0.78rem;">
+                                Select a document to view attachments
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // مدیریت خودکار مخفی/آشکار سازی گرید هنگام لود فرم Inline
+    document.body.addEventListener('htmx:afterSwap', function (e) {
+        // ۱. وقتی فرم باز می‌شود -> گرید مخفی شود
+        if (e.detail.target.id === 'doc-form-container') {
+            var grid = document.getElementById('doc-grid-container');
+            if (grid && e.detail.target.innerHTML.trim() !== '') {
+                grid.classList.add('d-none');
+            }
+        }
+
+        // ۲. وقتی کل تب پس از ثبت بازخوانی می‌شود -> گرید ظاهر شود
+        if (e.detail.target.id === 'document-manager-content-2') {
+            var grid = document.getElementById('doc-grid-container');
+            if (grid) grid.classList.remove('d-none');
+        }
+
+        // ۳. لود زنجیره‌ای Attachments
+        if (e.detail.target.id === 'attachments-grid') {
+            var url = e.detail.requestConfig.path;
+            if (url && url.indexOf('?') !== -1) {
+                var params = new URLSearchParams(url.split('?')[1]);
+                var docId = params.get('documentId');
+                if (docId) {
+                    htmx.ajax('GET',
+                        '/DocumentManager/Emails?documentId=' + docId,
+                        { target: '#emails-grid', swap: 'innerHTML' }
+                    );
+                }
+            }
+        }
+    });
+
+    // بستن فرم اینلاین و برگرداندن گرید
+    function closeInlineDocForm() {
+        var formContainer = document.getElementById('doc-form-container');
+        var gridContainer = document.getElementById('doc-grid-container');
+        if (formContainer) formContainer.innerHTML = '';
+        if (gridContainer) gridContainer.classList.remove('d-none');
+    }
+
+    // هایلایت ردیف انتخاب شده
+    document.body.addEventListener('click', function (e) {
+        var row = e.target.closest('.doc-row');
+        if (row) {
+            document.querySelectorAll('.doc-row').forEach(function (r) { r.classList.remove('table-active'); });
+            row.classList.add('table-active');
+        }
+    });
+</script>

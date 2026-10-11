@@ -1,0 +1,127 @@
+﻿@{
+    ViewData["Title"] = "NOA Management";
+}
+
+<div class="container-fluid py-3" dir="ltr">
+    <!-- ===== Top Action Bar & Filters (Matches image-4.png) ===== -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <form hx-get="@Url.Action("Grid")"
+                  hx-target="#noa-grid"
+                  hx-swap="innerHTML"
+                  hx-indicator="#search-loading"
+                  class="row g-2 align-items-end">
+
+                <!-- BL Number Search -->
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold small text-muted">BL Number</label>
+                    <input type="text" name="blNumber" class="form-control" placeholder="Search by BL..." />
+                </div>
+
+                <!-- From Date -->
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold small text-muted">From Date</label>
+                    <input type="date" name="fromDate" class="form-control" />
+                </div>
+
+                <!-- To Date -->
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold small text-muted">To Date</label>
+                    <input type="date" name="toDate" class="form-control" />
+                </div>
+
+                <!-- Filter Buttons -->
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <span class="htmx-indicator spinner-border spinner-border-sm me-1" id="search-loading"></span>
+                        <i class="bi bi-search me-1"></i> Search
+                    </button>
+                </div>
+
+                <!-- Spacer to push Create button to the far right -->
+                <div class="col"></div>
+
+                <!-- Issue New NOA Trigger Button (Purple Style) -->
+@*                 <div class="col-auto">
+                    <button type="button"
+                            class="btn btn-purple px-4"
+                            style="background-color: #6f42c1; border-color: #6f42c1; color: white;"
+                            hx-get="@Url.Action("Create", "NOA")"
+                            hx-target="#noaModalBody"
+                            hx-swap="innerHTML"
+                            onclick="showNoaModal()">
+                        <i class="bi bi-plus-circle me-1"></i> Issue New NOA
+                    </button>
+                </div>
+ *@
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== Main NOA List (Auto-loads Grid) ===== -->
+    <div id="noa-grid"
+         hx-get="@Url.Action("Grid", new { page = 1, pageSize = 10 })"
+         hx-trigger="load, refresh from:body"
+         hx-swap="innerHTML">
+        <div class="text-center p-5">
+            <div class="spinner-border text-primary"></div>
+        </div>
+    </div>
+
+    <!-- ===== Principal Issue NOA Modal ===== -->
+    <div class="modal fade" id="noaModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-body p-0 pb-3" id="noaModalBody">
+                    <!-- Form layout & Price Grid populated dynamically via HTMX -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Notification History / Actions Modal ===== -->
+    <div class="modal fade" id="sendModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content shadow">
+                <div class="modal-header py-2 px-3 bg-light border-bottom border-secondary-subtle">
+                    <h5 class="modal-title fs-6 fw-bold font-monospace text-dark mb-0">
+                        <i class="bi bi-broadcast me-1 text-primary"></i> Dispatch Hub & History
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0" id="sendModalBody">
+                    <!-- Sent SMS/Email Logs rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Minimal Modal Controls & HTMX Event Binding -->
+<script>
+    function showNoaModal() {
+        bootstrap.Modal.getOrCreateInstance('#noaModal').show();
+    }
+
+    function hideNoaModal() {
+        bootstrap.Modal.getOrCreateInstance('#noaModal').hide();
+    }
+
+    function showSendModal() {
+        bootstrap.Modal.getOrCreateInstance('#sendModal').show();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Trigger local auto-refresh on grid when the Issue Modal is closed
+        document.getElementById('noaModal')
+            ?.addEventListener('hidden.bs.modal', () => {
+                htmx.trigger('#noa-grid', 'refresh');
+            });
+
+        // Register custom event for external triggering
+        document.getElementById('noa-grid')
+            ?.addEventListener('refresh-htmx', () => {
+                htmx.trigger('#noa-grid', 'refresh');
+            });
+    });
+</script>

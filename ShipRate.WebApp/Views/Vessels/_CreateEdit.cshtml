@@ -1,0 +1,242 @@
+﻿@using ShipRate.Application.DTOs.Base_Info
+@using ShipRate.Application.DTOs.Cargo
+@model VesselCreateEditDto
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+}
+
+<form hx-post="@Url.Action(isCreateMode?"Create":"Edit", "Vessels")"
+      hx-target="#app-modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header form-caption-bg  text-white">
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add Vessel</h5>
+        }
+        else
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Edit Vessel</h5>
+            <input type="hidden" asp-for="Id" />
+        }
+
+
+        <button type="button"
+                class="btn-close"
+                onclick="AppModal.close()">
+        </button>
+    </div>
+
+
+    <div class="modal-body row">
+
+        @Html.AntiForgeryToken()
+        @if (!ViewData.ModelState.IsValid)
+        {
+            var allErrors = ViewData.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            if (allErrors.Any())
+            {
+                <div class="alert alert-danger py-2 mb-1">
+                    <ul class="mb-0 small">
+                        @foreach (var err in allErrors)
+                        {
+                            <li>@err</li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+
+
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                Vessel Type <span class="text-danger">*</span>
+            </label>
+            <div class="d-flex align-items-center gap-2">
+                <select asp-for="VesselTypeId"
+                        asp-items="@ViewBag.VesselTypes"
+                        class="form-select @(ViewData.ModelState.ContainsKey("VesselTypeId") && ViewData.ModelState["VesselTypeId"]!.Errors.Any() ? "is-invalid" : "")">
+                    <option value=0>-- Select --</option>
+                </select>
+            </div>
+        </div>
+
+
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                Shipping Line <span class="text-danger">*</span>
+            </label>
+            <div class="d-flex align-items-center gap-2">
+                <select asp-for="ShippingLineId"
+                        asp-items="@ViewBag.ShippingLines"
+                        class="form-select @(ViewData.ModelState.ContainsKey("ShippingLineId") && ViewData.ModelState["ShippingLineId"]!.Errors.Any() ? "is-invalid" : "")">
+                    <option value=0>-- Select --</option>
+                </select>
+            </div>
+        </div>
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                Own Type <span class="text-danger">*</span>
+            </label>
+            <div class="d-flex align-items-center gap-2">
+                <select asp-for="OwnTypeId"
+                        asp-items="@ViewBag.VesselOwnTypes"
+                        class="form-select @(ViewData.ModelState.ContainsKey("OwnTypeId") && ViewData.ModelState["OwnTypeId"]!.Errors.Any() ? "is-invalid" : "")">
+                    <option value=0>-- Select --</option>
+                </select>
+
+            </div>
+
+        </div>
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                Flag Country <span class="text-danger">*</span>
+            </label>
+            <div class="d-flex align-items-center gap-2">
+                
+                <select asp-for="FlagCountryId"
+                        asp-items="@ViewBag.Countries"
+                        class="form-select @(ViewData.ModelState.ContainsKey("FlagCountryId") && ViewData.ModelState["FlagCountryId"]!.Errors.Any() ? "is-invalid" : "")">
+                    <option value=0>-- Select --</option>
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                Code <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="VesselCode"
+                   value="@Model.VesselCode"
+                   class="form-control @(ViewData.ModelState.ContainsKey("VesselCode") && ViewData.ModelState["VesselCode"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder="" />
+
+        </div>
+
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                Name <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="VesselName"
+                   value="@Model.VesselName"
+                   class="form-control @(ViewData.ModelState.ContainsKey("VesselName") && ViewData.ModelState["VesselName"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder="" />
+        </div>
+
+
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                Call Sign <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="CallSign"
+                   value="@Model.CallSign"
+                   class="form-control @(ViewData.ModelState.ContainsKey("CallSign") && ViewData.ModelState["CallSign"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder="" />
+
+        </div>
+
+
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                IMO Number <span class="text-danger"></span>
+            </label>
+            <input type="text"
+                   name="IMONumber"
+                   value="@Model.IMONumber"
+                   class="form-control @(ViewData.ModelState.ContainsKey("IMONumber") && ViewData.ModelState["IMONumber"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder="" />
+        </div>
+
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                MMSI <span class="text-danger"></span>
+            </label>
+            <input type="text"
+                   name="MMSI"
+                   value="@Model.MMSI"
+                   class="form-control @(ViewData.ModelState.ContainsKey("MMSI") && ViewData.ModelState["MMSI"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder="" />
+        </div>
+
+        <div class="mb-1 col-md-4">
+        <label class="form-label fw-medium">
+            Dead Weight (DWT)<span class="text-danger">*</span>
+        </label>
+        <input type="text"
+               name="DWT"
+               value="@Model.DWT"
+               class="form-control @(ViewData.ModelState.ContainsKey("DWT") && ViewData.ModelState["DWT"]!.Errors.Any() ? "is-invalid" : "")"
+               placeholder="" />
+            
+               </div>
+
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                Gross Tonnage<span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="GrossTonnage"
+                   value="@Model.GrossTonnage"
+                   class="form-control @(ViewData.ModelState.ContainsKey("GrossTonnage") && ViewData.ModelState["GrossTonnage"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder="" />
+        </div>
+
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                Net Tonnage<span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="NetTonnage"
+                   value="@Model.NetTonnage"
+                   class="form-control @(ViewData.ModelState.ContainsKey("NetTonnage") && ViewData.ModelState["NetTonnage"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder="" />
+        </div>
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                Build Year<span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="BuiltYear"
+                   value="@Model.BuiltYear"
+                   class="form-control @(ViewData.ModelState.ContainsKey("BuiltYear") && ViewData.ModelState["BuiltYear"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder="" />
+        </div>
+        <div class="mb-1 col-md-4">
+            <label class="form-label fw-medium">
+                Capacity (TEU)<span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="CapacityTEU"
+                   value="@Model.CapacityTEU"
+                   class="form-control @(ViewData.ModelState.ContainsKey("CapacityTEU") && ViewData.ModelState["CapacityTEU"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder="" />
+        </div>
+
+        </div>
+
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="AppModal.close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>
+

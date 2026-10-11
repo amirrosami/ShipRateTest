@@ -1,0 +1,42 @@
+﻿.task-management-container {
+    padding: 20px;
+}
+
+.task-management-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+}
+
+.grid-column {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #b6ff00;
+}
+
+.column-header {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list-group-item {
+    cursor: pointer;
+}
+
+    .list-group-item.selected {
+        background: #e7f1ff;
+    }
+
+.actions {
+    display: flex;
+    gap: 6px;
+}
+
+.empty-state {
+    padding: 30px;
+    text-align: center;
+    color: #999;
+}

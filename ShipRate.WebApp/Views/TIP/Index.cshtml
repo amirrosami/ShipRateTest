@@ -1,0 +1,156 @@
+﻿@using ShipRate.Application.DTOs
+@model PagedResultDto<TipListDto>
+
+@{
+    ViewData["Title"] = "TIP Management";
+}
+
+<h3>TIP Management</h3>
+
+<form id="tip-search-form"
+      class="row g-2 mb-3"
+      hx-get="@Url.Action("ListTips", "TIP")"
+      hx-target="#tip-grid"
+      hx-trigger="change delay:300ms, submit">
+
+    <div class="col-md-2">
+        <label class="form-label">Voyage No</label>
+        <input type="text" name="VoyageNo" class="form-control" />
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">Vessel Name</label>
+        <input type="text" name="VesselName" class="form-control" />
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">TIP No</label>
+        <input type="text" name="TIPNo" class="form-control" />
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">Port</label>
+        <input type="text" name="Port" class="form-control" />
+    </div>
+
+    <div class="col-md-1 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+
+    <div class="col-md-1 d-flex align-items-end">
+        <button type="button"
+                class="btn btn-primary"
+                hx-get="@Url.Action("Create", "TIP")"
+                hx-target="#tip-modal-placeholder"
+                hx-swap="innerHTML">
+            <i class="bi bi-plus-circle"></i>
+            New TIP
+        </button>
+    </div>
+</form>
+
+<!-- Top Grid: TIPs -->
+<div id="tip-grid">
+    @Html.Partial("_TipGrid", Model)
+</div>
+
+<!-- Middle Grid: TIPUsages -->
+<h5 class="mt-4">TIP Usages</h5>
+<div id="tip-usage-grid">
+    <div class="alert alert-info">Select a TIP to see its usages.</div>
+</div>
+
+<!-- Bottom Grid: Containers -->
+<h5 class="mt-4">TIP Usage Containers</h5>
+<div id="tip-usage-containers-grid">
+    <div class="alert alert-info">Select a TIP usage to see containers.</div>
+</div>
+
+<!-- Main TIP Modal Placeholder -->
+<div id="tip-modal-placeholder"></div>
+
+<!-- Lookup Modal Placeholder -->
+<div id="lookup-modal-placeholder"></div>
+
+<div class="modal fade" id="documentManagerModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="document-manager-content">
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    function showModalFromPlaceholder(placeholderId) {
+        var holder = document.getElementById(placeholderId);
+        if (!holder) return;
+
+        var modalEl = holder.querySelector('.modal');
+        if (!modalEl) return;
+
+        var modal = bootstrap.Modal.getInstance(modalEl);
+        if (!modal) modal = new bootstrap.Modal(modalEl);
+
+        modal.show();
+    }
+
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (!evt.detail || !evt.detail.target) return;
+
+        if (evt.detail.target.id === 'tip-modal-placeholder') {
+            showModalFromPlaceholder('tip-modal-placeholder');
+        }
+
+        if (evt.detail.target.id === 'lookup-modal-placeholder') {
+            showModalFromPlaceholder('lookup-modal-placeholder');
+        }
+    });
+
+    document.body.addEventListener('hidden.bs.modal', function (evt) {
+        if (evt.target.id === 'tipFormModal' || evt.target.id === 'tipDeleteModal' || evt.target.id === 'tipDetailsModal') {
+            var tipHolder = document.getElementById('tip-modal-placeholder');
+            if (tipHolder) tipHolder.innerHTML = '';
+        }
+
+        if (evt.target.id === 'voyagePortLookupModal') {
+            var lookupHolder = document.getElementById('lookup-modal-placeholder');
+            if (lookupHolder) lookupHolder.innerHTML = '';
+        }
+    });
+
+    document.body.addEventListener('closeLookupModal', function () {
+        var modalEl = document.getElementById('voyagePortLookupModal');
+        if (!modalEl) return;
+
+        var modal = bootstrap.Modal.getInstance(modalEl);
+        if (!modal) {
+            modal = new bootstrap.Modal(modalEl);
+        }
+
+        modal.hide();
+
+        setTimeout(function () {
+            var lookupHolder = document.getElementById('lookup-modal-placeholder');
+            if (lookupHolder) lookupHolder.innerHTML = '';
+
+            document.querySelectorAll('.modal-backdrop').forEach(function (el) {
+                el.remove();
+            });
+
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('padding-right');
+        }, 300);
+    });
+
+    document.body.addEventListener('closeTipFormModal', function () {
+        var modalEl = document.getElementById('tipFormModal');
+        if (!modalEl) return;
+
+        var modal = bootstrap.Modal.getInstance(modalEl);
+        if (!modal) modal = new bootstrap.Modal(modalEl);
+
+        modal.hide();
+    });
+
+</script>

@@ -1,0 +1,12 @@
+﻿@using ShipRate.Application.DTOs
+@model PagedResultDto<TipListDto>
+
+<div id="tip-grid" hx-swap-oob="outerHTML">
+    @await Html.PartialAsync("_TipGrid", Model)
+</div>
+
+<div hx-swap-oob="true">
+    <script>
+        document.body.dispatchEvent(new Event('closeTipFormModal'));
+    </script>
+</div>

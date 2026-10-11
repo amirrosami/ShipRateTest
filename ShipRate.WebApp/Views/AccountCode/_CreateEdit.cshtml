@@ -1,0 +1,77 @@
+﻿@using ShipRate.Application.ViewModels
+@model AccountCodeCreateEditVm
+
+@{
+    var isEdit = Model.Id.HasValue;
+    var actionName = isEdit ? "Edit" : "Create";
+}
+
+<form hx-post="@Url.Action(actionName, "AccountCode")"
+      hx-target="#accountCodeModalBody"
+      hx-swap="innerHTML"
+      method="post"
+      dir="ltr">
+
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    @if (isEdit)
+    {
+        <input type="hidden" asp-for="Id" />
+    }
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label asp-for="CompanyId" class="form-label"></label>
+            <select asp-for="CompanyId" asp-items="Model.Companies" class="form-select">
+                <option value="">-- Select Company --</option>
+            </select>
+            <span asp-validation-for="CompanyId" class="text-danger"></span>
+        </div>
+        <div class="col-md-8">
+        </div>
+
+
+        <div class="col-md-4">
+            <label asp-for="PersonId" class="form-label"></label>
+            <select asp-for="PersonId" asp-items="Model.Persons" class="form-select">
+                <option value="">-- Select Person --</option>
+            </select>
+            <span asp-validation-for="PersonId" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="AccCode" class="form-label"></label>
+            <input asp-for="AccCode" class="form-control" />
+            <span asp-validation-for="AccCode" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="ChargeTypeId" class="form-label"></label>
+            <select asp-for="ChargeTypeId" asp-items="Model.ChargeTypes" class="form-select">
+                <option value="">-- Select Charge Type --</option>
+            </select>
+            <span asp-validation-for="ChargeTypeId" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="BuyAccCode" class="form-label"></label>
+            <input asp-for="BuyAccCode" class="form-control" />
+            <span asp-validation-for="BuyAccCode" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="SellAccCode" class="form-label"></label>
+            <input asp-for="SellAccCode" class="form-control" />
+            <span asp-validation-for="SellAccCode" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">
+            @(isEdit ? "Update" : "Create")
+        </button>
+    </div>
+</form>
+
+<partial name="_ValidationScriptsPartial" />

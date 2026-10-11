@@ -1,0 +1,58 @@
+﻿@using ShipRate.Application.DTOs.UserTeams
+@model EditTeamViewModel
+
+<form hx-post="/UserTeams/EditTeam/@Model.Id"
+      hx-swap="none">
+
+    <div class="mb-3">
+
+        <label>Company</label>
+
+        <select asp-for="Team.CompanyId"
+                asp-items="Model.Companies"
+                class="form-select">
+        </select>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label>Team Name</label>
+
+        <input asp-for="Team.TeamName" class="form-control" />
+
+    </div>
+
+    <div class="mb-3">
+
+        <label>Local Name</label>
+
+        <input asp-for="Team.TeamLocalName" class="form-control" />
+
+    </div>
+
+    <div class="mb-3">
+
+        <label>Team Type</label>
+
+        <select asp-for="Team.TeamTypeId"
+                asp-items="Model.TeamTypes"
+                class="form-select">
+        </select>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label>Manager</label>
+
+        <select asp-for="Team.ManagerId"
+                asp-items="Model.Managers"
+                class="form-select">
+        </select>
+
+    </div>
+
+    <button class="btn btn-primary">Save</button>
+
+</form>

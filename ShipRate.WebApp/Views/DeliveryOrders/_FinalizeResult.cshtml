@@ -1,0 +1,16 @@
+﻿@using ShipRate.Application.ViewModels
+@model FinalizeDeliveryOrderResultVm
+@if (Model.Success)
+{
+    <div class="alert alert-success"
+         data-finalize-success="true"
+         data-delivery-order-id="@Model.DeliveryOrderId">
+        @Model.Message
+    </div>
+}
+else
+{
+    <div class="alert alert-danger">
+        @Model.Message
+    </div>
+}

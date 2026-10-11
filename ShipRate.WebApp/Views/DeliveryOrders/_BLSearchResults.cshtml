@@ -1,0 +1,45 @@
+﻿@using ShipRate.Application.ViewModels
+@model List<DeliveryOrderBLLookupItemVm>
+
+<div class="table-responsive">
+    <table class="table table-sm table-bordered align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>BL No</th>
+                <th>Reference No</th>
+                <th>Booking No</th>
+                <th>Carrier</th>
+                <th>Consignee</th>
+                <th style="width: 120px;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Count == 0)
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No records found.</td>
+                </tr>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.BLNo</td>
+                        <td>@item.ReferenceNo</td>
+                        <td>@item.BookingNo</td>
+                        <td>@item.CarrierName</td>
+                        <td>@item.ConsigneeName</td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-sm btn-primary"
+                                    onclick="selectBL('@item.BLId', '@item.BLNo')">
+                                Select
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

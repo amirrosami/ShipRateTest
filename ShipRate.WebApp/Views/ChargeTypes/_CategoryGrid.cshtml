@@ -1,0 +1,41 @@
+﻿@using ShipRate.WebApp.ViewModels.ChargeTypeVms
+@model ChargeTypeListViewModel
+
+<table class="table">
+
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Local</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @foreach (var item in Model.Categories)
+        {
+            <tr>
+                <td>@item.ChargeTypeCategoryName</td>
+                <td>@item.ChargeTypeCategoryLocalName</td>
+
+                <td>
+
+                    <button class="btn btn-sm btn-primary"
+                            hx-get="/ChargeTypes/List?categoryId=@item.Id&searchTerm=@Model.SearchTerm"
+                            hx-target="#chargeTypeGrid">
+                        Select
+                    </button>
+
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+<div hx-trigger="chargeTypeChanged from:body"
+     hx-get="/ChargeTypes/CategoryList"
+     hx-target="#categoryGrid">
+</div>
+

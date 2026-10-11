@@ -1,0 +1,67 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.Documents
+@model PagedResultDto<DocumentTypeListDto>
+@{
+    ViewData["Title"] = "Document Types Management";
+}
+
+<div class="container-fluid py-4 text-start" dir="ltr">
+    <div class="card shadow-sm">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom-0">
+            <h5 class="mb-0 text-dark fw-bold">Document Types</h5>
+            <button class="btn btn-primary btn-sm d-flex align-items-center gap-2"
+                    hx-get="@Url.Action("Create")"
+                    hx-target="#modal-container"
+                    data-bs-toggle="modal"
+                    data-bs-target="#actionModal">
+                <i class="bi bi-plus-lg"></i> Add New Document Type
+            </button>
+        </div>
+
+        <!-- Search and Filter Bar -->
+        <div class="card-body border-bottom bg-light">
+            <form hx-get="@Url.Action("Index")"
+                  hx-target="#list-container"
+                  hx-push-url="true"
+                  hx-trigger="submit, keyup changed delay:500ms from:#searchTerm"
+                  class="row g-2">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" id="searchTerm" name="searchTerm"
+                               value="@ViewData["SearchTerm"]"
+                               class="form-control"
+                               placeholder="Search by name or category..." autocomplete="off">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Table Ajax Container -->
+        <div id="list-container" hx-get="@Url.Action("Index", new { searchTerm = ViewData["SearchTerm"] })" hx-trigger="listChanged from:body">
+            @await Html.PartialAsync("_ListPartial", Model)
+        </div>
+    </div>
+</div>
+
+<!-- Modal Container Placeholder -->
+<div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel" aria-hidden="true" dir="ltr" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" id="modal-container">
+        <!-- Content will be loaded dynamically by HTMX -->
+    </div>
+</div>
+
+@section Scripts {
+    <!-- اسکریپت ساده برای بستن مودال پس از موفقیت‌آمیز بودن پاسخ HTMX (وقتی بادی خالی است) -->
+    <script>
+        document.body.addEventListener('htmx:afterOnLoad', function (evt) {
+            if (evt.detail.xhr.status === 200 && evt.detail.xhr.responseText === "") {
+                const modalEl = document.getElementById('actionModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) {
+                    modal.hide();
+                }
+            }
+        });
+    </script>
+}

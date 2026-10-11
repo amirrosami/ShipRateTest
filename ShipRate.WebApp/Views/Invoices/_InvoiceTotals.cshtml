@@ -1,0 +1,76 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model InvoiceTotalsVm
+
+<style>
+
+    /* گرید ۵ ستونه برای Totals */
+    .excel-grid-5 {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0;
+        border: 1px solid #d1d9e0;
+    }
+    /* هر سلول به صورت عمودی: Label بالا، عدد پایین */
+    .excel-cell {
+        display: flex;
+        flex-direction: column;
+        border: 0.5px solid #d1d9e0;
+        background: #fff;
+        padding: 4px 6px;
+    }
+
+        /* Label آبی در بالا */
+        .excel-cell .text-label {
+            background: #eef6ff;
+            color: #4a5568;
+            padding: 2px 8px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 0;
+            text-align: center;
+            border-bottom: 1px solid #d1d9e0;
+        }
+
+        /* عدد در پایین */
+        .excel-cell input {
+            width: 100%;
+            border: none !important;
+            background: transparent;
+            padding: 4px 6px;
+            font-size: 13px;
+            text-align: right;
+            box-shadow: none !important;
+            margin-top: 4px;
+        }
+
+        /* برجسته‌کردن Total Amount */
+        .excel-cell .fw-bold {
+            font-weight: 700 !important;
+            background: #eef6ff !important; /* کمی پس‌زمینه آبی برای تفکیک */
+        }
+
+</style>
+
+
+<div class="excel-grid excel-grid-5">
+    <div class="excel-cell">
+        <label class="text-label">First Total</label>
+        <input class="form-control form-control-sm text-end" value="@Model.FirstTotal.ToString("N2")" readonly />
+    </div>
+    <div class="excel-cell">
+        <label class="text-label">Discount</label>
+        <input class="form-control form-control-sm text-end" value="@Model.Discount.ToString("N2")" readonly />
+    </div>
+    <div class="excel-cell">
+        <label class="text-label">Sub Total</label>
+        <input class="form-control form-control-sm text-end" value="@Model.SubTotal.ToString("N2")" readonly />
+    </div>
+    <div class="excel-cell">
+        <label class="text-label">VAT Amount</label>
+        <input class="form-control form-control-sm text-end" value="@Model.TaxAmount.ToString("N2")" readonly />
+    </div>
+    <div class="excel-cell">
+        <label class="text-label">Total Amount</label>
+        <input class="form-control form-control-sm text-end fw-bold" value="@Model.TotalAmount.ToString("N2")" readonly />
+    </div>
+</div>

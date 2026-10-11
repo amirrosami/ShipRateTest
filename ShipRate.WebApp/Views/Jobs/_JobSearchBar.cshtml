@@ -1,0 +1,164 @@
+﻿@using ShipRate.Application.JobsViewModels
+@model JobIndexVm
+
+<style>
+    .job-search-card {
+        background: #ffffff;
+        border: 1px solid #d1d9e0;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 12px;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+    }
+
+    /* گرید فیلدها */
+    .job-search-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 8px;
+        align-items: center;
+    }
+
+    /* افزایش ارتفاع به 38px برای راحتی بیشتر */
+    .job-search-card .form-control,
+    .job-search-card .form-select {
+        height: 38px;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        border: 1px solid #d1d9e0;
+        padding: 0.4rem 0.6rem;
+    }
+
+    /* تنظیم دکمه‌ها برای هماهنگی با ارتفاع جدید */
+    .job-actions-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        height: 100%;
+    }
+
+    .btn-search-full {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        height: 38px; /* هماهنگ با اینپوت‌ها */
+        min-width: 100px;
+    }
+
+    .btn-search-primary {
+        background-color: #0b3c73;
+        color: #fff;
+        border: none;
+    }
+
+        .btn-search-primary:hover {
+            background-color: #082d56;
+            color: #fff;
+        }
+
+    .btn-search-clear {
+        background-color: #f8fafc;
+        color: #64748b;
+        border: 1px solid #d1d9e0;
+    }
+
+        .btn-search-clear:hover {
+            background-color: #e2e8f0;
+            color: #1e293b;
+        }
+
+    /* تنظیم Select2 با ارتفاع 38px */
+    .job-search-card .select2-container--default .select2-selection--single {
+        height: 38px !important;
+        border-radius: 6px !important;
+        border: 1px solid #d1d9e0 !important;
+    }
+
+        .job-search-card .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 36px !important;
+            font-size: 0.85rem;
+        }
+
+        .job-search-card .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px !important;
+        }
+</style>
+
+<form method="get"
+      hx-get="@Url.Action("List", "Jobs")"
+      hx-target="#jobs-table-container"
+      hx-swap="innerHTML"
+      class="job-search-card">
+
+    <input type="hidden" name="Page" value="1" />
+
+    <div class="row g-2">
+        <div class="col">
+            <!-- ردیف اول -->
+            <div class="job-search-grid mb-1">
+                <input name="JobNumber" value="@Model.Search.JobNumber" class="form-control" placeholder="Job / File No" />
+                <select name="CompanyId" class="form-select" asp-items="Model.Companies"><option value="">Company</option></select>
+
+                @* <select name="CustomerId" class="form-select" asp-items="Model.Customers"><option value="">Customer</option></select> *@
+
+                <select id="CustomerSelect2" name="CustomerId" class="form-select">
+                    @if (Model.Search.CustomerId.HasValue &&  Model.Search.CustomerId != Guid.Empty)
+                    {
+                        <option value="@Model.Search.CustomerId" selected>@Model.Search.CustomerName</option>
+                    }
+                </select>
+                <select name="TransportTypeId" class="form-select" asp-items="Model.TransportTypes"><option value="">Transport</option></select>
+                <select name="TradeTypeId" class="form-select" asp-items="Model.TradeTypes"><option value="">Shipment Type</option></select>
+            </div>
+
+            <!-- ردیف دوم -->
+            <div class="job-search-grid">
+                <select id="OriginSelect2" name="OriginId" class="form-select">
+                    @if (Model.Search.OriginId.HasValue && Model.Search.OriginId != Guid.Empty)
+                    {
+                        <option value="@Model.Search.OriginId" selected>@Model.Search.OriginName</option>
+                    }
+                    else
+                    {
+                        <option value="">Origin</option>
+                    }
+                </select>
+                <select id="DestinationSelect2" name="DestinationId" class="form-select">
+                    @if (Model.Search.DestinationId.HasValue && Model.Search.DestinationId != Guid.Empty)
+                    {
+                        <option value="@Model.Search.DestinationId" selected>@Model.Search.DestinationName</option>
+                    }
+                    else
+                    {
+                        <option value="">Destination</option>
+                    }
+                </select>
+                <select name="SalesUserId" class="form-select" asp-items="Model.SalesUsers"><option value="">Sales User</option></select>
+                <select name="JobStatusId" class="form-select" asp-items="Model.JobStatuses"><option value="">Status</option></select>
+                <select name="PageSize" class="form-select">
+                    <option value="10" selected="@(Model.Search.PageSize == 10)">10</option>
+                    <option value="20" selected="@(Model.Search.PageSize == 20)">20</option>
+                    <option value="50" selected="@(Model.Search.PageSize == 50)">50</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-auto">
+            <div class="job-actions-wrapper">
+                <button type="submit" class="btn btn-search-full btn-search-primary" title="Search">
+                    <i class="bi bi-search me-1"></i> Search
+                </button>
+                <button type="button" class="btn btn-search-full btn-search-clear" title="Clear"
+                        hx-get="@Url.Action("List", "Jobs", new { Page = 1, PageSize = 10 })"
+                        hx-target="#jobs-table-container"
+                        hx-swap="innerHTML">
+                    <i class="bi bi-x-lg me-1"></i> Clear
+                </button>
+            </div>
+        </div>
+    </div>
+</form>

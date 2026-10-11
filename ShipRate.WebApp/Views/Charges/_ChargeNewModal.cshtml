@@ -1,0 +1,306 @@
+﻿@using ShipRate.Application.JobsViewModels
+@model CreateChargeVm
+
+<style>
+    /* استایل اختصاصی و مستقل گرید اکسلی فرم */
+    #charge-modal .charge-excel-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        border-top: 1px solid #d1d9e0;
+        border-left: 1px solid #d1d9e0;
+        background-color: #ffffff;
+    }
+
+    #charge-modal .charge-excel-cell {
+        display: flex;
+        align-items: center;
+        border-right: 1px solid #d1d9e0;
+        border-bottom: 1px solid #d1d9e0;
+        height: 34px;
+        box-sizing: border-box;
+        background-color: #ffffff;
+    }
+
+        /* سلول مخصوص فیلدهای چندخطی مانند Remarks */
+        #charge-modal .charge-excel-cell.charge-excel-cell-multiline {
+            height: 68px;
+            align-items: stretch;
+        }
+
+        #charge-modal .charge-excel-cell.span-2 {
+            grid-column: span 2;
+        }
+
+        #charge-modal .charge-excel-cell.span-3 {
+            grid-column: span 3;
+        }
+
+        #charge-modal .charge-excel-cell label {
+            width: 105px;
+            min-width: 105px;
+            height: 100%;
+            margin: 0;
+            padding: 0 8px;
+            display: flex;
+            align-items: center;
+            background-color: #eef6ff;
+            color: #1a365d;
+            font-size: 12px;
+            font-weight: 600;
+            border-right: 1px solid #d1d9e0;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        /* تراز عمودی لیبل برای حالت چندخطی */
+        #charge-modal .charge-excel-cell.charge-excel-cell-multiline label {
+            align-items: flex-start;
+            padding-top: 8px;
+        }
+
+        #charge-modal .charge-excel-cell input,
+        #charge-modal .charge-excel-cell select,
+        #charge-modal .charge-excel-cell textarea {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            border: none !important;
+            border-radius: 0 !important;
+            padding: 6px 8px;
+            font-size: 13px;
+            background-color: transparent;
+            outline: none !important;
+            box-shadow: none !important;
+            resize: none;
+            font-family: inherit;
+        }
+
+            #charge-modal .charge-excel-cell input:focus,
+            #charge-modal .charge-excel-cell select:focus,
+            #charge-modal .charge-excel-cell textarea:focus {
+                background-color: #fffde7 !important;
+            }
+
+            #charge-modal .charge-excel-cell input[readonly] {
+                background-color: #f8f9fa;
+                cursor: not-allowed;
+            }
+
+        /* هماهنگی Select2 با سلول اکسل */
+        #charge-modal .charge-excel-cell .select2-container {
+            flex: 1 !important;
+            width: auto !important;
+            height: 100% !important;
+        }
+
+            #charge-modal .charge-excel-cell .select2-container .select2-selection--single {
+                height: 100% !important;
+                border: none !important;
+                border-radius: 0 !important;
+                background: transparent !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+
+        #charge-modal .charge-excel-cell .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+            font-size: 13px !important;
+            padding-left: 8px !important;
+            line-height: normal !important;
+        }
+
+        #charge-modal .charge-excel-cell:has(.select2-container--focus),
+        #charge-modal .charge-excel-cell:has(.select2-container--open),
+        #charge-modal .charge-excel-cell .select2-container--focus .select2-selection,
+        #charge-modal .charge-excel-cell .select2-container--open .select2-selection {
+            background-color: #fffde7 !important;
+        }
+</style>
+
+<div class="modal fade show" id="charge-modal" aria-modal="true" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow border-0 rounded-1">
+            <div class="modal-header bg-light py-2 px-3 border-bottom">
+                <h6 class="modal-title fw-bold text-dark mb-0 fs-6">
+                    <i class="bi bi-receipt me-1 text-primary"></i> New Charge
+                </h6>
+                <button type="button" class="btn-close" onclick="closeChargeModal()"></button>
+            </div>
+
+            <form hx-post="@Url.Action("CreateCharge","Jobs")"
+                  hx-target="#tab-charges"
+                  hx-swap="innerHTML"
+                  hx-on::after-request="if(event.detail.successful) closeChargeModal()">
+
+                <div class="modal-body p-3 bg-white">
+                    <input type="hidden" asp-for="JobId" />
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="charge-excel-grid">
+
+                        <!-- سطر ۱: Company + Party -->
+                        <div class="charge-excel-cell">
+                            <label>Company</label>
+                            <select asp-items="Model.Companies" asp-for="CompanyId">
+                                <option value="">-- Select --</option>
+                            </select>
+                        </div>
+
+                        <div class="charge-excel-cell span-2">
+                            <label>Party</label>
+                            <select id="PartySelect2" name="PartyId">
+                                @if (Model.PartyId != Guid.Empty)
+                                {
+                                    <option value="@Model.PartyId" selected>@Model.PartyName</option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- سطر ۲: Direction + Charge Type + Currency -->
+                        <div class="charge-excel-cell">
+                            <label>Direction</label>
+                            <select asp-for="DirectionId">
+                                <option value="1">Sell (فروش)</option>
+                                <option value="2">Buy (خرید)</option>
+                            </select>
+                        </div>
+
+                        <div class="charge-excel-cell">
+                            <label>Charge Type</label>
+                            <select asp-for="ChargeTypeId"
+                                    asp-items="Model.ChargeTypes"
+                                    onchange="document.getElementById('charge-description').value = this.options[this.selectedIndex].text !== '-- Select --' ? this.options[this.selectedIndex].text : '';">
+                                <option value="">-- Select --</option>
+                            </select>
+                        </div>
+
+                        <div class="charge-excel-cell">
+                            <label>Currency</label>
+                            <select asp-for="CurrencyId" asp-items="Model.Currencies">
+                                <option value="">-- Select --</option>
+                            </select>
+                        </div>
+
+                        <!-- سطر ۳: Charge Description -->
+                        <div class="charge-excel-cell span-3">
+                            <label>Description</label>
+                            <input asp-for="ChargeDescription" id="charge-description" autocomplete="off" />
+                        </div>
+
+                        <!-- سطر ۴: Quantity + Unit Rate + Amount -->
+                        <div class="charge-excel-cell">
+                            <label>Quantity</label>
+                            <input asp-for="Quantity" id="qty" type="number" step="any" oninput="calcAmount()" placeholder="0.00" />
+                        </div>
+
+                        <div class="charge-excel-cell">
+                            <label>Unit Rate</label>
+                            <input asp-for="UnitRate" id="rate" type="number" step="any" oninput="calcAmount()" placeholder="0.00" />
+                        </div>
+
+                        <div class="charge-excel-cell">
+                            <label>Amount</label>
+                            <input asp-for="Amount" id="amount" class="fw-semibold" readonly placeholder="0.00" />
+                        </div>
+
+                        <!-- سطر ۵: Taxable + Tax % + Tax Amount -->
+                        <div class="charge-excel-cell">
+                            <label>Taxable</label>
+                            <div class="d-flex align-items-center ps-2">
+                                <input type="checkbox" asp-for="Taxable" id="taxable" onchange="calcAmount()" style="width: 16px; height: 16px; cursor: pointer;" />
+                                <span class="small text-muted ms-2 user-select-none">Is Taxable</span>
+                            </div>
+                        </div>
+
+                        <div class="charge-excel-cell">
+                            <label>Tax %</label>
+                            <input asp-for="TaxPercent" id="taxpercent" type="number" step="any" oninput="calcAmount()" placeholder="0.00" />
+                        </div>
+
+                        <div class="charge-excel-cell">
+                            <label>Tax Amount</label>
+                            <input asp-for="TaxAmount" id="taxamount" readonly placeholder="0.00" />
+                        </div>
+
+                        <!-- سطر ۶: Gross Amount (سطر کامل) -->
+                        <div class="charge-excel-cell span-3">
+                            <label style="background-color: #e3f2fd; color: #0d47a1;">Gross Amount</label>
+                            <input asp-for="GrossAmount" id="grossamount" class="fw-bold text-primary" readonly placeholder="0.00" />
+                        </div>
+
+                        <!-- سطر ۷: Remarks (سطر کامل و چندخطی) -->
+                        <div class="charge-excel-cell span-3 charge-excel-cell-multiline">
+                            <label>Remarks</label>
+                            <textarea asp-for="Remarks" rows="2" placeholder="Enter remarks if any..."></textarea>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer py-2 px-3 bg-light border-top d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn btn-sm btn-primary px-3 fw-semibold">
+                        <i class="bi bi-check2-circle me-1"></i> Save Charge
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary px-3" onclick="closeChargeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calcAmount() {
+        let qty = parseFloat(document.getElementById("qty").value) || 0;
+        let rate = parseFloat(document.getElementById("rate").value) || 0;
+        let taxpercent = parseFloat(document.getElementById("taxpercent").value) || 0;
+        let taxable = document.getElementById("taxable").checked ? 1 : 0;
+
+        let amount = qty * rate;
+        let tax = taxable ? (amount * taxpercent / 100) : 0;
+        let grossamount = amount + tax;
+
+        document.getElementById("amount").value = amount.toFixed(2);
+        document.getElementById("taxamount").value = tax.toFixed(2);
+        document.getElementById("grossamount").value = grossamount.toFixed(2);
+    }
+
+    function closeChargeModal() {
+        const modalEl = document.getElementById("charge-modal");
+        if (modalEl) modalEl.remove();
+
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
+
+        const modalContainer = document.getElementById("modalContainer");
+        if (modalContainer) modalContainer.innerHTML = '';
+    }
+
+    $(document).ready(function () {
+        var $partySelect = $('#PartySelect2');
+        var $parentModal = $partySelect.closest('.modal');
+
+        $partySelect.select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Search Party...',
+            allowClear: true,
+            minimumInputLength: 1,
+            dropdownParent: $parentModal.length ? $parentModal : $(document.body),
+            ajax: {
+                url: '/Persons/GetPersonsJson',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { q: params.term };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.results || $.map(data, function (item) {
+                            return { id: item.id, text: item.text };
+                        })
+                    };
+                }
+            }
+        });
+    });
+</script>

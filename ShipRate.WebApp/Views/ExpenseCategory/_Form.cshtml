@@ -1,0 +1,167 @@
+﻿@using ShipRate.WebApp.ViewModels.FinanceVms
+@model ExpenseCategoryFormVM
+@{
+    bool isEdit = Model.Id != null && Model.Id != Guid.Empty;
+    var companies = ViewBag.Companies as SelectList;
+}
+
+<form hx-post="@Url.Action("Save")"
+      hx-target="#modalBody"
+      hx-swap="innerHTML"
+      id="expenseCategoryForm">
+
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <!-- ============ Validation Summary ============ -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger alert-dismissible fade show py-2" role="alert">
+            <i class="bi bi-exclamation-triangle"></i>
+            <strong>Please fix the following errors:</strong>
+            <ul class="mb-0 mt-1">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <!-- ============ Title ============ -->
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">
+                Title <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="Title"
+                   value="@Model.Title"
+                   class="form-control @(ViewData.ModelState.ContainsKey("Title") && ViewData.ModelState["Title"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="50"
+                   required
+                   autofocus />
+            @if (ViewData.ModelState.ContainsKey("Title") && ViewData.ModelState["Title"]!.Errors.Any())
+            {
+                <div class="invalid-feedback">
+                    @ViewData.ModelState["Title"]!.Errors.First().ErrorMessage
+                </div>
+            }
+        </div>
+
+        <!-- ============ Account Code ============ -->
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">
+                Account Code <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="AccountCode"
+                   value="@Model.AccountCode"
+                   class="form-control @(ViewData.ModelState.ContainsKey("AccountCode") && ViewData.ModelState["AccountCode"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="20"
+                   required />
+            @if (ViewData.ModelState.ContainsKey("AccountCode") && ViewData.ModelState["AccountCode"]!.Errors.Any())
+            {
+                <div class="invalid-feedback">
+                    @ViewData.ModelState["AccountCode"]!.Errors.First().ErrorMessage
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- ============ Max Allowed Amount ============ -->
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">
+                Max Allowed Amount(Rials) <span class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-volume-up"></i></span>
+                <input type="number"
+                       name="MaxAllowedAmount"
+                       value="@Model.MaxAllowedAmount"
+                       class="form-control @(ViewData.ModelState.ContainsKey("MaxAllowedAmount") && ViewData.ModelState["MaxAllowedAmount"]!.Errors.Any() ? "is-invalid" : "")"
+                       placeholder="0.00"
+                       step="0.01"
+                       min="0"
+                       required />
+                @if (ViewData.ModelState.ContainsKey("MaxAllowedAmount") && ViewData.ModelState["MaxAllowedAmount"]!.Errors.Any())
+                {
+                    <div class="invalid-feedback">
+                        @ViewData.ModelState["MaxAllowedAmount"]!.Errors.First().ErrorMessage
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- ============ Company ============ -->
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">
+                Company <span class="text-danger">*</span>
+            </label>
+
+            <select name="CompanyId"
+                    class="form-select"
+                    required>
+                <option value="">-- Select Company --</option>
+                @if (companies != null)
+                {
+                    @foreach (var item in companies)
+                    {
+                        if (item.Value == Model.CompanyId.ToString())
+                        {
+                            @:
+                            <option value="@item.Value" selected="selected">@item.Text</option>
+                        }
+                        else
+                        {
+                            @:
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    }
+                }
+            </select>
+
+            @if (ViewData.ModelState.ContainsKey("CompanyId") && ViewData.ModelState["CompanyId"]!.Errors.Any())
+            {
+                <div class="invalid-feedback">
+                    @ViewData.ModelState["CompanyId"]!.Errors.First().ErrorMessage
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- ============ Active Switch ============ -->
+    <div class="mb-3 form-check form-switch">
+        <input type="checkbox"
+               class="form-check-input"
+               name="IsActive"
+               value="true"
+               id="chkActive"
+               @(Model.IsActive ? "checked" : "") />
+        <label class="form-check-label" for="chkActive">Active</label>
+    </div>
+
+    <hr />
+
+    <!-- ============ Action Buttons ============ -->
+    <div class="d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-lg"></i> Cancel
+        </button>
+        <button type="submit" class="btn @(isEdit ? "btn-warning" : "btn-primary")" id="btnSave">
+            <i class="bi bi-check-lg"></i>
+            @(isEdit ? "Update" : "Create")
+        </button>
+    </div>
+</form>
+
+<!-- ============ SET MODAL TITLE ============ -->
+<script>
+    document.getElementById('modalTitle').innerHTML =
+        '@(isEdit
+            ? "<i class=\"bi bi-pencil-square\"></i> Edit Expense Category"
+            : "<i class=\"bi bi-plus-circle\"></i> New Expense Category")';
+</script>

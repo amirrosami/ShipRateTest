@@ -1,0 +1,50 @@
+﻿@model ShipRate.Web.ViewModels.AuditLogViewModel
+@{
+    ViewData["Title"] = "Log Details";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>📝 Log Details #@Model.Id</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">User:</dt>
+                <dd class="col-sm-9">@Model.UserName</dd>
+
+                <dt class="col-sm-3">Operation:</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-primary">@Model.Action</span>
+                </dd>
+
+                <dt class="col-sm-3">Entity:</dt>
+                <dd class="col-sm-9">@Model.EntityName (@Model.EntityId)</dd>
+
+                <dt class="col-sm-3">IP Address:</dt>
+                <dd class="col-sm-9"><code>@Model.IpAddress</code></dd>
+
+                <dt class="col-sm-3">Date time:</dt>
+                <dd class="col-sm-9">@Model.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")</dd>
+
+                @if (!string.IsNullOrEmpty(Model.OldValues))
+                {
+                    <dt class="col-sm-3">Previous Values:</dt>
+                    <dd class="col-sm-9">
+                        <pre class="bg-light p-3">@Model.OldValues</pre>
+                    </dd>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.NewValues))
+                {
+                    <dt class="col-sm-3">New Values:</dt>
+                    <dd class="col-sm-9">
+                        <pre class="bg-light p-3">@Model.NewValues</pre>
+                    </dd>
+                }
+            </dl>
+
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+</div>

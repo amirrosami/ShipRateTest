@@ -1,0 +1,519 @@
+﻿@* ============================================
+   SIDEBAR PARTIAL VIEW
+   ============================================ *@
+<aside class="sneat-sidebar" id="sidebar">
+    <!-- Sidebar Brand -->
+    <div class="sidebar-brand">
+        <a asp-controller="Home" asp-action="Index" class="brand-logo">
+            <span class="logo-icon"><i class="bi bi-globe-americas"></i></span>
+            <span>ShipRate</span>
+        </a>
+        <button class="sidebar-close-btn" id="sidebarCloseBtn" title="Close Sidebar">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar Menu -->
+    <nav class="sidebar-menu">
+
+        <!-- Dashboard -->
+        <div class="menu-item">
+            <a asp-controller="Home" asp-action="Index" class="menu-link active">
+                <i class="bi bi-speedometer2 menu-icon"></i>
+                <span class="menu-text">Dashboard</span>
+            </a>
+        </div>
+        <div class="menu-item">
+            <a asp-controller="AppTasks" asp-action="Index" class="menu-link ">
+                <i class="bi bi-list-task menu-icon"></i>
+                <span class="menu-text">Tasks</span>
+            </a>
+        </div>
+        <div class="menu-item">
+            <a asp-controller="Messaging" asp-action="Index" class="menu-link ">
+                <i class="bi bi-chat-left-text"></i>
+                <span class="menu-text">Conversations</span>
+            </a>
+        </div>
+
+
+        @if (!User.IsInRole("External Party"))
+        {
+            <!-- SHIPMENT MANAGEMENT -->
+            @* <div class="menu-heading">Base Info</div> *@
+
+            <div class="menu-item has-submenu">
+                <a href="#" class="menu-link">
+                    <i class="bi bi-box-seam menu-icon"></i>
+                    <span class="menu-text">Base Info</span>
+                    @* <span class="badge bg-primary menu-badge">6</span> *@
+                </a>
+                <div class="submenu">
+                    <div class="submenu-item">
+                        <a asp-controller="Persons" asp-action="Index" class="submenu-link">Organizations&Persons</a>
+                    </div>
+
+
+
+
+
+                    @*<div class="submenu-item">
+                    <a asp-controller="Country" asp-action="Index" class="submenu-link">Country List</a>
+                </div> *@
+
+                    <div class="submenu-item">
+                        <a asp-controller="Locations" asp-action="Index" class="submenu-link">Locations</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="Territory" asp-action="Index" class="submenu-link">Territories</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="Banks" asp-action="Index" class="submenu-link">Banks</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="Vessels" asp-action="Index" class="submenu-link">Vessels</a>
+                    </div>
+                    <div class="submenu-item">
+                        @* <a asp-controller="PackageTypes" asp-action="Index" class="submenu-link" data-controller="PackageTypes" data-action="Index">Package Types</a> *@
+                        <a asp-controller="PackageTypes" asp-action="Index" class="submenu-link package-link-ajax" data-controller="PackageTypes" data-action="Index">Package Types</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="CargoCommodity" asp-action="Index" class="submenu-link">Cargo Commodity</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="HSCodes" asp-action="Index" class="submenu-link">HS Codes</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="DGs" asp-action="Index" class="submenu-link">Dangerous Goods</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="BlackListReason" asp-action="Index" class="submenu-link">Black List Reasons</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="EventTypes" asp-action="Index" class="submenu-link">Event Types</a>
+                    </div>
+
+
+
+
+                    <div class="submenu-item">
+                        <a asp-controller="MeasurementUnits" asp-action="Index" class="submenu-link">Measurement Units</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="TaskManagement" asp-action="Index" class="submenu-link">Task Types Definition</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-item has-submenu">
+                <a href="#" class="menu-link">
+                    <i class="bi bi-sliders menu-icon"></i>
+                    <span class="menu-text">Operations</span>
+                    @* <span class="badge bg-warning menu-badge">5</span> *@
+                </a>
+                <div class="submenu">
+                    <div class="submenu-item">
+                        <a asp-controller="RateRequests" asp-action="Index" class="submenu-link">Rate Requests</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="Jobs" asp-action="Index" class="submenu-link">Jobs Management</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="ServiceRequests" asp-action="Index" class="submenu-link">Requests Management</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="ShippingRoute" asp-action="Index" class="submenu-link">Services and Loops</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="Voyage" asp-action="Index" class="submenu-link">Voyages</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="Flight" asp-action="Index" class="submenu-link">Flights</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="Routes" asp-action="Index" class="submenu-link">Routes</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="PortDistance" asp-action="Index" class="submenu-link">Distances</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="Agents" asp-action="Index" class="submenu-link">Agents Management</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="TariffBooks" asp-action="Index" class="submenu-link">Tariffs</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="FACContracts" asp-action="Index" class="submenu-link">FAC Contracts</a>
+                    </div>
+                    @*                 <div class="submenu-item">
+                    <a asp-controller="Customs" asp-action="ComplianceCheck" class="submenu-link">Contracts</a>
+                </div>
+ *@                @*                 <div class="submenu-item">
+                    <a asp-controller="Customs" asp-action="ComplianceCheck" class="submenu-link">Bookings</a>
+                </div>
+                <div class="submenu-item">
+                    <a asp-controller="Customs" asp-action="ComplianceCheck" class="submenu-link">Bill Of Ladings</a>
+                </div>
+ *@           
+                    <div class="submenu-item">
+                        <a asp-controller="NOA" asp-action="Index" class="submenu-link">Arrival Notice</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="TIP" asp-action="Index" class="submenu-link">TIP Management</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="BLSerialSeries" asp-action="Index" class="submenu-link">Seials and Holograms </a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="TelexRelease" asp-action="Index" class="submenu-link">Telex Release</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="VoyageManagement" asp-action="Index" class="submenu-link">Voyages Management</a>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="menu-item has-submenu">
+                <a href="#" class="menu-link">
+                    <i class="bi bi-box menu-icon"></i>
+                    <span class="menu-text">Containers</span>
+                    @* <span class="badge bg-warning menu-badge">5</span> *@
+                </a>
+                <div class="submenu">
+                    <div class="submenu-item">
+                        <a asp-controller="Container" asp-action="Index" class="submenu-link">Containers Management</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="ContainerActions" asp-action="Index" class="submenu-link">Container Actions</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="System" asp-action="UnderConstruction" class="submenu-link">Container Detentions</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="System" asp-action="UnderConstruction" class="submenu-link">Container Traces</a>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+            <div class="menu-item has-submenu">
+                <a href="#" class="menu-link">
+                    <i class="bi bi-truck menu-icon"></i>
+                    <span class="menu-text">Transit</span>
+                    @* <span class="badge bg-warning menu-badge">5</span> *@
+                </a>
+                <div class="submenu">
+                    <div class="submenu-item">
+                        <a asp-controller="Truck" asp-action="Index" class="submenu-link">Trucks</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="Driver" asp-action="Index" class="submenu-link">Drivers</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="System" asp-action="UnderConstruction" class="submenu-link">GPS Providers</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="GPSDevice" asp-action="Index" class="submenu-link">GPS Devices</a>
+                    </div>
+                    @*                 <div class="submenu-item">
+                    <a asp-controller="Customs" asp-action="DutyCalculator" class="submenu-link">TIR Request</a>
+                </div>
+                *@                
+                                <div class="submenu-item">
+                        <a asp-controller="TIRCarnets" asp-action="Index" class="submenu-link">TIR Carnets</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="Trips" asp-action="Index" class="submenu-link">Trips</a>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <div class="menu-item has-submenu">
+                <a href="#" class="menu-link">
+                    <i class="bi bi-cash-coin menu-icon"></i>
+                    <span class="menu-text">Finance</span>
+                    @* <span class="badge bg-warning menu-badge">5</span> *@
+                </a>
+                <div class="submenu">
+                    <div class="submenu-item">
+                        <a asp-controller="ChargeTypes" asp-action="Index" class="submenu-link">Charge Types</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="ExchangeRates" asp-action="Index" class="submenu-link">Exchange Rates</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="Invoices" asp-action="Index" class="submenu-link">Invoices</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="PaymentDocuments" asp-action="Index" class="submenu-link">Payment Documents</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="TreasuryDocuments" asp-action="Index" class="submenu-link">Treasury Documents</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="Settlements" asp-action="Index" class="submenu-link">Settlements</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="System" asp-action="UnderConstruction" class="submenu-link">Return Cash</a>
+                    </div>
+
+                    <div class="submenu-item">
+                        <a asp-controller="AssetType" asp-action="Index" class="submenu-link">Asset Types(Vault)</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="VaultMovements" asp-action="Index" class="submenu-link">Vaults Transactions</a>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="menu-item has-submenu">
+                <a href="#" class="menu-link">
+                    <i class="bi bi-people-fill menu-icon"></i>
+                    <span class="menu-text">CRM</span>
+                    @* <span class="badge bg-warning menu-badge">5</span> *@
+                </a>
+                <div class="submenu">
+                    <div class="submenu-item">
+                        <a asp-controller="CustomerConfirmation" asp-action="Index" class="submenu-link">Customer Confirmations</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="Customers" asp-action="Index" class="submenu-link">Customers</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="Industry" asp-action="Index" class="submenu-link">Business Industry</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="Attorney" asp-action="Index" class="submenu-link">Attorney</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="System" asp-action="UnderConstruction" class="submenu-link">Black List</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="CustomerGrouping" asp-action="Index" class="submenu-link">Groups Management</a>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <a href="#" class="menu-link">
+                    <i class="bi bi-person-lines-fill menu-icon"></i>
+                    <span class="menu-text">Marketing</span>
+                    @* <span class="badge bg-warning menu-badge">5</span> *@
+                </a>
+                <div class="submenu">
+
+                    <div class="submenu-item">
+                        <a asp-controller="LostReasons" asp-action="Index" class="submenu-link">Lost Reasons</a>
+                    </div>
+
+
+                    <div class="submenu-item">
+                        <a asp-controller="Leads" asp-action="Index" class="submenu-link">Leads</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="System" asp-action="UnderConstruction" class="submenu-link">Campaigns</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="System" asp-action="UnderConstruction" class="submenu-link">Opportunity</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-item has-submenu">
+                <a href="#" class="menu-link">
+                    <i class="bi bi-shield-check menu-icon"></i>
+                    <span class="menu-text">Reports</span>
+                    @* <span class="badge bg-warning menu-badge">5</span> *@
+                </a>
+                <div class="submenu">
+                    <div class="submenu-item">
+                        <a asp-controller="Reports" asp-action="Index" class="submenu-link">Reports Center</a>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="menu-heading">Utilities</div>
+
+            <div class="menu-item has-submenu">
+                <a href="#" class="menu-link">
+                    <i class="bi bi-wallet2 menu-icon"></i>
+                    <span class="menu-text">Petty Cash</span>
+                    @* <span class="badge bg-warning menu-badge">5</span> *@
+                </a>
+                <div class="submenu">
+                    <div class="submenu-item">
+                        <a asp-controller="CostCenter" asp-action="Index" class="submenu-link">Cost Center</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="ExpenseCategory" asp-action="Index" class="submenu-link">Expense Category</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="PettyCash" asp-action="Index" class="submenu-link">Petty Cash Management</a>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="menu-item has-submenu">
+                <a href="#" class="menu-link">
+                    <i class="bi bi-boxes menu-icon"></i>
+                    <span class="menu-text">Inventory</span>
+                    @* <span class="badge bg-warning menu-badge">5</span> *@
+                </a>
+                <div class="submenu">
+                    <div class="submenu-item">
+                        <a asp-controller="Inventory" asp-action="Index" class="submenu-link">Inventories</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="ProductCategory" asp-action="Index" class="submenu-link">Product Category</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="Products" asp-action="Index" class="submenu-link">Products</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="ProductRequests" asp-action="Index" class="submenu-link">Requests Management</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="ProductStockTransactions" asp-action="Index" class="submenu-link">Inventory Transactions</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-item has-submenu">
+                <a href="#" class="menu-link">
+                    <i class="bi bi-tools menu-icon"></i>
+                    <span class="menu-text">Utilities</span>
+                    @* <span class="badge bg-warning menu-badge">5</span> *@
+                </a>
+                <div class="submenu">
+                    <div class="submenu-item">
+                        <a asp-controller="Documents" asp-action="Index" class="submenu-link">Documents</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="Correspondences" asp-action="Index" class="submenu-link">Correspondences</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="PostalDispatches" asp-action="Index" class="submenu-link">Postal Dispatch</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="EDI" asp-action="Index" class="submenu-link">EDI Messages</a>
+                    </div>
+                </div>
+            </div>
+        }
+
+
+
+        @if (User.IsInRole("External Party"))
+        {
+            <div class="menu-item has-submenu">
+                <a href="#" class="menu-link">
+                    <i class="bi bi-sliders menu-icon"></i>
+                    <span class="menu-text">External Parties</span>
+                    @* <span class="badge bg-warning menu-badge">5</span> *@
+                </a>
+
+                <div class="submenu">
+                    <div class="submenu-item">
+                        <a asp-controller="MyInquiries" asp-action="Index" class="submenu-link">My Inquiries</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="System" asp-action="UnderConstruction" class="submenu-link">My Debit Notes</a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @* <div class="menu-item">
+            <a asp-controller="Regulation" asp-action="Index" class="menu-link">
+                <i class="bi bi-card-checklist menu-icon"></i>
+                <span class="menu-text">Regulations</span>
+            </a>
+        </div> *@
+
+        <!-- FLEET & OPERATIONS -->
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="menu-heading">System</div>
+            <div class="menu-item has-submenu">
+                <a href="#" class="menu-link">
+                    <i class="bi bi-shield-lock-fill menu-icon"></i>
+                    <span class="menu-text">Administration</span>
+                </a>
+                <div class="submenu">
+
+                    <div class="submenu-item">
+                        <a asp-controller="NotificationRules" asp-action="Index" class="submenu-link">Notification Rules</a>
+                    </div>
+
+                    <div class="submenu-item">
+                        <a asp-controller="Notifications" asp-action="Manage" class="submenu-link">Manage Notifications</a>
+                    </div>
+
+
+                    <div class="submenu-item">
+                        <a asp-controller="Company" asp-action="Index" class="submenu-link">Company Settings</a>
+                    </div>
+
+                    <div class="submenu-item">
+                        <a asp-controller="UserManagement" asp-action="Roles" class="submenu-link">Roles</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="PermissionGroup" asp-action="Index" class="submenu-link">Permission Groups</a>
+                    </div>
+
+                    <div class="submenu-item">
+                        <a asp-controller="UserManagement" asp-action="Index" class="submenu-link">Users</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="UserTeams" asp-action="Index" class="submenu-link">Users Teams</a>
+                    </div>
+
+
+                    @*                 <div class="submenu-item">
+                    <a asp-controller="PermissionManagement" asp-action="Index" class="submenu-link">Permission Management</a>
+                </div>
+
+ *@                <div class="submenu-item">
+                        <a asp-controller="AuditLog" asp-action="Index" class="submenu-link">Audit Log</a>
+                    </div>
+                    <div class="submenu-item">
+                        <a asp-controller="SecurityEvent" asp-action="Index" class="submenu-link">Security Event Log</a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @*         <div class="menu-heading">Dashbords</div>
+        <div class="menu-item has-submenu">
+            <a href="#" class="menu-link">
+                <i class="bi bi-speedometer2 menu-icon"></i>
+                <span class="menu-text">Dashbords</span>
+            </a>
+            <div class="submenu">
+                <div class="submenu-item">
+                                        <a asp-controller="Dashboard1" asp-action="Index" class="submenu-link">Dashboard 1 </a>
+                    <a asp-controller="Dashboard2" asp-action="Index" class="submenu-link">Dashboard 2 </a>
+                    <a asp-controller="Dashboard3" asp-action="Index" class="submenu-link">Dashboard 3 </a>
+                    <a asp-controller="Dashboard4" asp-action="Index" class="submenu-link">Dashboard 4 </a>
+                </div>
+            </div>
+        </div>
+ *@
+    </nav>
+</aside>
+<!-- Sidebar Overlay (Mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>

@@ -1,0 +1,112 @@
+﻿@using ShipRate.Application.DTOs
+@model PagedResultDto<BlackListDto>
+@{
+    ViewData["Title"] = "Black List Management";
+    var searchModel = (ViewBag.SearchModel as ShipRate.Application.DTOs.BlackListSearchDto) ?? new ShipRate.Application.DTOs.BlackListSearchDto();
+}
+
+<div class="container-fluid mt-4 text-start" dir="ltr">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h3"><i class="bi bi-shield-slash text-danger"></i> Black List Directory</h2>
+        <!-- دکمه ورود شخص جدید به لیست سیاه -->
+        <button class="btn btn-danger"
+                hx-get="@Url.Action("Create", "BlackList")"
+                hx-target="#modal-container"
+                data-bs-toggle="modal"
+                data-bs-target="#actionModal">
+            <i class="bi bi-plus-circle"></i> Add to Black List
+        </button>
+    </div>
+
+    <!-- پنل جستجوی پیشرفته -->
+    <div class="card mb-4 bg-light shadow-sm">
+        <div class="card-body">
+            <form hx-get="@Url.Action("Index", "BlackList")"
+                  hx-target="#table-rows"
+                  hx-swap="innerHTML"
+                  hx-trigger="submit, keyup delay:500ms from:#SearchTerm, change from:select, change from:#IsActiveOnly">
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label text-secondary fw-semibold">Search Person / Remarks</label>
+                        <input type="text" id="SearchTerm" name="SearchTerm"
+                               value="@(searchModel?.SearchTerm ?? "")"
+                               class="form-control" placeholder="Search...">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label text-secondary fw-semibold">Reason</label>
+                        <select name="BlackListReasonId" class="form-select" asp-items="ViewBag.Reasons">
+                            <option value="">-- All Reasons --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="IsActiveInBlackList" name="IsActiveInBlackList" value="true" @(searchModel.IsActiveInBlackList == true ? "checked" : "")>
+                            <label class="form-check-label fw-semibold" for="IsActiveInBlackList">
+                                Active In Blacklist Only
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end justify-content-end">
+                        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel"></i> Filter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- جدول اطلاعات با قابلیت اسکرول افقی واکنش‌گرا -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0 text-start"
+                       hx-get="@Url.Action("Index", "BlackList")"
+                       hx-trigger="refreshBlackListTable from:body"
+                       hx-target="#table-rows">
+                    <thead class="">
+                        <tr>
+                            <th>Person Name</th>
+                            <th>National ID</th>
+                            <th>Entry Reason</th>
+                            <th>Entry Date</th>
+                            <th>Entry Remarks</th>
+                            <th>Status</th>
+                            <th>Exit Remarks / Date</th>
+                            <th class="text-center" style="width: 180px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-rows">
+                        @if (Model != null)
+                        {
+                            <partial name="_TableRows" model="Model" />
+                        }
+                        else
+                        {
+                            <tr><td colspan="8">Loading data...</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Container برای کارهای پویا از طریق HTMX -->
+<div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" id="modal-container">
+        <!-- ساختار مودال به صورت داینامیک از سمت سرور لود می‌شود -->
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // بستن مودال پس از موفقیت آمیز بودن رویداد ارسال فرم در HTMX
+        document.body.addEventListener("refreshBlackListTable", function() {
+            var modalEl = document.getElementById('actionModal');
+            var modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) {
+                modal.hide();
+            }
+        });
+    </script>
+}

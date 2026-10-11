@@ -1,0 +1,29 @@
+﻿@using ShipRate.Application.ViewModels
+@model SaveDeliveryOrderDraftResultVm
+
+@if (Model.Success)
+{
+    <div class="alert alert-success py-1 px-3 mb-0 d-flex align-items-center" role="alert" id="autoCloseAlert" style="height: 38px;">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span>@Model.Message</span>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger py-1 px-3 mb-0 d-flex align-items-center" id="autoCloseAlert"  role="alert" style="height: 38px;">
+        <i class="bi bi-x-circle-fill me-2 fs-5"></i>
+        @Model.Message
+    </div>
+}
+<script>
+    setTimeout(function() {
+        var alertEl = document.getElementById('autoCloseAlert');
+        if (alertEl) {
+            // استفاده از کلاس‌های بوت‌استرپ برای محو کردن
+            alertEl.classList.remove('show');
+            setTimeout(function() {
+                alertEl.remove();
+            }, 150);
+        }
+    }, 5000); // ۵ ثانیه
+</script>

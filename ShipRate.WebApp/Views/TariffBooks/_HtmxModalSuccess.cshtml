@@ -1,0 +1,64 @@
+﻿@using ShipRate.Application.ViewModels
+@model HtmxModalSuccessVm
+
+
+
+
+<div class="d-none"
+     id="htmx-modal-success"
+     data-refresh-target="@Model.RefreshTarget"
+     data-refresh-url="@Model.RefreshUrl"
+     data-clear-targets="@(Model.ClearTargets == null ? "" : string.Join(",", Model.ClearTargets))">
+</div>
+
+<script>
+    (function () {
+        const successElement = document.getElementById('htmx-modal-success');
+
+        if (!successElement) {
+            return;
+        }
+
+        const modalElement = document.getElementById('mainModal');
+
+        if (modalElement) {
+            const modalInstance = bootstrap.Modal.getInstance(modalElement)
+                || new bootstrap.Modal(modalElement);
+
+            modalInstance.hide();
+        }
+
+        const clearTargets = successElement.getAttribute('data-clear-targets');
+
+        if (clearTargets) {
+            clearTargets.split(',').forEach(function (target) {
+                target = target.trim();
+
+                if (!target) {
+                    return;
+                }
+
+                const element = document.querySelector(target);
+
+                if (element) {
+                    element.innerHTML = '';
+                }
+            });
+        }
+
+        const refreshTarget = successElement.getAttribute('data-refresh-target');
+        const refreshUrl = successElement.getAttribute('data-refresh-url');
+
+        if (refreshTarget === '#tariffBooksGrid') {
+            htmx.trigger(document.body, 'refreshTariffBooks');
+            return;
+        }
+
+        if (refreshTarget && refreshUrl) {
+            htmx.ajax('GET', refreshUrl, {
+                target: refreshTarget,
+                swap: 'innerHTML'
+            });
+        }
+    })();
+</script>

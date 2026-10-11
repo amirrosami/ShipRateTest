@@ -1,0 +1,187 @@
+﻿@* =========================================================================
+   COMPACT SIDEBAR PARTIAL VIEW (ShipRate Core)
+   ========================================================================= *@
+<aside class="sneat-sidebar" id="sidebar">
+    <!-- Sidebar Brand -->
+    <div class="sidebar-brand">
+        <a asp-controller="Home" asp-action="Index" class="brand-logo">
+            <span class="logo-icon"><i class="bi bi-globe-americas"></i></span>
+            <span>ShipRate</span>
+        </a>
+        <button class="sidebar-close-btn" id="sidebarCloseBtn" title="Close Sidebar">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar Menu -->
+    <nav class="sidebar-menu">
+
+        <!-- Direct Action Links -->
+        <div class="menu-item">
+            <a asp-controller="Home" asp-action="Index" class="menu-link active">
+                <i class="bi bi-speedometer2 menu-icon"></i>
+                <span class="menu-text">Dashboard</span>
+            </a>
+        </div>
+        <div class="menu-item">
+            <a asp-controller="AppTasks" asp-action="Index" class="menu-link">
+                <i class="bi bi-list-task menu-icon"></i>
+                <span class="menu-text">Tasks</span>
+            </a>
+        </div>
+        <div class="menu-item">
+            <a asp-controller="Messaging" asp-action="Index" class="menu-link">
+                <i class="bi bi-chat-left-text menu-icon"></i>
+                <span class="menu-text">Conversations</span>
+            </a>
+        </div>
+
+        @if (!User.IsInRole("External Party"))
+        {
+            <div class="menu-heading">Operation Modules</div>
+
+            <auth-policy policy="BaseInfo">
+                <div class="menu-item">
+                    <a asp-controller="Hub" asp-action="BaseInfo" class="menu-link">
+                        <i class="bi bi-box-seam menu-icon"></i>
+                        <span class="menu-text">Base Info</span>
+                    </a>
+                </div>
+            </auth-policy>
+
+            <auth-policy policy="BaseOperations">
+                <div class="menu-item">
+                    <a asp-controller="Hub" asp-action="BaseOperations" class="menu-link">
+                        <i class="bi bi-layers-half menu-icon"></i>
+                        <span class="menu-text">Base Operations</span>
+                    </a>
+                </div>
+            </auth-policy>
+
+            <auth-policy policy="Operations">
+                <div class="menu-item">
+                    <a asp-controller="Hub" asp-action="Operations" class="menu-link">
+                        <i class="bi bi-clipboard-data menu-icon"></i>
+                        <span class="menu-text">Operations</span>
+                    </a>
+                </div>
+            </auth-policy>
+
+            <auth-policy policy="ImportSpecific">
+                <div class="menu-item">
+                    <a asp-controller="Hub" asp-action="Import" class="menu-link">
+                        <i class="bi bi-box-arrow-in-down menu-icon"></i>
+                        <span class="menu-text">Import Specific</span>
+                    </a>
+                </div>
+            </auth-policy>
+
+            <auth-policy policy="Containers">
+                <div class="menu-item">
+                    <a asp-controller="Hub" asp-action="Containers" class="menu-link">
+                        <i class="bi bi-box menu-icon"></i>
+                        <span class="menu-text">Containers</span>
+                    </a>
+                </div>
+            </auth-policy>
+
+            <auth-policy policy="Transit">
+                <div class="menu-item">
+                    <a asp-controller="Hub" asp-action="Transit" class="menu-link">
+                        <i class="bi bi-truck menu-icon"></i>
+                        <span class="menu-text">Transit</span>
+                    </a>
+                </div>
+            </auth-policy>
+
+            <auth-policy policy="Finance">
+                <div class="menu-item">
+                    <a asp-controller="Hub" asp-action="Finance" class="menu-link">
+                        <i class="bi bi-cash-coin menu-icon"></i>
+                        <span class="menu-text">Finance</span>
+                    </a>
+                </div>
+            </auth-policy>
+
+            <auth-policy policy="CRM">
+                <div class="menu-item">
+                    <a asp-controller="Hub" asp-action="Crm" class="menu-link">
+                        <i class="bi bi-people-fill menu-icon"></i>
+                        <span class="menu-text">CRM</span>
+                    </a>
+                </div>
+            </auth-policy>
+
+            <auth-policy policy="Marketing">
+                <div class="menu-item">
+                    <a asp-controller="Hub" asp-action="Marketing" class="menu-link">
+                        <i class="bi bi-person-lines-fill menu-icon"></i>
+                        <span class="menu-text">Marketing</span>
+                    </a>
+                </div>
+            </auth-policy>
+
+            <auth-policy policy="Reports">
+                <div class="menu-item">
+                    <a asp-controller="Reports" asp-action="Index" class="menu-link">
+                        <i class="bi bi-shield-check menu-icon"></i>
+                        <span class="menu-text">Reports</span>
+                    </a>
+                </div>
+            </auth-policy>
+
+            <div class="menu-heading">Utilities & Storage</div>
+
+            <auth-policy policy="PettyCash">
+                <div class="menu-item">
+                    <a asp-controller="Hub" asp-action="PettyCash" class="menu-link">
+                        <i class="bi bi-wallet2 menu-icon"></i>
+                        <span class="menu-text">Petty Cash</span>
+                    </a>
+                </div>
+            </auth-policy>
+
+            <auth-policy policy="Inventory">
+                <div class="menu-item">
+                    <a asp-controller="Hub" asp-action="Inventory" class="menu-link">
+                        <i class="bi bi-boxes menu-icon"></i>
+                        <span class="menu-text">Inventory</span>
+                    </a>
+                </div>
+            </auth-policy>
+
+            <auth-policy policy="Utilities">
+                <div class="menu-item">
+                    <a asp-controller="Hub" asp-action="Utilities" class="menu-link">
+                        <i class="bi bi-tools menu-icon"></i>
+                        <span class="menu-text">Utilities</span>
+                    </a>
+                </div>
+            </auth-policy>
+        }
+
+        @if (User.IsInRole("External Party"))
+        {
+            <div class="menu-heading">Portal</div>
+            <div class="menu-item">
+                <a asp-controller="Hub" asp-action="ExternalPortal" class="menu-link">
+                    <i class="bi bi-sliders menu-icon"></i>
+                    <span class="menu-text">Client Services</span>
+                </a>
+            </div>
+        }
+
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="menu-heading">System Control</div>
+            <div class="menu-item">
+                <a asp-controller="Hub" asp-action="Administration" class="menu-link">
+                    <i class="bi bi-shield-lock-fill menu-icon"></i>
+                    <span class="menu-text">Administration</span>
+                </a>
+            </div>
+        }
+
+    </nav>
+</aside>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>

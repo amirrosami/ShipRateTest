@@ -1,0 +1,92 @@
+﻿@using ShipRate.Application.DTOs
+@model ServiceRequestChargesPanelDto
+
+<div class="card border-success">
+    <div class="card-header d-flex justify-content-between align-items-center py-2">
+        <div>
+            <strong>Charges</strong>
+            <span class="text-muted small">- Service Request #@Model.ServiceRequestNo</span>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="button"
+                    class="btn btn-sm btn-primary"
+                    hx-get="@Url.Action("CreateCharge", "ServiceRequests", new { serviceRequestId = Model.ServiceRequestId })"
+                    hx-target="#modal-container"
+                    hx-swap="innerHTML">
+                <i class="bi bi-plus-lg"></i>
+                Add Charge
+            </button>
+
+            <button type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    onclick="document.getElementById('charges-panel').innerHTML = '';">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body p-2">
+        @if (Model.Charges == null || !Model.Charges.Any())
+        {
+            <div class="alert alert-info mb-0 py-2">
+                No charges found for this service request.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Charge Type</th>
+                            <th>Cost Title</th>
+                            <th class="text-end">Amount</th>
+                            <th>Currency</th>
+                            <th class="text-center">Payable</th>
+                            <th class="text-center">Receivable</th>
+                            <th class="text-center">Approved</th>
+                            <th>Remarks</th>
+                            <th style="width:100px;" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Charges)
+                        {
+                            <tr>
+                                <td>@item.ChargeTypeName</td>
+                                <td>@item.CostTitle</td>
+                                <td class="text-end">@item.Amount.ToString("N2")</td>
+                                <td>@item.CurrencyName</td>
+                                <td class="text-center">@(item.IsPayable ? "Yes" : "No")</td>
+                                <td class="text-center">@(item.IsReceivable ? "Yes" : "No")</td>
+                                <td class="text-center">@(item.IsApproved ? "Yes" : "No")</td>
+                                <td>@item.Remarks</td>
+                                <td class="text-center">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-primary"
+                                            title="Edit"
+                                            hx-get="@Url.Action("EditCharge", "ServiceRequests", new { id = item.Id })"
+                                            hx-target="#modal-container"
+                                            hx-swap="innerHTML">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger"
+                                            title="Delete"
+                                            hx-delete="@Url.Action("DeleteCharge", "ServiceRequests", new { id = item.Id, serviceRequestId = Model.ServiceRequestId })"
+                                            hx-target="#charges-panel"
+                                            hx-swap="innerHTML"
+                                            hx-confirm="Are you sure you want to delete this charge?">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

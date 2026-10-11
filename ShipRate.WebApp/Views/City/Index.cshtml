@@ -1,0 +1,873 @@
+﻿@{
+    ViewData["Title"] = "مدیریت شهرها";
+}
+
+<!-- AntiForgery Token (مهم!) -->
+@Html.AntiForgeryToken()
+
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="bi bi-building"></i>
+            مدیریت شهرها
+        </h2>
+        <button class="btn btn-primary" onclick="cityManager.showCreateModal()">
+            <i class="bi bi-plus-circle"></i>
+            افزودن شهر جدید
+        </button>
+    </div>
+
+    <!-- Search & Filter Panel -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- جستجوی کد شهر -->
+                <div class="col-md-3">
+                    <label class="form-label">کد شهر (جستجوی دقیق)</label>
+                    <input type="number"
+                           id="searchCityId"
+                           class="form-control"
+                           placeholder="کد شهر را وارد کنید">
+                </div>
+
+                <!-- جستجوی نام شهر -->
+                <div class="col-md-3">
+                    <label class="form-label">نام شهر</label>
+                    <input type="text"
+                           id="searchTerm"
+                           class="form-control"
+                           placeholder="جستجو در نام شهر">
+                </div>
+
+                <!-- فیلتر کشور با AutoComplete -->
+                <div class="col-md-4">
+                    <label class="form-label">کشور</label>
+                    <div class="autocomplete-wrapper">
+                        <input type="text"
+                               id="searchCountryInput"
+                               class="form-control autocomplete-input"
+                               placeholder="نام کشور را تایپ کنید"
+                               autocomplete="off">
+                        <input type="hidden" id="searchCountryId">
+                        <div id="searchCountryDropdown" class="autocomplete-dropdown"></div>
+                    </div>
+                </div>
+
+                <!-- دکمه‌های عملیات -->
+                <div class="col-md-2 d-flex align-items-end gap-2">
+                    <button class="btn btn-success flex-fill" onclick="cityManager.search()">
+                        <i class="fas fa-search"></i>
+                        جستجو
+                    </button>
+                    <button class="btn btn-secondary" onclick="cityManager.resetFilters()" title="پاک کردن فیلترها">
+                        <i class="fas fa-circle"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cities Table -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>کد</th>
+                            <th>نام شهر</th>
+                            <th>کشور</th>
+                            <th>جمعیت</th>
+                            <th>مساحت (km²)</th>
+                            <th>پایتخت</th>
+                            <th>وضعیت</th>
+                            <th style="width: 150px;">عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="citiesTableBody">
+                        <tr>
+                            <td colspan="8" class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">در حال بارگذاری...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div>
+                    <span id="paginationInfo" class="text-muted"></span>
+                </div>
+                <nav>
+                    <ul class="pagination mb-0" id="pagination"></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create/Edit Modal -->
+<div class="modal fade" id="cityModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">افزودن شهر جدید</h5>
+                <button type="button" class="btn-close" onclick="cityManager.closeModal()" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="cityForm">
+                    <input type="hidden" id="cityId">
+
+                    <!-- نام شهر -->
+                    <div class="mb-3">
+                        <label for="cityName" class="form-label">نام شهر <span class="text-danger">*</span></label>
+                        <input type="text"
+                               class="form-control"
+                               id="cityName"
+                               required
+                               maxlength="100">
+                        <div class="invalid-feedback" id="nameError"></div>
+                    </div>
+
+                    <!-- کشور با AutoComplete -->
+                    <div class="mb-3">
+                        <label for="modalCountryInput" class="form-label">کشور <span class="text-danger">*</span></label>
+                        <div class="autocomplete-wrapper">
+                            <input type="text"
+                                   id="modalCountryInput"
+                                   class="form-control autocomplete-input"
+                                   placeholder="نام کشور را تایپ کنید"
+                                   required
+                                   autocomplete="off">
+                            <input type="hidden" id="cityCountryId">
+                            <div id="modalCountryDropdown" class="autocomplete-dropdown"></div>
+                        </div>
+                        <div class="invalid-feedback" id="countryIdError"></div>
+                    </div>
+
+                    <!-- جمعیت -->
+                    <div class="mb-3">
+                        <label for="cityPopulation" class="form-label">جمعیت</label>
+                        <input type="number"
+                               class="form-control"
+                               id="cityPopulation"
+                               min="0">
+                        <div class="invalid-feedback" id="populationError"></div>
+                    </div>
+
+                    <!-- مساحت -->
+                    <div class="mb-3">
+                        <label for="cityArea" class="form-label">مساحت (کیلومتر مربع)</label>
+                        <input type="number"
+                               class="form-control"
+                               id="cityArea"
+                               step="0.01"
+                               min="0">
+                        <div class="invalid-feedback" id="areaError"></div>
+                    </div>
+
+                    <!-- پایتخت -->
+                    <div class="mb-3 form-check">
+                        <input type="checkbox"
+                               class="form-check-input"
+                               id="cityIsCapital">
+                        <label class="form-check-label" for="cityIsCapital">
+                            پایتخت کشور
+                        </label>
+                    </div>
+
+                    <!-- وضعیت -->
+                    <div class="mb-3 form-check">
+                        <input type="checkbox"
+                               class="form-check-input"
+                               id="cityIsActive"
+                               checked>
+                        <label class="form-check-label" for="cityIsActive">
+                            فعال
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="cityManager.closeModal()">
+                    <i class="bi bi-x-circle"></i>
+                    انصراف
+                </button>
+                <button type="button" class="btn btn-primary" onclick="cityManager.saveCity()" id="saveButton">
+                    <i class="bi bi-check-circle"></i>
+                    <span id="saveButtonText">ذخیره</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    تأیید حذف
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                <button type="button" class="btn btn-danger" onclick="cityManager.confirmDelete()">حذف</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Container -->
+<div id="notificationContainer" style="position: fixed; top: 20px; left: 20px; z-index: 9999; max-width: 400px;"></div>
+
+@section Styles {
+    <style>
+        /* ========== Autocomplete Styles ========== */
+        .autocomplete-wrapper {
+            position: relative;
+        }
+
+        .autocomplete-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ced4da;
+            border-top: none;
+            border-radius: 0 0 0.25rem 0.25rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1050;
+        }
+
+            .autocomplete-dropdown.show {
+                display: block;
+            }
+
+        .autocomplete-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+            .autocomplete-item:hover {
+                background-color: #f8f9fa;
+            }
+
+            .autocomplete-item.active {
+                background-color: #0d6efd;
+                color: white;
+            }
+
+        .autocomplete-no-results {
+            padding: 8px 12px;
+            color: #6c757d;
+            text-align: center;
+        }
+
+        /* ========== Notification Styles ========== */
+        .notification {
+            margin-bottom: 10px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .notification.success {
+                background-color: #d4edda;
+                color: #155724;
+                border-left: 4px solid #28a745;
+            }
+
+            .notification.error {
+                background-color: #f8d7da;
+                color: #721c24;
+                border-left: 4px solid #dc3545;
+            }
+
+            .notification.info {
+                background-color: #d1ecf1;
+                color: #0c5460;
+                border-left: 4px solid #17a2b8;
+            }
+
+        @@keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ========== Modal Improvements ========== */
+        .modal-header .btn-close {
+            opacity: 1;
+            padding: 0.5rem;
+            margin: -0.5rem -0.5rem -0.5rem auto;
+        }
+
+            .modal-header .btn-close:hover {
+                opacity: 0.75;
+            }
+
+        /* ========== Table Improvements ========== */
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .badge {
+            font-size: 0.85em;
+            padding: 0.35em 0.65em;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        // ========== Get AntiForgery Token ==========
+        function getAntiForgeryToken() {
+            return document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        }
+
+        // ========== Custom Autocomplete Component ==========
+        class Autocomplete {
+            constructor(inputId, dropdownId, hiddenId, fetchUrl) {
+                this.input = document.getElementById(inputId);
+                this.dropdown = document.getElementById(dropdownId);
+                this.hidden = document.getElementById(hiddenId);
+                this.fetchUrl = fetchUrl;
+                this.data = [];
+                this.selectedIndex = -1;
+
+                this.init();
+            }
+
+            init() {
+                this.input.addEventListener('input', () => this.handleInput());
+                this.input.addEventListener('focus', () => this.handleInput());
+                this.input.addEventListener('keydown', (e) => this.handleKeydown(e));
+
+                document.addEventListener('click', (e) => {
+                    if (!this.input.contains(e.target) && !this.dropdown.contains(e.target)) {
+                        this.hideDropdown();
+                    }
+                });
+
+                this.loadData();
+            }
+
+            async loadData() {
+                try {
+                    const response = await fetch(this.fetchUrl);
+                    const result = await response.json();
+                    if (result.success) {
+                        this.data = result.data;
+                    }
+                } catch (error) {
+                    console.error('خطا در بارگذاری داده‌ها:', error);
+                }
+            }
+
+            handleInput() {
+                const query = this.input.value.trim().toLowerCase();
+
+                if (query === '') {
+                    this.hidden.value = '';
+                }
+
+                const filtered = this.data.filter(item =>
+                    item.name.toLowerCase().includes(query)
+                );
+
+                this.renderDropdown(filtered);
+            }
+
+            renderDropdown(items) {
+                this.dropdown.innerHTML = '';
+                this.selectedIndex = -1;
+
+                if (items.length === 0) {
+                    this.dropdown.innerHTML = '<div class="autocomplete-no-results">نتیجه‌ای یافت نشد</div>';
+                    this.showDropdown();
+                    return;
+                }
+
+                items.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'autocomplete-item';
+                    div.textContent = item.name;
+                    div.dataset.id = item.id;
+                    div.dataset.index = index;
+
+                    div.addEventListener('click', () => this.selectItem(item));
+                    this.dropdown.appendChild(div);
+                });
+
+                this.showDropdown();
+            }
+
+            selectItem(item) {
+                this.input.value = item.name;
+                this.hidden.value = item.id;
+                this.hideDropdown();
+                this.input.classList.remove('is-invalid');
+            }
+
+            handleKeydown(e) {
+                const items = this.dropdown.querySelectorAll('.autocomplete-item');
+
+                if (items.length === 0) return;
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    this.selectedIndex = Math.min(this.selectedIndex + 1, items.length - 1);
+                    this.highlightItem(items);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    this.selectedIndex = Math.max(this.selectedIndex - 1, 0);
+                    this.highlightItem(items);
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (this.selectedIndex >= 0) {
+                        const item = items[this.selectedIndex];
+                        this.selectItem({
+                            id: item.dataset.id,
+                            name: item.textContent
+                        });
+                    }
+                } else if (e.key === 'Escape') {
+                    this.hideDropdown();
+                }
+            }
+
+            highlightItem(items) {
+                items.forEach((item, index) => {
+                    item.classList.toggle('active', index === this.selectedIndex);
+                });
+
+                if (this.selectedIndex >= 0) {
+                    items[this.selectedIndex].scrollIntoView({ block: 'nearest' });
+                }
+            }
+
+            showDropdown() {
+                this.dropdown.classList.add('show');
+            }
+
+            hideDropdown() {
+                this.dropdown.classList.remove('show');
+                this.selectedIndex = -1;
+            }
+
+            reset() {
+                this.input.value = '';
+                this.hidden.value = '';
+                this.hideDropdown();
+            }
+
+            setValue(id, name) {
+                this.input.value = name;
+                this.hidden.value = id;
+            }
+        }
+
+        // ========== City Management Object ==========
+        const cityManager = {
+            currentPage: 1,
+            pageSize: 10,
+            totalCount: 0,
+            editingCityId: null,
+            deleteTargetId: null,
+            searchAutocomplete: null,
+            modalAutocomplete: null,
+            modalInstance: null,
+            deleteModalInstance: null,
+
+            init() {
+                // Initialize autocomplete instances
+                this.searchAutocomplete = new Autocomplete(
+                    'searchCountryInput',
+                    'searchCountryDropdown',
+                    'searchCountryId',
+                    '/City/SearchCountries'
+                );
+
+                this.modalAutocomplete = new Autocomplete(
+                    'modalCountryInput',
+                    'modalCountryDropdown',
+                    'cityCountryId',
+                    '/City/SearchCountries'
+                );
+
+                // Initialize Bootstrap modals
+                this.modalInstance = new bootstrap.Modal(document.getElementById('cityModal'));
+                this.deleteModalInstance = new bootstrap.Modal(document.getElementById('deleteModal'));
+
+                // Load cities on page load
+                this.loadCities();
+
+                // Search on Enter key
+                document.getElementById('searchTerm').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.search();
+                });
+
+                document.getElementById('searchCityId').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.search();
+                });
+            },
+
+            async loadCities() {
+                try {
+                    const params = new URLSearchParams({
+                        pageNumber: this.currentPage,
+                        pageSize: this.pageSize
+                    });
+
+                    const cityId = document.getElementById('searchCityId').value.trim();
+                    const searchTerm = document.getElementById('searchTerm').value.trim();
+                    const countryId = document.getElementById('searchCountryId').value;
+
+                    if (cityId) params.append('cityId', cityId);
+                    if (searchTerm) params.append('searchTerm', searchTerm);
+                    if (countryId) params.append('countryId', countryId);
+
+                    const response = await fetch(`/City/GetPaged?${params}`);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.renderTable(result.data.items);
+                        this.totalCount = result.data.totalCount;
+                        this.renderPagination();
+                    } else {
+                        this.showNotification(result.message || 'خطا در دریافت اطلاعات', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    this.showNotification('خطا در برقراری ارتباط با سرور', 'error');
+                }
+            },
+
+            renderTable(cities) {
+                const tbody = document.getElementById('citiesTableBody');
+
+                if (cities.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center">شهری یافت نشد</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = cities.map(city => `
+                    <tr>
+                        <td>${city.id}</td>
+                        <td>${city.name}</td>
+                        <td>${city.countryName || '-'}</td>
+                        <td>${city.population ? city.population.toLocaleString() : '-'}</td>
+                        <td>${city.area ? city.area.toFixed(2) : '-'}</td>
+                        <td>
+                            ${city.isCapital ? '<span class="badge bg-warning">پایتخت</span>' : '-'}
+                        </td>
+                        <td>
+                            ${city.isActive
+                                ? '<span class="badge bg-success">فعال</span>'
+                                : '<span class="badge bg-secondary">غیرفعال</span>'}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-primary" onclick="cityManager.editCity(${city.id})" title="ویرایش">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger" onclick="cityManager.showDeleteModal(${city.id}, '${city.name.replace(/'/g, "\\'")}')" title="حذف">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            },
+
+            renderPagination() {
+                const totalPages = Math.ceil(this.totalCount / this.pageSize);
+                const pagination = document.getElementById('pagination');
+                const info = document.getElementById('paginationInfo');
+
+                const start = ((this.currentPage - 1) * this.pageSize) + 1;
+                const end = Math.min(this.currentPage * this.pageSize, this.totalCount);
+                info.textContent = `نمایش ${start} تا ${end} از ${this.totalCount} شهر`;
+
+                if (totalPages <= 1) {
+                    pagination.innerHTML = '';
+                    return;
+                }
+
+                let html = '';
+
+                // Previous button
+                if (this.currentPage > 1) {
+                    html += `<li class="page-item"><a class="page-link" href="#" onclick="cityManager.goToPage(${this.currentPage - 1}); return false;">قبلی</a></li>`;
+                }
+
+                // Page numbers
+                const startPage = Math.max(1, this.currentPage - 2);
+                const endPage = Math.min(totalPages, this.currentPage + 2);
+
+                if (startPage > 1) {
+                    html += `<li class="page-item"><a class="page-link" href="#" onclick="cityManager.goToPage(1); return false;">1</a></li>`;
+                    if (startPage > 2) {
+                        html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                    }
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    html += `<li class="page-item ${i === this.currentPage ? 'active' : ''}">
+                                <a class="page-link" href="#" onclick="cityManager.goToPage(${i}); return false;">${i}</a>
+                             </li>`;
+                }
+
+                if (endPage < totalPages) {
+                    if (endPage < totalPages - 1) {
+                        html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                    }
+                    html += `<li class="page-item"><a class="page-link" href="#" onclick="cityManager.goToPage(${totalPages}); return false;">${totalPages}</a></li>`;
+                }
+
+                // Next button
+                if (this.currentPage < totalPages) {
+                    html += `<li class="page-item"><a class="page-link" href="#" onclick="cityManager.goToPage(${this.currentPage + 1}); return false;">بعدی</a></li>`;
+                }
+
+                pagination.innerHTML = html;
+            },
+
+            goToPage(page) {
+                this.currentPage = page;
+                this.loadCities();
+            },
+
+            search() {
+                this.currentPage = 1;
+                this.loadCities();
+            },
+
+            resetFilters() {
+                document.getElementById('searchCityId').value = '';
+                document.getElementById('searchTerm').value = '';
+                this.searchAutocomplete.reset();
+                this.currentPage = 1;
+                this.loadCities();
+            },
+
+            showCreateModal() {
+                this.editingCityId = null;
+                document.getElementById('modalTitle').textContent = 'افزودن شهر جدید';
+                document.getElementById('saveButtonText').textContent = 'ذخیره';
+                this.resetForm();
+                this.modalInstance.show();
+            },
+
+            async editCity(id) {
+                try {
+                    const response = await fetch(`/City/GetById/${id}`);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        const city = result.data;
+                        this.editingCityId = city.id;
+
+                        document.getElementById('modalTitle').textContent = 'ویرایش شهر';
+                        document.getElementById('saveButtonText').textContent = 'بروزرسانی';
+
+                        document.getElementById('cityId').value = city.id;
+                        document.getElementById('cityName').value = city.name;
+                        document.getElementById('cityPopulation').value = city.population || '';
+                        document.getElementById('cityArea').value = city.area || '';
+                        document.getElementById('cityIsCapital').checked = city.isCapital;
+                        document.getElementById('cityIsActive').checked = city.isActive;
+
+                        this.modalAutocomplete.setValue(city.countryId, city.countryName);
+
+                        this.modalInstance.show();
+                    } else {
+                        this.showNotification(result.message || 'خطا در دریافت اطلاعات شهر', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    this.showNotification('خطا در برقراری ارتباط با سرور', 'error');
+                }
+            },
+
+            async saveCity() {
+                // Disable save button
+                const saveButton = document.getElementById('saveButton');
+                const originalText = document.getElementById('saveButtonText').textContent;
+                saveButton.disabled = true;
+                document.getElementById('saveButtonText').textContent = 'در حال ذخیره...';
+
+                // Clear previous errors
+                this.clearValidationErrors();
+
+                const cityData = {
+                    id: this.editingCityId || 0,
+                    name: document.getElementById('cityName').value.trim(),
+                    countryId: parseInt(document.getElementById('cityCountryId').value),
+                    population: parseInt(document.getElementById('cityPopulation').value) || null,
+                    area: parseFloat(document.getElementById('cityArea').value) || null,
+                    isCapital: document.getElementById('cityIsCapital').checked,
+                    isActive: document.getElementById('cityIsActive').checked
+                };
+
+                // Client-side validation
+                if (!cityData.name) {
+                    this.showValidationError('cityName', 'نام شهر الزامی است');
+                    saveButton.disabled = false;
+                    document.getElementById('saveButtonText').textContent = originalText;
+                    return;
+                }
+
+                if (!cityData.countryId || isNaN(cityData.countryId)) {
+                    this.showValidationError('modalCountryInput', 'انتخاب کشور الزامی است');
+                    saveButton.disabled = false;
+                    document.getElementById('saveButtonText').textContent = originalText;
+                    return;
+                }
+
+                try {
+                    const url = this.editingCityId ? '/City/Update' : '/City/Create';
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': getAntiForgeryToken()
+                        },
+                        body: JSON.stringify(cityData)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.showNotification(result.message || 'عملیات با موفقیت انجام شد', 'success');
+                        this.closeModal();
+                        this.loadCities();
+                    } else {
+                        if (result.errors && Object.keys(result.errors).length > 0) {
+                            this.showServerValidationErrors(result.errors);
+                        } else {
+                            this.showNotification(result.message || 'خطا در انجام عملیات', 'error');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    this.showNotification('خطا در برقراری ارتباط با سرور', 'error');
+                } finally {
+                    // Re-enable button
+                    saveButton.disabled = false;
+                    document.getElementById('saveButtonText').textContent = originalText;
+                }
+            },
+
+            showDeleteModal(id, name) {
+                this.deleteTargetId = id;
+                document.getElementById('deleteMessage').textContent = `آیا از حذف شهر "${name}" اطمینان دارید؟`;
+                this.deleteModalInstance.show();
+            },
+
+            async confirmDelete() {
+                try {
+                    const response = await fetch(`/City/Delete/${this.deleteTargetId}`, {
+                        method: 'POST',
+                        headers: {
+                            'RequestVerificationToken': getAntiForgeryToken()
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.showNotification(result.message || 'شهر با موفقیت حذف شد', 'success');
+                        this.deleteModalInstance.hide();
+                        this.loadCities();
+                    } else {
+                        this.showNotification(result.message || 'خطا در حذف شهر', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    this.showNotification('خطا در برقراری ارتباط با سرور', 'error');
+                }
+            },
+
+            closeModal() {
+                this.modalInstance.hide();
+                this.resetForm();
+            },
+
+            resetForm() {
+                document.getElementById('cityForm').reset();
+                document.getElementById('cityId').value = '';
+                document.getElementById('cityIsActive').checked = true;
+                this.modalAutocomplete.reset();
+                this.clearValidationErrors();
+            },
+
+            clearValidationErrors() {
+                document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+            },
+
+            showValidationError(fieldId, message) {
+                const field = document.getElementById(fieldId);
+                const errorDiv = document.getElementById(fieldId.charAt(0).toLowerCase() + fieldId.slice(1) + 'Error');
+
+                if (field) field.classList.add('is-invalid');
+                if (errorDiv) errorDiv.textContent = message;
+            },
+
+            showServerValidationErrors(errors) {
+                for (const [field, messages] of Object.entries(errors)) {
+                    const fieldId = 'city' + field.charAt(0).toUpperCase() + field.slice(1);
+                    this.showValidationError(fieldId, messages[0]);
+                }
+            },
+
+            showNotification(message, type = 'info') {
+                const container = document.getElementById('notificationContainer');
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+
+                const icon = type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ';
+                notification.innerHTML = `<strong>${icon}</strong> ${message}`;
+
+                container.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    setTimeout(() => notification.remove(), 300);
+                }, 4000);
+            }
+        };
+
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            cityManager.init();
+        });
+    </script>
+}

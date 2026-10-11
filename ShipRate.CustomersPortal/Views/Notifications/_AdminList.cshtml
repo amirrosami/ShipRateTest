@@ -1,0 +1,96 @@
+﻿@using ShipRate.Application.DTOs.Notif
+@model NotificationAdminListViewModel
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Source</th>
+                    <th>Created By</th>
+                    <th>Created At</th>
+                    <th>Recipients</th>
+                    <th>Read</th>
+                    <th>Unread</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Items.Any())
+                {
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-4">
+                            No notifications found.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model.Items)
+                    {
+                        <tr id="notification-row-@item.Id">
+                            <td>
+                                <div class="fw-semibold">@item.Title</div>
+                                <div class="small text-muted">@item.MessagePreview</div>
+                            </td>
+                            <td>@item.SourceTypeTitle</td>
+                            <td>@item.CreatedByName</td>
+                            <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@item.TotalRecipients</td>
+                            <td>
+                                <span class="badge bg-success">@item.ReadCount</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-warning text-dark">@item.UnreadCount</span>
+                            </td>
+                            <td>
+                                @if (item.IsArchived)
+                                {
+                                    <span class="badge bg-secondary">Archived</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-primary">Active</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-secondary"
+                                   href="@Url.Action("Details", "Notifications", new { id = item.Id })">
+                                    Details
+                                </a>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary"
+                                        hx-get="@Url.Action("Duplicate", "Notifications", new { id = item.Id })"
+                                        hx-target="#modalHost"
+                                        hx-swap="innerHTML">
+                                    Duplicate
+                                </button>
+
+                                @if (!item.IsArchived)
+                                {
+                                    <form method="post"
+                                          class="d-inline"
+                                          hx-post="@Url.Action("Archive", "Notifications", new { id = item.Id })"
+                                          hx-confirm="Archive this notification?"
+                                          hx-target="#notificationAdminList"
+                                          hx-swap="innerHTML"
+                                          hx-include="#notificationFilterForm">
+                                        @Html.AntiForgeryToken()
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-danger">
+                                            Archive
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

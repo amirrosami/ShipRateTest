@@ -1,0 +1,248 @@
+﻿@using Microsoft.Extensions.Localization
+@using ShipRate.Application.DTOs.Finance
+@using System.Globalization
+@using ShipRate.WebAppCustomers
+@model List<InvoiceItemRowVm>
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isFa = culture == "fa";
+    var dir = isFa ? "rtl" : "ltr";
+}
+
+<style>
+    /* همان استایل‌های قبلی شما */
+    .table-responsive {
+        overflow-x: scroll !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: #888 #f1f1f1;
+    }
+
+        .table-responsive::-webkit-scrollbar {
+            height: 12px;
+            -webkit-appearance: none;
+        }
+
+
+        .table-responsive::-webkit-scrollbar-track {
+            background-color: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background-color: #888;
+            border-radius: 10px;
+        }
+
+            .table-responsive::-webkit-scrollbar-thumb:hover {
+                background-color: #555;
+            }
+</style>
+
+<div class="card" dir="@dir">
+    <div class="card-header">
+        <h6>@Localizer["ItemsForInvoice"]: <b> @ViewBag.InvoiceNo</b></h6>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover table-striped table-bordered mb-0">
+            <thead>
+                <tr class="table-info">
+                    <th style="width:70px;">@Localizer["Seq"]</th>
+                    <th>@Localizer["ChargeType"]</th>
+                    <th>@Localizer["Charge"]</th>
+                    <th>@Localizer["Description"]</th>
+                    <th class="text-end">@Localizer["QTY"]</th>
+                    <th class="text-end">@Localizer["UnitPrice"]</th>
+                    <th class="text-end">@Localizer["Discount"]</th>
+                    <th class="text-end">@Localizer["TaxPercent"]</th>
+                    <th>@Localizer["Currency"]</th>
+                    <th class="text-end">@Localizer["BeforeDiscount"]</th>
+                    <th class="text-end">@Localizer["AfterDiscount"]</th>
+                    <th class="text-end">@Localizer["Tax"]</th>
+                    <th class="text-end">@Localizer["Total"]</th>
+                    @* <th>@Localizer["CreateDate"]</th>
+                    <th>@Localizer["UpdateDate"]</th> *@
+                    <th style="width:150px;">@Localizer["Actions"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.SequenceNumber</td>
+                            <td>@item.ChargeTypeName</td>
+                            <td>@item.ChargeName</td>
+                            <td>@item.Description</td>
+                            <td class="text-end">@item.QTY.ToString("N2")</td>
+                            <td class="text-end">@item.UnitPrice.ToString("N2")</td>
+                            <td class="text-end">@item.Discount.ToString("N2")</td>
+                            <td class="text-end">@item.TaxPercent.ToString("N2")</td>
+                            <td>@item.CurrencyCode</td>
+                            <td class="text-end">@item.AmountBeforeDiscount.ToString("N2")</td>
+                            <td class="text-end">@item.AmountAfterDiscount.ToString("N2")</td>
+                            <td class="text-end">@item.TaxAmount.ToString("N2")</td>
+                            <td class="text-end fw-bold">@item.TotalAmount.ToString("N2")</td>
+                            @* <td>@item.CreateDateTime</td>
+                            <td>@item.UpdateDateTime</td> *@
+                            <td>
+                                @* <div class="d-flex gap-1">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-primary"
+                                            hx-get="@Url.Action("EditItemForm", "Invoices", new { id = item.Id })"
+                                            hx-target="#invoice-item-form-container"
+                                            hx-swap="innerHTML">
+                                        @Localizer["Edit"]
+                                    </button>
+
+                                    <form hx-post="@Url.Action("DeleteItem", "Invoices", new { id = item.Id, invoiceId = item.InvoiceId })"
+                                          hx-target="this"
+                                          hx-swap="none"
+                                          hx-confirm="@Localizer["AreYouSureDelete"]"
+                                          class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">@Localizer["Delete"]</button>
+                                    </form>
+                                </div> *@
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="30" class="text-center text-muted">@Localizer["NoItemsFound"]</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+@* @using ShipRate.Application.DTOs.Finance
+@model List<InvoiceItemRowVm>
+
+    <style>
+     .table-responsive {
+        overflow-x: scroll !important;
+        -webkit-overflow-scrolling: touch;
+        }
+
+        .table-responsive::-webkit-scrollbar {
+            height: 12px;
+            -webkit-appearance: none;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background-color: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background-color: #888;
+            border-radius: 10px;
+        }
+
+            .table-responsive::-webkit-scrollbar-thumb:hover {
+                background-color: #555;
+            }
+
+    .table-responsive {
+        scrollbar-width: thin;
+        scrollbar-color: #888 #f1f1f1;
+    }
+</style>
+<div class="card">
+    <div class="card-header">
+        <h6>Items For Invoice No:   <b> @ViewBag.InvoiceNo</b></h6>
+    </div>
+</div>
+
+
+<div class="table-responsive">
+    <table class="table table-hover table-striped table-bordered mb-0">
+        <thead>
+            <tr class="table-info">
+                <th style="width:70px;">Seq</th>
+                <th>Charge Type</th>
+                <th>Charge</th>
+                <th>Description</th>
+                <th class="text-end">QTY</th>
+                <th class="text-end">Unit Price</th>
+                <th class="text-end">Discount</th>
+                <th class="text-end">Tax %</th>
+                <th>Currency</th>
+                <th class="text-end">Before Disc</th>
+                <th class="text-end">After Disc</th>
+                <th class="text-end">Tax</th>
+                <th class="text-end">Total</th>
+                <th>Create Date</th>
+               
+                <th>Update Date</th>
+               
+
+                <th style="width:150px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.SequenceNumber</td>
+                        <td>@item.ChargeTypeName</td>
+                        <td>@item.ChargeName</td>
+                        <td>@item.Description</td>
+                        <td class="text-end">@item.QTY.ToString("N2")</td>
+                        <td class="text-end">@item.UnitPrice.ToString("N2")</td>
+                        <td class="text-end">@item.Discount.ToString("N2")</td>
+                        <td class="text-end">@item.TaxPercent.ToString("N2")</td>
+                        <td>@item.CurrencyCode</td>
+                        <td class="text-end">@item.AmountBeforeDiscount.ToString("N2")</td>
+                        <td class="text-end">@item.AmountAfterDiscount.ToString("N2")</td>
+                        <td class="text-end">@item.TaxAmount.ToString("N2")</td>
+                        <td class="text-end fw-bold">@item.TotalAmount.ToString("N2")</td>
+                        <td>@item.CreateDateTime</td>
+                        
+                        <td>@item.UpdateDateTime</td>
+                        
+                        <td>
+                            <div class="d-flex gap-1">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary"
+                                        hx-get="@Url.Action("EditItemForm", "Invoices", new { id = item.Id })"
+                                        hx-target="#invoice-item-form-container"
+                                        hx-swap="innerHTML">
+                                    Edit
+                                </button>
+
+                                <form hx-post="@Url.Action("DeleteItem", "Invoices", new { id = item.Id, invoiceId = item.InvoiceId })"
+                                      hx-target="this"
+                                      hx-swap="none"
+                                      hx-confirm="Are you sure you want to delete this item?"
+                                      class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="30" class="text-center text-muted">No items found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div> *@

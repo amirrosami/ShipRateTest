@@ -1,0 +1,75 @@
+﻿@using ShipRate.Application.ViewModels
+@model List<DetentionItemListItemVm>
+
+<style>
+    .table-compact th,
+    .table-compact td {
+        padding-top: 0.25rem !important;
+        padding-bottom: 0.25rem !important;
+        font-size: 0.85rem;
+        line-height: 1.2;
+    }
+
+    .btn-xs {
+        padding: 0.1rem 0.35rem;
+        font-size: 0.75rem;
+        line-height: 1;
+        border-radius: 0.2rem;
+    }
+</style>
+
+<div class="card border-info">
+    <div class="card-header bg-info text-white py-1 px-3 fs-6">
+        Detention Containers (Items)
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-striped table-hover table-compact align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="py-1">Container No</th>
+                        <th class="py-1">Type</th>
+                        <th class="py-1">Start</th>
+                        <th class="py-1">End</th>
+                        <th class="py-1">Total / Free / Late</th>
+                        <th class="py-1 text-end">Amount</th>
+                        <th class="py-1 text-center" style="width: 80px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@item.ContainerNo</td>
+                                <td>@item.ContainerType</td>
+                                <td>@item.StartDate.ToString("yyyy-MM-dd")</td>
+                                <td>@item.EndDate.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    <span class="text-secondary">@item.TotalDays</span> /
+                                    <span class="text-success">@item.FreeDays</span> /
+                                    <span class="text-danger fw-bold">@item.LateDays</span>
+                                </td>
+                                <td class="text-end fw-semibold">@item.Amount.ToString("N2")</td>
+                                <td class="text-center">
+                                    <button class="btn btn-outline-primary btn-xs"
+                                            hx-get="@Url.Action("GetItemDetails", new { id = item.Id })"
+                                            hx-target="#details-grid-container">
+                                        Details
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-2">No items found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

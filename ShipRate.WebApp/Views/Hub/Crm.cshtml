@@ -1,0 +1,92 @@
+﻿@{
+    ViewData["Title"] = "CRM Hub";
+}
+
+<div class="container-fluid py-3">
+    <div class="hub-page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="fw-bold mb-1"><i class="bi bi-people-fill text-primary me-2"></i>Customer Relationship Management</h5>
+            <span class="text-muted small">Customer records, onboarding confirmations, legal attorneys, and risk blacklists</span>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <auth-policy policy="CRM.Customers.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Customers" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-person-check"></i></div>
+                    <div>
+                        <div class="hub-title">Customers</div>
+                        <p class="hub-desc">Customer profiles, trade history, commercial terms, and credit limits.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="CRM.CustomerConfirmations.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="CustomerConfirmation" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-shield-check"></i></div>
+                    <div>
+                        <div class="hub-title">Customer Confirmations</div>
+                        <p class="hub-desc">KYC approvals, verified accounts, and onboarding workflow checks.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="CRM.CustomerGroupings.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="CustomerGrouping" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-collection"></i></div>
+                    <div>
+                        <div class="hub-title">Groups Management</div>
+                        <p class="hub-desc">Segment customers into VIP, regular, corporate, or partner groups.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="CRM.Industries.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Industry" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-buildings"></i></div>
+                    <div>
+                        <div class="hub-title">Business Industry</div>
+                        <p class="hub-desc">Classification of economic sectors and business fields.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="CRM.Attornies.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Attorney" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-award"></i></div>
+                    <div>
+                        <div class="hub-title">Attorneys</div>
+                        <p class="hub-desc">Legal representatives, authorized attorneys, and power-of-attorney validity.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="CRM.BlackLists.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="BlackList" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-person-x"></i></div>
+                    <div>
+                        <div class="hub-title">Black List</div>
+                        <p class="hub-desc">Restricted accounts, payment defaulters, and locked consignees.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+    </div>
+</div>

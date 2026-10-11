@@ -1,0 +1,29 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model InvoiceTotalsVm
+
+<div class="card bg-light">
+    <div class="card-body">
+        <div class="row g-2">
+            <div class="col-md-2">
+                <label class="form-label">First Total</label>
+                <input class="form-control text-end" value="@Model.FirstTotal.ToString("N2")" readonly />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Discount</label>
+                <input class="form-control text-end" value="@Model.Discount.ToString("N2")" readonly />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Sub Total</label>
+                <input class="form-control text-end" value="@Model.SubTotal.ToString("N2")" readonly />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Tax Amount</label>
+                <input class="form-control text-end" value="@Model.TaxAmount.ToString("N2")" readonly />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Total Amount</label>
+                <input class="form-control text-end fw-bold" value="@Model.TotalAmount.ToString("N2")" readonly />
+            </div>
+        </div>
+    </div>
+</div>

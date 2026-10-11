@@ -1,0 +1,171 @@
+﻿@using ShipRate.WebApp.ViewModels.Location
+@using ShipRate.WebApp.ViewModels.TerritoryVms
+@model TerritoryEditViewModel
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+}
+
+<form hx-post="@Url.Action(isCreateMode?"CreateTerritory":"EditTerritory", "Territory")"
+      hx-target="#app-modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header form-caption-bg  text-white">
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add Territory</h5>
+        }
+        else
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Edit Territory</h5>
+            <input type="hidden" asp-for="Id" />
+        }
+
+
+        <button type="button"
+                class="btn-close"
+                onclick="AppModal.close()">
+        </button>
+    </div>
+
+
+    <div class="modal-body row">
+
+        @await Html.PartialAsync("_ModelStateError")
+
+        <div class="mb-3 col-md-4">
+            <label class="form-label fw-semibold">
+                <i class="bi bi-geo-alt text-primary me-1"></i>
+                Territory Name <span class="text-danger">*</span>
+            </label>
+            <input name="TerritoryName"
+                   class="form-control"
+                   placeholder="Enter territory name…"
+                   value="@Model.TerritoryName"
+                   required />
+        </div>
+
+        <!-- Remarks -->
+        <div class="mb-3 col-md-5">
+            <label class="form-label fw-semibold">
+                <i class="bi bi-chat-left-text text-primary me-1"></i>
+                Remarks
+            </label>
+            <textarea name="Remarks"
+                      class="form-control"
+                      rows="3"
+                      placeholder="Optional notes…">@Model.Remarks</textarea>
+        </div>
+
+        <!-- Active Switch -->
+        
+       
+    </div>
+
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="AppModal.close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>
+
+
+
+
+@* @using ShipRate.WebApp.ViewModels.TerritoryVms
+@model TerritoryEditViewModel
+
+@{
+    bool isEdit = Model.Id.HasValue;
+}
+
+<!-- ══════════ Modal Header ══════════ -->
+<div class="modal-header bg-primary bg-gradient text-white">
+    <h5 class="modal-title">
+        <i class="bi @(isEdit ? "bi-pencil-square" : "bi-plus-circle") me-2"></i>
+        @(isEdit ? "Edit Territory" : "New Territory")
+    </h5>
+    <button type="button"
+            class="btn-close btn-close-white"
+            data-bs-dismiss="modal"
+            aria-label="Close"></button>
+</div>
+
+<!-- ══════════ Modal Body ══════════ -->
+<form hx-post="@(isEdit ? Url.Action("EditTerritory") : Url.Action("CreateTerritory"))"
+      hx-target="#appModal .modal-content"
+      hx-swap="innerHTML">
+
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <div class="modal-body">
+
+        <!-- Territory Name -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold">
+                <i class="bi bi-geo-alt text-primary me-1"></i>
+                Territory Name <span class="text-danger">*</span>
+            </label>
+            <input name="TerritoryName"
+                   class="form-control"
+                   placeholder="Enter territory name…"
+                   value="@Model.TerritoryName"
+                   required />
+        </div>
+
+        <!-- Remarks -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold">
+                <i class="bi bi-chat-left-text text-primary me-1"></i>
+                Remarks
+            </label>
+            <textarea name="Remarks"
+                      class="form-control"
+                      rows="3"
+                      placeholder="Optional notes…">@Model.Remarks</textarea>
+        </div>
+
+        <!-- Active Switch -->
+        <div class="form-check form-switch">
+            <input class="form-check-input"
+                   type="checkbox"
+                   role="switch"
+                   id="switchIsActive"
+                   name="IsActive"
+                   value="true"
+                   @(Model.IsActive ? "checked" : "") />
+            <label class="form-check-label fw-semibold" for="switchIsActive">
+                Active
+            </label>
+        </div>
+
+    </div>
+
+    <!-- ══════════ Modal Footer ══════════ -->
+    <div class="modal-footer">
+        <button type="button"
+                class="btn btn-outline-secondary"
+                data-bs-dismiss="modal">
+            <i class="bi bi-x-lg me-1"></i> Cancel
+        </button>
+        <button type="submit"
+                class="btn btn-primary">
+            <i class="bi @(isEdit ? "bi-check-lg" : "bi-save") me-1"></i>
+            @(isEdit ? "Update" : "Save")
+        </button>
+    </div>
+
+</form> *@

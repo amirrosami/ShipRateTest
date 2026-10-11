@@ -1,0 +1,55 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.Documents
+@model PagedResultDto<SystemObjectTypeDto>
+
+<div class="grid-scroll-wrapper">
+    <table class="table table-hover table-striped align-middle mb-0" style="min-width: 800px; white-space: nowrap;">
+        <thead class="table-light">
+            <tr>
+                <th class="ps-4">System Object Name</th>
+                <th>Local Name</th>
+                <th class="text-end pe-4" style="width: 120px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td class="ps-4 fw-semibold text-secondary">@item.SystemObjectTypeName</td>
+                    <td>@item.SystemObjectTypeLocalName</td>
+                    <td class="text-end pe-4">
+                        <button type="button"
+                                class="btn btn-primary btn-sm px-3"
+                                hx-get="@Url.Action("LoadDetailList", new { objectTypeId = item.Id })"
+                                hx-target="#detail-list-container">
+                            <i class="bi bi-check2-square"></i> Select
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center py-2 border-top-0">
+        <span class="text-muted small">Showing Page @Model.PageNumber of @Model.TotalPages</span>
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                    <button class="page-link" hx-get="@Url.Action("Index", new { searchTerm = ViewData["SearchTerm"], pageNumber = Model.PageNumber - 1 })" hx-target="#master-list-container">Previous</button>
+                </li>
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(Model.PageNumber == i ? "active" : "")">
+                        <button class="page-link" hx-get="@Url.Action("Index", new { searchTerm = ViewData["SearchTerm"], pageNumber = i })" hx-target="#master-list-container">@i</button>
+                    </li>
+                }
+                <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                    <button class="page-link" hx-get="@Url.Action("Index", new { searchTerm = ViewData["SearchTerm"], pageNumber = Model.PageNumber + 1 })" hx-target="#master-list-container">Next</button>
+                </li>
+            </ul>
+        </nav>
+    </div>
+}

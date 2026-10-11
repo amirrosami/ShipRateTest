@@ -1,0 +1,124 @@
+﻿@using ShipRate.Application.ViewModels
+@model TransportDocumentUpsertVm
+
+<div class="row g-3">
+
+    <div class="col-md-6">
+        <label asp-for="PORId" class="form-label"></label>
+        <select asp-for="PORId"
+                asp-items="Model.Locations"
+                class="form-select">
+            <option value="">-- Select --</option>
+        </select>
+        <span asp-validation-for="PORId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="PORText" class="form-label"></label>
+        <input asp-for="PORText" class="form-control" />
+        <span asp-validation-for="PORText" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="POLId" class="form-label"></label>
+        <select asp-for="POLId"
+                asp-items="Model.Locations"
+                class="form-select">
+            <option value="">-- Select --</option>
+        </select>
+        <span asp-validation-for="POLId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="POLText" class="form-label"></label>
+        <input asp-for="POLText" class="form-control" />
+        <span asp-validation-for="POLText" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="PODId" class="form-label"></label>
+        <select asp-for="PODId"
+                asp-items="Model.Locations"
+                class="form-select">
+            <option value="">-- Select --</option>
+        </select>
+        <span asp-validation-for="PODId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="PODText" class="form-label"></label>
+        <input asp-for="PODText" class="form-control" />
+        <span asp-validation-for="PODText" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="PODelId" class="form-label"></label>
+        <select asp-for="PODelId"
+                asp-items="Model.Locations"
+                class="form-select">
+            <option value="">-- Select --</option>
+        </select>
+        <span asp-validation-for="PODelId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="PODelText" class="form-label"></label>
+        <input asp-for="PODelText" class="form-control" />
+        <span asp-validation-for="PODelText" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-12">
+        <label asp-for="FinalDestinationText" class="form-label"></label>
+        <input asp-for="FinalDestinationText" class="form-control" />
+        <span asp-validation-for="FinalDestinationText" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="TranshipmentPortId" class="form-label"></label>
+        <select asp-for="TranshipmentPortId"
+                asp-items="Model.Locations"
+                class="form-select">
+            <option value="">-- Select --</option>
+        </select>
+        <span asp-validation-for="TranshipmentPortId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="TranshipmentPortText" class="form-label"></label>
+        <input asp-for="TranshipmentPortText" class="form-control" />
+        <span asp-validation-for="TranshipmentPortText" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="PointandCountryOfOriginId" class="form-label"></label>
+        <select asp-for="PointandCountryOfOriginId"
+                asp-items="Model.Locations"
+                class="form-select">
+            <option value="">-- Select --</option>
+        </select>
+        <span asp-validation-for="PointandCountryOfOriginId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="PointandCountryOfOriginText" class="form-label"></label>
+        <input asp-for="PointandCountryOfOriginText" class="form-control" />
+        <span asp-validation-for="PointandCountryOfOriginText" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="OnwardInlandRoutingId" class="form-label"></label>
+        <select asp-for="OnwardInlandRoutingId"
+                asp-items="Model.Locations"
+                class="form-select">
+            <option value="">-- Select --</option>
+        </select>
+        <span asp-validation-for="OnwardInlandRoutingId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="OnwardInlandRoutingText" class="form-label"></label>
+        <input asp-for="OnwardInlandRoutingText" class="form-control" />
+        <span asp-validation-for="OnwardInlandRoutingText" class="text-danger"></span>
+    </div>
+
+</div>

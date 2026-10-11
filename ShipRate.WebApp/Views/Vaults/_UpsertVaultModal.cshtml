@@ -1,0 +1,71 @@
+﻿@using ShipRate.Application.DTOs
+@model VaultUpsertDto
+
+<div class="modal-content vault-modal">
+    <div class="modal-header py-2">
+        <h6 class="modal-title fw-bold">@(Model.Id.HasValue ? "Edit Vault" : "Create New Vault")</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <form hx-post="/Vaults/UpsertVault" hx-swap="none">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+
+        <div class="modal-body p-3">
+            <div class="excel-grid">
+                <!-- Vault Name -->
+                <div class="excel-field">
+                    <label>Vault Name</label>
+                    <input asp-for="VaultName" class="form-control" placeholder="e.g. Central Vault" required />
+                    <span asp-validation-for="VaultName" class="text-danger small"></span>
+                </div>
+
+                <!-- Company Dropdown -->
+                <div class="excel-field">
+                    <label>Company</label>
+                    <select asp-for="CompanyId" asp-items="Model.CompanyList" class="form-select" required>
+                        <option value="">-- Select Company --</option>
+                    </select>
+                    <span asp-validation-for="CompanyId" class="text-danger small"></span>
+                </div>
+
+                <!-- Branch Dropdown -->
+                <div class="excel-field">
+                    <label>Branch</label>
+                    <select asp-for="BranchId" asp-items="Model.BranchList" class="form-select">
+                        <option value="">-- Select Branch (Optional) --</option>
+                    </select>
+                    <span asp-validation-for="BranchId" class="text-danger small"></span>
+                </div>
+
+                <!-- Keeper User Dropdown -->
+                <div class="excel-field">
+                    <label>Keeper / Custodian</label>
+                    <select asp-for="KeeperUserId" asp-items="Model.KeeperUserList" class="form-select">
+                        <option value="">-- Select Keeper (Optional) --</option>
+                    </select>
+                    <span asp-validation-for="KeeperUserId" class="text-danger small"></span>
+                </div>
+
+                <!-- Status Dropdown -->
+                <div class="excel-field">
+                    <label>Status</label>
+                    <select asp-for="IsActive" class="form-select">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Remarks -->
+            <div class="excel-field mt-2 w-100">
+                <label>Remarks</label>
+                <input asp-for="Remarks" class="form-control" placeholder="Optional notes or physical location details" />
+            </div>
+        </div>
+
+        <div class="modal-footer py-2">
+            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-sm btn-primary">Save Vault</button>
+        </div>
+    </form>
+</div>

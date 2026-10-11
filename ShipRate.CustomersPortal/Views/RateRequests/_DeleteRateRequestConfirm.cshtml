@@ -1,0 +1,41 @@
+﻿@using Microsoft.Extensions.Localization
+@using ShipRate.WebAppCustomers
+@using System.Globalization
+@model Guid
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    var isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var direction = isRtl ? "rtl" : "ltr";
+    var textAlign = isRtl ? "text-end" : "text-start";
+    var textAlignOpposite = isRtl ? "text-start" : "text-end";
+}
+
+<div dir="@direction">
+    <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">
+            <i class="bi bi-exclamation-triangle me-2"></i>@Localizer["DeleteConfirmation"]
+        </h5>
+        <button type="button" class="btn-close btn-close-white" onclick="hideModal()" aria-label="@Localizer["Close"]"></button>
+    </div>
+
+    <div class="modal-body @textAlign">
+        <p class="mb-3">@Localizer["DeleteConfirmationMessage"]</p>
+    </div>
+
+    <div class="modal-footer">
+        @Html.AntiForgeryToken()
+
+        <button type="button" class="btn btn-secondary" onclick="hideModal()">
+            @Localizer["Cancel"]
+        </button>
+
+        <button type="button"
+                class="btn btn-danger"
+                hx-post="@Url.Action("Delete", "RateRequests", new { id = Model })"
+                hx-swap="none"
+                hx-include="[name='__RequestVerificationToken']">
+            <i class="bi bi-trash me-1"></i> @Localizer["YesDelete"]
+        </button>
+    </div>
+</div>

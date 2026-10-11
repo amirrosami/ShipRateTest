@@ -1,0 +1,113 @@
+﻿@{
+    ViewData["Title"] = "Cost Centers";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid mt-4" dir="ltr">
+
+    <!-- amamamamam Header amamamamam -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">
+            <i class="bi bi-diagram-3 me-2"></i>Cost Centers
+        </h4>
+        <button class="btn btn-primary"
+                hx-get="/CostCenter/Create"
+                hx-target="#modalBody"
+                hx-swap="innerHTML"
+                onclick="document.getElementById('crudModalLabel').textContent='New Cost Center'; new bootstrap.Modal(document.getElementById('crudModal')).show();">
+            <i class="bi bi-plus-lg me-1"></i> New Cost Center
+        </button>
+    </div>
+
+    <!-- amamamamam Search amamamamam -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text"
+                       id="searchInput"
+                       class="form-control"
+                       placeholder="Search by title, code or company..."
+                       hx-get="/CostCenter/Grid"
+                       hx-trigger="keyup changed delay:400ms"
+                       hx-target="#gridContainer"
+                       hx-swap="innerHTML"
+                       name="search"
+                       autocomplete="off" />
+                <button class="btn btn-outline-secondary"
+                        type="button"
+                        id="btnClearSearch"
+                        title="Clear search"
+                        style="display:none;">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- amamamamam Grid Container amamamamam -->
+    <div id="gridContainer"
+         hx-get="/CostCenter/Grid"
+         hx-trigger="load"
+         hx-swap="innerHTML">
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 text-muted">Loading...</p>
+        </div>
+    </div>
+</div>
+
+<!-- amamamamam Modal amamamamam -->
+<div class="modal fade" id="crudModal" tabindex="-1" aria-labelledby="crudModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="crudModalLabel">Cost Center</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Form loaded here via HTMX -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // ---- Close modal & refresh grid on successful save ----
+        document.body.addEventListener("closeModalAndRefresh", function () {
+            var modalEl = document.getElementById('crudModal');
+            var modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+
+            var search = document.getElementById('searchInput').value;
+            htmx.ajax('GET', '/CostCenter/Grid?search=' + encodeURIComponent(search), {target: '#gridContainer', swap: 'innerHTML'});
+        });
+
+        // ---- Search clear button ----
+        var searchInput = document.getElementById('searchInput');
+        var btnClear = document.getElementById('btnClearSearch');
+
+        searchInput.addEventListener('input', function () {
+            btnClear.style.display = this.value.length > 0 ? 'inline-block' : 'none';
+        });
+
+        btnClear.addEventListener('click', function () {
+            searchInput.value = '';
+            btnClear.style.display = 'none';
+            htmx.ajax('GET', '/CostCenter/Grid', {target: '#gridContainer', swap: 'innerHTML'});
+        });
+
+        // ---- Delete confirmation ----
+        document.body.addEventListener('click', function (e) {
+            var btn = e.target.closest('.btn-delete');
+            if (btn) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (confirm('Are you sure you want to delete this cost center?')) {
+                    htmx.ajax('DELETE', btn.getAttribute('hx-delete'), {target: '#gridContainer', swap: 'innerHTML'});
+                }
+            }
+        });
+    </script>
+}

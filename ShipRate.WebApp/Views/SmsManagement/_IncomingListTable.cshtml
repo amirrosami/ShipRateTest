@@ -1,0 +1,48 @@
+﻿@using ShipRate.Application.DTOs
+@model IEnumerable<SmsIncomingItemDto>
+
+<div class="table-responsive" dir="ltr">
+    <table class="table table-hover table-sm align-middle border">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Line Number</th>
+                <th>Sender Mobile</th>
+                <th>Message Body</th>
+                <th>Received At</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">No incoming messages found.</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td><code>@item.LineNumber</code></td>
+                        <td class="fw-bold text-primary">@item.FromMobile</td>
+                        <td style="max-width: 350px;">@item.MessageBody</td>
+                        <td class="small">@item.ReceivedAtUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>
+                            @if (item.IsProcessed)
+                            {
+                                <span class="badge bg-secondary">Processed</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-info text-dark">New</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

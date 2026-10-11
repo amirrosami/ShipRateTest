@@ -1,0 +1,56 @@
+﻿@using ShipRate.WebApp.ViewModels.ChargeTypeVms
+@model ChargeTypeListViewModel
+
+<div class="mb-2">
+
+    <button class="btn btn-success"
+            hx-get="/ChargeTypes/Form?categoryId=@Model.SelectedCategoryId"
+            hx-target="#dialog">
+        Add
+    </button>
+
+</div>
+
+<table class="table">
+
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Local Name</th>
+            <th>Code</th>
+            <th>Code2</th>
+            <th>Currency</th>
+            <th>Calc By</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @foreach (var item in Model.ChargeTypes)
+        {
+            <tr>
+                <td>@item.ChargeTypeName</td>
+                <td>@item.ChargeTypeLocalName</td>
+                <td>@item.ChargeTypeCode</td>
+                <td>@item.ChargeTypeCode2</td>
+                <td>@item.CurrencyCode</td>
+                <td>@item.CalculationByName</td>
+                <td>
+                    <button class="btn btn-sm btn-warning"
+                            hx-get="/ChargeTypes/Form?id=@item.Id"
+                            hx-target="#dialog">
+                        Edit
+                    </button>
+                    <button class="btn btn-sm btn-danger"
+                            hx-post="/ChargeTypes/Delete/@item.Id"
+                            hx-confirm="Delete?"
+                            hx-trigger="click">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>

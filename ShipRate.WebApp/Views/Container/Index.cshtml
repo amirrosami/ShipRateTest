@@ -1,0 +1,132 @@
+﻿@using ShipRate.WebApp.ViewModels.ContainerViewModels
+@model List<ContainerListVM>
+@{
+    ViewData["Title"] = "Containers";
+    // string ownLeaseTypeId = ViewBag.OwnLeaseTypeId?.ToString() ?? "";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h6 class="mb-0"><i class="bi bi-box-seam me-1"></i>Containers</h6>
+    <button class="btn btn-sm btn-primary"
+            hx-get="/container/create"
+            hx-target="#modalContent"
+            hx-on::after-request="showModal()">
+        <i class="bi bi-plus-lg me-1"></i>New Container
+    </button>
+</div>
+
+<div class="card mb-2">
+    <div class="card-body py-2">
+        <form hx-get="/container"
+              hx-target="#tableWrapper"
+              hx-push-url="true"
+              class="row g-2 align-items-end">
+
+            <div class="col-md-4">
+                <input type="text" name="search" value="@ViewBag.Search"
+                       class="form-control form-control-sm" placeholder="Container No...">
+            </div>
+
+            <div class="col-md-4">
+                <select name="ownLeaseTypeId" class="form-select form-select-sm">
+                    <option value="">Own/Lease Type</option>
+                    @foreach (var item in (List<SelectListItem>)ViewBag.OwnLeaseTypes)
+                    {
+                        string filterVal = ViewBag.OwnLeaseTypeId?.ToString() ?? "";
+                        <option value="@item.Value"
+                                selected="@(item.Value == filterVal)">@item.Text</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <select name="cntOwnTypeId" class="form-select form-select-sm">
+                    <option value="">Ownership Type</option>
+                    @foreach (var item in (List<SelectListItem>)ViewBag.CntOwnTypes)
+                    {
+                        string filterVal = ViewBag.CntOwnTypeId?.ToString() ?? "";
+                        <option value="@item.Value"
+                                selected="@(item.Value == filterVal)">@item.Text</option>
+                    }
+
+@*                     @foreach (var item in (SelectList)ViewBag.CntOwnTypes)
+                    {
+                        var sel = item.Value == ViewBag.CntOwnTypeId?.ToString();
+                        <option value="@item.Value" selected="@sel">@item.Text</option>
+                    }
+ *@               
+
+
+</select>
+            </div>
+
+            <div class="col-md-4">
+                <select name="ownerId" class="form-select form-select-sm">
+                    <option value="">Owner</option>
+                    @foreach (var item in (SelectList)ViewBag.Owners)
+                    {
+                        var sel = item.Value == ViewBag.OwnerId?.ToString();
+                        <option value="@item.Value" selected="@sel">@item.Text</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <select name="isActive" class="form-select form-select-sm">
+                    <option value="">Status</option>
+                    <option value="true" selected="@(ViewBag.IsActive == true)">Active</option>
+                    <option value="false" selected="@(ViewBag.IsActive == false)">Inactive</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <select name="responsibilityByUs" class="form-select form-select-sm">
+                    <option value="">Resp.</option>
+                    <option value="true" selected="@(ViewBag.ResponsibilityByUs == true)">Yes</option>
+                    <option value="false" selected="@(ViewBag.ResponsibilityByUs == false)">No</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <select name="responsibleCompanyId" class="form-select form-select-sm">
+                    <option value="">Resp. Company</option>
+                    @foreach (var item in (SelectList)ViewBag.Companies)
+                    {
+                        var sel = item.Value == ViewBag.ResponsibleCompanyId?.ToString();
+                        <option value="@item.Value" selected="@sel">@item.Text</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-auto">
+                <button class="btn btn-sm btn-secondary" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+                <a href="/container" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="tableWrapper"
+     hx-get="/container?search=@ViewBag.Search&ownLeaseTypeId=@ViewBag.OwnLeaseTypeId&cntOwnTypeId=@ViewBag.CntOwnTypeId&ownerId=@ViewBag.OwnerId&isActive=@ViewBag.IsActive&responsibilityByUs=@ViewBag.ResponsibilityByUs&responsibleCompanyId=@ViewBag.ResponsibleCompanyId"
+     hx-trigger="refreshTable from:body"
+     hx-target="#tableWrapper">
+    @await Html.PartialAsync("_Table", Model)
+</div>
+
+<div class="modal fade" id="mainModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showModal() {
+            new bootstrap.Modal(document.getElementById('mainModal')).show();
+        }
+    </script>
+}

@@ -1,0 +1,106 @@
+﻿@using ShipRate.Application.ViewModels
+
+@model ContainerFormVM
+@{
+    var isEdit =  Model.Id.HasValue;
+    var action = isEdit ? $"/container/edit" : "/container/create";
+    var title = isEdit ? "Edit Container" : "New Container";
+}
+<form hx-post="@action" hx-target="#modalContent" hx-swap="innerHTML">
+    <div class="modal-header">
+        <h6 class="modal-title"><i class="bi bi-box-seam me-1"></i>@title</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+
+    <div class="modal-body">
+        @if (isEdit)
+        {
+            <input type="hidden" name="Id" value="@Model.Id" />
+        }
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Container Number <span class="text-danger">*</span></label>
+                <input type="text" name="ContainerNumber" value="@Model.ContainerNumber"
+                       class="form-control form-control-sm" maxlength="12" placeholder="" required>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Size / Type <span class="text-danger">*</span></label>
+                <select asp-for="ContainerSizeTypeId" class="form-select form-select-sm" required
+                        asp-items="@ViewBag.SizeTypes">
+                    <option value="">-- Select --</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Own / Lease Type <span class="text-danger">*</span></label>
+                <select asp-for="OwnLeaseTypeId" class="form-select form-select-sm" required
+                        asp-items="@ViewBag.OwnLeaseTypes">
+                    <option value="">-- Select --</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Ownership Type <span class="text-danger">*</span></label>
+                <select asp-for="CntOwnTypeId" class="form-select form-select-sm" required
+                        asp-items="@ViewBag.CntOwnTypes">
+                    <option value="">-- Select --</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Owner</label>
+                <select asp-for="OwnerId" class="form-select form-select-sm"
+                        asp-items="@ViewBag.Owners">
+                    <option value="">-- Select --</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Responsible Company</label>
+                <select asp-for="ResponsibleCompanyId" class="form-select form-select-sm"
+                        asp-items="@ViewBag.Companies">
+                    <option value="">-- Select --</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Max PayLoad (kg) <span class="text-danger">*</span></label>
+                <input type="number" name="MaxPayLoad" value="@Model.MaxPayLoad"
+                       class="form-control form-control-sm" required>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Tare Weight (kg) <span class="text-danger">*</span></label>
+                <input type="number" name="TareWeight" value="@Model.TareWeight"
+                       class="form-control form-control-sm" required>
+            </div>
+
+            <div class="col-md-3">
+                <div class="form-check mt-4">
+                    <input type="checkbox" name="IsActive" value="true"
+                           class="form-check-input" id="chkActive"
+                           @(Model.IsActive ? "checked" : "")>
+                    <label class="form-check-label" for="chkActive">Active</label>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="form-check mt-4">
+                    <input type="checkbox" name="ResponsibilityByUs" value="true"
+                           class="form-check-input" id="chkResp"
+                           @(Model.ResponsibilityByUs ? "checked" : "")>
+                    <label class="form-check-label" for="chkResp">Responsibility By Us</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-sm btn-primary">
+            <i class="bi bi-check-lg me-1"></i>@(isEdit ? "Update" : "Save")
+        </button>
+    </div>
+</form>

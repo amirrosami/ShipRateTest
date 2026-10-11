@@ -1,0 +1,155 @@
+﻿@using ShipRate.Application.ViewModels
+@model BLContainerVm
+
+@{
+    var containerIndex = (int)(ViewData["ContainerIndex"] ?? 0);
+    var allocations = Model.CargoAllocations ?? new List<BLContainerCargoAllocationVm>();
+    var cargoDetailOptions =
+        ViewData["CargoDetailOptions"] as IEnumerable<SelectListItem>
+        ?? Enumerable.Empty<SelectListItem>();
+}
+
+<tr id="containerAllocationRow_@containerIndex"
+    class="container-allocation-row d-none"
+    data-container-index="@containerIndex">
+    <td colspan="100">
+        <div class="border rounded bg-light p-3 my-2">
+
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <strong>Cargo Allocations</strong>
+                    <span class="text-muted small">
+                        - Container @(containerIndex + 1)
+                    </span>
+                </div>
+
+                <button type="button"
+                        class="btn btn-sm btn-outline-secondary add-container-allocation-row-btn"
+                        data-container-index="@containerIndex">
+                    + Add Allocation
+                </button>
+            </div>
+
+            <select id="cargoDetailOptionsTemplate" class="d-none">
+                <option value="">Select Cargo...</option>
+                @foreach (var cargoOption in cargoDetailOptions)
+                {
+                    <option value="@cargoOption.Value">@cargoOption.Text</option>
+                }
+            </select>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="min-width:160px;">Cargo</th>
+                            <th style="min-width:100px;">Packages</th>
+                            <th style="min-width:120px;">Gross Weight</th>
+                            <th style="min-width:120px;">Net Weight</th>
+                            <th style="min-width:100px;">CBM</th>
+                            <th style="width:90px;">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="containerAllocationBody_@containerIndex"
+                           data-container-index="@containerIndex">
+
+                        @if (allocations.Any())
+                        {
+                            for (var allocationIndex = 0; allocationIndex < allocations.Count; allocationIndex++)
+                            {
+                                var allocation = allocations[allocationIndex];
+
+                                <tr class="container-allocation-item-row"
+                                    data-container-index="@containerIndex"
+                                    data-allocation-index="@allocationIndex">
+
+                                    <td>
+                                        <input type="hidden"
+                                               name="Containers[@containerIndex].CargoAllocations[@allocationIndex].Id"
+                                               value="@allocation.Id" />
+
+                                        <input type="hidden"
+                                               name="Containers[@containerIndex].CargoAllocations[@allocationIndex].BLContainerId"
+                                               value="@allocation.BLContainerId" />
+
+                                        <select name="Containers[@containerIndex].CargoAllocations[@allocationIndex].CargoDetailId"
+                                                class="form-select form-select-sm allocation-cargo-detail-id">
+                                            <option value="">Select Cargo...</option>
+
+                                            @foreach (var cargoOption in cargoDetailOptions)
+                                            {
+                                                <option value="@cargoOption.Value"
+                                                        selected="@(cargoOption.Value == allocation.CargoDetailId.ToString())">
+                                                    @cargoOption.Text
+                                                </option>
+                                            }
+                                        </select>
+                                    </td>
+
+
+                                    <td>
+                                        <input type="number"
+                                               name="Containers[@containerIndex].CargoAllocations[@allocationIndex].PackageCount"
+                                               value="@allocation.PackageCount"
+                                               class="form-control form-control-sm allocation-package-count"
+                                               min="0" />
+                                    </td>
+
+                                    <td>
+                                        <input type="number"
+                                               step="0.01"
+                                               name="Containers[@containerIndex].CargoAllocations[@allocationIndex].GrossWeight"
+                                               value="@allocation.GrossWeight"
+                                               class="form-control form-control-sm allocation-gross-weight"
+                                               min="0" />
+                                    </td>
+
+                                    <td>
+                                        <input type="number"
+                                               step="0.01"
+                                               name="Containers[@containerIndex].CargoAllocations[@allocationIndex].NetWeight"
+                                               value="@allocation.NetWeight"
+                                               class="form-control form-control-sm allocation-net-weight"
+                                               min="0" />
+                                    </td>
+
+                                    <td>
+                                        <input type="number"
+                                               step="0.001"
+                                               name="Containers[@containerIndex].CargoAllocations[@allocationIndex].Volume"
+                                               value="@allocation.Volume"
+                                               class="form-control form-control-sm allocation-volume-cbm"
+                                               min="0" />
+                                    </td>
+
+                                    <td>
+                                        <button type="button"
+                                                class="btn btn-sm btn-danger remove-container-allocation-row-btn"
+                                                data-container-index="@containerIndex"
+                                                data-allocation-index="@allocationIndex">
+                                            Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr class="empty-container-allocation-row">
+                                <td colspan="9" class="text-center text-muted py-3">
+                                    No cargo allocations yet.
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="small text-muted mt-2">
+                Allocation totals can be synced with container summary fields after Auto Allocate or manual editing.
+            </div>
+        </div>
+    </td>
+</tr>

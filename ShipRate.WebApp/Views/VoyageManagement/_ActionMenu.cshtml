@@ -1,0 +1,14 @@
+﻿@using ShipRate.Application.DTOs
+@model VoyageMonitoringRowDto
+
+
+
+<button class="btn btn-sm btn-link text-dark p-0 border-0 shadow-none"
+        type="button"
+        title="Actions"
+        hx-get="@Url.Action("ActionPanel", "VoyageManagement", new { voyagePortId = Model.VoyagePortId })"
+        hx-target="#voyage-action-panel-content"
+        hx-swap="innerHTML"
+        hx-on::after-request="var el = document.getElementById('voyageActionOffcanvas'); if (el) bootstrap.Offcanvas.getOrCreateInstance(el).show();">
+    <span style="font-size: 1.25rem; line-height: 1;">&#8942;</span>
+</button>

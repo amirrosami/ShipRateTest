@@ -1,0 +1,261 @@
+﻿@using ShipRate.Application.JobsViewModels
+@model JobChargesVm
+
+<div class="charges-container">
+
+    <!-- Header Actions -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0 text-muted fw-bold">
+            <i class="bi bi-receipt-cutoff me-1"></i> Job Financial Charges
+        </h6>
+        <button class="btn btn-sm btn-primary px-3 shadow-sm"
+                hx-get="@Url.Action("NewCharge", "Jobs", new { jobId = Model.JobId })"
+                hx-target="#modalContainer"
+                hx-swap="innerHTML">
+            <i class="bi bi-plus-circle me-1"></i> New Charge (ثبت هزینه/درآمد جدید)
+        </button>
+    </div>
+
+    <div class="row g-3">
+
+        <!-- SELL CHARGES (INCOME) -->
+        <div class="col-xl-6 col-12">
+            <div class="charge-card card shadow-sm border-0">
+                <div class="card-header bg-success-subtle text-success-emphasis border-bottom d-flex align-items-center justify-content-between py-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-arrow-down-left-circle-fill text-success fs-5"></i>
+                        <span class="fw-bold fs-6">Sell Charges (Income)</span>
+                    </div>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle">
+                        @Model.SellCharges.Count Records
+                    </span>
+                </div>
+                <div class="table-responsive charge-table-wrapper">
+                    <table class="table table-bordered table-hover table-compact table-sm mb-0">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th style="width: 40px;" class="text-center">#</th>
+                                <th>Company</th>
+                                <th>Party</th>
+                                <th>Charge</th>
+                                <th class="text-end">Gross</th>
+                                <th class="text-center">Curr</th>
+                                <th class="text-center">Qty</th>
+                                <th class="text-end">Rate</th>
+                                <th class="text-end">Amount</th>
+                                <th class="text-center">Tax</th>
+                                <th class="text-end">Tax Amt</th>
+                                <th>Description</th>
+                                <th style="width: 75px;" class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.SellCharges.Any())
+                            {
+                                int idx = 1;
+                                foreach (var c in Model.SellCharges)
+                                {
+                                    <tr>
+                                        <td class="text-center text-muted">@idx</td>
+                                        <td class="text-truncate" style="max-width: 130px;" title="@c.CompanyName">@c.CompanyName</td>
+                                        <td class="text-truncate" style="max-width: 120px;" title="@c.PartyName">@c.PartyName</td>
+                                        <td>@c.Charge</td>
+                                        <td class="text-end font-monospace">@c.GrossAmount.ToString("N2")</td>
+                                        <td class="text-center"><span class="badge bg-light text-dark border">@c.Currency</span></td>
+                                        <td class="text-center">@c.Qty</td>
+                                        <td class="text-end font-monospace">@c.UnitRate.ToString("N2")</td>
+                                        <td class="text-end font-monospace fw-bold text-success">@c.Amount.ToString("N2")</td>
+                                        <td class="text-center">
+                                            @if (c.IsTaxable)
+                                            {
+                                                <i class="bi bi-check-circle-fill text-success" title="Tax: @c.TaxPercent%"></i>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td class="text-end font-monospace">@c.TaxAmount.ToString("N2")</td>
+                                        <td class="text-truncate" style="max-width: 150px;" title="@c.ChargeDscription - @c.Remarks">
+                                            @c.ChargeDscription
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button"
+                                                        class="btn btn-outline-primary btn-table p-1"
+                                                        title="Edit"
+                                                        hx-get="@Url.Action("EditCharge", "Jobs", new { chargeId = c.Id })"
+                                                        hx-target="#modalContainer"
+                                                        hx-swap="innerHTML">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </button>
+                                                <button type="button"
+                                                        class="btn btn-outline-danger btn-table p-1"
+                                                        title="Delete"
+                                                        hx-get="@Url.Action("DeleteCharge", "Jobs", new { chargeId = c.Id })"
+                                                        hx-target="#modalContainer"
+                                                        hx-swap="innerHTML">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    idx++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="13" class="text-center text-muted py-3">No Sell Charges Found</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer bg-light d-flex justify-content-between align-items-center py-2 border-top">
+                    <span class="text-muted small">Total Sell:</span>
+                    <strong class="text-success fs-6 font-monospace">@Model.SellTotal.ToString("N2")</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- BUY CHARGES (COST) -->
+        <div class="col-xl-6 col-12">
+            <div class="charge-card card shadow-sm border-0">
+                <div class="card-header bg-danger-subtle text-danger-emphasis border-bottom d-flex align-items-center justify-content-between py-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-arrow-up-right-circle-fill text-danger fs-5"></i>
+                        <span class="fw-bold fs-6">Buy Charges (Cost)</span>
+                    </div>
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                        @Model.BuyCharges.Count Records
+                    </span>
+                </div>
+                <div class="table-responsive charge-table-wrapper">
+                    <table class="table table-bordered table-hover table-compact table-sm mb-0">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th style="width: 40px;" class="text-center">#</th>
+                                <th>Company</th>
+                                <th>Party</th>
+                                <th>Charge</th>
+                                <th class="text-end">Gross</th>
+                                <th class="text-center">Curr</th>
+                                <th class="text-center">Qty</th>
+                                <th class="text-end">Rate</th>
+                                <th class="text-end">Amount</th>
+                                <th class="text-center">Tax</th>
+                                <th class="text-end">Tax Amt</th>
+                                <th>Description</th>
+                                <th style="width: 75px;" class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.BuyCharges.Any())
+                            {
+                                int idx = 1;
+                                foreach (var c in Model.BuyCharges)
+                                {
+                                    <tr>
+                                        <td class="text-center text-muted">@idx</td>
+                                        <td class="text-truncate" style="max-width: 130px;" title="@c.CompanyName">@c.CompanyName</td>
+                                        <td class="text-truncate" style="max-width: 120px;" title="@c.PartyName">@c.PartyName</td>
+                                        <td>@c.Charge</td>
+                                        <td class="text-end font-monospace">@c.GrossAmount.ToString("N2")</td>
+                                        <td class="text-center"><span class="badge bg-light text-dark border">@c.Currency</span></td>
+                                        <td class="text-center">@c.Qty</td>
+                                        <td class="text-end font-monospace">@c.UnitRate.ToString("N2")</td>
+                                        <td class="text-end font-monospace fw-bold text-danger">@c.Amount.ToString("N2")</td>
+                                        <td class="text-center">
+                                            @if (c.IsTaxable)
+                                            {
+                                                <i class="bi bi-check-circle-fill text-success" title="Tax: @c.TaxPercent%"></i>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td class="text-end font-monospace">@c.TaxAmount.ToString("N2")</td>
+                                        <td class="text-truncate" style="max-width: 150px;" title="@c.ChargeDscription - @c.Remarks">
+                                            @c.ChargeDscription
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button"
+                                                        class="btn btn-outline-primary btn-table p-1"
+                                                        title="Edit"
+                                                        hx-get="@Url.Action("EditCharge", "Jobs", new { chargeId = c.Id })"
+                                                        hx-target="#modalContainer"
+                                                        hx-swap="innerHTML">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </button>
+                                                <button type="button"
+                                                        class="btn btn-outline-danger btn-table p-1"
+                                                        title="Delete"
+                                                        hx-get="@Url.Action("DeleteCharge", "Jobs", new { chargeId = c.Id })"
+                                                        hx-target="#modalContainer"
+                                                        hx-swap="innerHTML">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    idx++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="13" class="text-center text-muted py-3">No Buy Charges Found</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer bg-light d-flex justify-content-between align-items-center py-2 border-top">
+                    <span class="text-muted small">Total Buy:</span>
+                    <strong class="text-danger fs-6 font-monospace">@Model.BuyTotal.ToString("N2")</strong>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PROFIT / LOSS SUMMARY -->
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-5 col-lg-4 text-center">
+            <div class="p-3 rounded border shadow-sm @(Model.Profit >= 0 ? "bg-success-subtle border-success-subtle text-success-emphasis" : "bg-danger-subtle border-danger-subtle text-danger-emphasis")">
+                <span class="d-block text-muted small fw-semibold mb-1">NET PROFIT / MARGIN</span>
+                <span class="fs-4 fw-bold font-monospace">
+                    @(Model.Profit >= 0 ? "+" : "")@Model.Profit.ToString("N2")
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .charge-table-wrapper {
+        max-height: 480px;
+        overflow-y: auto;
+        overflow-x: auto;
+    }
+
+    .table-compact th, .table-compact td {
+        font-size: 13px;
+        padding: 4px 6px;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    .table-compact th {
+        font-weight: 600;
+        background-color: #f8f9fa;
+    }
+
+    .btn-table {
+        padding: 2px 5px !important;
+        font-size: 12px;
+    }
+</style>

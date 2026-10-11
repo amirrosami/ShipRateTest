@@ -1,0 +1,96 @@
+﻿@using ShipRate.Application.DTOs.Documents
+@model List<DocumentTypeObjectTypeDto>
+@{
+    var selectedObjectId = ViewData["SelectedObjectId"];
+    var selectedObjectName = ViewData["SelectedObjectName"];
+}
+
+<!-- بروزرسانی عنوان کارت در کارت Detail به روش Out-of-Band (hx-swap-oob) -->
+<span id="selected-object-title" hx-swap-oob="innerHTML" class="text-primary">
+    @selectedObjectName
+</span>
+
+<!-- بروزرسانی دکمه‌های ایجاد در هدر کارت به روش Out-of-Band -->
+<div id="action-btn-container" hx-swap-oob="innerHTML">
+    <button class="btn btn-primary btn-sm d-flex align-items-center gap-2"
+            hx-get="@Url.Action("Create", new { objectTypeId = selectedObjectId })"
+            hx-target="#modal-container"
+            data-bs-toggle="modal"
+            data-bs-target="#actionModal">
+        <i class="bi bi-plus-lg"></i> Map New Document Type
+    </button>
+</div>
+
+<!-- ظرف شنونده‌ی بروزرسانی مجدد لیست جزئیات پس از تغییرات در این کلاس -->
+<div id="detail-list-wrapper"
+     hx-get="@Url.Action("LoadDetailList", new { objectTypeId = selectedObjectId })"
+     hx-trigger="detailListChanged-@selectedObjectId from:body">
+
+    <div class="grid-scroll-wrapper">
+        <table class="table table-hover table-striped align-middle mb-0" style="min-width: 1000px; white-space: nowrap;">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4">Document Type Name</th>
+                    <th>Local Name</th>
+                    <th>Source Object</th>
+                    <th>System Defined</th>
+                    <th class="text-end pe-4" style="width: 200px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-semibold text-secondary">@item.DocumentTypeName</td>
+                            <td>@item.DocumentTypeLocalName</td>
+                            <td><span class="badge bg-light text-dark">@item.ObjectTypeName</span></td>
+                            <td>
+                                @if (item.SystemDefined)
+                                {
+                                    <span class="text-success"><i class="bi bi-check-circle-fill"></i> System</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted"><i class="bi bi-person-fill"></i> User</span>
+                                }
+                            </td>
+                            <td class="text-end pe-4">
+                                @if (!item.SystemDefined)
+                                {
+@*                                     <button class="btn btn-outline-secondary btn-sm me-1"
+                                            hx-get="@Url.Action("Edit", new { id = item.Id })"
+                                            hx-target="#modal-container"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#actionModal">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </button>
+ *@                                    <button class="btn btn-outline-danger btn-sm"
+                                            hx-get="@Url.Action("Delete", new { id = item.Id })"
+                                            hx-target="#modal-container"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#actionModal">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small"><i class="bi bi-lock-fill"></i> Locked</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            No document types mapped for this System Object. Click "Map New Document Type" to add.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,75 @@
+﻿@using ShipRate.Domain.Entities.InventoryOperation
+@model ProductRequest
+
+<div class="modal-header">
+    <h6 class="modal-title">
+        <i class="bi bi-eye me-1"></i>Request Detail — #@Model.RequestNo
+    </h6>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+    <div class="row g-2 mb-3">
+        <div class="col-6">
+            <small class="text-muted d-block">Requested By</small>
+            <strong>@Model.RequestedByUser?.UserName</strong>
+        </div>
+        <div class="col-6">
+            <small class="text-muted d-block">Request Date</small>
+            <strong>@Model.RequestDate.ToString("yyyy/MM/dd")</strong>
+        </div>
+        <div class="col-6">
+            <small class="text-muted d-block">Status</small>
+            <strong>@Model.ProductRequestStatus?.ProductRequestStatusName</strong>
+        </div>
+        @if (Model.ApprovedAt.HasValue)
+        {
+            <div class="col-6">
+                <small class="text-muted d-block">Approved By</small>
+                <strong>@Model.ApprovedByManager?.UserName— @Model.ApprovedAt.Value.ToString("yyyy/MM/dd")</strong>
+            </div>
+        }
+        @if (Model.DeliveredAt.HasValue)
+        {
+            <div class="col-6">
+                <small class="text-muted d-block">Delivered By</small>
+                <strong>@Model.DeliveredByStoreKeeper?.UserName — @Model.DeliveredAt.Value.ToString("yyyy/MM/dd")</strong>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(Model.Remarks))
+        {
+            <div class="col-12">
+                <small class="text-muted d-block">Remarks</small>
+                <span>@Model.Remarks</span>
+            </div>
+        }
+    </div>
+
+    <table class="table table-sm table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>#</th>
+                <th>Product</th>
+                <th class="text-center">Qty</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int row = 0;
+            }
+            @foreach (var item in Model.Items)
+            {
+                row = row + 1;
+                <tr>
+                    <td>@row</td>
+                    <td>@item.Product?.ProductName</td>
+                    <td class="text-center">@item.Quantity</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="modal-footer py-2">
+    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>

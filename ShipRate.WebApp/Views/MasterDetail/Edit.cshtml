@@ -1,0 +1,155 @@
+﻿@* Views/Orders/Edit.cshtml *@
+@model OrderViewModel
+@using System.Text.Json
+@using ShipRate.WebApp.Models
+@using ShipRate.WebApp.TagHelpers
+
+@{
+    // Serialize existing detail rows for JS
+    var existingDetails = JsonSerializer.Serialize(Model.OrderDetails.Select(d => new
+    {
+        d.Id,
+        d.ProductId,
+        d.Quantity,
+        d.UnitPrice,
+        d.DiscountPercent,
+        d.LineTotal,
+        d.Description
+    }));
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/master-detail.css" />
+}
+
+<master-detail-form asp-action="Edit"
+                    asp-controller="Orders"
+                    form-id="orderEditForm"
+                    form-title="Edit Order #@Model.OrderNumber"
+                    submit-text="Update Order"
+                    cancel-url="/Orders"
+                    enable-validation="true">
+
+    @* Hidden ID field for edit *@
+    <master-section title="Order Information" columns="3">
+
+        <master-field name="Id"
+                      type="Hidden"
+                      value="@Model.Id" />
+
+        <master-field name="OrderNumber"
+                      label="Order Number"
+                      type="ReadOnly"
+                      value="@Model.OrderNumber" />
+
+        <master-field name="OrderDate"
+                      label="Order Date"
+                      type="Date"
+                      value="@Model.OrderDate.ToString("yyyy-MM-dd")"
+                      required="true" />
+
+        <master-field name="Status"
+                      label="Status"
+                      type="Select"
+                      select-items="@(new List<SelectListData> {
+                                                new SelectListData { Value = "0", Text = "Pending", Selected = Model.Status == 0 },
+                                                new SelectListData { Value = "1", Text = "Confirmed", Selected = Model.Status == 1 },
+                                                new SelectListData { Value = "2", Text = "Shipped", Selected = Model.Status == 2 },
+                                                new SelectListData { Value = "3", Text = "Delivered", Selected = Model.Status == 3 }
+                                            })"
+                      required="true" />
+
+        <master-field name="CustomerName"
+                      label="Customer Name"
+                      type="Text"
+                      value="@Model.CustomerName"
+                      required="true" />
+
+        <master-field name="CustomerEmail"
+                      label="Customer Email"
+                      type="Email"
+                      value="@Model.CustomerEmail" />
+
+        <master-field name="CustomerPhone"
+                      label="Phone"
+                      type="Tel"
+                      value="@Model.CustomerPhone" />
+
+        <master-field name="ShippingAddress"
+                      label="Shipping Address"
+                      type="TextArea"
+                      value="@Model.ShippingAddress"
+                      col-span="3"
+                      required="true" />
+
+    </master-section>
+
+    <detail-section title="Order Items"
+                    property-name="OrderDetails"
+                    add-button-text="+ Add Item"
+                    show-row-numbers="true"
+                    allow-delete="true"
+                    min-rows="1"
+                    max-rows="50"
+                    initial-rows="0"
+                    show-footer-totals="true"
+                    existing-data="@existingDetails">
+
+        <detail-column name="Id"
+                       header="Id"
+                       type="Hidden"
+                       default-value="0" />
+
+        <detail-column name="ProductId"
+                       header="Product"
+                       type="Select"
+                       required="true"
+                       width="200px"
+                       select-items="@ViewBag.Products" />
+
+        <detail-column name="Quantity"
+                       header="Qty"
+                       type="Number"
+                       required="true"
+                       default-value="1"
+                       min="1"
+                       width="80px" />
+
+        <detail-column name="UnitPrice"
+                       header="Unit Price"
+                       type="Decimal"
+                       required="true"
+                       default-value="0.00"
+                       min="0"
+                       step="0.01"
+                       width="120px" />
+
+        <detail-column name="DiscountPercent"
+                       header="Discount %"
+                       type="Decimal"
+                       default-value="0"
+                       min="0"
+                       max="100"
+                       width="100px" />
+
+        <detail-column name="LineTotal"
+                       header="Line Total"
+                       type="ReadOnly"
+                       width="120px"
+                       compute="Quantity * UnitPrice * (1 - DiscountPercent / 100)"
+                       show-total="true" />
+
+        <detail-column name="Description"
+                       header="Description"
+                       type="Text"
+                       is-total-label="true"
+                       total-label-text="Grand Total:"
+                       placeholder="Optional note" />
+
+    </detail-section>
+
+</master-detail-form>
+
+@section Scripts {
+    <script src="~/js/master-detail.js"></script>
+}

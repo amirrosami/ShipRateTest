@@ -1,0 +1,92 @@
+﻿@using ShipRate.WebApp.ViewModels
+@model GridFilterViewModel
+
+<div id="grid-filters" class="card mb-3">
+
+    @* <input type="hidden" name="page" value="@Model.Page" /> *@
+
+        <div class="row">
+            <div class="row">
+                <div class="col-md-3">
+                       <div class="input-group">
+                        <span class="bg-white input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="search"
+                               class="form-control border-start-0"
+                               placeholder="Search..."
+                               name="searchTerm"
+                               value="@Model.SearchTerm"
+                               placeholder="Search..."
+                               hx-post="@Model.ListUrl"
+                               hx-trigger="keyup changed delay:400ms"
+                               hx-target="#table-container"
+                               hx-swap="innerHTML"
+                               hx-include="#grid-filters, #table-sort-info" />
+                </div>
+                </div>
+            <!-- CUSTOM FILTERS -->
+            @if (!string.IsNullOrEmpty(Model.CustomFilterPartial))
+            {
+                @await Html.PartialAsync(Model.CustomFilterPartial, Model.CustomFilterValues)
+            }
+                <div class="col-md-1  text-end">
+                    <select name="pageSize"
+                        class="form-select form-select-sm"
+                        hx-post="@Model.ListUrl"
+                        hx-trigger="change"
+                        hx-target="#table-container"
+                        hx-swap="innerHTML"
+                        hx-include="#grid-filters, #table-sort-info">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+</div>
+
+
+
+
+
+
+
+
+
+  @*   <div class="row g-2 mb-2">
+
+        <div class="col">
+
+            <input type="text"
+                   name="searchTerm"
+                   value="@Model.SearchTerm"
+                   class="form-control"
+                   placeholder="Search..."
+                   hx-post="@Model.ListUrl"
+                   hx-trigger="keyup changed delay:400ms"
+                   hx-target="#table-container"
+                   hx-swap="innerHTML"
+                   hx-include="#grid-filters, #table-sort-info" />
+
+        </div>
+
+        <div class="col-auto">
+
+            <select name="pageSize"
+                    class="form-select"
+                    hx-post="@Model.ListUrl"
+                    hx-trigger="change"
+                    hx-target="#table-container"
+                    hx-swap="innerHTML"
+                    hx-include="#grid-filters, #table-sort-info">
+
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+
+            </select> *@
+
+
+        <!-- CUSTOM FILTERS -->
+       

@@ -1,0 +1,95 @@
+﻿@using ShipRate.Application.ViewModels
+@model List<TariffRuleCoverageListItemVm>
+
+@{
+    var tariffRuleId = ViewBag.TariffRuleId as Guid?;
+}
+
+<div class="card border-0 shadow-sm" dir="ltr">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <div>
+            <strong>Rule Coverages</strong>
+            <span class="text-muted small ms-2">
+                Total: @(Model?.Count ?? 0)
+            </span>
+        </div>
+
+        @if (tariffRuleId.HasValue && tariffRuleId.Value != Guid.Empty)
+        {
+            <button type="button"
+                    class="btn btn-sm btn-primary"
+                    hx-get="@Url.Action("CreateCoverage", "TariffBooks", new { tariffRuleId = tariffRuleId.Value })"
+                    hx-target="#mainModalContent"
+                    hx-swap="innerHTML"
+                    data-bs-toggle="modal"
+                    data-bs-target="#mainModal">
+                Add New Coverage
+            </button>
+        }
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Country</th>
+                        <th>Location</th>
+                        <th>Coverage Type</th>
+                        <th>Zone</th>
+                        <th>Remarks</th>
+                        <th style="width: 160px;">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model == null || !Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                No coverages found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr id="coverage-row-@item.Id">
+                                <td>@item.CountryName</td>
+                                <td>@item.LocationName</td>
+@*                                 <td>@item.CoverageTypeName</td>
+                                <td>@item.ZoneName</td>
+                                <td>@item.Remarks</td>
+ *@
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button"
+                                                class="btn btn-outline-secondary"
+                                                hx-get="@Url.Action("EditCoverage", "TariffBooks", new { id = item.Id })"
+                                                hx-target="#mainModalContent"
+                                                hx-swap="innerHTML"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#mainModal">
+                                            Edit
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-outline-danger"
+                                                hx-get="@Url.Action("DeleteCoverage", "TariffBooks", new { id = item.Id, tariffRuleId = item.TariffRuleId })"
+                                                hx-target="#mainModalContent"
+                                                hx-swap="innerHTML"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#mainModal">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

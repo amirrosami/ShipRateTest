@@ -1,0 +1,12 @@
+﻿@using ShipRate.Domain.Entities.Lines
+@model IEnumerable<Carrier>
+
+@foreach (var item in Model)
+{
+    <div class="list-group-item list-group-item-action"
+         hx-get="/FACContracts/SelectCarrier/@item.Id"
+         hx-target="#carrierBox"
+         hx-swap="outerHTML">
+        @item.Person.PersonName
+    </div>
+}

@@ -1,0 +1,176 @@
+﻿@using ShipRate.Application.DTOs.ApiIr
+@model ApiInquiryLogDetailsDto
+
+<div class="modal-header" dir="ltr">
+    <h5 class="modal-title" id="apiInquiryLogModalLabel">
+        API Inquiry Log Details
+    </h5>
+
+    <button type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close">
+    </button>
+</div>
+
+<div class="modal-body" dir="ltr">
+    @if (!string.IsNullOrWhiteSpace(Model.DecryptionError))
+    {
+        <div class="alert alert-danger">
+            <i class="bi bi-shield-exclamation me-2"></i>
+            @Model.DecryptionError
+        </div>
+    }
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="text-muted small">User</div>
+            <div class="fw-semibold">@Model.UserName</div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="text-muted small">Service</div>
+            <div class="fw-semibold">@Model.ServiceName</div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="text-muted small">Provider</div>
+            <div class="fw-semibold">@Model.Provider</div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="text-muted small">Endpoint</div>
+            <code>@Model.Endpoint</code>
+        </div>
+
+        <div class="col-md-6">
+            <div class="text-muted small">Correlation ID</div>
+            <code>@Model.CorrelationId</code>
+        </div>
+
+        <div class="col-md-4">
+            <div class="text-muted small">Started At (UTC)</div>
+            <div>@Model.RequestStartedAtUtc.ToString("yyyy-MM-dd HH:mm:ss")</div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="text-muted small">Completed At (UTC)</div>
+            <div>
+                @(Model.ResponseReceivedAtUtc?.ToString("yyyy-MM-dd HH:mm:ss") ?? "-")
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="text-muted small">Duration</div>
+            <div>
+                @(Model.DurationMilliseconds.HasValue
+                                ? $"{Model.DurationMilliseconds:N0} ms"
+                                : "-")
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="text-muted small">HTTP Status</div>
+            <div>@(Model.HttpStatusCode?.ToString() ?? "-")</div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="text-muted small">API Code</div>
+            <div>@(Model.ApiCode?.ToString() ?? "-")</div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="text-muted small">API Success</div>
+            <div>@(Model.ApiSuccess?.ToString() ?? "-")</div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="text-muted small">Final Status</div>
+
+            @if (!Model.IsCompleted)
+            {
+                <span class="badge text-bg-warning">Pending</span>
+            }
+            else if (Model.IsSucceeded)
+            {
+                <span class="badge text-bg-success">Succeeded</span>
+            }
+            else
+            {
+                <span class="badge text-bg-danger">Failed</span>
+            }
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+        {
+            <div class="col-12">
+                <div class="text-muted small">Error Message</div>
+                <div class="alert alert-danger mb-0">
+                    @Model.ErrorMessage
+                </div>
+            </div>
+        }
+    </div>
+
+    <ul class="nav nav-tabs" id="payloadTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active"
+                    id="request-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#request-pane"
+                    type="button"
+                    role="tab">
+                Request Payload
+            </button>
+        </li>
+
+        <li class="nav-item" role="presentation">
+            <button class="nav-link"
+                    id="response-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#response-pane"
+                    type="button"
+                    role="tab">
+                Response Payload
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content border border-top-0 rounded-bottom p-3">
+        <div class="tab-pane fade show active"
+             id="request-pane"
+             role="tabpanel">
+
+            @if (!string.IsNullOrWhiteSpace(Model.RequestPayload))
+            {
+                <pre class="bg-dark text-light rounded p-3 mb-0 small overflow-auto"
+                     style="max-height: 430px; direction: ltr; text-align: left;">@Model.RequestPayload</pre>
+            }
+            else
+            {
+                <div class="text-muted">No request payload is available.</div>
+            }
+        </div>
+
+        <div class="tab-pane fade"
+             id="response-pane"
+             role="tabpanel">
+
+            @if (!string.IsNullOrWhiteSpace(Model.ResponsePayload))
+            {
+                <pre class="bg-dark text-light rounded p-3 mb-0 small overflow-auto"
+                     style="max-height: 430px; direction: ltr; text-align: left;">@Model.ResponsePayload</pre>
+            }
+            else
+            {
+                <div class="text-muted">No response payload is available.</div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer" dir="ltr">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+        Close
+    </button>
+</div>

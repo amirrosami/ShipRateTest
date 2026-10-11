@@ -1,0 +1,143 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model List<InvoiceItemRowVm>
+
+<style>
+    .invoice-items-scroll {
+        max-height: 55vh;
+        overflow-y: auto;
+        overflow-x: auto;
+    }
+
+        .invoice-items-scroll table {
+            margin-bottom: 0;
+            font-size: 0.85rem;
+            border-collapse: collapse;
+        }
+
+        .invoice-items-scroll thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: #fff;
+            font-size: 0.8rem;
+            padding: 4px 6px;
+            white-space: nowrap;
+        }
+
+        .invoice-items-scroll tbody td {
+            padding: 4px 6px;
+            white-space: nowrap;
+        }
+
+            .invoice-items-scroll tbody td.datetime-cell {
+                font-variant-numeric: tabular-nums;
+            }
+</style>
+
+<div class="card">
+    <div class="card-header py-1">
+        <h6 class="mb-0">Items For Invoice No: <b>@ViewBag.InvoiceNo</b></h6>
+    </div>
+</div>
+
+<div class="table-responsive invoice-items-scroll">
+    <table class="table table-bordered table-striped align-middle text-nowrap mb-0">
+        <thead>
+            <tr>
+                <th style="width:45px;">Seq</th>
+                <th>Charge Type</th>
+                <th>Charge</th>
+                <th>Description</th>
+                <th class="text-end">QTY</th>
+                <th class="text-end">Unit Price</th>
+                <th class="text-end">Discount</th>
+                <th class="text-end">Tax %</th>
+                <th>Currency</th>
+                <th class="text-end">Before Disc.</th>
+                <th class="text-end">After Disc.</th>
+                <th class="text-end">Tax</th>
+                <th class="text-end">Total</th>
+                <th>Create Date</th>
+                <th>Create User</th>
+                <th>Update Date</th>
+                <th>Update User</th>
+                @* <th style="width:120px;">Actions</th> *@
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.SequenceNumber</td>
+                        <td>@item.ChargeTypeName</td>
+                        <td>@item.ChargeName</td>
+                        <td>@item.Description</td>
+                        <td class="text-end">@item.QTY.ToString("N2")</td>
+                        <td class="text-end">@item.UnitPrice.ToString("N2")</td>
+                        <td class="text-end">@item.Discount.ToString("N2")</td>
+                        <td class="text-end">@item.TaxPercent.ToString("N2")</td>
+                        <td>@item.CurrencyCode</td>
+                        <td class="text-end">@item.AmountBeforeDiscount.ToString("N2")</td>
+                        <td class="text-end">@item.AmountAfterDiscount.ToString("N2")</td>
+                        <td class="text-end">@item.TaxAmount.ToString("N2")</td>
+                        <td class="text-end fw-bold">@item.TotalAmount.ToString("N2")</td>
+
+                        <!-- CreateDate: فقط تاریخ، فرمت کامل در title -->
+                        <td class="datetime-cell"
+                            title="@(item.CreateDateTime.ToString("yyyy-MM-dd HH:mm:ss"))">
+                            @(item.CreateDateTime.ToString("yyyy-MM-dd"))
+                        </td>
+                        <td>@item.CreateUserName</td>
+
+                        <!-- UpdateDate: فقط تاریخ، فرمت کامل در title -->
+                        <td class="datetime-cell"
+                            title="@(item.UpdateDateTime?.ToString("yyyy-MM-dd HH:mm:ss"))">
+                            @(item.UpdateDateTime?.ToString("yyyy-MM-dd"))
+                        </td>
+                        <td>@item.UpdateUserName</td>
+@*                         <td>
+                            <div class="d-flex gap-1 align-items-center">
+                                <!-- Edit -->
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary py-0 px-1"
+                                        title="Edit"
+                                        hx-get="@Url.Action("EditItemForm", "Invoices", new { id = item.Id })"
+                                        hx-target="#invoice-item-form-container"
+                                        hx-swap="innerHTML">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+
+                                <!-- Delete -->
+                                <form hx-post="@Url.Action("DeleteItem", "Invoices", new { id = item.Id, invoiceId = item.InvoiceId })"
+                                      hx-target="this"
+                                      hx-swap="none"
+                                      hx-confirm="Are you sure you want to delete this item?"
+                                      class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-1" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+ *@                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="18" class="text-center text-muted">No items found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="card-footer text-end py-1">
+    <button class="btn btn-sm btn-secondary py-0 px-1" title="Close"
+            onclick="document.getElementById('invoiceitems-list-container').innerHTML = ''">
+        <i class="bi bi-x-circle"></i>
+    </button>
+</div>

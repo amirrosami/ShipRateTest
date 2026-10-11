@@ -1,0 +1,143 @@
+﻿@using ShipRate.Application.DTOs
+@model PagedResultDto<TipListDto>
+
+<table class="table table-bordered table-hover table-sm">
+    <thead class="table-light">
+        <tr>
+            <th>TIP No</th>
+            <th>TIP Date</th>
+            <th>Expiry Date</th>
+            <th>Voyage No</th>
+            <th>Vessel</th>
+            <th>Port</th>
+            <th>Status</th>
+            <th style="width:120px;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Items.Any())
+        {
+            foreach (var item in Model.Items)
+            {
+                <tr hx-get="@Url.Action("ListTipUsages", "TIP", new { tipId = item.Id })"
+                    hx-target="#tip-usage-grid"
+                    hx-trigger="click"
+                    style="cursor:pointer">
+                    <td>@item.TIPNo</td>
+                    <td>@item.TIPDate.ToString("yyyy-MM-dd")</td>
+                    <td>@item.TIPExpiryDate.ToString("yyyy-MM-dd")</td>
+                    <td>@item.VoyageNo</td>
+                    <td>@item.VesselName</td>
+                    <td>@item.PortName</td>
+                    <td>@item.TIPStatusName</td>
+                    <td class="text-nowrap" hx-on:click="event.stopPropagation()">
+                        <button type="button" class="btn btn-sm btn-outline-success"
+                                hx-get="/DocumentManager/Index?objectId=@item.Id&objectTypeId=10"
+                                hx-target="#document-manager-content"
+                                hx-swap="innerHTML"
+                                data-bs-toggle="modal"
+                                hx-on:click="event.stopPropagation()"
+                                data-bs-target="#documentManagerModal">
+                            <i class="bi bi-folder2-open"></i>File
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-sm btn-outline-info"
+                                title="Details"
+                                hx-on:click="event.stopPropagation()"
+                                hx-get="@Url.Action("Details", "TIP", new { id = item.Id })"
+                                hx-target="#tip-modal-placeholder"
+                                hx-swap="innerHTML">
+                            <i class="bi bi-eye"></i>
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-sm btn-outline-warning"
+                                title="Edit"
+                                hx-on:click="event.stopPropagation()"
+                                hx-get="@Url.Action("Edit", "TIP", new { id = item.Id })"
+                                hx-target="#tip-modal-placeholder"
+                                hx-swap="innerHTML">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger"
+                                title="Delete"
+                                hx-on:click="event.stopPropagation()"
+                                hx-get="@Url.Action("Delete", "TIP", new { id = item.Id })"
+                                hx-target="#tip-modal-placeholder"
+                                hx-swap="innerHTML">
+                            <i class="bi bi-trash"></i>
+                        </button>
+
+
+
+
+
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="8" class="text-center">No TIPs found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.TotalPages > 1)
+{
+    <nav aria-label="TIP pagination">
+        <ul class="pagination pagination-sm">
+            @{
+                int current = Model.PageNumber;
+                int total = Model.TotalPages;
+                int maxDisplay = 5;
+
+                int start = Math.Max(1, current - 2);
+                int end = Math.Min(total, start + maxDisplay - 1);
+
+                if (end - start < maxDisplay - 1)
+                {
+                    start = Math.Max(1, end - maxDisplay + 1);
+                }
+            }
+
+            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                <a class="page-link"
+                   hx-get="@Url.Action("ListTips", "TIP", new { PageNumber = 1, PageSize = Model.PageSize })"
+                   hx-target="#tip-grid">First</a>
+            </li>
+
+            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                <a class="page-link"
+                   hx-get="@Url.Action("ListTips", "TIP", new { PageNumber = Model.PageNumber - 1, PageSize = Model.PageSize })"
+                   hx-target="#tip-grid">Previous</a>
+            </li>
+
+            @for (int i = start; i <= end; i++)
+            {
+                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                    <a class="page-link"
+                       hx-get="@Url.Action("ListTips", "TIP", new { PageNumber = i, PageSize = Model.PageSize })"
+                       hx-target="#tip-grid">@i</a>
+                </li>
+            }
+
+            <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                <a class="page-link"
+                   hx-get="@Url.Action("ListTips", "TIP", new { PageNumber = Model.PageNumber + 1, PageSize = Model.PageSize })"
+                   hx-target="#tip-grid">Next</a>
+            </li>
+
+            <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                <a class="page-link"
+                   hx-get="@Url.Action("ListTips", "TIP", new { PageNumber = Model.TotalPages, PageSize = Model.PageSize })"
+                   hx-target="#tip-grid">Last</a>
+            </li>
+        </ul>
+    </nav>
+}

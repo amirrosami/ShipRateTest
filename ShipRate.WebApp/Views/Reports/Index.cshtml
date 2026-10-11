@@ -1,0 +1,98 @@
+﻿@using ShipRate.Application.ViewModels
+@model ReportsIndexViewModel
+
+@{
+    ViewData["Title"] = "Reports Center";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Reports Center</h2>
+            <p class="text-muted mb-0">
+                Company ID: @Model.SelectedCompanyId
+            </p>
+        </div>
+    </div>
+
+@*     <div class="text-center">
+        <h1 class="display-4">مدیریت کانتینرها</h1>
+        <a href="@Url.Action("ShowContainersReport", "Reports")" class="btn btn-primary" target="_blank">
+            مشاهده گزارش کانتینرها (PDF)
+        </a>
+    </div>
+ *@
+   
+@*  <div class="text-center">
+        <h1 class="display-4">درخواست نرخ</h1>
+        <a href="@Url.Action("RateRequestReport", "Reports", new { id = "019E81F5-0799-795F-B6BA-FD9D3ADD3BBF" })" class="btn btn-primary" target="_blank">
+            مشاهده گزارش درخواست نرخ (PDF)
+        </a>
+</div> *@
+
+
+
+    @if (!Model.Categories.Any())
+    {
+        <div class="alert alert-warning">
+            No authorized reports found for this company.
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var category in Model.Categories)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header text-white @(string.IsNullOrWhiteSpace(category.ColorClass) ? "bg-primary" : category.ColorClass)">
+                            <div class="d-flex align-items-center">
+                                @if (!string.IsNullOrWhiteSpace(category.IconClass))
+                                {
+                                    <i class="@category.IconClass me-2"></i>
+                                }
+                                <h5 class="mb-0">@category.CategoryName</h5>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            @if (!string.IsNullOrWhiteSpace(category.Description))
+                            {
+                                <p class="text-muted small">@category.Description</p>
+                            }
+
+                            <ul class="list-group list-group-flush">
+                                @foreach (var report in category.Reports.OrderBy(r => r.SortOrder))
+                                {
+                                    <li class="list-group-item px-0">
+                                        <a asp-controller="@report.ControllerName"
+                                           asp-action="@report.ActionName"
+                                           asp-route-reportKey="@report.ReportKey"
+                                           asp-route-companyId="@Model.SelectedCompanyId"
+                                           class="text-decoration-none d-flex justify-content-between align-items-center">
+                                            <span>
+                                                @if (!string.IsNullOrWhiteSpace(report.IconClass))
+                                                {
+                                                    <i class="@report.IconClass me-2"></i>
+                                                }
+                                                @report.ReportName
+                                            </span>
+                                            <i class="bi bi-chevron-right"></i>
+                                        </a>
+
+                                        @if (!string.IsNullOrWhiteSpace(report.Description))
+                                        {
+                                            <div class="small text-muted mt-1">
+                                                @report.Description
+                                            </div>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

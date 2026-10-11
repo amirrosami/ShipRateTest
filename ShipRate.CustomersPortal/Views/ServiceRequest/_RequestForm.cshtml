@@ -1,0 +1,17 @@
+﻿@using ShipRate.Application.DTOs
+@model ServiceRequestDto
+<div class="container">
+
+
+    <div class="container" id="master-form">
+    @await Html.PartialAsync("_RequestMasterForm",Model.ServiceRequestFormDto)
+    </div>
+
+
+    <div class="container" id="detail-form">
+
+        @await Html.PartialAsync(Model.PartialName , Model.DetailDto)
+        </div>
+</div>
+
+

@@ -1,0 +1,71 @@
+﻿@using ShipRate.Application.DTOs
+@model PagedResultDto<VoyageMonitoringRowDto>
+
+
+@{
+    var request = ViewBag.SearchRequest as VoyageSearchRequestDto ?? new VoyageSearchRequestDto();
+}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped table-hover table-sm align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Vessel</th>
+                <th>Shipping Line</th>
+                <th>Voyage In</th>
+                <th>Voyage Out</th>
+                <th>Port</th>
+                <th>Terminal</th>
+                <th>Seq</th>
+                <th>ETA</th>
+                <th>ATA</th>
+                <th>Berthing</th>
+                <th>Ops Commenced</th>
+                <th>Ops Completed</th>
+                <th>Last Event</th>
+                <th>Last Event Date</th>
+                <th>Stage</th>
+                <th class="text-center action-col">...</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Items != null && Model.Items.Any())
+            {
+                foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.VesselName</td>
+                        <td>@item.ShippingLineName</td>
+                        <td>@item.VoyageNoIn</td>
+                        <td>@item.VoyageNoOut</td>
+                        <td>@item.PortName</td>
+                        <td>@item.TerminalName</td>
+                        <td>@item.VoyagePortSequence</td>
+                        <td>@item.ETA?.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@item.ATA?.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@item.BerthingDate?.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@item.OperationsCommencedDate?.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@item.OperationsCompletedDate?.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@item.LastEventName</td>
+                        <td>@item.LastEventDate?.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>
+                            <span class="badge @item.StageCssClass">@item.CurrentStage</span>
+                        </td>
+                        <td class="text-center action-col">
+                            @await Html.PartialAsync("_ActionMenu", item)
+                        </td>
+
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="16" class="text-center">No records found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@await Html.PartialAsync("_Pagination", Model)

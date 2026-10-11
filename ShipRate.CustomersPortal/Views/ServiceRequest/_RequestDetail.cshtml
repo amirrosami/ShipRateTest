@@ -1,0 +1,378 @@
+﻿@model ShipRate.Application.ViewModels.ServiceRequestDetail
+
+@{
+    string statusClass = Model.Status.ToString().ToLower();
+    string statusLabel = Model.Status switch
+    {
+        ShipRate.Application.ViewModels.ServiceRequestStatus.Pending => "Pending",
+        ShipRate.Application.ViewModels.ServiceRequestStatus.InReview => "In Review",
+        ShipRate.Application.ViewModels.ServiceRequestStatus.Approved => "Approved",
+        ShipRate.Application.ViewModels.ServiceRequestStatus.Rejected => "Rejected",
+        _ => Model.Status.ToString()
+    };
+}
+
+<div class="rd">
+    {{!-- Meta --}}
+    <div class="rd-meta">
+        <div class="rd-meta-row">
+            <span class="rd-label">B/L Number</span>
+            <span class="rd-value rd-mono">@Model.BLNumber</span>
+        </div>
+        <div class="rd-meta-row">
+            <span class="rd-label">Job Ref</span>
+            <span class="rd-value">@Model.JobRef</span>
+        </div>
+        <div class="rd-meta-row">
+            <span class="rd-label">Created</span>
+            <span class="rd-value">@Model.CreatedAt.ToString("dd MMM yyyy") by @Model.CreatedBy</span>
+        </div>
+        <div class="rd-meta-row">
+            <span class="rd-label">Status</span>
+            <span class="status-badge status-@statusClass">@statusLabel</span>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Description))
+    {
+        <div class="rd-section">
+            <h3 class="rd-section-title">Description</h3>
+            <p class="rd-description">@Model.Description</p>
+        </div>
+    }
+
+    @if (Model.Status == ShipRate.Application.ViewModels.ServiceRequestStatus.Rejected &&
+        !string.IsNullOrWhiteSpace(Model.RejectionReason))
+    {
+        <div class="rd-rejection">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5" />
+                <path d="M8 5v4M8 11v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+            <span>@Model.RejectionReason</span>
+        </div>
+    }
+
+    {{!-- Type-specific fields --}}
+    @if (Model.AmendmentFields?.Any() == true)
+    {
+        <div class="rd-section">
+            <h3 class="rd-section-title">Fields to Amend</h3>
+            <div class="rd-tags">
+                @foreach (var field in Model.AmendmentFields)
+                {
+                    <span class="rd-tag">@field</span>
+                }
+            </div>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.TargetBLNumber))
+    {
+        <div class="rd-section">
+            <h3 class="rd-section-title">Target B/L Number</h3>
+            <span class="rd-mono">@Model.TargetBLNumber</span>
+        </div>
+    }
+
+    @if (Model.SplitCount.HasValue)
+    {
+        <div class="rd-section">
+            <h3 class="rd-section-title">Split Into</h3>
+            <span>@Model.SplitCount parts</span>
+        </div>
+    }
+
+    {{!-- Charges --}}
+    @if (Model.Charges.Any())
+    {
+        <div class="rd-section">
+            <h3 class="rd-section-title">Charges</h3>
+            <table class="rd-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Description</th>
+                        <th scope="col" class="rd-th-num">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var charge in Model.Charges)
+                    {
+                        <tr>
+                            <td>@charge.Description</td>
+                            <td class="rd-td-num">@charge.Currency @charge.Amount.ToString("N2")</td>
+                        </tr>
+                    }
+                    <tr class="rd-total">
+                        <td>Total</td>
+                        <td class="rd-td-num">
+                            @Model.Charges.First().Currency
+                            @Model.Charges.Sum(c => c.Amount).ToString("N2")
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+
+    {{!-- Approval timeline --}}
+    @if (Model.Approvals.Any())
+    {
+        <div class="rd-section">
+            <h3 class="rd-section-title">Approval Workflow</h3>
+            <ol class="rd-timeline" aria-label="Approval steps">
+                @foreach (var step in Model.Approvals)
+                {
+                    string stepClass = step.Status.ToLower() switch
+                    {
+                        "approved" => "step-approved",
+                        "rejected" => "step-rejected",
+                        _ => "step-pending"
+                    };
+                    <li class="rd-step @stepClass">
+                        <span class="step-dot" aria-hidden="true"></span>
+                        <span class="step-body">
+                            <strong>@step.Step</strong>
+                            @if (step.ApprovedBy != null)
+                            {
+                                <span>@step.ApprovedBy · @step.ApprovedAt?.ToString("dd MMM yyyy")</span>
+                            }
+                            else
+                            {
+                                <span>Awaiting</span>
+                            }
+                        </span>
+                        <span class="step-status">@step.Status</span>
+                    </li>
+                }
+            </ol>
+        </div>
+    }
+</div>
+
+<style>
+    .rd {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .rd-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .rd-meta-row {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .rd-label {
+        font-size: .72rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: var(--c-muted);
+        font-weight: 600;
+    }
+
+    .rd-value {
+        font-size: .875rem;
+        color: var(--c-text);
+    }
+
+    .rd-mono {
+        font-family: monospace;
+        font-size: .8rem;
+    }
+
+    .rd-section-title {
+        font-size: .75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: var(--c-muted);
+        margin: 0 0 10px;
+    }
+
+    .rd-description {
+        margin: 0;
+        font-size: .875rem;
+        color: var(--c-text);
+        line-height: 1.55;
+    }
+
+    .rd-rejection {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        background: oklch(96% 0.04 25);
+        border: 1px solid oklch(86% 0.08 25);
+        border-radius: var(--radius-md);
+        padding: 12px 14px;
+        font-size: .875rem;
+        color: oklch(36% 0.14 25);
+    }
+
+        .rd-rejection svg {
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+    .rd-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .rd-tag {
+        background: var(--c-raised);
+        border: 1px solid var(--c-border);
+        border-radius: 99px;
+        padding: 3px 10px;
+        font-size: .78rem;
+        color: var(--c-text);
+    }
+
+    .rd-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .875rem;
+    }
+
+        .rd-table th {
+            padding: 8px 12px;
+            text-align: left;
+            font-size: .72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: var(--c-muted);
+            border-bottom: 1px solid var(--c-border);
+            background: var(--c-raised);
+        }
+
+    .rd-th-num, .rd-td-num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .rd-table td {
+        padding: 9px 12px;
+        border-bottom: 1px solid var(--c-border);
+        color: var(--c-text);
+    }
+
+    .rd-total td {
+        border-bottom: none;
+        font-weight: 600;
+        padding-top: 11px;
+    }
+
+    .rd-timeline {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .rd-step {
+        display: flex;
+        align-items: flist-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .rd-step {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 10px 0;
+        position: relative;
+    }
+
+        .rd-step + .rd-step::before {
+            content: '';
+            position: absolute;
+            left: px;
+            height: 16px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 1px;
+            border: 2px solid var(--c-border);
+            background: var(--c-surface);
+        }
+
+    .step-approved .step-dot {
+        border-color: var(--c-success);
+        background: var(--c-success);
+    }
+
+    .step-rejected .step-dot {
+        border-color: var(--c-danger);
+        background: var(--c-danger);
+    }
+
+    .step-pending .step-dot {
+        border-color: var(--c-warning);
+        background: var(--c-surface);
+    }
+
+    .step-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        font-size: .875rem;
+        color: var(--c-text);
+    }
+
+        .step-body strong {
+            font-weight: 600;
+        }
+
+        .step-body span {
+            font-size: .8rem;
+            color: var(--c-muted);
+        }
+
+    .step-status {
+        font-size: .72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        padding-top: 2px;
+    }
+
+    .step-approved .step-status {
+        color: var(--c-success);
+    }
+
+    .step-rejected .step-status {
+        color: var(--c-danger);
+    }
+
+    .step-pending .step-status {
+        color: var(--c-warning);
+    }
+
+    @@media (prefers-color-scheme: dark) {
+        .rd-rejection {
+            background: oklch(22% 0.06 25);
+            border-color: oklch(34% 0.10 25);
+            color: oklch(76% 0.12 25);
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .rd-meta {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

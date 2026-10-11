@@ -1,0 +1,20 @@
+﻿@using ShipRate.WebApp.ViewModels
+@model TextFieldVm
+
+<div class="mb-2 col-md-6">
+
+    <label class="form-label">
+        @Model.Label
+
+        @if (Model.Required)
+        {
+            <span class="text-danger">*</span>
+        }
+    </label>
+
+    <input type="text"
+           name="@Model.Name"
+           value="@Model.Value"
+           class="form-control @(ViewData.ModelState.ContainsKey(Model.Name) ? "is-invalid" : "")" />
+
+</div>

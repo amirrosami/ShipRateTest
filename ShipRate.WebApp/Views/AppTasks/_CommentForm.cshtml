@@ -1,0 +1,48 @@
+﻿@using ShipRate.Application.DTOs.AppTasks
+@model AppTaskDetailsDto
+
+@if (Model.CanComment)
+{
+    <form hx-post="@Url.Action("AddComment", "AppTasks")"
+          hx-target="#appTaskDrawerContent"
+          hx-swap="innerHTML"
+          class="mb-3">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="AppTaskId" value="@Model.Id" />
+        <input type="hidden" name="CommentTypeId" value="1" />
+        <input type="hidden" name="IsInternal" value="false" />
+
+        <div class="mb-2">
+            <label class="form-label">New Comment</label>
+            <textarea name="CommentText" class="form-control" rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-sm">
+            Add Comment
+        </button>
+    </form>
+
+    <hr />
+}
+
+@if (Model.Comments == null || !Model.Comments.Any())
+{
+    <div class="text-muted">No comment.</div>
+}
+else
+{
+    <div class="vstack gap-2">
+        @foreach (var comment in Model.Comments)
+        {
+            <div class="border rounded p-2">
+                <div class="d-flex justify-content-between">
+                    <strong>@(comment.CreatedByUserName ?? "-")</strong>
+                    <small class="text-muted">@comment.CreatedDate.ToString("yyyy/MM/dd HH:mm")</small>
+                </div>
+                <div class="mt-1">@comment.CommentText</div>
+            </div>
+        }
+    </div>
+}

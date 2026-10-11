@@ -1,0 +1,171 @@
+﻿@using ShipRate.WebApp.ViewModels.ContainerViewModels
+@model List<ContainerListVM>
+
+<div class="table-responsive">
+    <table class="table table-sm table-hover table-bordered align-middle mb-1">
+        <thead class="table-light">
+            <tr>
+                <th style="width:40px">#</th>
+                <th>Container No</th>
+                <th>Size/Type</th>
+                <th>Own/Lease</th>
+                <th>Ownership</th>
+                <th>Owner</th>
+                <th>MaxPayLoad</th>
+                <th>Tare</th>
+                <th>Resp. By Us</th>
+                <th>Resp. Company</th>
+                <th>Status</th>
+                <th style="width:100px">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="12" class="text-center text-muted py-3">No containers found.</td>
+                </tr>
+            }
+            else
+            {
+                var page = (int)(ViewBag.Page ?? 1);
+                var row = (page - 1) * 15;
+                @foreach (var c in Model)
+                {
+                    row++;
+                    <tr>
+                        <td class="text-muted">@row</td>
+                        <td><strong>@c.ContainerNumber</strong></td>
+                        <td>@c.SizeType</td>
+                        <td>@c.OwnLeaseType</td>
+                        <td>@c.CntOwnType</td>
+                        <td>@(c.OwnerName ?? "—")</td>
+                        <td>@c.MaxPayLoad.ToString("N0")</td>
+                        <td>@c.TareWeight.ToString("N0")</td>
+                        <td>
+                            @if (c.ResponsibilityByUs)
+                            {
+                                <span class="badge bg-info-subtle text-info">Yes</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary-subtle text-secondary">No</span>
+                            }
+                        </td>
+                        <td>@(c.ResponsibleCompany ?? "—")</td>
+                        <td>
+                            @if (c.IsActive)
+                            {
+                                <span class="badge bg-success-subtle text-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="d-flex">
+                                <button class="btn btn-sm btn-outline-primary"
+                                        hx-get="/container/edit/@c.Id"
+                                        hx-target="#modalContent"
+                                        hx-on::after-request="showModal()"
+                                        title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger"
+                                        hx-delete="/container/delete/@c.Id"
+                                        hx-confirm="Are you sure you want to delete this container?"
+                                        title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success"
+                                        hx-get="/container/conditionreports/@c.Id"
+                                        title="Condition Reports">
+                                    <i class="bi bi-bag-check"></i>
+                                </button>
+
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+@{
+    var currentPage = (int)(ViewBag.Page ?? 1);
+    var totalPages = (int)(ViewBag.TotalPages ?? 1);
+    var totalCount = (int)(ViewBag.TotalCount ?? 0);
+
+    var startPage = Math.Max(1, currentPage - 2);
+    var endPage = Math.Min(totalPages, currentPage + 2);
+}
+
+<div class="d-flex justify-content-between align-items-center">
+    <small class="text-muted">Total: @totalCount records</small>
+
+    @if (totalPages > 1)
+    {
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       hx-get="/container?page=@(currentPage - 1)&search=@ViewBag.Search&ownLeaseTypeId=@ViewBag.OwnLeaseTypeId&cntOwnTypeId=@ViewBag.CntOwnTypeId&ownerId=@ViewBag.OwnerId&isActive=@ViewBag.IsActive&responsibilityByUs=@ViewBag.ResponsibilityByUs&responsibleCompanyId=@ViewBag.ResponsibleCompanyId"
+                       hx-target="#tableWrapper">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+
+                @if (startPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link"
+                           hx-get="/container?page=1&search=@ViewBag.Search&ownLeaseTypeId=@ViewBag.OwnLeaseTypeId&cntOwnTypeId=@ViewBag.CntOwnTypeId&ownerId=@ViewBag.OwnerId&isActive=@ViewBag.IsActive&responsibilityByUs=@ViewBag.ResponsibilityByUs&responsibleCompanyId=@ViewBag.ResponsibleCompanyId"
+                           hx-target="#tableWrapper">1</a>
+                    </li>
+
+                    @if (startPage > 2)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+                }
+
+                @for (int i = startPage; i <= endPage; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link"
+                           hx-get="/container?page=@i&search=@ViewBag.Search&ownLeaseTypeId=@ViewBag.OwnLeaseTypeId&cntOwnTypeId=@ViewBag.CntOwnTypeId&ownerId=@ViewBag.OwnerId&isActive=@ViewBag.IsActive&responsibilityByUs=@ViewBag.ResponsibilityByUs&responsibleCompanyId=@ViewBag.ResponsibleCompanyId"
+                           hx-target="#tableWrapper">@i</a>
+                    </li>
+                }
+
+                @if (endPage < totalPages)
+                {
+                    @if (endPage < totalPages - 1)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+
+                    <li class="page-item">
+                        <a class="page-link"
+                           hx-get="/container?page=@totalPages&search=@ViewBag.Search&ownLeaseTypeId=@ViewBag.OwnLeaseTypeId&cntOwnTypeId=@ViewBag.CntOwnTypeId&ownerId=@ViewBag.OwnerId&isActive=@ViewBag.IsActive&responsibilityByUs=@ViewBag.ResponsibilityByUs&responsibleCompanyId=@ViewBag.ResponsibleCompanyId"
+                           hx-target="#tableWrapper">@totalPages</a>
+                    </li>
+                }
+
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       hx-get="/container?page=@(currentPage + 1)&search=@ViewBag.Search&ownLeaseTypeId=@ViewBag.OwnLeaseTypeId&cntOwnTypeId=@ViewBag.CntOwnTypeId&ownerId=@ViewBag.OwnerId&isActive=@ViewBag.IsActive&responsibilityByUs=@ViewBag.ResponsibilityByUs&responsibleCompanyId=@ViewBag.ResponsibleCompanyId"
+                       hx-target="#tableWrapper">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+

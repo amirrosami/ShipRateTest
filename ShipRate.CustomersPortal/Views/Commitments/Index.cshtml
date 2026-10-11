@@ -1,0 +1,80 @@
+﻿@using Microsoft.Extensions.Localization
+@using System.Globalization
+@using ShipRate.Application.ViewModels
+@using ShipRate.WebAppCustomers
+@inject IStringLocalizer<SharedResource> Localizer
+@model List<CommitmentFileListItemVm>
+
+@{
+    var isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var direction = isRtl ? "rtl" : "ltr";
+    var textAlign = isRtl ? "text-end" : "text-start";
+    var textAlignOpposite = isRtl ? "text-start" : "text-end";
+}
+
+<div class="card shadow-sm border-0" dir="@direction">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0 @textAlign">
+            <i class="bi bi-file-earmark-text me-1"></i>
+            @Localizer["CommitmentLetters"]
+        </h5>
+    </div>
+
+    <div class="card-body @textAlign">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>@Localizer["Row"]</th>
+                            <th>@Localizer["FileTitle"]</th>
+                            <th>@Localizer["Description"]</th>
+                            <th>@Localizer["UploadDate"]</th>
+                            <th class="@textAlignOpposite">@Localizer["Actions"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            var item = Model[i];
+                            <tr>
+                                <td>@(i + 1)</td>
+                                <td>@(isRtl ? item.FileTitle : item.LatinName)</td>
+                                <td>@(isRtl ? item.Description : item.LatinDscp)</td>
+                                <td>
+                                    @(item.UploadDate.HasValue
+                                                                ? item.UploadDate.Value.ToString("yyyy/MM/dd")
+                                                                : "-")
+                                </td>
+                                <td class="@textAlignOpposite">
+                                    <a asp-action="DownloadCommitmentFile"
+                                       asp-route-fileName="@item.FileName"
+                                       class="btn btn-sm btn-outline-primary"
+                                       title="@Localizer["Download"]">
+                                        <i class="bi bi-download me-1"></i>
+                                        @Localizer["Download"]
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info mb-0">
+                <i class="bi bi-info-circle me-1"></i>
+                @Localizer["NoCommitmentLettersFound"]
+            </div>
+        }
+    </div>
+
+    @* <div class="card-footer @textAlignOpposite">
+         <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i>
+            @Localizer["Close"]
+        </button> *
+    </div> *@
+</div>

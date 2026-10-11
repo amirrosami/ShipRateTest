@@ -1,0 +1,92 @@
+﻿@using ShipRate.Application.DTOs.ApiIr
+@model PersonInfoLookupVm
+
+<div class="modal-header">
+    <h5 class="modal-title">استعلام اطلاعات شخص از API.ir</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <form 
+        hx-post="@Url.Action("PersonInfo", "ApiIr")"
+        hx-target="#apiIrModalBody"
+        hx-swap="innerHTML"
+        hx-indicator="#apiIrLoading"
+        class="row g-3">
+
+        @Html.AntiForgeryToken()
+
+        <div class="col-12">
+            <label class="form-label">کد ملی</label>
+            <input asp-for="NationalCode" class="form-control ltr text-start" maxlength="10" />
+            <span asp-validation-for="NationalCode" class="text-danger small"></span>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">تاریخ تولد</label>
+            <input asp-for="BirthDate" class="form-control ltr text-start" placeholder="YYYY/MM/DD" />
+            <span asp-validation-for="BirthDate" class="text-danger small"></span>
+        </div>
+
+        <div class="col-12 d-flex gap-2 align-items-center">
+            <button type="submit" class="btn btn-primary">
+                <span id="apiIrLoading" class="htmx-indicator spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                استعلام
+            </button>
+        </div>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger mt-3 mb-0">
+            @Model.ErrorMessage
+        </div>
+    }
+
+    @if (Model.Result is not null)
+    {
+        <div class="card mt-3 border-0 shadow-sm">
+            <div class="card-header bg-light">
+                <strong>نتیجه استعلام</strong>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="text-muted small">نام</div>
+                        <div class="fw-semibold">@Model.Result.Data?.FirstName</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">نام خانوادگی</div>
+                        <div class="fw-semibold">@Model.Result.Data?.LastName</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">نام پدر</div>
+                        <div class="fw-semibold">@Model.Result.Data?.FatherName</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">کد ملی</div>
+                        <div class="fw-semibold">@Model.Result.Data?.NationalCode</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">جنسیت</div>
+                        <div class="fw-semibold">@Model.Result.Data?.Gender</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">زنده</div>
+                        <div class="fw-semibold">
+                            @(Model.Result.Data?.Alive == true ? "بله" : "خیر")
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="small text-muted">
+                    <div>Success: @Model.Result.Success</div>
+                    <div>Code: @Model.Result.Code</div>
+                    <div>Message: @Model.Result.Message</div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

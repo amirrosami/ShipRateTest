@@ -1,0 +1,106 @@
+﻿@using ShipRate.Application.DTOs
+@model PagedResultDto<VaultItemDto>
+@{
+    var filter = ViewBag.Filter as VaultItemFilterDto ?? new();
+}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover table-striped mb-0 vault-table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Title</th>
+                    <th>Identifier / Plaque</th>
+                    <th>Beneficiary / Owner</th>
+                    <th>Shelf Loc</th>
+                    <th>Status</th>
+                    <th>Current Holder</th>
+                    <th>Expiry Date</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.CategoryName</td>
+                        <td class="fw-bold">@item.Title</td>
+                        <td>@item.IdentifierNo</td>
+                        <td>@item.OwnerOrBeneficiary</td>
+                        <td>@item.ShelfLocation</td>
+                        <td>
+                            @if (item.VaultItemStatusId == 1)
+                            {
+                                <span class="badge bg-success">In Vault</span>
+                            }
+                            else if (item.VaultItemStatusId == 2)
+                            {
+                                <span class="badge bg-warning text-dark">Checked Out</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Permanent Out</span>
+                            }
+                        </td>
+                        <td>@item.CurrentHolderName</td>
+                        <td>@item.ExpiryDate?.ToString("yyyy-MM-dd")</td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                @if (item.VaultItemStatusId == 1)
+                                {
+                                    <button class="btn btn-outline-warning" hx-get="/Vaults/CustodyActionModal?itemId=@item.Id&actionTypeId=2" hx-target="#modalContainer" data-bs-toggle="modal" data-bs-target="#appModal">
+                                        Check-Out
+                                    </button>
+                                }
+                                else if (item.VaultItemStatusId == 2)
+                                {
+                                    <button class="btn btn-outline-success" hx-get="/Vaults/CustodyActionModal?itemId=@item.Id&actionTypeId=3" hx-target="#modalContainer" data-bs-toggle="modal" data-bs-target="#appModal">
+                                        Return
+                                    </button>
+                                }
+                                <button class="btn btn-outline-secondary" hx-get="/Vaults/UpsertItemModal?vaultId=@item.VaultId&id=@item.Id" hx-target="#modalContainer" data-bs-toggle="modal" data-bs-target="#appModal">
+                                    Edit
+                                </button>
+                                <button type="button"
+                                        class="btn btn-xs btn-outline-info"
+                                        hx-get="/Vaults/CustodyHistoryModal?itemId=@item.Id"
+                                        hx-target="#custodyHistoryModalContent"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#custodyHistoryModal"
+                                        title="View Custody History">
+                                    <i class="bi bi-clock-history"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                        hx-get="/DocumentManager/Index?objectId=@item.Id&objectTypeId=491"
+                                        hx-target="#document-manager-content"
+                                        hx-swap="innerHTML"
+                                        data-bs-toggle="modal"
+                                        title="مستندات"
+                                        data-bs-target="#documentManagerModal">
+                                    <i class="bi bi-folder2-open me-1"></i>
+                                </button>
+
+
+
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="custodyHistoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" id="custodyHistoryModalContent">
+            <!-- محتوای _CustodyHistoryModal.cshtml توسط HTMX اینجا لود می‌شود -->
+            <div class="p-4 text-center text-muted">
+                <div class="spinner-border spinner-border-sm text-info me-2" role="status"></div>
+                Loading history...
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,166 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.Base_Info
+@model PagedResultDto<EventTypeListItemDto>
+
+@{
+    var categoryId = ViewBag.CategoryId as int?;
+    var searchTerm = Model.SearchTerm;
+}
+
+<div class="card" dir="ltr">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Event Types</strong>
+
+        <button class="btn btn-success btn-sm"
+                hx-get="@Url.Action("Create", "EventTypes", new { categoryId = categoryId })"
+                hx-target="#modalContent"
+                hx-swap="innerHTML"
+                data-bs-toggle="modal"
+                data-bs-target="#mainModal">
+            Create New
+        </button>
+    </div>
+
+    <div class="card-body">
+        <form class="row g-2 mb-3"
+              hx-get="@Url.Action("List", "EventTypes")"
+              hx-target="#eventTypesContainer"
+              hx-swap="innerHTML">
+            <input type="hidden" name="categoryId" value="@categoryId" />
+            <input type="hidden" name="pageNumber" value="1" />
+
+            <div class="col-md-4">
+                <input type="text" name="searchTerm" value="@searchTerm" class="form-control" placeholder="Search..." />
+            </div>
+
+            <div class="col-md-2">
+                <select name="pageSize" class="form-select">
+                    <option value="10" selected="@(Model.PageSize == 10)">10</option>
+                    <option value="20" selected="@(Model.PageSize == 20)">20</option>
+                    <option value="50" selected="@(Model.PageSize == 50)">50</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Id</th>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Remarks</th>
+                        <th>System Defined</th>
+                        <th>System Event</th>
+                        <th>Active</th>
+                        <th style="width:160px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items.Any())
+                    {
+                        foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@item.EventTypeCode</td>
+                                <td>@item.EventTypeName</td>
+                                <td>@item.EventTypeRemarks</td>
+                                <td>
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           @(item.SystemDefined ? "checked" : "")
+                                           style="pointer-events:none;"
+                                           disblaed />
+                                <td>
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           @(item.IsSystemEvent ? "checked" : "")
+                                           style="pointer-events:none;"
+                                           disabled />
+                                </td>
+                                <td>
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           @(item.IsActive ? "checked" : "")
+                                           style="pointer-events:none;"
+                                           disabled />
+                                </td>
+                                <td>
+                                    <button type="button"
+                                            class="btn btn-sm btn-warning"
+                                            title="Edit"
+                                            hx-get="@Url.Action("Edit", "EventTypes", new { id = item.Id })"
+                                            hx-target="#modalContent"
+                                            hx-swap="innerHTML"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#mainModal"
+                                            @(item.SystemDefined ? "disabled" : "")>
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-danger"
+                                            title="Delete"
+                                            hx-get="@Url.Action("Delete", "EventTypes", new { id = item.Id, categoryId = categoryId, searchTerm = Model.SearchTerm, pageNumber = Model.PageNumber })"
+                                            hx-target="#modalContent"
+                                            hx-swap="innerHTML"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#mainModal"
+                                            @(item.SystemDefined ? "disabled" : "")>
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center">No data found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <nav>
+            <ul class="pagination">
+                @if (Model.HasPreviousPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link"
+                           hx-get="@Url.Action("List", "EventTypes", new { categoryId = categoryId, searchTerm = Model.SearchTerm, pageNumber = Model.PageNumber - 1, pageSize = Model.PageSize })"
+                           hx-target="#eventTypesContainer"
+                           hx-swap="innerHTML">Previous</a>
+                    </li>
+                }
+
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    var active = i == Model.PageNumber ? "active" : "";
+                    <li class="page-item @active">
+                        <a class="page-link"
+                           hx-get="@Url.Action("List", "EventTypes", new { categoryId = categoryId, searchTerm = Model.SearchTerm, pageNumber = i, pageSize = Model.PageSize })"
+                           hx-target="#eventTypesContainer"
+                           hx-swap="innerHTML">@i</a>
+                    </li>
+                }
+
+                @if (Model.HasNextPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link"
+                           hx-get="@Url.Action("List", "EventTypes", new { categoryId = categoryId, searchTerm = Model.SearchTerm, pageNumber = Model.PageNumber + 1, pageSize = Model.PageSize })"
+                           hx-target="#eventTypesContainer"
+                           hx-swap="innerHTML">Next</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+</div>

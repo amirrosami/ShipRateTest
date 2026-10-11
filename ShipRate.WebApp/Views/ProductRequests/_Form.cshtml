@@ -1,0 +1,107 @@
+﻿@using ShipRate.WebApp.ViewModels.InventoryViewModels
+@model ProductRequestFormVM
+
+<div class="modal-header">
+    <h6 class="modal-title">
+        <i class="bi bi-cart-plus me-1"></i>
+        @(Model.Id == Guid.Empty ? "New Request" : "Edit Request")
+    </h6>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<form hx-post="/inventory/product-requests/@(Model.Id == Guid.Empty ? "create" : $"{Model.Id}/edit")"
+      hx-target="#formResult">
+    <div class="modal-body">
+        <div id="formResult"></div>
+
+        <div class="mb-2">
+            <label class="form-label form-label-sm">Remarks</label>
+            <textarea name="Remarks" class="form-control form-control-sm" rows="2"
+                      maxlength="200">@Model.Remarks</textarea>
+        </div>
+
+        <hr class="my-2">
+
+        <div class="d-flex justify-content-between align-items-center mb-1">
+            <small class="fw-bold">Request Items</small>
+            <button type="button" class="btn btn-sm btn-success py-0" onclick="addRow()">
+                <i class="bi bi-plus-lg"></i> Add Item
+            </button>
+        </div>
+
+        <table class="table table-sm table-bordered" id="itemsTable">
+            <thead class="table-light">
+                <tr>
+                    <th>Product</th>
+                    <th style="width:120px;" class="text-center">Qty</th>
+                    <th style="width:40px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Items.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <input type="hidden" name="Items[@i].Id" value="@Model.Items[i].Id">
+                            <select name="Items[@i].ProductId" class="form-select form-select-sm" required>
+                                @foreach (var p in ViewBag.Products)
+                                {
+                                    <option value="@p.Id" selected="@(p.Id == Model.Items[i].ProductId)">@p.ProductName</option>
+                                }
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" name="Items[@i].Quantity"
+                                   value="@Model.Items[i].Quantity"
+                                   class="form-control form-control-sm text-center" min="1" required>
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1"
+                                    onclick="this.closest('tr').remove(); reindex()">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="modal-footer py-2">
+        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-sm btn-primary">
+            <i class="bi bi-save me-1"></i>Save
+        </button>
+    </div>
+</form>
+
+<script>
+    const products = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                ((IEnumerable<dynamic>)ViewBag.Products).Select(p => new { id = p.Id, name = p.ProductName })));
+
+    function addRow() {
+        const tbody = document.querySelector('#itemsTable tbody');
+        const idx = tbody.rows.length;
+        const opts = products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+        tbody.insertAdjacentHTML('beforeend', `
+            <tr>
+                <td><select name="Items[${idx}].ProductId" class="form-select form-select-sm" required>${opts}</select></td>
+                <td><input type="number" name="Items[${idx}].Quantity" value="1"
+                           class="form-control form-control-sm text-center" min="1" required></td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1"
+                            onclick="this.closest('tr').remove();reindex()">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>`);
+    }
+
+    function reindex() {
+        document.querySelectorAll('#itemsTable tbody tr').forEach((tr, i) => {
+            tr.querySelectorAll('[name]').forEach(el => {
+                el.name = el.name.replace(/\[\d+\]/, `[${i}]`);
+            });
+        });
+    }
+</script>

@@ -1,0 +1,76 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model List<JobSettlementDetailDto>
+
+<div class="modal-header">
+    <h5 class="modal-title">Settlement Details</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+    @if (Model != null && Model.Any())
+    {
+        var first = Model.First();
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Settlement No</label>
+                <div>@first.SettlementNo</div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Settlement Date</label>
+                <div>@first.SettlementDate.ToString("yyyy-MM-dd")</div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Invoice No</label>
+                <div>@first.InvoiceNo</div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Charge</label>
+                <div>@first.ChargeName</div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Item Amount</label>
+                <div>@first.ItemAmount.ToString("N2")</div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Payment Document</th>
+                        <th class="text-end">Allocated Amount</th>
+                        <th class="text-end">Settled Amount</th>
+                        <th class="text-end">Exchange Rate</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.PaymentDocumentNo</td>
+                            <td class="text-end">@item.AllocatedAmount.ToString("N2")</td>
+                            <td class="text-end">@item.SettledAmount.ToString("N2")</td>
+                            <td class="text-end">@item.ExchangeRate.ToString("N4")</td>
+                            <td>@item.Remarks</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning mb-0">No details found.</div>
+    }
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+</div>
+
+<script>
+    var modal = new bootstrap.Modal(document.getElementById('mainModal'));
+    modal.show();
+</script>

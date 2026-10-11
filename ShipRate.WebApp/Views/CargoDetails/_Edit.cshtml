@@ -1,0 +1,35 @@
+﻿@using ShipRate.Application.ViewModels
+@model CargoDetailFormVm
+
+<div class="modal fade" id="cargoDetailModal" tabindex="-1" aria-hidden="true" dir="ltr">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <form asp-action="Edit"
+                  asp-controller="CargoDetails"
+                  method="post"
+                  hx-post="@Url.Action("Edit", "CargoDetails")"
+                  hx-target="#cargoDetailsPanel"
+                  hx-swap="outerHTML">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="Id" />
+
+                @await Html.PartialAsync("_CargoDetailFormFields", Model)
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+
+                    <button type="submit" class="btn btn-primary">
+                        Save Changes
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>

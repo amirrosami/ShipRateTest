@@ -1,0 +1,331 @@
+﻿@using ShipRate.Application.DTOs.BillOfLadings
+@model BLManagementPageViewModel
+
+<style>
+    /* کانتینر اصلی جهت تضمین اسکرول افقی در موبایل بدون شکستگی صفحه */
+    .bl-table-wrapper {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    .bl-table {
+        width: 100%;
+        min-width: 1150px;
+        table-layout: fixed;
+    }
+
+    /* استایل هدر جدول - تم سرمه‌ای/نقره‌ای */
+    .bl-table-header {
+        background-color: #dbeafe !important;
+        background: linear-gradient(180deg, #e0eafc 0%, #cfdef3 100%) !important;
+        border-top: 1px solid #b8cbe5 !important;
+        border-bottom: 2px solid #9bb5d6 !important;
+    }
+
+        .bl-table-header th {
+            color: #1e3a5f !important;
+            font-size: 0.78rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            vertical-align: middle;
+            padding-top: 11px !important;
+            padding-bottom: 11px !important;
+            border-bottom: none !important;
+        }
+
+    .bl-data-row {
+        border-bottom: 1px solid #e9ecef;
+        transition: background-color 0.15s ease-in-out;
+    }
+
+        .bl-data-row:hover {
+            background-color: #f1f5f9 !important;
+        }
+
+    /* بج شماره ردیف */
+    .row-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 28px;
+        height: 24px;
+        padding: 0 6px;
+        color: #334155;
+        background-color: #e2e8f0;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .bl-number {
+        display: inline-block;
+        padding: 4px 8px;
+        color: #0c4a6e;
+        background-color: #fef08a; /* طلایی روشن */
+        border: 1px solid #fde047;
+        border-radius: 5px;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .bg-purple-subtle {
+        background-color: #f3e8ff !important;
+    }
+
+    .text-purple {
+        color: #7e22ce !important;
+    }
+
+    .fs-7 {
+        font-size: 0.85rem !important;
+    }
+
+    .fs-8 {
+        font-size: 0.75rem !important;
+    }
+
+    #bl-grid-container,
+    #bl-grid-container .row,
+    #bl-grid-container .col,
+    .bl-table-wrapper {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    @@media (max-width: 768px) {
+        .bl-table {
+            min-width: 1050px;
+        }
+
+            .bl-table td:nth-child(9) .text-truncate {
+                max-width: 140px !important;
+            }
+    }
+</style>
+
+<div class="bl-table-wrapper">
+    <table class="table table-hover align-middle mb-0 bl-table">
+        <thead class="bl-table-header">
+            <tr>
+                <th class="ps-3 py-3 text-center" style="width: 55px;">#</th>
+                <th class="py-3" style="width: 130px;">BL Number</th>
+                <th class="py-3" style="width: 90px;">BL Type</th>
+                <th class="py-3" style="width: 110px;">Job File</th>
+                <th class="py-3" style="width: 110px;">Sales User</th>
+                <th class="py-3" style="width: 130px;">Mode</th>
+                <th class="py-3" style="width: 140px;">Mode Details</th>
+                <th class="py-3" style="width: 120px;">Shipment Type</th>
+                <th class="py-3" style="width: 220px;">Shipper &amp; Consignee</th>
+                <th class="py-3">Route</th>
+                <th class="py-3 text-end" style="width: 120px;">Gross Wt. (Kg)</th>
+                <th class="py-3 text-end pe-4" style="width: 140px;">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody class="border-0">
+            @if (Model.PagedResult != null && Model.PagedResult.Items.Any())
+            {
+                var rowIndex = 0;
+
+                foreach (var item in Model.PagedResult.Items)
+                {
+                    rowIndex++;
+
+                    var rowNumber = ((Model.PagedResult.PageNumber - 1) * Model.PagedResult.PageSize) + rowIndex;
+
+                    var badgeClass = item.TransportTypeId switch
+                    {
+                        1 => "bg-primary-subtle text-primary",
+                        2 => "bg-success-subtle text-success",
+                        3 => "bg-warning-subtle text-warning-emphasis",
+                        4 => "bg-info-subtle text-info-emphasis",
+                        5 => "bg-purple-subtle text-purple",
+                        _ => "bg-secondary-subtle text-secondary"
+                    };
+
+                    var transportIcon = item.TransportTypeId switch
+                    {
+                        1 => "bi-ship",
+                        2 => "bi-truck",
+                        3 => "bi-train",
+                        4 => "bi-airplane",
+                        _ => "bi-grid"
+                    };
+
+                    <tr class="bl-data-row">
+                        <!-- Row Number -->
+                        <td class="ps-3 text-center">
+                            <span class="row-number">
+                                @rowNumber
+                            </span>
+                        </td>
+
+                        <!-- BL Number -->
+                        <td>
+                            <span class="bl-number">
+                                @item.BLNo
+                            </span>
+                        </td>
+
+                        <!-- BL Type -->
+                        <td>
+                            @item.BLTypeTitle
+                        </td>
+
+                        <!-- Job File -->
+                        <td>
+                            @item.JobFileNumber
+                        </td>
+
+                        <!-- Sales User -->
+                        <td>
+                            @item.SalesUserName
+                        </td>
+
+                        <!-- Mode -->
+                        <td>
+                            <span class="badge rounded-pill px-3 py-2 fs-8 @badgeClass">
+                                <i class="bi @transportIcon me-1"></i>
+                                @item.TransportTypeTitle
+                            </span>
+                        </td>
+
+                        <!-- Mode Details -->
+                        <td>
+                            <div class="fw-semibold text-dark fs-7">
+                                @item.ModeDetailTitle
+                            </div>
+                            <div class="text-muted fs-8">
+                                @item.ModeDetailSubTitle
+                            </div>
+                        </td>
+
+                        <!-- Shipment Type -->
+                        <td>
+                            <span class="fs-7">
+                                @item.TradeTypeName
+                            </span>
+                        </td>
+
+                        <!-- Shipper & Consignee -->
+                        <td style="max-width: 220px;">
+                            <div class="fs-7 text-dark fw-medium d-flex align-items-center" title="Shipper: @item.ShipperName">
+                                <span class="text-muted fs-8 me-1 flex-shrink-0">SHPR:</span>
+                                <span class="text-truncate" style="max-width: 170px;">@(string.IsNullOrWhiteSpace(item.ShipperName) ? "-" : item.ShipperName)</span>
+                            </div>
+
+                            <div class="fs-7 text-dark fw-medium d-flex align-items-center mt-1" title="Consignee: @item.ConsigneeName">
+                                <span class="text-muted fs-8 me-1 flex-shrink-0">CNEE:</span>
+                                <span class="text-truncate" style="max-width: 170px;">@(string.IsNullOrWhiteSpace(item.ConsigneeName) ? "-" : item.ConsigneeName)</span>
+                            </div>
+                        </td>
+
+                        <!-- Route -->
+                        <td>
+                            <div class="fs-7 text-dark text-truncate" title="@item.RouteText">
+                                <i class="bi bi-geo-alt-fill text-muted me-1"></i>
+                                @item.RouteText
+                            </div>
+                        </td>
+
+                        <!-- Gross Weight -->
+                        <td class="text-secondary fs-7 text-end fw-semibold">
+                            @(item.GrossWeightKg?.ToString("N2") ?? "0.00")
+                        </td>
+
+                        <!-- Actions -->
+                        <td class="pe-4 text-end">
+                            <a asp-controller="BLManagement"
+                               asp-action="MasterConsole"
+                               asp-route-id="@item.BLId"
+                               asp-route-jobid="@item.JobId"
+                               class="btn btn-sm btn-outline-primary"
+                               title="Open B/L Console">
+                                <i class="bi bi-grid-1x2 me-1"></i>
+                                BL Console
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="12" class="text-center py-5 text-muted">
+                        <i class="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
+                        No Bill of Lading matches your current search criteria.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination Section -->
+@if (Model.PagedResult != null && Model.PagedResult.TotalPages > 1)
+{
+    <div class="card-footer bg-white border-top py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span class="text-muted fs-7">
+            Showing page @Model.PagedResult.PageNumber of @Model.PagedResult.TotalPages
+        </span>
+
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+
+                <!-- Previous -->
+                <li class="page-item @(!Model.PagedResult.HasPreviousPage ? "disabled" : "")">
+                    <button type="button"
+                            class="page-link"
+                            hx-post="@Url.Action("SearchList", "BLManagement")"
+                            hx-include="#filterForm"
+                            name="Page"
+                            value="@(Model.PagedResult.PageNumber - 1)"
+                            hx-target="#bl-grid-container"
+                            hx-swap="innerHTML">
+                        Previous
+                    </button>
+                </li>
+
+                <!-- Page Numbers -->
+                @for (int i = 1; i <= Model.PagedResult.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.PagedResult.PageNumber ? "active" : "")">
+                        <button type="button"
+                                class="page-link"
+                                hx-post="@Url.Action("SearchList", "BLManagement")"
+                                hx-include="#filterForm"
+                                name="Page"
+                                value="@i"
+                                hx-target="#bl-grid-container"
+                                hx-swap="innerHTML">
+                            @i
+                        </button>
+                    </li>
+                }
+
+                <!-- Next -->
+                <li class="page-item @(!Model.PagedResult.HasNextPage ? "disabled" : "")">
+                    <button type="button"
+                            class="page-link"
+                            hx-post="@Url.Action("SearchList", "BLManagement")"
+                            hx-include="#filterForm"
+                            name="Page"
+                            value="@(Model.PagedResult.PageNumber + 1)"
+                            hx-target="#bl-grid-container"
+                            hx-swap="innerHTML">
+                        Next
+                    </button>
+                </li>
+
+            </ul>
+        </nav>
+    </div>
+}

@@ -1,0 +1,508 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["PageHeader"] = "Dashboard";
+    ViewData["PageDescription"] = "Logistics & Shipping Overview";
+}
+
+@* @section PageActions {
+    <a href="#" class="btn btn-sm btn-primary">
+        <i class="bi bi-plus-lg me-1"></i> New Shipment
+    </a>
+    <a href="#" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-download me-1"></i> Export
+    </a>
+}
+ *@
+
+
+<!-- ===================== KPI CARDS ===================== -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-3 d-flex align-items-center justify-content-center"
+                     style="width:48px;height:48px;background:var(--bs-primary);color:#fff;font-size:1.3rem;">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div>
+                    <div class="text-muted small">Active Shipments</div>
+                    <div class="fw-bold fs-5 lh-1 mt-1">2,847</div>
+                    <small class="text-success"><i class="bi bi-arrow-up"></i> 12.5%</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-3 d-flex align-items-center justify-content-center"
+                     style="width:48px;height:48px;background:#198754;color:#fff;font-size:1.3rem;">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div>
+                    <div class="text-muted small">Delivered</div>
+                    <div class="fw-bold fs-5 lh-1 mt-1">18,429</div>
+                    <small class="text-success"><i class="bi bi-arrow-up"></i> 8.2%</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-3 d-flex align-items-center justify-content-center"
+                     style="width:48px;height:48px;background:#ffc107;color:#000;font-size:1.3rem;">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div>
+                    <div class="text-muted small">In Transit</div>
+                    <div class="fw-bold fs-5 lh-1 mt-1">1,156</div>
+                    <small class="text-warning"><i class="bi bi-dash"></i> 0.4%</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-3 d-flex align-items-center justify-content-center"
+                     style="width:48px;height:48px;background:#dc3545;color:#fff;font-size:1.3rem;">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <div class="text-muted small">Delayed</div>
+                    <div class="fw-bold fs-5 lh-1 mt-1">43</div>
+                    <small class="text-danger"><i class="bi bi-arrow-up"></i> 2.1%</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== MAIN CHARTS ROW ===================== -->
+<div class="row g-3 mb-4">
+    <!-- Shipment Volume (Line Chart) -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold">Shipment Volume</h6>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary active" data-range="weekly">Week</button>
+                    <button class="btn btn-outline-secondary" data-range="monthly">Month</button>
+                    <button class="btn btn-outline-secondary" data-range="yearly">Year</button>
+                </div>
+            </div>
+            <div class="card-body pt-0">
+                <div style="position:relative; height:300px;">
+                    <canvas id="chartVolume"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Transport Distribution (Doughnut) -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0">
+                <h6 class="mb-0 fw-semibold">Transport Mode</h6>
+            </div>
+            <div class="card-body pt-0 d-flex flex-column align-items-center justify-content-center">
+                <div style="position:relative; height:220px; width:220px;">
+                    <canvas id="chartDoughnut"></canvas>
+                </div>
+                <div class="d-flex flex-wrap gap-3 mt-3 small justify-content-center">
+                    <span><i class="bi bi-circle-fill text-primary me-1"></i>Sea 45%</span>
+                    <span><i class="bi bi-circle-fill me-1" style="color:#36b9cc"></i>Air 25%</span>
+                    <span><i class="bi bi-circle-fill me-1" style="color:#f6c23e"></i>Road 20%</span>
+                    <span><i class="bi bi-circle-fill me-1" style="color:#1cc88a"></i>Rail 10%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== SECOND CHARTS ROW ===================== -->
+<div class="row g-3 mb-4">
+    <!-- Revenue Chart (Bar) -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0">
+                <h6 class="mb-0 fw-semibold">Monthly Revenue ($K)</h6>
+            </div>
+            <div class="card-body pt-0">
+                <div style="position:relative; height:280px;">
+                    <canvas id="chartRevenue"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- On-Time Performance (Bar Horizontal) -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0">
+                <h6 class="mb-0 fw-semibold">On-Time Delivery by Region</h6>
+            </div>
+            <div class="card-body pt-0">
+                <div style="position:relative; height:280px;">
+                    <canvas id="chartOnTime"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== TABLE + ACTIVITY ===================== -->
+<div class="row g-3 mb-4">
+    <!-- Top Routes Table -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold">Top Shipping Routes</h6>
+                <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Route</th>
+                                <th class="text-center">Shipments</th>
+                                <th class="text-center">Avg Days</th>
+                                <th class="text-center">On-Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">Shanghai → Rotterdam</div>
+                                    <small class="text-muted">Via Suez Canal</small>
+                                </td>
+                                <td class="text-center">1,247</td>
+                                <td class="text-center">28</td>
+                                <td class="text-center">
+                                    <div class="progress" style="height:6px;width:80px;margin:auto;">
+                                        <div class="progress-bar bg-success" style="width:94%"></div>
+                                    </div>
+                                    <small>94%</small>
+                                </td>
+                                <td><span class="badge bg-success-subtle text-success">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">Dubai → Hamburg</div>
+                                    <small class="text-muted">Direct Service</small>
+                                </td>
+                                <td class="text-center">893</td>
+                                <td class="text-center">18</td>
+                                <td class="text-center">
+                                    <div class="progress" style="height:6px;width:80px;margin:auto;">
+                                        <div class="progress-bar bg-success" style="width:91%"></div>
+                                    </div>
+                                    <small>91%</small>
+                                </td>
+                                <td><span class="badge bg-success-subtle text-success">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">Los Angeles → Tokyo</div>
+                                    <small class="text-muted">Trans-Pacific</small>
+                                </td>
+                                <td class="text-center">756</td>
+                                <td class="text-center">14</td>
+                                <td class="text-center">
+                                    <div class="progress" style="height:6px;width:80px;margin:auto;">
+                                        <div class="progress-bar bg-warning" style="width:87%"></div>
+                                    </div>
+                                    <small>87%</small>
+                                </td>
+                                <td><span class="badge bg-warning-subtle text-warning">Moderate</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">Singapore → Sydney</div>
+                                    <small class="text-muted">Coastal Route</small>
+                                </td>
+                                <td class="text-center">612</td>
+                                <td class="text-center">10</td>
+                                <td class="text-center">
+                                    <div class="progress" style="height:6px;width:80px;margin:auto;">
+                                        <div class="progress-bar bg-success" style="width:96%"></div>
+                                    </div>
+                                    <small>96%</small>
+                                </td>
+                                <td><span class="badge bg-success-subtle text-success">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">Mumbai → Durban</div>
+                                    <small class="text-muted">Indian Ocean</small>
+                                </td>
+                                <td class="text-center">489</td>
+                                <td class="text-center">22</td>
+                                <td class="text-center">
+                                    <div class="progress" style="height:6px;width:80px;margin:auto;">
+                                        <div class="progress-bar bg-danger" style="width:78%"></div>
+                                    </div>
+                                    <small>78%</small>
+                                </td>
+                                <td><span class="badge bg-danger-subtle text-danger">Delayed</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Live Activity Feed -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold">Live Activity</h6>
+                <span class="badge bg-success"><i class="bi bi-broadcast me-1"></i>Live</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item border-0 py-3">
+                        <div class="d-flex gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                 style="width:36px;height:36px;background:#d1ecf1;color:#0c5460;">
+                                <i class="bi bi-truck"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold small">Container MSKU-7284931 departed</div>
+                                <small class="text-muted">Shanghai Port → Rotterdam • 2 min ago</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item border-0 py-3">
+                        <div class="d-flex gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                 style="width:36px;height:36px;background:#d4edda;color:#155724;">
+                                <i class="bi bi-check-lg"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold small">Shipment #SHP-44821 delivered</div>
+                                <small class="text-muted">Hamburg Warehouse B • 15 min ago</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item border-0 py-3">
+                        <div class="d-flex gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                 style="width:36px;height:36px;background:#fff3cd;color:#856404;">
+                                <i class="bi bi-exclamation-lg"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold small">Delay alert: Route SG-SYD</div>
+                                <small class="text-muted">Weather disruption • 32 min ago</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item border-0 py-3">
+                        <div class="d-flex gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                 style="width:36px;height:36px;background:#cce5ff;color:#004085;">
+                                <i class="bi bi-clipboard-check"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold small">Customs cleared: Batch #B-9912</div>
+                                <small class="text-muted">Dubai Free Zone • 1 hr ago</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item border-0 py-3">
+                        <div class="d-flex gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                 style="width:36px;height:36px;background:#e2d9f3;color:#4a235a;">
+                                <i class="bi bi-person-plus"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold small">New carrier registered</div>
+                                <small class="text-muted">Pacific Express Lines • 2 hr ago</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item border-0 py-3">
+                        <div class="d-flex gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                 style="width:36px;height:36px;background:#f8d7da;color:#721c24;">
+                                <i class="bi bi-geo-alt"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold small">GPS signal lost: Vessel MV-Orion</div>
+                                <small class="text-muted">Indian Ocean sector • 3 hr ago</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // ===== COLOR PALETTE =====
+            const colors = {
+                primary: '#4e73df',
+                success: '#1cc88a',
+                info: '#36b9cc',
+                warning: '#f6c23e',
+                danger: '#e74a3b',
+                secondary: '#858796',
+                light: '#f8f9fc'
+            };
+
+            // ===== HELPER: get CSS var or fallback =====
+            function textColor() {
+                return getComputedStyle(document.documentElement)
+                    .getPropertyValue('--bs-body-color').trim() || '#333';
+            }
+            function gridColor() {
+                return 'rgba(128,128,128,0.15)';
+            }
+
+            // ===== 1. SHIPMENT VOLUME (Line / Area) =====
+            new Chart(document.getElementById('chartVolume'), {
+                type: 'line',
+                data: {
+                    labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+                    datasets: [
+                        {
+                            label: 'This Week',
+                            data: [420,380,510,470,540,390,480],
+                            borderColor: colors.primary,
+                            backgroundColor: 'rgba(78,115,223,0.12)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#fff',
+                            pointBorderWidth: 2
+                        },
+                        {
+                            label: 'Last Week',
+                            data: [350,310,430,400,460,350,410],
+                            borderColor: colors.secondary,
+                            backgroundColor: 'transparent',
+                            borderDash: [5,5],
+                            fill: false,
+                            tension: 0.4,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#fff',
+                            pointBorderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { usePointStyle: true, padding: 20, color: textColor() } }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: textColor() } },
+                        y: { grid: { color: gridColor() }, ticks: { color: textColor() }, beginAtZero: true }
+                    }
+                }
+            });
+
+            // ===== 2. TRANSPORT MODE (Doughnut) =====
+            new Chart(document.getElementById('chartDoughnut'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Sea','Air','Road','Rail'],
+                    datasets: [{
+                        data: [45,25,20,10],
+                        backgroundColor: [colors.primary, colors.info, colors.warning, colors.success],
+                        borderWidth: 0,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '68%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // ===== 3. MONTHLY REVENUE (Bar) =====
+            new Chart(document.getElementById('chartRevenue'), {
+                type: 'bar',
+                data: {
+                    labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [120,135,128,142,155,148,162,158,170,165,178,190],
+                        backgroundColor: colors.primary,
+                        borderRadius: 4,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: textColor() } },
+                        y: { grid: { color: gridColor() }, ticks: { color: textColor(), callback: v => '$' + v + 'K' }, beginAtZero: true }
+                    }
+                }
+            });
+
+            // ===== 4. ON-TIME DELIVERY BY REGION (Horizontal Bar) =====
+            new Chart(document.getElementById('chartOnTime'), {
+                type: 'bar',
+                data: {
+                    labels: ['Asia Pacific','Europe','North America','Middle East','Africa','South America'],
+                    datasets: [{
+                        label: 'On-Time %',
+                        data: [94,91,89,87,78,82],
+                        backgroundColor: function(ctx) {
+                            const v = ctx.parsed.x;
+                            if (v >= 90) return colors.success;
+                            if (v >= 85) return colors.info;
+                            if (v >= 80) return colors.warning;
+                            return colors.danger;
+                        },
+                        borderRadius: 4,
+                        barPercentage: 0.55
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: ctx => ctx.parsed.x + '%' } }
+                    },
+                    scales: {
+                        x: { grid: { color: gridColor() }, ticks: { color: textColor(), callback: v => v + '%' }, min: 60, max: 100 },
+                        y: { grid: { display: false }, ticks: { color: textColor() } }
+                    }
+                }
+            });
+
+            // Fix bar colors (scriptable doesn't work in all versions, apply manually)
+            const onTimeChart = Chart.getChart('chartOnTime');
+            if (onTimeChart) {
+                const vals = onTimeChart.data.datasets[0].data;
+                onTimeChart.data.datasets[0].backgroundColor = vals.map(v => {
+                    if (v >= 90) return colors.success;
+                    if (v >= 85) return colors.info;
+                    if (v >= 80) return colors.warning;
+                    return colors.danger;
+                });
+                onTimeChart.update();
+            }
+
+        });
+    </script>
+}

@@ -1,0 +1,113 @@
+﻿@using ShipRate.Application.ViewModels
+@model CustomsClearanceLicenseCreateEditVm
+
+<div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    @(Model.IsEdit ? "Edit License" : "Add License")
+                </h5>
+                <button type="button" class="btn-close" onclick="closeHtmxModal()"></button>
+            </div>
+
+            <form hx-post="@(Model.IsEdit
+                                                  ? Url.Action("EditLicense", "CustomsClearance")
+                                                  : Url.Action("CreateLicense", "CustomsClearance"))"
+                  hx-target="#modal-container"
+                  hx-swap="innerHTML">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-body">
+                    @Html.ValidationSummary(false, "", new { @class = "text-danger mb-3" })
+
+                    <input asp-for="Id" type="hidden" />
+                    <input asp-for="CustomsClearanceId" type="hidden" />
+                    <input asp-for="IsEdit" type="hidden" />
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="LicenseTypeId" class="form-label"></label>
+                            <select asp-for="LicenseTypeId" asp-items="Model.LicenseTypeLookup" class="form-select">
+                                <option value="">Select...</option>
+                            </select>
+                            <span asp-validation-for="LicenseTypeId" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="LicenseStatusId" class="form-label"></label>
+                            <select asp-for="LicenseStatusId" asp-items="Model.LicenseStatusLookup" class="form-select">
+                                <option value="">Select...</option>
+                            </select>
+                            <span asp-validation-for="LicenseStatusId" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="LicenseNumber" class="form-label"></label>
+                            <input asp-for="LicenseNumber" class="form-control" />
+                            <span asp-validation-for="LicenseNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="IssuingOrganization" class="form-label"></label>
+                            <input asp-for="IssuingOrganization" class="form-control" />
+                            <span asp-validation-for="IssuingOrganization" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="IssueDate" class="form-label"></label>
+                            <input asp-for="IssueDate" class="form-control" type="date" />
+                            <span asp-validation-for="IssueDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="ExpiryDate" class="form-label"></label>
+                            <input asp-for="ExpiryDate" class="form-control" type="date" />
+                            <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Remarks" class="form-label"></label>
+                            <textarea asp-for="Remarks" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Remarks" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" onclick="closeHtmxModal()">Cancel</button>
+
+                    @if (Model.CanEdit)
+                    {
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check2 me-1"></i>
+                            Save
+                        </button>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const issueDate = document.getElementById("IssueDate");
+        const expiryDate = document.getElementById("ExpiryDate");
+
+        function validateDates() {
+            if (!issueDate || !expiryDate) return;
+
+            if (issueDate.value) {
+                expiryDate.min = issueDate.value;
+            }
+
+            if (issueDate.value && expiryDate.value && expiryDate.value < issueDate.value) {
+                expiryDate.value = issueDate.value;
+            }
+        }
+
+        issueDate?.addEventListener("change", validateDates);
+        validateDates();
+    })();
+</script>

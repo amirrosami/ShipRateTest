@@ -1,0 +1,812 @@
+﻿@using ShipRate.Application.ViewModels
+@model BLManifestReportVm
+
+@{
+    ViewData["Title"] = "Container Cargo Manifest";
+
+    string FormatWeight(decimal? value)
+        => value.HasValue ? $"{value.Value:N2} KG" : "-";
+
+    string FormatVolume(decimal? value)
+        => value.HasValue ? $"{value.Value:N2} CBM" : "-";
+
+    string FormatNumber(decimal? value)
+        => value.HasValue ? value.Value.ToString("N2") : "-";
+
+    string FormatDate(DateTime? value)
+        => value.HasValue ? value.Value.ToString("yyyy-MM-dd") : "-";
+
+    string GetVoyageText(BLManifestVoyageVm voyage)
+    {
+        var vessel = voyage.VesselName?.Trim();
+        var voyageNo = voyage.VoyageNo?.Trim();
+
+        if (string.IsNullOrWhiteSpace(vessel))
+        {
+            return voyageNo ?? "-";
+        }
+
+        if (string.IsNullOrWhiteSpace(voyageNo))
+        {
+            return vessel;
+        }
+
+        return $"{vessel} / {voyageNo}";
+    }
+}
+
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Container Cargo Manifest - @Model.BLNo</title>
+
+    <style>
+        :root {
+            --primary: #0f3b5e;
+            --primary-dark: #082b45;
+            --header-bg: #dcecf7;
+            --sub-header-bg: #edf5fa;
+            --border: #64748b;
+            --light-border: #cbd5e1;
+            --muted: #475569;
+            --light: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        @@page {
+            size: A4 landscape;
+            margin: 10mm;
+        }
+
+        body {
+            margin: 0;
+            background: #e5e7eb;
+            color: #111827;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .page {
+            width: min(297mm, calc(100% - 32px));
+            min-height: 210mm;
+            margin: 16px auto;
+            padding: 10mm;
+            background: #fff;
+            box-shadow: 0 2px 14px rgba(15, 23, 42, .18);
+        }
+
+        .no-print {
+            width: min(297mm, calc(100% - 32px));
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin: 16px auto 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border: 1px solid #0f3b5e;
+            border-radius: 4px;
+            background: #fff;
+            color: #0f3b5e;
+            cursor: pointer;
+            font-size: 12px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: #0f3b5e;
+            color: #fff;
+        }
+
+        .manifest-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .company-name {
+            margin: 0;
+            color: var(--primary);
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .document-title {
+            margin: 0;
+            color: var(--primary-dark);
+            font-size: 21px;
+            font-weight: 800;
+            text-align: right;
+            text-transform: uppercase;
+        }
+
+        .document-meta {
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 10px;
+            line-height: 1.6;
+            text-align: right;
+        }
+
+        .section {
+            margin-top: 12px;
+            border: 1px solid var(--light-border);
+        }
+
+        .section-title {
+            margin: 0;
+            padding: 6px 8px;
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--light-border);
+            color: var(--primary-dark);
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .section-content {
+            padding: 8px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            border-left: 1px solid var(--light-border);
+            border-top: 1px solid var(--light-border);
+        }
+
+        .info-item {
+            min-height: 43px;
+            border-right: 1px solid var(--light-border);
+            border-bottom: 1px solid var(--light-border);
+        }
+
+        .info-label {
+            display: block;
+            padding: 4px 6px;
+            background: var(--light);
+            color: var(--muted);
+            font-size: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            display: block;
+            padding: 5px 6px;
+            color: #172033;
+            font-size: 10px;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .party-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .party-box {
+            min-height: 92px;
+            padding: 8px;
+            border: 1px solid var(--light-border);
+        }
+
+        .party-title {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--primary-dark);
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .party-content {
+            white-space: pre-line;
+            overflow-wrap: anywhere;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 5px 4px;
+            border: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        th {
+            background: var(--header-bg);
+            color: var(--primary-dark);
+            font-size: 8px;
+            font-weight: 800;
+            line-height: 1.25;
+            text-align: center;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        td {
+            font-size: 9px;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .nowrap {
+            white-space: nowrap;
+        }
+
+        .cargo-table {
+            margin-top: 8px;
+        }
+
+            .cargo-table th {
+                background: var(--sub-header-bg);
+            }
+
+        .cargo-title-row td {
+            padding: 6px;
+            background: #eaf2f8;
+            color: var(--primary-dark);
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .totals-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            margin-top: 8px;
+            border-top: 1px solid var(--border);
+            border-left: 1px solid var(--border);
+        }
+
+        .total-item {
+            min-height: 48px;
+            padding: 6px;
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .total-label {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--muted);
+            font-size: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .total-value {
+            color: var(--primary-dark);
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .text-boxes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .text-box {
+            min-height: 90px;
+            padding: 8px;
+            border: 1px solid var(--light-border);
+            white-space: pre-line;
+            overflow-wrap: anywhere;
+        }
+
+        .box-label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--primary-dark);
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: 16px;
+            padding-top: 7px;
+            border-top: 1px solid var(--light-border);
+            color: var(--muted);
+            font-size: 8px;
+        }
+
+        @@media print {
+            body {
+                background: #fff;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .page {
+                width: auto;
+                min-height: auto;
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+            }
+
+            thead {
+                display: table-header-group;
+            }
+
+            tr {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+
+        @@media (max-width: 1100px) {
+            .page,
+            .no-print {
+                width: calc(100% - 16px);
+            }
+
+            .info-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .party-grid,
+            .text-boxes,
+            .totals-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                min-width: 1180px;
+            }
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <div class="no-print">
+        <a asp-controller="BL"
+           asp-action="Details"
+           asp-route-id="@Model.BLId"
+           class="btn">
+            Back to B/L
+        </a>
+
+        <button type="button"
+                class="btn btn-primary"
+                onclick="window.print();">
+            Print Manifest
+        </button>
+    </div>
+
+    <main class="page">
+        <header class="manifest-header">
+            <div>
+                <h1 class="company-name">
+                    @(Model.CarrierName ?? Model.IssuerName ?? "Shipping Company")
+                </h1>
+
+                <div class="document-meta" style="text-align:left;">
+                    @(Model.IssuerName ?? "")
+                </div>
+            </div>
+
+            <div>
+                <h2 class="document-title">Container Cargo Manifest</h2>
+
+                <div class="document-meta">
+                    Manifest Ref: <strong>@Model.ManifestReference</strong><br />
+                    B/L No: <strong>@Model.BLNo</strong><br />
+                    Master B/L: <strong>@(Model.MasterBLNo ?? "-")</strong><br />
+                    Print Date: <strong>@Model.PrintedAt.ToString("yyyy-MM-dd HH:mm")</strong>
+                </div>
+            </div>
+        </header>
+
+        <section class="section">
+            <h3 class="section-title">B/L, Routing and Voyage Information</h3>
+
+            <div class="section-content">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Place of Receipt</span>
+                        <span class="info-value">@(Model.POR ?? "-")</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Port of Loading</span>
+                        <span class="info-value">@(Model.POL ?? "-")</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Port of Discharge</span>
+                        <span class="info-value">@(Model.POD ?? "-")</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Place of Delivery</span>
+                        <span class="info-value">@(Model.PODel ?? "-")</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Freight Terms</span>
+                        <span class="info-value">@(Model.FreightTerms ?? "-")</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Payment Type</span>
+                        <span class="info-value">@(Model.PaymentType ?? "-")</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Load / Movement Type</span>
+                        <span class="info-value">
+                            @(Model.LoadType ?? "-") / @(Model.MovementType ?? "-")
+                        </span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Shipped on Board</span>
+                        <span class="info-value">@FormatDate(Model.ShippedOnBoardDate)</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Received for Shipment</span>
+                        <span class="info-value">@FormatDate(Model.ReceivedForShipmentDate)</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">B/L Issue Date</span>
+                        <span class="info-value">@FormatDate(Model.BLIssueDate)</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Export Reference</span>
+                        <span class="info-value">@(Model.ExportReference ?? "-")</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">MRN / Pursuit Code</span>
+                        <span class="info-value">
+                            @(Model.MRN ?? "-") / @(Model.PursuitCode ?? "-")
+                        </span>
+                    </div>
+                </div>
+
+                @if (Model.Voyages.Any())
+                {
+                    <div class="table-wrapper" style="margin-top:8px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Voyage Type</th>
+                                    <th>Vessel / Voyage No.</th>
+                                    <th>Received for Shipment</th>
+                                    <th>Shipped on Board</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var voyage in Model.Voyages)
+                                {
+                                    <tr>
+                                        <td>@(voyage.VoyageType ?? "-")</td>
+                                        <td>@GetVoyageText(voyage)</td>
+                                        <td>@FormatDate(voyage.ReceivedForShipmentDate)</td>
+                                        <td>@FormatDate(voyage.ShippedOnBoardDate)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <section class="section">
+            <h3 class="section-title">Shipper, Consignee and Notify Party</h3>
+
+            <div class="section-content">
+                <div class="party-grid">
+                    <div class="party-box">
+                        <span class="party-title">Shipper</span>
+                        <div class="party-content">@(Model.Shipper?.DisplayText ?? "-")</div>
+                    </div>
+
+                    <div class="party-box">
+                        <span class="party-title">Consignee</span>
+                        <div class="party-content">@(Model.Consignee?.DisplayText ?? "-")</div>
+                    </div>
+
+                    <div class="party-box">
+                        <span class="party-title">Notify Party</span>
+                        <div class="party-content">@(Model.NotifyParty?.DisplayText ?? "-")</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h3 class="section-title">Container Details</h3>
+
+            <div class="section-content table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Container No.</th>
+                            <th>Size / Type</th>
+                            <th>Load Type</th>
+                            <th>FCL / MT</th>
+                            <th>Ownership</th>
+                            <th>Seal No. 1</th>
+                            <th>Seal No. 2</th>
+                            <th>Packages</th>
+                            <th>Gross KG</th>
+                            <th>Net KG</th>
+                            <th>Tare KG</th>
+                            <th>CBM</th>
+                            <th>Export Permission</th>
+                            <th>OOG Dimensions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (!Model.Containers.Any())
+                        {
+                            <tr>
+                                <td colspan="15" class="text-center">
+                                    No container records found for this B/L.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var container in Model.Containers)
+                            {
+                                var oogText =
+                                container.OverLength.HasValue ||
+                                container.OverWidth.HasValue ||
+                                container.OverHeight.HasValue
+                                ? $"{container.OverLength:0.##} × {container.OverWidth:0.##} × {container.OverHeight:0.##} {container.DimensionUnit}"
+                                : "-";
+
+                                <tr>
+                                    <td class="text-center">@container.RowNo</td>
+                                    <td class="nowrap">@container.ContainerNumber</td>
+                                    <td class="text-center">@(container.ContainerSizeType ?? "-")</td>
+                                    <td class="text-center">@(container.LoadType ?? "-")</td>
+                                    <td class="text-center">@(container.FullMT ?? "-")</td>
+                                    <td class="text-center">@(container.OwnershipType ?? "-")</td>
+                                    <td class="nowrap">@(container.SealNumber ?? "-")</td>
+                                    <td class="nowrap">@(container.SealNumber2 ?? "-")</td>
+                                    <td class="text-right">@container.TotalPackageCount.ToString("N0")</td>
+                                    <td class="text-right">@FormatNumber(container.TotalGrossWeightKg)</td>
+                                    <td class="text-right">@FormatNumber(container.TotalNetWeightKg)</td>
+                                    <td class="text-right">@FormatNumber(container.TareWeightKg)</td>
+                                    <td class="text-right">@FormatNumber(container.TotalVolumeCBM)</td>
+                                    <td>@(container.ExportPermissionNo ?? "-")</td>
+                                    <td class="text-center">@oogText</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+
+                <div class="totals-grid">
+                    <div class="total-item">
+                        <span class="total-label">Containers</span>
+                        <span class="total-value">
+                            @Model.CalculatedTotalContainers / @Model.DeclaredTotalContainers
+                        </span>
+                    </div>
+
+                    <div class="total-item">
+                        <span class="total-label">Declared Packages</span>
+                        <span class="total-value">@Model.DeclaredTotalPackages.ToString("N0")</span>
+                    </div>
+
+                    <div class="total-item">
+                        <span class="total-label">Declared Gross Weight</span>
+                        <span class="total-value">@FormatWeight(Model.DeclaredGrossWeightKg)</span>
+                    </div>
+
+                    <div class="total-item">
+                        <span class="total-label">Declared Net Weight</span>
+                        <span class="total-value">@FormatWeight(Model.DeclaredNetWeightKg)</span>
+                    </div>
+
+                    <div class="total-item">
+                        <span class="total-label">Declared Volume</span>
+                        <span class="total-value">@FormatVolume(Model.DeclaredVolumeCBM)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        @if (Model.Containers.Any(x => x.Cargoes.Any()))
+        {
+            <section class="section">
+                <h3 class="section-title">Cargo Allocation by Container</h3>
+
+                <div class="section-content table-wrapper">
+                    <table class="cargo-table">
+                        <thead>
+                            <tr>
+                                <th>Container No.</th>
+                                <th>#</th>
+                                <th>Description of Goods</th>
+                                <th>HS Code</th>
+                                <th>Packages</th>
+                                <th>Package Type</th>
+                                <th>Gross KG</th>
+                                <th>Net KG</th>
+                                <th>CBM</th>
+                                <th>DG / UN No.</th>
+                                <th>Temperature</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var container in Model.Containers.Where(x => x.Cargoes.Any()))
+                            {
+                                foreach (var cargo in container.Cargoes)
+                                {
+                                    <tr>
+                                        <td class="nowrap">@container.ContainerNumber</td>
+                                        <td class="text-center">@cargo.RowNo</td>
+                                        <td>@cargo.CargoDescription</td>
+                                        <td>@(cargo.HSCode ?? "-")</td>
+                                        <td class="text-right">@FormatNumber(cargo.PackageCount)</td>
+                                        <td>@(cargo.PackageType ?? "-")</td>
+                                        <td class="text-right">@FormatNumber(cargo.GrossWeightKg)</td>
+                                        <td class="text-right">@FormatNumber(cargo.NetWeightKg)</td>
+                                        <td class="text-right">@FormatNumber(cargo.VolumeCBM)</td>
+                                        <td>
+                                            @if (cargo.IsDG)
+                                            {
+                                                <text>
+                                                    @(cargo.DGClass ?? "DG")
+                                                    /
+                                                    @(cargo.UNNumber ?? "-")
+                                                </text>
+                                            }
+                                            else
+                                            {
+                                                <text>Non-DG</text>
+                                            }
+                                        </td>
+                                        <td>@(cargo.TemperatureRequirement ?? "-")</td>
+                                        <td>@(cargo.Remarks ?? "-")</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        }
+
+        @if (Model.UnallocatedCargoes.Any())
+        {
+            <section class="section">
+                <h3 class="section-title">Unallocated Cargo Details</h3>
+
+                <div class="section-content table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Description of Goods</th>
+                                <th>HS Code</th>
+                                <th>Packages</th>
+                                <th>Package Type</th>
+                                <th>Gross KG</th>
+                                <th>Net KG</th>
+                                <th>CBM</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var cargo in Model.UnallocatedCargoes)
+                            {
+                                <tr>
+                                    <td class="text-center">@cargo.Sequence</td>
+                                    <td>@cargo.CargoDescription</td>
+                                    <td>@(cargo.HSCode ?? "-")</td>
+                                    <td class="text-right">@FormatNumber(cargo.PackageCount)</td>
+                                    <td>@(cargo.PackageType ?? "-")</td>
+                                    <td class="text-right">@FormatNumber(cargo.GrossWeightKg)</td>
+                                    <td class="text-right">@FormatNumber(cargo.NetWeightKg)</td>
+                                    <td class="text-right">@FormatNumber(cargo.VolumeCBM)</td>
+                                    <td>@(cargo.Remarks ?? "-")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        }
+
+        <section class="section">
+            <h3 class="section-title">Cargo Description, Marks and Manifest Remarks</h3>
+
+            <div class="section-content">
+                <div class="text-boxes">
+                    <div class="text-box">
+                        <span class="box-label">Description of Goods</span>
+                        @(Model.GoodsDescription ?? "-")
+                    </div>
+
+                    <div class="text-box">
+                        <span class="box-label">Marks and Numbers</span>
+                        @(Model.MarksAndNumbers ?? "-")
+                    </div>
+
+                    <div class="text-box">
+                        <span class="box-label">Manifest Remarks</span>
+                        @(Model.RemarksInManifest ?? "-")
+                    </div>
+
+                    <div class="text-box">
+                        <span class="box-label">Clauses / On Board Notation</span>
+                        @(Model.ClauseRemarks ?? "-")
+
+                        @if (!string.IsNullOrWhiteSpace(Model.OnBoardNotation))
+                        {
+                            <br />
+                            <br />
+                            @Model.OnBoardNotation
+                        }
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div>
+                Container Cargo Manifest — B/L No: @Model.BLNo
+            </div>
+
+            <div>
+                Generated: @Model.PrintedAt.ToString("yyyy-MM-dd HH:mm")
+            </div>
+        </footer>
+    </main>
+</body>
+</html>

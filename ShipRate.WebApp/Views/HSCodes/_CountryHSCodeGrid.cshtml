@@ -1,0 +1,83 @@
+﻿@using ShipRate.WebApp.Controllers
+@using ShipRate.WebApp.ViewModels
+@using ShipRate.WebApp.ViewModels.TerritoryVms
+@model DetailGridViewModel
+
+<input type="hidden" name="hsCodeId" value="@Model.MasterId" id="selected-master-id" />
+@{
+    int counter = 0;
+}
+@if (!Model.Data.Any())
+{
+    <tr>
+        <td colspan="6" class="text-center py-5 text-muted">
+            <i class="bi bi-inbox display-4 d-block mb-2"></i>
+            No Records found.
+        </td>
+    </tr>
+}
+
+else
+{
+
+    @foreach (var item in Model.Data)
+    {
+        counter++;
+        var vm = (CountryHSCodeListItem)item;
+        <tr>
+            <td>@counter</td>
+            <td>@vm.CountryName</td>
+            <td>@vm.CHSCode</td>
+            <td>@vm.CHSName</td>
+            <td>@vm.LocalName</td>
+            <td>@vm.ValidFrom</td>
+            <td>@vm.ValidTo</td>
+            <td>@vm.DutyRate</td>
+            <td>@vm.CommercialBenefitRate</td>
+@*             <td>
+                @if (vm.IsActive)
+                {
+                    <span class="badge text-bg-success">
+                        Active
+                    </span>
+                }
+                else
+                {
+                    <span class="badge text-bg-danger">
+                        Inactive
+                    </span>
+                }
+            </td>
+ *@            <td class="text-center">
+                <div class="btn-group btn-group-sm">
+
+                    <button type="button"
+                            class="btn btn-outline-primary"
+                            title="Edit"
+                            hx-get="@Url.Action("EditCountryHSCode", "HSCodes", new { id = vm.Id })"
+                            hx-target="#app-modal-content"
+                            hx-swap="innerHTML">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+
+
+                    <button type="button"
+                            class="btn btn-outline-danger"
+                            title="Delete"
+                            hx-get="@Url.Action("DeleteCountryHSCode", "HSCodes", new { id = vm.Id })"
+                            hx-target="#app-modal-content"
+                            hx-swap="innerHTML">
+                        <i class="bi bi-trash"></i>
+                    </button>
+
+
+                </div>
+            </td>
+        </tr>
+    }
+
+}
+
+
+
+

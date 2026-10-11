@@ -1,0 +1,48 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model List<JobSettlementGridRowDto>
+
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-hover align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>Invoice No</th>
+                <th>Charge</th>
+                <th>Payment Document</th>
+                <th class="text-end">Settled Amount</th>
+                <th style="width:100px;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var row in Model)
+                {
+                    <tr>
+                        <td>@row.InvoiceNo</td>
+                        <td>@row.ChargeName</td>
+                        <td>@row.PaymentDocumentNo</td>
+                        <td class="text-end">@row.SettledAmount.ToString("N2")</td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-primary"
+                                    hx-get="@Url.Action("JobSettlementDetails", "Settlements", new { settlementItemId = row.SettlementItemId })"
+                                    hx-target="#settModalContainer"
+                                    hx-swap="innerHTML"
+                                    onclick="openSettleModal()">
+                                Details
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="text-center text-muted">
+                        No settlement records found.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

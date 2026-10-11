@@ -1,0 +1,29 @@
+﻿@Html.AntiForgeryToken()
+@if (!ViewData.ModelState.IsValid)
+{
+    var allErrors = ViewData.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+    if (allErrors.Any())
+    {
+        <div class="alert alert-danger py-2 mb-1">
+            <ul class="mb-0 small">
+                @foreach (var err in allErrors)
+                {
+                    if (err.Contains("-"))
+                    {
+                        foreach (var item in err.Split("-"))
+                        {
+                            if (!string.IsNullOrEmpty(item.Trim()))
+                            {
+                                <li>@item</li>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <li>@err</li>
+                    }
+                }
+            </ul>
+        </div>
+    }
+}

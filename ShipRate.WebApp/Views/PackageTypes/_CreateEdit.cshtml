@@ -1,0 +1,148 @@
+﻿@using ShipRate.Application.DTOs.Base_Info
+@using ShipRate.Application.DTOs.Cargo
+@model PackageTypeCreateDto
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+}
+
+<form hx-post="@Url.Action(isCreateMode?"Create":"Edit", "PackageTypes")"
+      hx-target="#app-modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header form-caption-bg  text-white">
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add Package Type</h5>
+        }
+        else
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Edit Package Type</h5>
+            <input type="hidden" asp-for="Id" />
+        }
+
+
+        <button type="button"
+                class="btn-close"
+                onclick="AppModal.close()">
+        </button>
+    </div>
+
+
+    <div class="modal-body row">
+
+        @await Html.PartialAsync("_ModelStateError")
+
+
+       
+
+
+        <div class="mb-3 col-md-4">
+            <label class="form-label fw-medium">
+                Code <span class="text-danger">*</span>
+            </label>
+            <div class="d-flex align-items-center gap-2">
+                <input type="text"
+                       name="PackageTypeCode"
+                       value="@Model.PackageTypeCode"
+                       class="form-control @(ViewData.ModelState.ContainsKey("Code") && ViewData.ModelState["Code"]!.Errors.Any() ? "is-invalid" : "")"
+                       placeholder="" />
+                <span id="code-check"></span>
+            </div>
+        </div>
+
+        <!-- Title -->
+        <div class="mb-3 col-md-4">
+            <label class="form-label fw-medium">
+                Name <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="PackageTypeName"
+                   value="@Model.PackageTypeName"
+                   class="form-control @(ViewData.ModelState.ContainsKey("Title") && ViewData.ModelState["Title"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder="" />
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3 col-md-4">
+            <label class="form-label fw-medium">Description</label>
+            <textarea name="PackageTypeDescription"
+                      class="form-control"
+                      rows="2"
+                      placeholder="Optional description..."
+                      maxlength="500">@Model.PackageTypeDescription</textarea>
+        </div>
+
+        <!-- ENS -->
+        <div class="mb-3 col-md-4">
+            <label class="form-label fw-medium">
+                ENS Code <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="ENSCode"
+                   value="@Model.ENSCode"
+                   class="form-control @(ViewData.ModelState.ContainsKey("ENSCode") && ViewData.ModelState["ENSCode"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="10" />
+        </div>
+        <!-- Numeric -->
+        <div class="mb-3 col-md-4">
+            <label class="form-label fw-medium">
+                Numeric Code <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="NumericCode"
+                   value="@Model.NumericCode"
+                   class="form-control @(ViewData.ModelState.ContainsKey("NumericCode") && ViewData.ModelState["NumericCode"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="10" />
+        </div>
+
+        <!-- Code -->
+        <div class="mb-3 col-md-4">
+            <label class="form-label fw-medium">
+                Sequence <span class="text-danger">*</span>
+            </label>
+            <div class="d-flex align-items-center gap-2">
+                <input type="number"
+                       name="Sequence"
+                       value="@Model.Sequence"
+                       class="form-control @(ViewData.ModelState.ContainsKey("Sequence") && ViewData.ModelState["Sequence"]!.Errors.Any() ? "is-invalid" : "")"
+                       placeholder="1" />
+            </div>
+        </div>
+
+
+     
+        <!-- IsActive -->
+        <div class="form-check form-switch">
+            <input type="checkbox"
+                   class="form-check-input"
+                   name="IsActive"
+                   asp-for="IsActive"
+                   id="createIsActive"
+                   />
+            <label class="form-check-label" for="createIsActive">Active</label>
+        </div>
+    </div>
+
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="AppModal.close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>
+
+

@@ -1,0 +1,15 @@
+﻿@using ShipRate.Application.DTOs.Persons
+@model CustomerDto
+<app-form method="post">
+
+    <h3>Customer Info</h3>
+    <custom-input display="نام مخاطب" asp-for="@Model.ContactName" width="300px"></custom-input>
+
+    <h3>Person Info</h3>
+    <custom-input display="نام" asp-for="@Model.PersonDto.FirstName"></custom-input>
+    <custom-input display="نام خانوادگی" asp-for="@Model.PersonDto.LastName"></custom-input>
+
+    <app-button text="ذخیره" class="btn-success" />
+
+</app-form>
+

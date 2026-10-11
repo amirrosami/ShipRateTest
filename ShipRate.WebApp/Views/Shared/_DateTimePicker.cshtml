@@ -1,0 +1,166 @@
+﻿@using ShipRate.WebApp.ViewModels
+@model DateTimePickerViewModel
+
+@{
+    var inputId = Model.Id;
+    var inputIdEnd = Model.Id + "_end";
+    var dropdownId = "dropdown_" + Model.Id;
+    var calendarId = "calendar_" + Model.Id;
+    var displayValue = Model.Value?.ToString(Model.Format ?? "yyyy/MM/dd HH:mm") ?? "";
+    var displayValueEnd = Model.ValueEnd?.ToString(Model.Format ?? "yyyy/MM/dd HH:mm") ?? "";
+}
+
+<div class="mb-3 date-time-picker-wrapper" data-picker-id="@inputId">
+    @if (!string.IsNullOrEmpty(Model.Label))
+    {
+        <label for="@inputId" class="form-label">
+            @Model.Label
+            @if (Model.IsRequired)
+            {
+                <span class="text-danger">*</span>
+            }
+        </label>
+    }
+
+    <div class="input-group">
+        <input type="text" 
+               class="form-control date-time-picker-input @Model.CssClass" 
+               id="@inputId"
+               name="@Model.Name"
+               value="@displayValue"
+               placeholder="@(Model.Placeholder ?? "انتخاب تاریخ")"
+               readonly
+               data-calendar-type="@Model.CalendarType"
+               data-show-time="@Model.ShowTime.ToString().ToLower()"
+               data-is-range="@Model.IsRange.ToString().ToLower()"
+               @(Model.IsRequired ? "required" : "")>
+
+        @if (Model.IsRange)
+        {
+            <span class="input-group-text">تا</span>
+            <input type="text" 
+                   class="form-control date-time-picker-input-end" 
+                   id="@inputIdEnd"
+                   name="@(Model.Name)End"
+                   value="@displayValueEnd"
+                   placeholder="تاریخ پایان"
+                   readonly>
+        }
+
+        <button class="btn btn-outline-secondary dropdown-toggle" 
+                type="button" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false">
+            <i class="ti ti-calendar"></i>
+        </button>
+
+        <div class="dropdown-menu dropdown-menu-end p-0 date-time-picker-dropdown" 
+             id="@dropdownId" 
+             style="min-width: 320px;">
+            
+            @* Header with Calendar Type Toggle *@
+            <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-outline-primary calendar-type-btn active" data-type="jalali">
+                        شمسی
+                    </button>
+                    <button type="button" class="btn btn-outline-primary calendar-type-btn" data-type="gregorian">
+                        میلادی
+                    </button>
+                </div>
+                <button type="button" class="btn btn-sm btn-text-secondary clear-date-btn">
+                    <i class="ti ti-x"></i>
+                </button>
+            </div>
+
+            @* Quick Select *@
+            @if (Model.ShowQuickSelect)
+            {
+                <div class="border-bottom p-2">
+                    <div class="d-flex flex-wrap gap-1">
+                        <button type="button" class="btn btn-sm btn-label-primary quick-select" data-range="today">Today</button>
+                        <button type="button" class="btn btn-sm btn-label-primary quick-select" data-range="yesterday">Yesterday</button>
+                        <button type="button" class="btn btn-sm btn-label-primary quick-select" data-range="last7">Last 7 Days</button>
+                        <button type="button" class="btn btn-sm btn-label-primary quick-select" data-range="last30">Last 30 Days</button>
+                        <button type="button" class="btn btn-sm btn-label-primary quick-select" data-range="thisMonth">This Month</button>
+                    </div>
+                </div>
+            }
+
+            <div id="@calendarId" class="p-3 calendar-container"></div>
+
+            @if (Model.ShowTime)
+            {
+                <div class="border-top p-3">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <input type="time" class="form-control time-picker-start">
+                        </div>
+                        @if (Model.IsRange)
+                        {
+                            <div class="col-6">
+                                <input type="time" class="form-control time-picker-end">
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="border-top p-2 text-end">
+                <button type="button" class="btn btn-sm btn-primary apply-date-btn">
+                    Apply
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+    document.addEventListener("click", function (e) {
+
+        if (e.target.classList.contains("quick-select")) {
+
+            let wrapper = e.target.closest(".date-time-picker-wrapper");
+            let input = wrapper.querySelector(".date-time-picker-input");
+            let inputEnd = wrapper.querySelector(".date-time-picker-input-end");
+
+            let today = new Date();
+            let start = new Date();
+            let end = new Date();
+
+            switch (e.target.dataset.range) {
+
+                case "today":
+                    break;
+
+                case "yesterday":
+                    start.setDate(today.getDate() - 1);
+                    end = start;
+                    break;
+
+                case "last7":
+                    start.setDate(today.getDate() - 7);
+                    break;
+
+                case "last30":
+                    start.setDate(today.getDate() - 30);
+                    break;
+
+                case "thisMonth":
+                    start = new Date(today.getFullYear(), today.getMonth(), 1);
+                    break;
+            }
+
+            input.value = start.toISOString().slice(0,16).replace("T"," ");
+
+            if (inputEnd)
+                inputEnd.value = end.toISOString().slice(0,16).replace("T"," ");
+        }
+
+    });
+
+
+
+</script>

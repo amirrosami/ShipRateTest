@@ -1,0 +1,163 @@
+﻿@using ShipRate.Application.DTOs
+@model List<CorrespondenceDto>
+
+<style>
+    .corr-table {
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+        .corr-table table {
+            margin: 0;
+            font-size: 0.85rem;
+        }
+
+        .corr-table th {
+            background: #f8f9fa;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #374151;
+            padding: 0.75rem 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .corr-table td {
+            padding: 0.6rem 0.5rem;
+            vertical-align: middle;
+        }
+
+        .corr-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+    .corr-no {
+        font-weight: 700;
+        color: #1e40af;
+    }
+
+    .corr-date {
+        font-size: 0.78rem;
+        color: #6b7280;
+        direction: ltr;
+        text-align: left;
+    }
+
+    .corr-actions {
+        display: flex;
+        gap: 0.3rem;
+        justify-content: center;
+    }
+
+        .corr-actions .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+    .badge-active {
+        background: #dcfce7;
+        color: #166534;
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .badge-inactive {
+        background: #fee2e2;
+        color: #991b1b;
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+    }
+</style>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info text-center">
+        <i class="bi bi-info-circle me-2"></i>
+        هیچ مکاتبه‌ای یافت نشد
+    </div>
+}
+else
+{
+    <div class="corr-table">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th style="width: 10%">شماره</th>
+                    <th style="width: 12%">تاریخ</th>
+                    <th style="width: 8%">ورودی/خروجی</th>
+                    <th style="width: 15%">فرستنده/گیرنده</th>
+                    <th style="width: 15%">موضوع</th>
+                    <th style="width: 20%">متن موضوع</th>
+                    <th style="width: 8%">وضعیت</th>
+                    <th style="width: 12%">عملیات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="corr-no">@item.CorrespondenceNo</td>
+                        <td class="corr-date">@item.CorrespondenceDate.ToString("yyyy-MM-dd")</td>
+                        <td>@item.InOutName</td>
+                        <td>@(item.SenderReceiverName ?? item.SenderReceiverTitle ?? "—")</td>
+                        <td>@(item.SubjectName ?? "—")</td>
+                        <td>@item.SubjectFreeText</td>
+                        <td>
+                            @if (item.IsActive)
+                            {
+                                <span class="badge badge-active">فعال</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-inactive">غیرفعال</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="corr-actions">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary"
+                                        hx-get="@Url.Action("Edit", new { id = item.Id })"
+                                        hx-target="#modal-content"
+                                        hx-swap="innerHTML"
+                                        onclick="showModal()"
+                                        title="ویرایش">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger"
+                                        hx-get="@Url.Action("Delete", new { id = item.Id })"
+                                        hx-target="#modal-content"
+                                        hx-swap="innerHTML"
+                                        onclick="showModal()"
+                                        title="حذف">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                        hx-get="/DocumentManager/Index?objectId=@item.Id&objectTypeId=460"
+                                        hx-target="#document-manager-content"
+                                        hx-swap="innerHTML"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#documentManagerModal">
+                                    <i class="bi bi-folder2-open me-1"></i>مستندات
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+
+
+
+
+@* <script>
+    function showModal() {
+        var modal = new bootstrap.Modal(document.getElementById('mainModal'));
+        modal.show();
+    }
+</script>
+ *@

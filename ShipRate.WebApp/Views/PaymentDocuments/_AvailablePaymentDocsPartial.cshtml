@@ -1,0 +1,35 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model IEnumerable<AvailablePaymentDocDto>
+
+@if (Model != null && Model.Any())
+{
+    foreach (var doc in Model)
+    {
+        <tr id="doc-row-@doc.PaymentDocumentId">
+            <td class="ps-2 fw-semibold text-dark">@doc.DocumentNo</td>
+            <td class="text-muted">@doc.PaymentMethodName</td>
+            <td class="text-end fw-bold text-success">
+                @doc.UnallocatedAmount.ToString("N2")
+                <span class="text-muted fw-normal" style="font-size: 0.7rem;">@doc.CurrencyCode</span>
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 btn-match-doc"
+                        data-id="@doc.PaymentDocumentId"
+                        data-no="@doc.DocumentNo"
+                        data-rem="@doc.UnallocatedAmount"
+                        data-currid="@doc.CurrencyId"
+                        data-curr="@doc.CurrencyCode">
+                    <i class="bi bi-link-45deg"></i> Match
+                </button>
+            </td>
+        </tr>
+    }
+}
+else
+{
+    <tr>
+        <td colspan="4" class="text-center text-muted py-4 small">
+            No open payment documents found for this party.
+        </td>
+    </tr>
+}

@@ -1,0 +1,108 @@
+﻿@using ShipRate.Application.DTOs.Notif
+@model NotificationRuleEditDto
+
+
+@{
+    var isSpecificUsersMode = Model.RecipientModeId == Model.SpecificUsersModeId;
+    var isUserTypesMode = Model.RecipientModeId == Model.UserTypesModeId;
+}
+
+<div class="modal-header">
+    <h5 class="modal-title">Edit Notification Rule</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<form asp-action="Edit" method="post" onsubmit="return submitModalForm(this);" dir="ltr">
+    @Html.AntiForgeryToken()
+    <input asp-for="Id" type="hidden" />
+
+    <div class="modal-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="ActivityType" class="form-label">Activity Type</label>
+            <input asp-for="ActivityType" class="form-control text-start" />
+            <span asp-validation-for="ActivityType" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="EntityTypeId" class="form-label">Entity Type</label>
+            <select asp-for="EntityTypeId" asp-items="Model.EntityTypes" class="form-select"></select>
+            <span asp-validation-for="EntityTypeId" class="text-danger"></span>
+        </div>
+
+        <div class="form-check mb-3">
+            <input asp-for="ShouldNotify" class="form-check-input" />
+            <label asp-for="ShouldNotify" class="form-check-label">Should Notify</label>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="RecipientModeId" class="form-label">Recipient Mode</label>
+            <select asp-for="RecipientModeId"
+                    asp-items="Model.RecipientModes"
+                    class="form-select"
+                    id="RecipientModeId"
+                    data-specific-users-mode-id="@Model.SpecificUsersModeId"
+                    data-user-types-mode-id="@Model.UserTypesModeId"
+                    onchange="
+                        const form = this.closest('form');
+                        const selectedValue = parseInt(this.value || '0', 10);
+                        const specificUsersModeId = parseInt(this.dataset.specificUsersModeId || '0', 10);
+                        const userTypesModeId = parseInt(this.dataset.userTypesModeId || '0', 10);
+
+                        const usersSection = form.querySelector('#usersSection');
+                        const userTypesSection = form.querySelector('#userTypesSection');
+
+                        if (usersSection) {
+                            usersSection.style.display = selectedValue === specificUsersModeId ? 'block' : 'none';
+                        }
+
+                        if (userTypesSection) {
+                            userTypesSection.style.display = selectedValue === userTypesModeId ? 'block' : 'none';
+                        }
+                    ">
+            </select>
+            <span asp-validation-for="RecipientModeId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3" id="usersSection" style="@(isSpecificUsersMode ? "" : "display:none;")">
+            <label class="form-label">Users</label>
+            <select asp-for="SelectedUserIds" asp-items="Model.Users" class="form-select" multiple></select>
+            <span asp-validation-for="SelectedUserIds" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3" id="userTypesSection" style="@(isUserTypesMode ? "" : "display:none;")">
+            <label class="form-label">User Types</label>
+            <select asp-for="SelectedUserTypeIds" asp-items="Model.UserTypes" class="form-select" multiple></select>
+            <span asp-validation-for="SelectedUserTypeIds" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="TitleTemplate" class="form-label">Title Template</label>
+            <input asp-for="TitleTemplate" class="form-control text-start" />
+            <span asp-validation-for="TitleTemplate" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="MessageTemplate" class="form-label">Message Template</label>
+            <textarea asp-for="MessageTemplate" class="form-control text-start" rows="4"></textarea>
+            <span asp-validation-for="MessageTemplate" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="TargetUrlTemplate" class="form-label">Target Url Template</label>
+            <input asp-for="TargetUrlTemplate" class="form-control text-start" />
+            <span asp-validation-for="TargetUrlTemplate" class="text-danger"></span>
+        </div>
+
+        <div class="form-check mb-3">
+            <input asp-for="IsActive" class="form-check-input" />
+            <label asp-for="IsActive" class="form-check-label">Is Active</label>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+</form>

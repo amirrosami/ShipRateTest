@@ -1,0 +1,68 @@
+﻿@using ShipRate.WebApp.ViewModels
+@model List<EmailListItem>
+
+<div class="mb-1 text-end">
+    <button type="button" class="btn btn-outline-primary py-0 px-2"
+            hx-get="/DocumentManager/EmailForm?documentId=@ViewBag.DocumentId"
+            hx-target="#email-form-container"
+            hx-swap="innerHTML">
+        <i class="bi bi-plus-lg me-1"></i>New Email
+    </button>
+</div>
+
+<div id="email-form-container"></div>
+
+<div class="table-responsive" style="max-height:180px; overflow-y:auto;">
+    <table class="table  table-hover table-bordered mb-0" style="font-size:0.75rem;">
+        <thead class="table-secondary sticky-top">
+            <tr>
+                <th>Subject</th>
+                <th style="width:80px;">From</th>
+                <th style="width:80px;">To</th>
+                <th style="width:60px;">Dir.</th>
+                <th style="width:80px;">Date</th>
+                <th style="width:70px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr><td colspan="6" class="text-center text-muted">No emails</td></tr>
+            }
+            @foreach (var eml in Model)
+            {
+                <tr>
+                    <td class="text-truncate" style="max-width:120px;" title="@eml.Subject">@eml.Subject</td>
+                    <td class="text-truncate" style="max-width:80px;" title="@eml.From">@eml.From</td>
+                    <td class="text-truncate" style="max-width:80px;" title="@eml.To">@eml.To</td>
+                    <td>
+                        @if (eml.Direction == "Inbound")
+                        {
+                            <span class="badge bg-success">In</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">Out</span>
+                        }
+                    </td>
+                    <td>@eml.SendDate.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        <button class="btn btn-outline-info  py-0 px-1"
+                                hx-get="/DocumentManager/EmailForm?documentId=@ViewBag.DocumentId&id=@eml.Id"
+                                hx-target="#email-form-container"
+                                hx-swap="innerHTML">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-danger  py-0 px-1"
+                                hx-post="/DocumentManager/DeleteEmail?id=@eml.Id&documentId=@ViewBag.DocumentId"
+                                hx-target="#emails-grid"
+                                hx-swap="innerHTML"
+                                hx-confirm="Delete this email?">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

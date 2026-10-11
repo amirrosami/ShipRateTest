@@ -1,0 +1,255 @@
+﻿@model ShipRate.Web.ViewModels.AuditLogIndexViewModel
+@{
+    ViewData["Title"] = "Uers' Acivities Log";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">System Operations Log 📊</h3>
+                </div>
+
+                <!-- فیلترها -->
+                <div class="card-body">
+                    <form method="get" asp-action="Index">
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-3">
+                                <label class="form-label">User Name</label>
+                                <input type="text" class="form-control"
+                                       asp-for="UserName" placeholder="Search..." />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label">Operations Type</label>
+                                <select class="form-select" asp-for="ActionName">
+                                    <option value="">All</option>
+                                    <option value="Login">Login</option>
+                                    <option value="Logout">Logout</option>
+                                    <option value="Create">Create</option>
+                                    <option value="Update">Edit</option>
+                                    <option value="Delete">Delete</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label">Entity</label>
+                                <select class="form-select" asp-for="EntityName">
+                                    <option value="">All</option>
+                                    <option value="Location">Location</option>
+                                    <option value="User">User</option>
+                                    <option value="Account">Account</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label">From Date</label>
+                                <input type="date" class="form-control" asp-for="FromDate" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label">To Date</label>
+                                <input type="date" class="form-control" asp-for="ToDate" />
+                            </div>
+
+
+
+
+
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    🔍 Search
+                                </button>
+                            </div>
+
+
+
+                                        <div class="btn-group col-md-1" role="group">
+                                            <a href="@Url.Action("ExportExcel", "AuditLog", new { 
+                                                    fromDate = Model.FromDate, 
+                                                    toDate = Model.ToDate, 
+                                                    userId = Model.UserId, 
+                                                    action = Model.ActionName
+                                                })" 
+                                               class="btn btn-success" title="Export To Excel">
+                                                <i class="bi bi-file-earmark-excel"></i>
+                                            </a>
+                                            <a href="@Url.Action("ExportPdf", "AuditLog", new { 
+                                                    fromDate = Model.FromDate, 
+                                                    toDate = Model.ToDate, 
+                                                    userId = Model.UserId, 
+                                                    action = Model.ActionName 
+                                                })" 
+                                               class="btn btn-danger" title="Export To PDF">
+                                                <i class="bi bi-file-earmark-pdf"></i>
+                                            </a>
+                                        </div>
+
+
+
+
+
+
+
+                        </div>
+                    </form>
+
+                    <!-- نتایج -->
+                    @if (Model.Logs.Any())
+                    {
+
+
+@*                                 <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="bi bi-download"></i> Export Options
+                                        </h5>
+                                        <div class="btn-group" role="group">
+                                            <a href="@Url.Action("ExportExcel", "AuditLog", new { 
+                                                    fromDate = Model.FromDate, 
+                                                    toDate = Model.ToDate, 
+                                                    userId = Model.UserId, 
+                                                    action = Model.ActionName
+                                                })" 
+                                               class="btn btn-success">
+                                                <i class="bi bi-file-earmark-excel"></i>
+                                            </a>
+                                            <a href="@Url.Action("ExportPdf", "AuditLog", new { 
+                                                    fromDate = Model.FromDate, 
+                                                    toDate = Model.ToDate, 
+                                                    userId = Model.UserId, 
+                                                    action = Model.ActionName 
+                                                })" 
+                                               class="btn btn-danger">
+                                                <i class="bi bi-file-earmark-pdf"></i>
+                                            </a>
+                                        </div>
+                                        <small class="text-muted d-block mt-2">
+                                            <i class="bi bi-info-circle"></i> 
+                                            Current filters will be applied to the export
+                                        </small>
+                                    </div>
+                                </div>
+ *@
+
+
+
+
+
+
+
+
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Actions</th>
+                                        <th>Operations</th>
+                                        <th>IP</th>
+                                        <th>Date time</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var log in Model.Logs)
+                                    {
+                                        <tr>
+                                            <td>@log.UserName</td>
+                                            <td>
+                                                <span class="badge bg-@GetActionBadgeClass(log.Action)">
+                                                    @GetActionLabel(log.Action)
+                                                </span>
+                                            </td>
+                                            <td>@log.EntityName</td>
+                                            <td><small>@log.IpAddress</small></td>
+                                            <td>
+                                                <small>@log.CreatedAt.ToString("yyyy/MM/dd HH:mm")</small>
+                                            </td>
+                                            <td>
+                                                <a asp-action="Details" asp-route-id="@log.Id"
+                                                   class="btn btn-sm btn-info">
+                                                    Details
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        @if (Model.TotalPages > 1)
+                        {
+                            <nav>
+                                <ul class="pagination justify-content-center">
+                                    @for (int i = 1; i <= Model.TotalPages; i++)
+                                    {
+                                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                            <a class="page-link"
+                                               asp-action="Index"
+                                               asp-route-pageNumber="@i"
+                                               asp-route-userName="@Model.UserName"
+                                               asp-route-action="@Model.ActionName"
+                                               asp-route-entityName="@Model.EntityName">
+                                                @i
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+                        }
+
+                        <p class="text-muted text-center">
+@*                             نمایش @Model.Logs.Count از @Model.TotalCount رکورد
+ *@                        </p>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            📭 No log found!!!!
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetActionBadgeClass(string action)
+    {
+        return action switch
+        {
+            "Login" => "success",
+            "Logout" => "secondary",
+            "Create" => "primary",
+            "Update" => "warning",
+            "Delete" => "danger",
+            _ => "info"
+        };
+    }
+
+    // string GetActionLabel(string action)
+    // {
+    //     return action switch
+    //     {
+    //         "Login" => "ورود",
+    //         "Logout" => "خروج",
+    //         "Create" => "ایجاد",
+    //         "Update" => "ویرایش",
+    //         "Delete" => "حذف",
+    //         _ => action
+    //     };
+    // }
+
+
+    string GetActionLabel(string action)
+    {
+        return action;
+    }
+
+
+
+}

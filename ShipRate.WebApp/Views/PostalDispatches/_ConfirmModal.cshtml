@@ -1,0 +1,48 @@
+﻿@using ShipRate.WebApp.ViewModels
+@model PostalDispatchConfirmViewModel
+
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form hx-post="@Url.Action("ConfirmReceipt")"
+              hx-swap="none"
+              hx-encoding="application/x-www-form-urlencoded">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="PostalDispatchId" value="@Model.PostalDispatchId" />
+
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white py-2">
+                    <h6 class="modal-title"><i class="bi bi-check2-circle"></i> Confirm Receipt</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label form-label-sm">Confirmation Date</label>
+                        <input type="date" name="ConfirmationDate" class="form-control form-control-sm"
+                               value="@Model.ConfirmationDate.ToString("yyyy-MM-dd")" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label form-label-sm">Condition on Receipt</label>
+                        <select name="ConditionOnReceipt" class="form-select form-select-sm" required>
+                            <option value="">-- Select --</option>
+                            <option value="Good">Good</option>
+                            <option value="Damaged">Damaged</option>
+                            <option value="Incomplete">Incomplete</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label form-label-sm">Remarks</label>
+                        <textarea name="Remarks" class="form-control form-control-sm" rows="3"
+                                  maxlength="200">@Model.Remarks</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer py-2">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-success">
+                        <i class="bi bi-check-lg"></i> Confirm
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

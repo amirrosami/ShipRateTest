@@ -1,0 +1,193 @@
+﻿@using ShipRate.WebApp.ViewModels
+@* Views/Shared/_DateTimePickerPro.cshtml *@
+@model DateTimePickerProViewModel
+
+@{
+    var wrapperId = Model.Id ?? "dtppro_" + Guid.CreateVersion7().ToString("N")[..8];
+
+    var displayValue = Model.Value?.ToString(Model.Format ?? "yyyy/MM/dd HH:mm") ?? "";
+    var displayValueEnd = Model.ValueEnd?.ToString(Model.Format ?? "yyyy/MM/dd HH:mm") ?? "";
+
+    var hiddenValue = Model.Value?.ToString("o") ?? "";
+    var hiddenValueEnd = Model.ValueEnd?.ToString("o") ?? "";
+}
+
+<div class="mb-3 @Model.CssClass">
+
+    @if (!string.IsNullOrWhiteSpace(Model.Label))
+    {
+        <label class="form-label">
+            @Model.Label
+            @if (Model.IsRequired)
+            {
+                <span class="text-danger">*</span>
+            }
+        </label>
+    }
+
+    <div class="app-datetimepicker-wrapper"
+         id="@wrapperId"
+         data-calendar-type="@Model.CalendarType"
+         data-show-time="@Model.ShowTime.ToString().ToLower()"
+         data-is-range="@Model.IsRange.ToString().ToLower()"
+         data-theme="@Model.Theme"
+         data-min-date="@(Model.MinDate?.ToString("o") ?? "")"
+         data-max-date="@(Model.MaxDate?.ToString("o") ?? "")">
+
+        <div class="input-group">
+
+            <input type="text"
+                   class="form-control app-dtp-display app-dtp-trigger"
+                   placeholder="@(Model.Placeholder ?? "Select date")"
+                   value="@displayValue"
+                   readonly
+                   aria-label="@Model.Label"
+                   @(Model.IsRequired ? "required" : "") />
+
+            @if (Model.IsRange)
+            {
+                <span class="input-group-text">to</span>
+
+                <input type="text"
+                       class="form-control app-dtp-display-end app-dtp-trigger"
+                       placeholder="@(Model.PlaceholderEnd ?? "End date")"
+                       value="@displayValueEnd"
+                       readonly
+                       aria-label="@Model.Label End" />
+            }
+
+            <button type="button"
+                    class="btn btn-outline-secondary app-dtp-trigger"
+                    aria-label="Open calendar">
+                <i class="bx bx-calendar"></i>
+            </button>
+
+            @if (Model.ShowClearButton)
+            {
+                <button type="button"
+                        class="btn btn-outline-danger app-dtp-clear"
+                        aria-label="Clear date">
+                    <i class="bx bx-x"></i>
+                </button>
+            }
+        </div>
+
+        <input type="hidden"
+               name="@Model.Name"
+               class="app-dtp-hidden"
+               value="@hiddenValue" />
+
+        @if (Model.IsRange)
+        {
+            <input type="hidden"
+                   name="@(Model.Name)End"
+                   class="app-dtp-hidden-end"
+                   value="@hiddenValueEnd" />
+        }
+
+        <div class="app-dtp-dropdown" style="display:none;">
+
+            <div class="app-dtp-header">
+
+                <button type="button" class="app-dtp-prev">
+                    <i class="bx bx-chevron-left"></i>
+                </button>
+
+                <div class="app-dtp-month-year">
+
+                    <button type="button" class="app-dtp-month-btn">
+                        <span class="app-dtp-month-name"></span>
+                    </button>
+
+                    <button type="button" class="app-dtp-year-btn">
+                        <span class="app-dtp-year-name"></span>
+                    </button>
+
+                </div>
+
+                <button type="button" class="app-dtp-next">
+                    <i class="bx bx-chevron-right"></i>
+                </button>
+
+                <div class="app-dtp-calendar-toggle ms-2">
+
+                    <button type="button"
+                            class="btn btn-sm btn-outline-primary app-dtp-toggle"
+                            data-calendar="shamsi">
+                        SH
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-sm btn-outline-secondary app-dtp-toggle"
+                            data-calendar="gregorian">
+                        AD
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="app-dtp-weekdays">
+
+                <span>Su</span>
+                <span>Mo</span>
+                <span>Tu</span>
+                <span>We</span>
+                <span>Th</span>
+                <span>Fr</span>
+                <span>Sa</span>
+
+            </div>
+
+            <div class="app-dtp-days"></div>
+
+            @if (Model.ShowTime)
+            {
+                <div class="app-dtp-time p-2 border-top">
+
+                    <div class="row g-2">
+
+                        <div class="col">
+                            <input type="number"
+                                   class="form-control form-control-sm app-dtp-hour"
+                                   min="0"
+                                   max="23"
+                                   placeholder="HH" />
+                        </div>
+
+                        <div class="col-auto align-self-center">
+                            :
+                        </div>
+
+                        <div class="col">
+                            <input type="number"
+                                   class="form-control form-control-sm app-dtp-minute"
+                                   min="0"
+                                   max="59"
+                                   placeholder="MM" />
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+            <div class="app-dtp-footer p-2 border-top d-flex justify-content-between">
+
+                <button type="button"
+                        class="btn btn-sm btn-outline-secondary app-dtp-today">
+                    Today
+                </button>
+
+                <button type="button"
+                        class="btn btn-sm btn-primary app-dtp-apply">
+                    Apply
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

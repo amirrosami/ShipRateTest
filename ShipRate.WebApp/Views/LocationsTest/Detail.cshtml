@@ -1,0 +1,270 @@
+﻿@using ShipRate.WebApp.ViewModels.Location
+@model LocationDetailViewModel
+@{
+    ViewData["Title"] = $"Location — {Model.LocationName}";
+}
+
+@await Html.PartialAsync("_LocationStyles")
+
+<div class="loc-page">
+
+    <!-- ═══ Header ═══ -->
+    <div class="loc-header">
+        <div class="loc-header-left">
+            <div class="loc-header-icon">👁</div>
+            <div>
+                <h1>Location Details</h1>
+                <p>
+                    Viewing <strong>@Model.LocationCode</strong> — @Model.LocationName
+                </p>
+            </div>
+        </div>
+        <div class="loc-header-actions">
+            <a asp-action="Edit" asp-route-id="@Model.LocationId"
+               class="loc-btn loc-btn-primary">
+                ✏️ Edit
+            </a>
+            <a asp-action="Delete" asp-route-id="@Model.LocationId"
+               class="loc-btn loc-btn-danger">
+                🗑 Delete
+            </a>
+            <a asp-action="Index" class="loc-btn loc-btn-outline">
+                ← Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- ═══ Status Banner ═══ -->
+    @if (!Model.IsActive)
+    {
+        <div class="loc-alert loc-alert-warning">
+            ⚠️ This location is currently <strong>inactive</strong>.
+        </div>
+    }
+
+    <!-- ═══ Basic Information ═══ -->
+    <div class="loc-card" style="margin-bottom: 20px;">
+        <div class="loc-card-header">
+            <h2>🏷 Basic Information</h2>
+            <span>
+                @if (Model.IsActive)
+                {
+                    <span class="loc-badge loc-badge-success">
+                        <span class="loc-badge-dot"></span> Active
+                    </span>
+                }
+                else
+                {
+                    <span class="loc-badge loc-badge-danger">
+                        <span class="loc-badge-dot"></span> Inactive
+                    </span>
+                }
+            </span>
+        </div>
+        <div class="loc-card-body">
+            <div class="loc-detail-grid">
+
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Location ID</span>
+                    <span class="loc-detail-value">@Model.LocationId</span>
+                </div>
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Location Code</span>
+                    <span class="loc-detail-value" style="color: var(--loc-primary); font-weight: 700;">
+                        @Model.LocationCode
+                    </span>
+                </div>
+
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Location Name</span>
+                    <span class="loc-detail-value">@Model.LocationName</span>
+                </div>
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Location Name (Native)</span>
+                    <span class="loc-detail-value @(string.IsNullOrEmpty(Model.LocationLocalName) ? "empty" : "")">
+                        @(Model.LocationLocalName ?? "Not set")
+                    </span>
+                </div>
+
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Location Type</span>
+                    <span class="loc-detail-value">
+                        <span class="loc-badge loc-badge-primary">
+                            @(Model.LocationTypeName ?? "—")
+                        </span>
+                    </span>
+                </div>
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Country</span>
+                    <span class="loc-detail-value @(string.IsNullOrEmpty(Model.CountryName) ? "empty" : "")">
+                        @(Model.CountryName ?? "Not set")
+                    </span>
+                </div>
+
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Parent Location</span>
+                    <span class="loc-detail-value @(string.IsNullOrEmpty(Model.ParentLocationName) ? "empty" : "")">
+                        @(Model.ParentLocationName ?? "None (Top-level)")
+                    </span>
+                </div>
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Child Locations</span>
+                    <span class="loc-detail-value">
+                        @if (Model.ChildLocationsCount > 0)
+                        {
+                            <span class="loc-badge loc-badge-warning">
+                                @Model.ChildLocationsCount child location(s)
+                            </span>
+                        }
+                        else
+                        {
+                            <span style="color: var(--loc-gray-400);">None</span>
+                        }
+                    </span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Type-Specific Details ═══ -->
+    @{
+        bool hasTypeSpecific =
+        !string.IsNullOrEmpty(Model.CityTypeName) ||
+        !string.IsNullOrEmpty(Model.IATACode) ||
+        !string.IsNullOrEmpty(Model.ICAOCode) ||
+        !string.IsNullOrEmpty(Model.CountryName2) ||
+        !string.IsNullOrEmpty(Model.DepotTypeName) ||
+        !string.IsNullOrEmpty(Model.TerminalTypeName);
+    }
+
+    @if (hasTypeSpecific)
+    {
+        <div class="loc-card" style="margin-bottom: 20px;">
+            <div class="loc-card-header">
+                <h2>🔧 Type-Specific Details</h2>
+            </div>
+            <div class="loc-card-body">
+                <div class="loc-detail-grid">
+
+                    @if (!string.IsNullOrEmpty(Model.CityTypeName))
+                    {
+                        <div class="loc-detail-item">
+                            <span class="loc-detail-label">City Type</span>
+                            <span class="loc-detail-value">@Model.CityTypeName</span>
+                        </div>
+                        <div class="loc-detail-item"></div>
+         @* spacer *@
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.IATACode) || !string.IsNullOrEmpty(Model.ICAOCode))
+                    {
+                        <div class="loc-detail-item">
+                            <span class="loc-detail-label">IATA Code</span>
+                            <span class="loc-detail-value @(string.IsNullOrEmpty(Model.IATACode) ? "empty" : "")">
+                                @(Model.IATACode ?? "Not set")
+                            </span>
+                        </div>
+                        <div class="loc-detail-item">
+                            <span class="loc-detail-label">ICAO Code</span>
+                            <span class="loc-detail-value @(string.IsNullOrEmpty(Model.ICAOCode) ? "empty" : "")">
+                                @(Model.ICAOCode ?? "Not set")
+                            </span>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.CountryName2))
+                    {
+                        <div class="loc-detail-item">
+                            <span class="loc-detail-label">Second Country (Border)</span>
+                            <span class="loc-detail-value">@Model.CountryName2</span>
+                        </div>
+                        <div class="loc-detail-item"></div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.DepotTypeName))
+                    {
+                        <div class="loc-detail-item">
+                            <span class="loc-detail-label">Depot Type</span>
+                            <span class="loc-detail-value">@Model.DepotTypeName</span>
+                        </div>
+                        <div class="loc-detail-item"></div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.TerminalTypeName))
+                    {
+                        <div class="loc-detail-item">
+                            <span class="loc-detail-label">Terminal Type</span>
+                            <span class="loc-detail-value">@Model.TerminalTypeName</span>
+                        </div>
+                        <div class="loc-detail-item"></div>
+                    }
+
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ═══ Geographic & Coding ═══ -->
+    <div class="loc-card" style="margin-bottom: 20px;">
+        <div class="loc-card-header">
+            <h2>🌐 Geographic & Coding</h2>
+        </div>
+        <div class="loc-card-body">
+            <div class="loc-detail-grid">
+
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Latitude</span>
+                    <span class="loc-detail-value @(Model.Latitude == null ? "empty" : "")">
+                        @(Model.Latitude?.ToString("F6") ?? "Not set")
+                    </span>
+                </div>
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Longitude</span>
+                    <span class="loc-detail-value @(Model.Longitude == null ? "empty" : "")">
+                        @(Model.Longitude?.ToString("F6") ?? "Not set")
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Audit Trail ═══ -->
+    <div class="loc-card">
+        <div class="loc-card-header">
+            <h2>🕐 Audit Information</h2>
+        </div>
+        <div class="loc-card-body">
+            <div class="loc-detail-grid">
+
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Created Date</span>
+                    <span class="loc-detail-value">
+                        @Model.CreatedDate.ToString("yyyy-MM-dd HH:mm:ss")
+                    </span>
+                </div>
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Created By</span>
+                    <span class="loc-detail-value @(string.IsNullOrEmpty(Model.CreatedBy) ? "empty" : "")">
+                        @(Model.CreatedBy ?? "Unknown")
+                    </span>
+                </div>
+
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Last Modified Date</span>
+                    <span class="loc-detail-value @(Model.ModifiedDate == null ? "empty" : "")">
+                        @(Model.ModifiedDate?.ToString("yyyy-MM-dd HH:mm:ss") ?? "Never modified")
+                    </span>
+                </div>
+                <div class="loc-detail-item">
+                    <span class="loc-detail-label">Modified By</span>
+                    <span class="loc-detail-value @(string.IsNullOrEmpty(Model.ModifiedBy) ? "empty" : "")">
+                        @(Model.ModifiedBy ?? "—")
+                    </span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

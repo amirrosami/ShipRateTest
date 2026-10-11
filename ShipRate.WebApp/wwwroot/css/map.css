@@ -1,0 +1,67 @@
+﻿.map-shell {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.map-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f8fafc;
+}
+
+.map-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.map-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+#map {
+    height: 750px;
+    width: 100%;
+    background: #eef2f7;
+}
+
+/* Custom markers */
+.map-marker {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 4px rgba(0,0,0,.35);
+}
+
+.port-marker {
+    background: #16a34a;
+}
+
+.airport-marker {
+    background: #2563eb;
+}
+
+.office-marker {
+    background: #f97316;
+}
+
+.warehouse-marker {
+    background: #7c3aed;
+}
+
+.map-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #0f172a;
+    background: rgba(255,255,255,.9);
+    border: 1px solid #dbe3ee;
+    border-radius: 4px;
+    padding: 2px 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+}

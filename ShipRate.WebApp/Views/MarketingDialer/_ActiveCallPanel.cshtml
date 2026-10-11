@@ -1,0 +1,80 @@
+﻿@if (!ViewBag.Success)
+{
+    <div class="alert alert-danger py-2 small mb-0">
+        ❌ @ViewBag.Message
+    </div>
+}
+else
+{
+    <div class="card border border-primary mt-2" style="background-color: #f0f7ff;">
+        <div class="card-header py-1 bg-primary text-white d-flex justify-content-between align-items-center" style="font-size: 0.85rem;">
+            <span><i class="bi bi-broadcast text-warning"></i> تماس برقرار شد: <b>@ViewBag.PhoneNumber</b> (@ViewBag.CustomerName)</span>
+            <span class="badge bg-danger fs-6" id="timerBadge">00:00</span>
+        </div>
+        <div class="card-body p-2">
+
+            <form hx-post="/MarketingDialer/SaveResult"
+                  hx-target="#recentCallsContainer"
+                  hx-swap="innerHTML"
+                  onsubmit="stopTimer()">
+
+                <input type="hidden" name="CallLogId" value="@ViewBag.CallLogId" />
+                <input type="hidden" name="DurationSeconds" id="durationSecondsInput" value="0" />
+
+                <table class="sr-grid-table mb-2">
+                    <tbody>
+                        <tr>
+                            <td class="sr-label-cell" style="width: 30%;">نتیجه مذاکره</td>
+                            <td>
+                                <select name="Outcome" class="sr-input" required>
+                                    <option value="1">✅ مذاکره موفق / ارسال نرخ</option>
+                                    <option value="2">🔄 نیاز به پیگیری مجدد</option>
+                                    <option value="3">📵 عدم پاسخگویی</option>
+                                    <option value="4">⏳ مشغول بود</option>
+                                    <option value="6">❌ عدم توافق / رد قیمت</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="sr-label-cell">تاریخ پیگیری بعدی</td>
+                            <td>
+                                <input type="date" name="FollowUpDate" class="sr-input" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="sr-label-cell">خلاصه گفتگو / نرخ</td>
+                            <td>
+                                <textarea name="Notes" class="sr-input" rows="2" placeholder="توضیحات مکالمه، نرخ توافق شده، مقصد کانتینر و..."></textarea>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <button type="submit" class="btn btn-success btn-sm w-100 fw-bold">
+                    💾 پایان و ثبت نتیجه مکالمه
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // تایمر زنده مکالمه
+        var seconds = 0;
+        if (window.callTimerInterval) clearInterval(window.callTimerInterval);
+
+        window.callTimerInterval = setInterval(function () {
+            seconds++;
+            document.getElementById('durationSecondsInput').value = seconds;
+            var mins = Math.floor(seconds / 60);
+            var secs = seconds % 60;
+            document.getElementById('timerBadge').innerText =
+                (mins < 10 ? "0" + mins : mins) + ":" + (secs < 10 ? "0" + secs : secs);
+        }, 1000);
+
+        function stopTimer() {
+            if (window.callTimerInterval) {
+                clearInterval(window.callTimerInterval);
+            }
+        }
+    </script>
+}

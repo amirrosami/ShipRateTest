@@ -1,0 +1,31 @@
+﻿@using ShipRate.Application.DTOs.UserTeams
+@model CreateMemberViewModel
+
+<form hx-post="/UserTeams/CreateMember"
+      hx-target="#membersGrid"
+      hx-swap="outerHTML">
+
+    <input type="hidden" asp-for="Member.UserTeamId" />
+
+    <div class="mb-3">
+
+        <label>User</label>
+
+        <select asp-for="Member.UserId"
+                asp-items="Model.Users"
+                class="form-select">
+        </select>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label>Role</label>
+
+        <input asp-for="Member.MemberRole" class="form-control" />
+
+    </div>
+
+    <button class="btn btn-primary">Add</button>
+
+</form>

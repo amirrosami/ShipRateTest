@@ -1,0 +1,71 @@
+﻿@using ShipRate.WebApp.ViewModels.ShippingRouteVms
+@model ServiceFormViewModel
+
+<form hx-post="@(Model.ShippingLineServiceId == Guid.Empty
+                          ? "/ShippingRoute/ServiceCreate"
+                          : "/ShippingRoute/ServiceEdit")"
+      hx-target="#modalBody"
+      hx-swap="innerHTML">
+
+    <div class="modal-body">
+        <input type="hidden" name="ShippingLineServiceId" value="@Model.ShippingLineServiceId" />
+        <input type="hidden" name="CarrierId" value="@Model.CarrierId" />
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger alert-sm py-2">
+                <ul class="mb-0 small">
+                    @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@err.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">
+                Service Name <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   class="form-control"
+                   name="ServiceName"
+                   value="@Model.ServiceName"
+                   maxlength="200"
+                   required
+                   placeholder="Enter service name" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Service Code</label>
+            <input type="text"
+                   class="form-control"
+                   name="ServiceCode"
+                   value="@Model.ServiceCode"
+                   maxlength="50"
+                   placeholder="" />
+        </div>
+
+        <div class="mb-3">
+            <div class="form-check form-switch">
+                <input class="form-check-input"
+                       type="checkbox"
+                       name="IsActive"
+                       value="true"
+                       id="svcIsActive"
+                       @(Model.IsActive ? "checked" : "") />
+                <label class="form-check-label" for="svcIsActive">Active</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-lg"></i> Cancel
+        </button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg"></i>
+            @(Model.ShippingLineServiceId == Guid.Empty ? "Create" : "Save Changes")
+        </button>
+    </div>
+</form>

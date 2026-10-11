@@ -1,0 +1,197 @@
+﻿@using ShipRate.Application.ViewModels
+@model CustomsClearanceChargeCreateEditVm
+
+
+@{
+    var isEdit = Model.Id.HasValue;
+    var postUrl = isEdit
+        ? Url.Action("EditCharge", "CustomsClearance")
+        : Url.Action("CreateCharge", "CustomsClearance");
+}
+
+<div class="modal fade show d-block"
+     id="customs-clearance-charge-modal"
+     tabindex="-1"
+     aria-modal="true"
+     role="dialog"
+     style="background-color: rgba(0,0,0,.5);">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title mb-1">@(isEdit ? "Edit Charge" : "Add Charge")</h5>
+                    <div class="text-muted small">Capture file-level or item-level charges.</div>
+                </div>
+                <button type="button"
+                        class="btn-close"
+                        aria-label="Close"
+                        onclick="closeHtmxModal()"></button>
+            </div>
+
+            <form method="post"
+                  hx-post="@postUrl"
+                  hx-target="#modal-container"
+                  hx-swap="innerHTML">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="CustomsClearanceId" />
+                    <input type="hidden" asp-for="IsSystemCalculated" />
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="CustomsClearanceItemId" class="form-label"></label>
+                            <select asp-for="CustomsClearanceItemId"
+                                    asp-items="Model.ClearanceItems"
+                                    class="form-select">
+                                <option value="">File level charge</option>
+                            </select>
+                            <span asp-validation-for="CustomsClearanceItemId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="ChargeTypeId" class="form-label"></label>
+                            <select asp-for="ChargeTypeId"
+                                    asp-items="Model.ChargeTypes"
+                                    class="form-select">
+                                <option value="">Select charge type</option>
+                            </select>
+                            <span asp-validation-for="ChargeTypeId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label asp-for="ChargeDescription" class="form-label"></label>
+                            <input asp-for="ChargeDescription" class="form-control" />
+                            <span asp-validation-for="ChargeDescription" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="Amount" class="form-label"></label>
+                            <input asp-for="Amount" class="form-control js-amount" />
+                            <span asp-validation-for="Amount" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="CurrencyId" class="form-label"></label>
+                            <select asp-for="CurrencyId"
+                                    asp-items="Model.Currencies"
+                                    class="form-select">
+                                <option value="">Select currency</option>
+                            </select>
+                            <span asp-validation-for="CurrencyId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="ExchangeRate" class="form-label"></label>
+                            <input asp-for="ExchangeRate" class="form-control js-exchange-rate" />
+                            <span asp-validation-for="ExchangeRate" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="LocalAmount" class="form-label"></label>
+                            <input asp-for="LocalAmount" class="form-control js-local-amount" readonly />
+                            <span asp-validation-for="LocalAmount" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-check mt-4 pt-2">
+                                <input asp-for="IsTax" class="form-check-input" />
+                                <label asp-for="IsTax" class="form-check-label"></label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-check mt-4 pt-2">
+                                <input asp-for="IsPaid" class="form-check-input js-is-paid" />
+                                <label asp-for="IsPaid" class="form-check-label"></label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="PaidAt" class="form-label"></label>
+                            <input asp-for="PaidAt" class="form-control js-paid-at" />
+                            <span asp-validation-for="PaidAt" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="PaymentReferenceNo" class="form-label"></label>
+                            <input asp-for="PaymentReferenceNo" class="form-control" />
+                            <span asp-validation-for="PaymentReferenceNo" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="InvoiceNo" class="form-label"></label>
+                            <input asp-for="InvoiceNo" class="form-control" />
+                            <span asp-validation-for="InvoiceNo" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="InvoiceDate" class="form-label"></label>
+                            <input asp-for="InvoiceDate" class="form-control" />
+                            <span asp-validation-for="InvoiceDate" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Remarks" class="form-label"></label>
+                            <textarea asp-for="Remarks" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Remarks" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" onclick="closeHtmxModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i>
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var amountInput = document.querySelector(".js-amount");
+        var rateInput = document.querySelector(".js-exchange-rate");
+        var localInput = document.querySelector(".js-local-amount");
+        var isPaidInput = document.querySelector(".js-is-paid");
+        var paidAtInput = document.querySelector(".js-paid-at");
+
+        function calculateLocalAmount() {
+            if (!amountInput || !rateInput || !localInput) return;
+
+            var amount = parseFloat(amountInput.value);
+            var rate = parseFloat(rateInput.value);
+
+            if (isNaN(amount) || isNaN(rate)) {
+                localInput.value = "";
+                return;
+            }
+
+            localInput.value = (amount * rate).toFixed(2);
+        }
+
+        function togglePaidDate() {
+            if (!isPaidInput || !paidAtInput) return;
+
+            if (isPaidInput.checked) {
+                paidAtInput.removeAttribute("disabled");
+            } else {
+                paidAtInput.value = "";
+                paidAtInput.setAttribute("disabled", "disabled");
+            }
+        }
+
+        if (amountInput) amountInput.addEventListener("input", calculateLocalAmount);
+        if (rateInput) rateInput.addEventListener("input", calculateLocalAmount);
+        if (isPaidInput) isPaidInput.addEventListener("change", togglePaidDate);
+
+        calculateLocalAmount();
+        togglePaidDate();
+    })();
+</script>

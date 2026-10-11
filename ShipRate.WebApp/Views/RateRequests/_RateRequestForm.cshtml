@@ -1,0 +1,802 @@
+﻿@using ShipRate.Application.ViewModels
+@using ShipRate.WebApp.ViewModels
+@model RateRequestFormViewModel
+
+<style>
+    /* =========================================================
+               EXCEL GRID STYLES (Enlarged & Polished)
+               ========================================================= */
+    .rate-request-wrapper {
+        direction: ltr;
+        background-color: #f5f7fb;
+        font-family: inherit;
+    }
+
+    /* نوار هدر بالای فرم */
+    .bl-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: #ffffff;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 12px 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 6px 6px 0 0;
+    }
+
+    .bl-topbar-title h1 {
+        font-size: 17px;
+        margin: 0;
+        font-weight: 700;
+        color: #111827;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* تب‌های ناوبری هماهنگ */
+    .rate-request-wrapper .nav-tabs {
+        border-bottom: 1px solid #d1d9e0;
+    }
+
+        .rate-request-wrapper .nav-tabs .nav-link {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #4b5563;
+            border: 1px solid transparent;
+            padding: 8px 16px;
+        }
+
+            .rate-request-wrapper .nav-tabs .nav-link.active {
+                background-color: #ffffff;
+                border-color: #d1d9e0 #d1d9e0 #ffffff;
+                color: #0d6efd;
+            }
+
+    /* کارت‌های اکسلی */
+    .bl-card {
+        background: #ffffff;
+        border: 1px solid #d1d9e0;
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
+        margin-bottom: 14px;
+    }
+
+    .bl-card-header {
+        padding: 9px 15px;
+        border-bottom: 1px solid #d1d9e0;
+        background: #fbfdff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+        .bl-card-header h2 {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 0;
+            color: #1f2937;
+            letter-spacing: .2px;
+        }
+
+    /* گرید سه‌ستونه اکسل با سلول‌های به‌هم‌پیوسته */
+    .excel-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0;
+        border: 1px solid #d1d9e0;
+        background-color: #d1d9e0; /* حاشیه بین خطوط را تمیز و یکدست نگه می‌دارد */
+    }
+
+    .excel-field {
+        display: flex;
+        align-items: stretch;
+        background-color: #ffffff;
+        border: 0.5px solid #d1d9e0;
+        min-height: 40px; /* اندازه اندکی بزرگتر */
+    }
+
+    /* ستون‌های ادغام‌شده (Span) */
+    .span-2 {
+        grid-column: span 2;
+    }
+
+    .span-3 {
+        grid-column: span 3;
+    }
+
+    /* لیبل سلول (سمت چپ - آبی ملایم) */
+    .excel-field label {
+        background-color: #eef6ff;
+        color: #374151;
+        padding: 7px 12px;
+        font-size: 13.5px; /* کمی بزرگتر و خوانا */
+        font-weight: 600;
+        min-width: 155px; /* عرض ستون لیبل */
+        max-width: 155px;
+        border-right: 1px solid #d1d9e0;
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        margin: 0;
+        user-select: none;
+    }
+
+    /* اینپوت‌ها و دراپ‌داون‌ها (سمت راست - سفید) */
+    .excel-field input,
+    .excel-field select,
+    .excel-field textarea {
+        flex: 1;
+        border: none !important;
+        border-radius: 0 !important;
+        background-color: #ffffff;
+        padding: 6px 10px;
+        font-size: 14px;
+        color: #111827;
+        outline: none !important;
+        box-shadow: none !important;
+        width: 100%;
+        min-height: 38px;
+    }
+
+    .excel-field textarea {
+        min-height: 70px;
+        resize: vertical;
+    }
+
+        /* فوکوس زرد ملایم اکسل */
+        .excel-field input:focus,
+        .excel-field select:focus,
+        .excel-field textarea:focus {
+            background-color: #fff9c4 !important;
+        }
+
+    /* دکمه افزودن کنار فیلدها (مانند Commodity) */
+    .excel-field .inline-add-btn {
+        background: #f8fafc;
+        border: none;
+        border-left: 1px solid #d1d9e0;
+        color: #0d6efd;
+        padding: 0 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.15s ease;
+    }
+
+        .excel-field .inline-add-btn:hover {
+            background: #e2e8f0;
+        }
+
+    /* چک‌باکس‌های خدمات و آدرس‌ها */
+    .excel-checkbox-label {
+        background-color: #eef6ff;
+        color: #374151;
+        padding: 7px 12px;
+        font-size: 13.5px;
+        font-weight: 600;
+        min-width: 165px;
+        max-width: 165px;
+        border-right: 1px solid #d1d9e0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+        cursor: pointer;
+        user-select: none;
+    }
+
+        .excel-checkbox-label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            min-height: 16px;
+            cursor: pointer;
+            accent-color: #0d6efd;
+        }
+
+    /* بار خدمات جانبی (6 چک‌باکس پایین بخش آدرس‌ها) */
+    .services-strip {
+        background-color: #fbfdff;
+        border-top: 1px solid #d1d9e0;
+        padding: 10px 14px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px 24px;
+        align-items: center;
+    }
+
+    .service-check-item {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #374151;
+        cursor: pointer;
+        margin: 0;
+        user-select: none;
+    }
+
+        .service-check-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #0d6efd;
+        }
+
+    /* جدول‌های داخلی فشرده اکسل (Transport & Containers) */
+    .bl-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
+        .bl-table th,
+        .bl-table td {
+            font-size: 0.88rem;
+            padding: 4px 6px;
+            vertical-align: middle;
+            border: 1px solid #d1d9e0;
+        }
+
+        .bl-table thead th {
+            background-color: #eef6ff;
+            color: #1e3a8a;
+            font-weight: 600;
+            font-size: 0.88rem;
+        }
+
+        .bl-table td input,
+        .bl-table td select {
+            width: 100%;
+            border: none !important;
+            outline: none !important;
+            padding: 5px 8px;
+            font-size: 13.5px;
+            background: transparent;
+            height: 34px;
+        }
+
+            .bl-table td input:focus,
+            .bl-table td select:focus {
+                background-color: #fff9c4 !important;
+            }
+
+    @@media (max-width: 992px) {
+        .excel-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .span-2, .span-3 {
+            grid-column: span 1;
+        }
+    }
+</style>
+
+<div class="rate-request-wrapper p-3">
+    <!-- Topbar با استایل مدرن و چسبان -->
+    <div class="bl-topbar mb-3">
+        <div class="bl-topbar-title">
+            <h1>
+                <i class="bi @(Model.Id != null && Model.Id != Guid.Empty ? "bi-pencil-square" : "bi-plus-circle") text-primary"></i>
+                <span>@(Model.Id != null && Model.Id != Guid.Empty ? "Edit Rate Request" : "Create Rate Request")</span>
+            </h1>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    <!-- تب‌ها -->
+    <ul class="nav nav-tabs mb-3" id="rateRequestTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general-info" type="button" role="tab">
+                <i class="bi bi-file-earmark-text me-1"></i> General Information
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link @(Model.Id == null || Model.Id == Guid.Empty ? "disabled" : "")"
+                    id="cargo-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#cargo-details"
+                    type="button" role="tab">
+                <i class="bi bi-box-seam me-1"></i> Cargo Details @(Model.Id == null || Model.Id == Guid.Empty ? "(Save first)" : "")
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="rateRequestTabsContent">
+        <div class="tab-pane fade show active" id="general-info" role="tabpanel">
+            <form hx-post="@(Model.Id != null && Model.Id != Guid.Empty ? "/RateRequests/Edit" : "/RateRequests/SaveStep1")"
+                  hx-target="#modalContent"
+                  hx-swap="innerHTML">
+
+                <input type="hidden" asp-for="Id" />
+
+                <!-- ۱. اطلاعات عمومی درخواست (Request Information) -->
+                <div class="bl-card">
+                    <div class="bl-card-header">
+                        <h2><i class="bi bi-info-circle text-primary me-2"></i>Request Information</h2>
+                    </div>
+                    <div class="excel-grid">
+                        <div class="excel-field">
+                            <label asp-for="CompanyId">Company</label>
+                            <select asp-for="CompanyId" asp-items="Model.Companies">
+                                <option value="">Select Company</option>
+                            </select>
+                        </div>
+                        <div class="excel-field">
+                            <label asp-for="SourceId">Request Source</label>
+                            <select asp-for="SourceId" asp-items="Model.Sources">
+                                <option value="">Select Source</option>
+                            </select>
+                        </div>
+                        <div class="excel-field">
+                            <label asp-for="RequestDate">Request Date</label>
+                            <input asp-for="RequestDate" type="date" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ۲. مشتری و مخاطبان (Customer & Contacts) -->
+                <div class="bl-card">
+                    <div class="bl-card-header">
+                        <h2><i class="bi bi-person text-primary me-2"></i>Customer & Contacts & Cargo</h2>
+                    </div>
+                    <div class="excel-grid">
+                        <div class="excel-field position-relative">
+                            <label asp-for="CustomerId">Customer</label>
+                            <input type="hidden" asp-for="CustomerId" id="CustomerId" />
+                            <input type="text"
+                                   id="CustomerName"
+                                   name="CustomerName"
+                                   value="@Model.CustomerName"
+                                   placeholder="Search Party..."
+                                   autocomplete="off"
+                                   hx-get="@Url.Action("SearchParties", "JobParty")"
+                                   hx-trigger="keyup changed delay:400ms"
+                                   hx-target="#partySearchResults"
+                                   hx-swap="innerHTML"
+                                   hx-vals='js:{
+                                       term: document.getElementById("CustomerName").value,
+                                       targetHiddenInputId: "CustomerId",
+                                       targetTextInputId: "CustomerName"
+                                   }' />
+                            <div id="partySearchResults" class="position-absolute start-0 top-100 w-100 shadow" style="z-index: 1050;"></div>
+                        </div>
+                        <div class="excel-field">
+                            <label asp-for="MobileNo">Mobile No</label>
+                            <input asp-for="MobileNo" id="_MobileNo" />
+                        </div>
+                        <div class="excel-field">
+                            <label asp-for="EmailAddress">Email Address</label>
+                            <input asp-for="EmailAddress" id="_EmailAddress" />
+                        </div>
+
+                        <div class="excel-field">
+                            <label asp-for="ContactName">Contact Name</label>
+                            <input asp-for="ContactName" id="_ContactName" />
+                        </div>
+                        <div class="excel-field">
+                            <label asp-for="Introducer">Introduced By</label>
+                            <input asp-for="Introducer" />
+                        </div>
+                        <div class="excel-field">
+                            <label asp-for="TradeTypeId">Shipment Type</label>
+                            <select asp-for="TradeTypeId" asp-items="Model.TradeTypes">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                        @*                     </div>
+                </div>
+
+                <!-- ۳. جزئیات بار و حمل‌ونقل (Cargo & Shipment Details) -->
+                <div class="bl-card">
+                    <div class="bl-card-header">
+                        <h2><i class="bi bi-box-seam text-primary me-2"></i>Cargo & Shipment Details</h2>
+                    </div>
+                    <div class="excel-grid">
+ *@                        <div class="excel-field position-relative">
+                            <label asp-for="OriginId">Origin</label>
+                            <input type="hidden" asp-for="OriginId" id="OriginId" />
+                            <input type="text"
+                                   id="OriginSearchText"
+                                   name="Origin"
+                                   value="@Model.OriginName"
+                                   placeholder="Search Origin..."
+                                   autocomplete="off"
+                                   hx-get="@Url.Action("SearchLocations", "Locations")"
+                                   hx-trigger="keyup changed delay:400ms"
+                                   hx-target="#originSearchResults"
+                                   hx-swap="innerHTML"
+                                   hx-vals='js:{
+                                       term: document.getElementById("OriginSearchText").value,
+                                       targetHiddenInputId: "OriginId",
+                                       targetTextInputId: "OriginSearchText"
+                                   }' />
+                            <div id="originSearchResults" class="position-absolute start-0 top-100 w-100 shadow" style="z-index: 1050;"></div>
+                        </div>
+                        <div class="excel-field position-relative">
+                            <label asp-for="DestinationId">Destination</label>
+                            <input type="hidden" asp-for="DestinationId" id="DestinationId" />
+                            <input type="text"
+                                   id="DestinationSearchText"
+                                   name="Destination"
+                                   value="@Model.DestinationName"
+                                   placeholder="Search Destination..."
+                                   autocomplete="off"
+                                   hx-get="@Url.Action("SearchLocations", "Locations")"
+                                   hx-trigger="keyup changed delay:400ms"
+                                   hx-target="#destinationSearchResults"
+                                   hx-swap="innerHTML"
+                                   hx-vals='js:{
+                                       term: document.getElementById("DestinationSearchText").value,
+                                       targetHiddenInputId: "DestinationId",
+                                       targetTextInputId: "DestinationSearchText"
+                                   }' />
+                            <div id="destinationSearchResults" class="position-absolute start-0 top-100 w-100 shadow" style="z-index: 1050;"></div>
+                        </div>
+
+                        <div class="excel-field">
+                            <label asp-for="MovementTypeId">Movement Type</label>
+                            <select asp-for="MovementTypeId" asp-items="Model.MovementTypes">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                        <div class="excel-field">
+                            <label asp-for="PaymentTypeId">Payment Type</label>
+                            <select asp-for="PaymentTypeId" asp-items="Model.PaymentTypes">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                        <div class="excel-field">
+                            <label asp-for="CargoCommodityId">Commodity</label>
+                            <div class="d-flex w-100">
+                                <select asp-for="CargoCommodityId"
+                                        asp-items="Model.CargoCommodities"
+                                        id="_CargoCommodityId"
+                                        onchange="if(this.value){ document.getElementById('_CargoCommodityDescription').value = this.options[this.selectedIndex].text.trim(); }">
+                                    <option value="">Select</option>
+                                </select>
+                                <button type="button"
+                                        class="inline-add-btn"
+                                        title="Add New Commodity"
+                                        hx-get="@Url.Action("Create", "CargoCommodity")"
+                                        hx-target="#app-modal-content"
+                                        hx-swap="innerHTML">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="excel-field">
+                            <label asp-for="CargoCommodityDescription">Commodity Desc</label>
+                            <input asp-for="CargoCommodityDescription" id="_CargoCommodityDescription" />
+                        </div>
+                        <div class="excel-field">
+                            <label asp-for="CargoHandlingTypeId">Handling Type</label>
+                            <select asp-for="CargoHandlingTypeId" asp-items="Model.CargoHandlingTypes">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                        <div class="excel-field">
+                            <label asp-for="CargoNatureId">Cargo Nature</label>
+                            <select asp-for="CargoNatureId" asp-items="Model.CargoNatures">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+
+                        <div class="excel-field">
+                            <label asp-for="LoadTypeId">Load Type</label>
+                            <select asp-for="LoadTypeId" asp-items="Model.LoadTypes">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                        <div class="excel-field">
+                            <label asp-for="CargoReadinessDate">Cargo Readiness</label>
+                            <input asp-for="CargoReadinessDate" type="date" />
+                        </div>
+
+                        <div class="excel-field">
+                            <label asp-for="CargoValue">Cargo Value</label>
+                            <input type="text" asp-for="CargoValue" class="money-input" />
+                        </div>
+
+                        <div class="excel-field">
+                            <label asp-for="CurrencyId">Currency</label>
+                            <select asp-for="CurrencyId" asp-items="Model.Currencies">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+
+
+
+
+                    </div>
+                </div>
+
+                <!-- ۴. آدرس‌ها و خدمات مورد نیاز (Addresses & Services) -->
+                <div class="bl-card">
+                    <div class="bl-card-header">
+                        <h2><i class="bi bi-geo-alt text-primary me-2"></i>Required Services & Addresses</h2>
+                    </div>
+                    <div class="excel-grid">
+                        <!-- Origin Address -->
+                        <div class="excel-field span-2">
+                            <label class="excel-checkbox-label">
+                                <input asp-for="PickupRequired" type="checkbox" />
+                                <span>Pickup Address</span>
+                            </label>
+                            <input asp-for="PickupAddress" placeholder="Origin Pickup Address..." />
+                        </div>
+                        <div class="excel-field">
+                            <label asp-for="OriginZipCode" style="min-width: 110px; max-width: 110px;">Zip Code</label>
+                            <input asp-for="OriginZipCode" placeholder="Zip Code" />
+                        </div>
+
+                        <!-- Destination Address -->
+                        <div class="excel-field span-2">
+                            <label class="excel-checkbox-label">
+                                <input asp-for="DeliveryRequired" type="checkbox" />
+                                <span>Delivery Address</span>
+                            </label>
+                            <input asp-for="DeliveryAddress" placeholder="Destination Delivery Address..." />
+                        </div>
+                        <div class="excel-field">
+                            <label asp-for="DestinationZipCode" style="min-width: 110px; max-width: 110px;">Zip Code</label>
+                            <input asp-for="DestinationZipCode" placeholder="Zip Code" />
+                        </div>
+                    </div>
+
+                    <!-- ۶ چک‌باکس خدمات با پس‌زمینه یکدست -->
+                    <div class="services-strip">
+                        <label class="service-check-item">
+                            <input asp-for="InternalTransitRequired" type="checkbox" />
+                            <span>Internal Transit</span>
+                        </label>
+                        <label class="service-check-item">
+                            <input asp-for="ExternalTransitRequired" type="checkbox" />
+                            <span>External Transit</span>
+                        </label>
+                        <label class="service-check-item">
+                            <input asp-for="CustomsClearanceRequired" type="checkbox" />
+                            <span>Customs Clearance</span>
+                        </label>
+                        <label class="service-check-item">
+                            <input asp-for="InsuranceRequired" type="checkbox" />
+                            <span>Insurance</span>
+                        </label>
+                        <label class="service-check-item">
+                            <input asp-for="StuffingRequired" type="checkbox" />
+                            <span>Stuffing</span>
+                        </label>
+                        <label class="service-check-item">
+                            <input asp-for="WarehousingRequired" type="checkbox" />
+                            <span>Warehousing</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- ۵. یادداشت‌ها (Remarks) -->
+                <div class="bl-card">
+                    <div class="bl-card-header">
+                        <h2><i class="bi bi-chat-left-text text-primary me-2"></i>Remarks</h2>
+                    </div>
+                    <div class="excel-grid">
+                        <div class="excel-field span-3">
+                            <textarea asp-for="Remarks" placeholder="Write any specific notes or instructions here..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ۶. شیوه‌های حمل و کانتینرها (Transport & Containers) -->
+                <div class="row g-3 mb-3">
+                    <!-- Transport Modes -->
+                    <div class="col-md-6">
+                        <div class="bl-card h-100 mb-0">
+                            <div class="bl-card-header py-2">
+                                <h2><i class="bi bi-truck text-primary me-2"></i>Transport Mode</h2>
+                                <button type="button" class="btn btn-sm btn-primary py-0 px-2 fw-semibold" style="font-size: 0.8rem;" onclick="addTransportType()">+ Add</button>
+                            </div>
+                            <div class="p-0">
+                                <table class="bl-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Mode</th>
+                                            <th style="width: 45px; text-align: center;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="transportTypesContainer">
+                                        @if (Model.TransportTypes != null)
+                                        {
+                                            for (int i = 0; i < Model.TransportTypes.Count; i++)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <select name="TransportTypes[@i].TransportTypeId">
+                                                            <option value="">Select</option>
+                                                            @foreach (var item in Model.TransportTypesSelectList)
+                                                            {
+                                                                <option value="@item.Id"
+                                                                        selected="@(item.Id == Model.TransportTypes[i].TransportTypeId)">
+                                                                    @item.TransportTypeName
+                                                                </option>
+                                                            }
+                                                        </select>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button type="button" class="btn btn-link text-danger p-0 text-decoration-none fw-bold" onclick="this.closest('tr').remove()">✕</button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Container Types -->
+                    <div class="col-md-6">
+                        <div class="bl-card h-100 mb-0">
+                            <div class="bl-card-header py-2">
+                                <h2><i class="bi bi-hdd-rack text-primary me-2"></i>Container Type</h2>
+                                <button type="button" class="btn btn-sm btn-primary py-0 px-2 fw-semibold" style="font-size: 0.8rem;" onclick="addContainer()">+ Add</button>
+                            </div>
+                            <div class="p-0">
+                                <table class="bl-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th style="width: 100px;">Qty</th>
+                                            <th style="width: 45px; text-align: center;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="containersContainer">
+                                        @if (Model.Containers != null)
+                                        {
+                                            for (int i = 0; i < Model.Containers.Count; i++)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <select name="Containers[@i].ContainerSizeTypeId">
+                                                            <option value="">Select</option>
+                                                            @foreach (var item in Model.ContainerTypesSelectList)
+                                                            {
+                                                                <option value="@item.Id"
+                                                                        selected="@(item.Id == Model.Containers[i].ContainerSizeTypeId)">
+                                                                    @item.ShortName
+                                                                </option>
+                                                            }
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input name="Containers[@i].Counts" value="@Model.Containers[i].Counts" type="number" />
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button type="button" class="btn btn-link text-danger p-0 text-decoration-none fw-bold" onclick="this.closest('tr').remove()">✕</button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Buttons -->
+                <div class="d-flex justify-content-end gap-2 pt-3 border-top mt-3">
+                    <button type="button" class="btn btn-light border px-3 py-1 fw-semibold" style="font-size: .88rem;" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-3 py-1 fw-semibold shadow-sm" style="font-size: .88rem;">
+                        <i class="bi bi-check-lg me-1"></i> @(Model.Id != null && Model.Id != Guid.Empty ? "Update Information" : "Save & Continue")
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Cargo Details Tab -->
+        <div class="tab-pane fade" id="cargo-details" role="tabpanel">
+            @if (Model.Id != null && Model.Id != Guid.Empty)
+            {
+                <div hx-get="@Url.Action("Panel", "CargoDetails", new { RateRequestId = Model.Id })" hx-trigger="load">
+                    <div class="text-center p-5">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2 text-muted small">Loading Cargo Details...</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    let transportIndex = @(Model.TransportTypes?.Count ?? 0);
+    let containerIndex = @(Model.Containers?.Count ?? 0);
+
+    function addTransportType() {
+        const html = `
+        <tr>
+            <td>
+                <select name="TransportTypes[${transportIndex}].TransportTypeId">
+                    <option value="">Select</option>
+                    @if (Model.TransportTypesSelectList != null)
+                    {
+                                foreach (var item in Model.TransportTypesSelectList)
+                                {
+                                            <option value="@item.Id">@item.TransportTypeName</option>
+                                }
+                    }
+                </select>
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-link text-danger p-0 text-decoration-none fw-bold" onclick="this.closest('tr').remove()">✕</button>
+            </td>
+        </tr>`;
+        document.getElementById("transportTypesContainer").insertAdjacentHTML("beforeend", html);
+        transportIndex++;
+    }
+
+    function addContainer() {
+        const html = `
+        <tr>
+            <td>
+                <select name="Containers[${containerIndex}].ContainerSizeTypeId">
+                    <option value="">Select</option>
+                    @if (Model.ContainerTypesSelectList != null)
+                    {
+                                foreach (var item in Model.ContainerTypesSelectList)
+                                {
+                                            <option value="@item.Id">@item.ShortName</option>
+                                }
+                    }
+                </select>
+            </td>
+            <td>
+                <input name="Containers[${containerIndex}].Counts" type="number" />
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-link text-danger p-0 text-decoration-none fw-bold" onclick="this.closest('tr').remove()">✕</button>
+            </td>
+        </tr>`;
+        document.getElementById("containersContainer").insertAdjacentHTML("beforeend", html);
+        containerIndex++;
+    }
+
+    document.body.addEventListener("switchToCargoTab", function () {
+        var cargoTabElement = document.getElementById('cargo-tab');
+        if (cargoTabElement) {
+            var cargoTab = new bootstrap.Tab(cargoTabElement);
+            cargoTab.show();
+        }
+    });
+
+    document.body.addEventListener('cargoCommodityCreated', function (event) {
+        const select = document.getElementById('_CargoCommodityId');
+        if (!select) {
+            if (typeof AppModal !== 'undefined' && AppModal.close) {
+                AppModal.close();
+            }
+            return;
+        }
+
+        const newCommodityId = event.detail.id;
+        htmx.ajax(
+            'GET',
+            '@Url.Action("SelectOptions", "CargoCommodity")?selectedId=' + encodeURIComponent(newCommodityId),
+            {
+                target: '#_CargoCommodityId',
+                swap: 'innerHTML'
+            }
+        ).then(function () {
+            select.dispatchEvent(new Event('change'));
+        });
+
+        if (typeof AppModal !== 'undefined' && AppModal.close) {
+            AppModal.close();
+        }
+    });
+</script>

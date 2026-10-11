@@ -1,0 +1,85 @@
+﻿@using ShipRate.Application.DTOs
+@model VoyageManagementIndexViewModel
+
+<style>
+    .card,
+    .card-body {
+        overflow: visible;
+    }
+
+    .voyage-grid-wrap {
+        overflow-x: auto;
+        overflow-y: visible;
+    }
+
+        .voyage-grid-wrap .action-col {
+            width: 48px;
+            min-width: 48px;
+            white-space: nowrap;
+        }
+
+        .voyage-grid-wrap .dropdown-menu {
+            min-width: 220px;
+        }
+
+</style>
+
+
+
+<div class="container-fluid" dir="ltr">
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5 class="mb-0">Voyage Management</h5>
+        </div>
+        <div class="card-body">
+            @await Html.PartialAsync("_SearchForm", Model)
+        </div>
+    </div>
+
+    <div id="voyage-grid-container"
+         hx-get="@Url.Action("Search", "VoyageManagement")"
+         hx-trigger="load"
+         hx-include="#voyage-search-form"
+         hx-target="#voyage-grid-container"
+         hx-swap="innerHTML">
+    </div>
+</div>
+
+
+<div class="modal fade" id="voyageTimelineModal" tabindex="-1" aria-hidden="true"     data-bs-backdrop="false"     data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content" id="voyage-modal-container">
+        </div>
+    </div>
+</div>
+
+<div class="offcanvas offcanvas-end"
+     tabindex="-1"
+     id="voyageActionOffcanvas"
+     aria-labelledby="voyageActionOffcanvasLabel">
+    <div id="voyage-action-panel-content">
+    </div>
+</div>
+
+
+<script>
+    document.body.addEventListener('htmx:configRequest', function (event) {
+        var tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+        if (tokenInput) {
+            event.detail.headers['RequestVerificationToken'] = tokenInput.value;
+        }
+    });
+</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modalEl = document.getElementById('voyageTimelineModal');
+
+        if (modalEl) {
+            modalEl.addEventListener('hidden.bs.modal', function () {
+                document.getElementById('voyage-modal-container').innerHTML = '';
+            });
+        }
+    });
+</script>

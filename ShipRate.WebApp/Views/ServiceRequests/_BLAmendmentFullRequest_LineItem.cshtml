@@ -1,0 +1,51 @@
+﻿@using ShipRate.Application.DTOs
+@model BLAmendmentLineItemViewDto
+
+<div class="border rounded p-3 mb-3 bl-amendment-line">
+
+
+    <div class="row g-3">
+        <div class="col-md-1">
+            <strong>Line @(Model.Index + 1) :</strong>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Field Type</label>
+            <select name="Lines[@Model.Index].FieldTypeId"
+                    class="form-select">
+                <option value="">-- Select Field Type --</option>
+
+                @foreach (var item in Model.Line.FieldTypes)
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-7">
+            <label class="form-label">Remarks</label>
+            <textarea name="Lines[@Model.Index].Remarks"
+                      class="form-control"
+                      rows="1"></textarea>
+        </div>
+        <div class="col-md-1">
+@*             <button type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    onclick="this.closest('.bl-amendment-line').remove()">
+                Remove
+            </button>
+ *@        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Current Value</label>
+            <textarea name="Lines[@Model.Index].CurrentValue"
+                      class="form-control"
+                      rows="2"></textarea>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Requested Value</label>
+            <textarea name="Lines[@Model.Index].RequestedValue"
+                      class="form-control"
+                      rows="2"></textarea>
+        </div>
+    </div>
+</div>

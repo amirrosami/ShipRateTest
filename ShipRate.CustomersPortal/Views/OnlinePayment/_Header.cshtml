@@ -1,0 +1,120 @@
+﻿@using ShipRate.Application.ViewModels
+@model GatewayCallbackResultVM
+
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-xl-6">
+
+            @if (Model.IsSuccess)
+            {
+                <!-- Success payment result -->
+                <div class="card border-0 shadow-sm overflow-hidden">
+                    <div class="bg-success" style="height: 7px;"></div>
+
+                    <div class="card-body text-center p-4 p-md-5">
+                        <div class="mb-4">
+                            <span class="d-inline-flex align-items-center justify-content-center
+                                             rounded-circle bg-success-subtle text-success"
+                                  style="width: 88px; height: 88px;">
+                                <i class="bi bi-check-lg" style="font-size: 3.25rem;"></i>
+                            </span>
+                        </div>
+
+                        <h1 class="h3 fw-bold text-success mb-2">
+                            Payment Successful
+                        </h1>
+
+                        <p class="text-muted mb-4">
+                            Your payment has been completed successfully.
+                        </p>
+
+                        <div class="bg-light border rounded-3 text-start p-3 p-md-4 mb-4">
+                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                <span class="text-muted">Payment Status</span>
+                                <span class="badge text-bg-success">
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    Paid
+                                </span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                <span class="text-muted">Amount</span>
+                                <strong class="text-dark">
+                                    @Model.Amount.ToString("N2")
+                                </strong>
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
+                            <a asp-controller="Invoices"
+                               asp-action="Index"
+                               class="btn btn-outline-secondary px-4">
+                                <i class="bi bi-house me-1"></i>
+                                Back
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- Failed / cancelled payment result -->
+                <div class="card border-0 shadow-sm overflow-hidden">
+                    <div class="bg-danger" style="height: 7px;"></div>
+
+                    <div class="card-body text-center p-4 p-md-5">
+                        <div class="mb-4">
+                            <span class="d-inline-flex align-items-center justify-content-center
+                                             rounded-circle bg-danger-subtle text-danger"
+                                  style="width: 88px; height: 88px;">
+                                <i class="bi bi-x-lg" style="font-size: 3.25rem;"></i>
+                            </span>
+                        </div>
+
+                        <h1 class="h3 fw-bold text-danger mb-2">
+                            Payment Failed
+                        </h1>
+
+                        <p class="text-muted mb-4">
+                            Your payment was cancelled or could not be completed.
+                            No confirmed payment has been registered.
+                        </p>
+
+                        <div class="alert alert-danger text-start d-flex gap-3 mb-4" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+                            <div>
+                                <strong>Payment was not successful.</strong>
+                                <div class="small mt-1">
+                                    Please try again. If money was deducted from your account,
+                                    contact support with your payment token.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-light border rounded-3 text-start p-3 p-md-4 mb-4">
+                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                <span class="text-muted">Payment Status</span>
+                                <span class="badge text-bg-danger">
+                                    <i class="bi bi-x-circle me-1"></i>
+                                    Failed
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
+
+                            <a asp-controller="Invoices"
+                               asp-action="Index"
+                               class="btn btn-outline-secondary px-4">
+                                <i class="bi bi-house me-1"></i>
+                                Back to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

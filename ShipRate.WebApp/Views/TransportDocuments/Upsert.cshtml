@@ -1,0 +1,2936 @@
+﻿@using ShipRate.Application.ViewModels
+@model TransportDocumentUpsertVm
+@{
+    var isEdit = Model.Id.HasValue;
+    ViewData["Title"] = isEdit ? "Edit BL" : "Create BL";
+
+    var documentNo = !string.IsNullOrWhiteSpace(Model.BLNo) ? Model.BLNo : "Draft";
+    var statusName = !string.IsNullOrWhiteSpace(Model.StatusName) ? Model.StatusName : "Draft";
+}
+
+<style>
+    body {
+        background: #f5f7fb;
+    }
+
+    .containers-scroll-area { /* نام کلاس wrapper جدول */
+        overflow-y: auto;
+        scrollbar-gutter: stable;
+    }
+
+    /* ۲. حذف هر transition پیشفرض در hover که پرش ایجاد می‌کند */
+    .container-row, .container-row td {
+        transition: none !important;
+    }
+
+    /* استایل پیش فرض برای جدول */
+    .bl-table th,
+    .bl-table td {
+        font-size: 0.85rem; /* کوچکتر کردن فونت (مقدار پیشفرض معمولا 1rem یا 16px است) */
+        padding: 6px 8px; /* کم کردن فاصله داخلی سلولها برای فشرده تر شدن */
+        vertical-align: middle; /* اطمینان از اینکه متن در وسط سلول قرار میگیرد */
+    }
+
+    /* اگر لازم بود، برای سرتیترها فونت کمی بزرگتر */
+    .bl-table thead th {
+        font-size: 0.88rem;
+        font-weight: 500; /* یا 600، بسته به فونت */
+    }
+
+    /* برای اطمینان از اینکه همه چیز درست مرتب شود */
+    .bl-table .bl-section-actions button {
+        font-size: 0.8rem;
+        padding: 3px 6px;
+    }
+
+    .bl-table #addContainerLine {
+        font-size: 0.8rem;
+        padding: 4px 8px;
+    }
+
+
+
+
+
+
+
+
+
+    .aligned-excel-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 equal columns */
+        gap: 0; /* Excel-like touching cells */
+        border: 1px solid #dee2e6; /* outer border like Excel */
+    }
+
+
+
+    /* استایل کلی فیلدها */
+
+    .excel-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0; /* حذف گپ بین سلول‌ها برای چسبیده شدن */
+        border: 1px solid #d1d9e0; /* حاشیه دور کل گرید */
+    }
+
+    .excel-field {
+        display: flex; /* لیبل و اینپوت کنار هم */
+        border: 0.5px solid #d1d9e0; /* مرز بین سلول‌ها */
+        background-color: #fff;
+        align-items: stretch; /* ارتفاع یکسان */
+    }
+
+        /* استایل لیبل (سمت چپ - آبی روشن) */
+        .excel-field label {
+            background-color: #eef6ff; /* آبی بسیار ملایم */
+            color: #4a5568;
+            padding: 6px 10px;
+            font-size: 14px;
+            font-weight: 600;
+            min-width: 150px; /* عرض ستون لیبل */
+            border-right: 1px solid #d1d9e0;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            margin: 0;
+        }
+
+        /* استایل ورودی‌ها (سمت راست - سفید) */
+        .excel-field input,
+        .excel-field select,
+        .excel-field textarea {
+            flex: 1; /* پر کردن فضای باقی‌مانده */
+            border: none;
+            background-color: #ffffff;
+            padding: 5px 8px;
+            font-size: 14px;
+            outline: none;
+            width: 100%;
+        }
+
+    /* استایل فوکوس (زرد) */
+    input:focus,
+    select:focus,
+    textarea:focus {
+        background-color: #fff9c4 !important; /* زرد ملایم */
+    }
+
+
+    /* ۲. استایل فوکوس روی سلکتور Select2 داخل excel-field */
+    .excel-field .select2-container--bootstrap-5.select2-container--focus .select2-selection,
+    .excel-field .select2-container--bootstrap-5.select2-container--open .select2-selection,
+    .excel-field .select2-container--default.select2-container--focus .select2-selection,
+    .excel-field .select2-container--default.select2-container--open .select2-selection {
+        background-color: #fff9c4 !important; /* زرد ملایم هنگام فوکوس روی فیلد */
+        border-color: #ffe082 !important; /* کادر زرد هماهنگ */
+    }
+
+    /* ۳. استایل اینپوت جستجوی باز شده در دراپ‌داون Select2 */
+    .select2-dropdown .select2-search__field:focus {
+        background-color: #fff9c4 !important; /* زرد ملایم داخل کادر تایپ سرچ */
+        border-color: #ffe082 !important;
+    }
+
+
+
+
+
+
+
+
+
+    /* برای چک‌باکس‌ها که استایل متفاوتی دارند */
+    .excel-checkbox {
+        width: auto !important;
+        margin: auto 10px;
+    }
+
+    /* استایل فیلدهای span-3 (تمام عرض) */
+    .span-3 {
+        grid-column: span 3;
+    }
+
+
+
+
+    .refresh-text-btn i {
+        transition: opacity .15s ease-in-out;
+    }
+
+    .refresh-text-btn:hover i {
+        opacity: .9 !important;
+    }
+
+
+    .bl-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: #fff;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 12px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .bl-topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 0;
+    }
+
+    .bl-topbar-title h1 {
+        font-size: 18px;
+        margin: 0;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .bl-topbar-title span {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .bl-topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .bl-badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 600;
+        background: #eef2ff;
+        color: #3730a3;
+    }
+
+    .bl-summary-strip {
+        background: #fff;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 14px 20px;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+    }
+
+    .summary-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: #6b7280;
+        margin-bottom: 4px;
+    }
+
+    .summary-value {
+        font-size: 13px;
+        font-weight: 600;
+        color: #111827;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .bl-page {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .bl-main,
+    .bl-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .bl-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+    }
+
+        .bl-card + .bl-card {
+            margin-top: 2px; /* یا -1px برای چسبیدن کامل */
+        }
+
+
+    .bl-card-header {
+        padding: 14px 18px;
+        border-bottom: 1px solid #e5e7eb;
+        background: #fbfdff;
+    }
+
+        .bl-card-header h2 {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0;
+            color: #111827;
+        }
+
+    .bl-card-body {
+        padding: 18px;
+    }
+
+    .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+    }
+
+    .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+    }
+
+    .grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+    }
+
+    .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+    }
+
+        .field label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 9px;
+            padding: 9px 10px;
+            font-size: 13px;
+            color: #111827;
+            background: #fff;
+        }
+
+        .field textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+    .section-gap {
+        margin-top: 5px;
+    }
+
+    .validation-message {
+        font-size: 12px;
+        color: #dc2626;
+    }
+
+    @@media (max-width: 1200px) {
+        .bl-page {
+            grid-template-columns: 1fr;
+        }
+
+        .bl-sidebar {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 900px) {
+        .bl-topbar {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .bl-summary-strip {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-2,
+        .grid-3,
+        .grid-4 {
+            grid-template-columns: 1fr;
+        }
+
+        .bl-sidebar {
+            display: flex;
+        }
+    }
+
+
+    .bl-card-accordion-button {
+        width: 100%;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-align: left;
+        color: inherit;
+    }
+
+        .bl-card-accordion-button h2 {
+            font-size: inherit;
+            font-weight: inherit;
+        }
+
+        .bl-card-accordion-button:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        .bl-card-accordion-button .accordion-icon {
+            transition: transform 0.2s ease;
+        }
+
+        .bl-card-accordion-button[aria-expanded="true"] .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+    /* جلوگیری از بیرون زدن و سرریز فوکوس اینپوت‌های جدول */
+    .table-responsive .form-control:focus,
+    .table-responsive .form-select:focus,
+    .table-responsive .input-group:focus-within {
+        box-shadow: inset 0 0 0 1px #0d6efd !important; /* به جای shadow بیرونی از inset استفاده می‌شود */
+        outline: none !important;
+    }
+
+    /* در صورت لزوم، کاهش جزئی عرض حداقل ستون‌ها برای ایجاد حاشیه امن */
+    .table-responsive table {
+        table-layout: auto;
+    }
+
+    /* سلول اکسلی برای چک‌باکس */
+    td.excel-checkbox-cell {
+        padding: 0 !important;
+        text-align: center;
+        vertical-align: middle;
+        width: 60px; /* یا عرض مناسب بر اساس ستون */
+    }
+
+    /* کلیک روی کل سلول عمل کند */
+    .excel-checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        min-height: 31px; /* هماهنگ با ارتفاع ردیف‌های جدول اکسلی شما */
+        margin: 0;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    /* مخفی کردن اینپوت بومی */
+    .excel-checkbox-input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    /* استایل مربع چک‌باکس */
+    .excel-checkbox-custom {
+        position: relative;
+        width: 18px;
+        height: 18px;
+        background-color: #ffffff;
+        border: 2px solid #adb5bd;
+        border-radius: 4px;
+        transition: all 0.15s ease-in-out;
+    }
+
+    /* حالت هاور سلول */
+    .excel-checkbox-wrapper:hover .excel-checkbox-custom {
+        border-color: #0d6efd;
+        background-color: #f8f9fa;
+    }
+
+    /* فوکوس کیبورد شبیه اکسل */
+    .excel-checkbox-input:focus + .excel-checkbox-custom {
+        box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.35);
+        border-color: #0d6efd;
+    }
+
+    /* حالت تیک‌خورده: رنگ پررنگ و کامپکت */
+    .excel-checkbox-input:checked + .excel-checkbox-custom {
+        background-color: #0d6efd; /* یا رنگ تم سازمانی شما: #198754 سبز */
+        border-color: #0d6efd;
+    }
+
+        /* علامت تیک سفید و درشت */
+        .excel-checkbox-input:checked + .excel-checkbox-custom::after {
+            content: "";
+            position: absolute;
+            left: 5px;
+            top: 2px;
+            width: 5px;
+            height: 9px;
+            border: solid #ffffff;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+    /* هایلایت کل سلول موقع تیک خوردن (اختیاری ولی فوق‌العاده در اکسل) */
+    td.excel-checkbox-cell:has(.excel-checkbox-input:checked) {
+        background-color: #e7f1ff !important; /* رنگ ملایم پشت ردیف تیک‌خورده */
+    }
+
+
+
+
+</style>
+<form asp-action="@(isEdit ? "Edit" : "Create")"
+      asp-route-id="@Model.Id"
+      method="post">
+
+    @Html.AntiForgeryToken()
+
+    <input asp-for="Id" type="hidden" />
+    <input asp-for="JobId" type="hidden" />
+    <input asp-for="BookingId" type="hidden" />
+    <input asp-for="ShipmentId" type="hidden" />
+    <input asp-for="ShipmentLegId" type="hidden" />
+    <input asp-for="CompanyId" type="hidden" />
+    <div class="bl-page">
+        <main class="bl-main">
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+
+            <section class="bl-card">
+                <div id="documentInformationCollapse">
+                    <div class="bl-card-body">
+                        <h6>1)BL Information:</h6>
+                        <div class="excel-grid">
+
+                            <!-- ===== Document Type ===== -->
+                            <div class="excel-field">
+                                <label asp-for="TransportTypeId"></label>
+                                <select asp-for="TransportTypeId"
+                                        asp-items="Model.TransportTypes"
+                                        hx-get="@Url.Action("GetBLTypeOptions", "TransportDocuments")"
+                                        hx-trigger="change"
+                                        hx-target="#blTypeField"
+                                        hx-include="this"
+                                        hx-swap="outerHTML">
+                                    <option value="">Select...</option>
+                                </select>
+                            </div>
+
+                            <div id="blTypeField" class="excel-field">
+                                <label asp-for="BLTypeId"></label>
+                                <select asp-for="BLTypeId" asp-items="Model.BLTypes">
+                                    <option value="">Select...</option>
+                                </select>
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="BLLevelId"></label>
+                                <select asp-for="BLLevelId" asp-items="Model.BLLevels">
+                                    <option value="">Select...</option>
+                                </select>
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="TradeTypeId">Trade Type</label>
+                                <select asp-for="TradeTypeId" asp-items="Model.TradeTypes">
+                                    <option value="">Select...</option>
+                                </select>
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="LoadTypeId">Load Type</label>
+                                <select asp-for="LoadTypeId" asp-items="Model.LoadTypes">
+                                    <option value="">Select...</option>
+                                </select>
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="MovementTypeId">Movement Type</label>
+                                <select asp-for="MovementTypeId" asp-items="Model.MovementTypes">
+                                    <option value="">Select...</option>
+                                </select>
+                            </div>
+
+                            <!-- ===== BL Numbers & Issue ===== -->
+                            <div class="excel-field">
+                                <label asp-for="BLNo">BL No</label>
+                                <input asp-for="BLNo" />
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="MasterBLNo">Master BL No</label>
+                                <input asp-for="MasterBLNo" />
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="SerialNo"></label>
+                                <input asp-for="SerialNo" />
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="BLIssueDate"></label>
+                                <input asp-for="BLIssueDate" type="date" />
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="PlaceOfIssue"></label>
+                                <input asp-for="PlaceOfIssue" />
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="BLReleaseTypeId">Release Type</label>
+                                <select asp-for="BLReleaseTypeId" asp-items="Model.BLReleaseTypes">
+                                    <option value="">Select...</option>
+                                </select>
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="ReleaseDate"></label>
+                                <input asp-for="ReleaseDate" type="date" />
+                            </div>
+
+                            <!-- ===== Parties & Payment ===== -->
+                            <div class="excel-field">
+                                <label asp-for="CarrierId">Carrier</label>
+                                <select asp-for="CarrierId" asp-items="Model.Carriers">
+                                    <option value="">Select...</option>
+                                </select>
+                            </div>
+                            <div class="excel-field">
+                                <label class="form-label">Issuer Party</label>
+                                <select id="IssuerPartySelect2" name="IssuerPartyId" class="form-select form-select-sm">
+                                    @if (Model.IssuerPartyId != Guid.Empty)
+                                    {
+                                        <option value="@Model.IssuerPartyId" selected>@Model.IssuerPartyName</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="excel-field">
+                                <label asp-for="PaymentTypeId">Payment Type</label>
+                                <select asp-for="PaymentTypeId" asp-items="Model.PaymentTypes">
+                                    <option value="">Select...</option>
+                                </select>
+                            </div>
+
+                            <!-- ===== Copies / Incoterm ===== -->
+                            <div class="excel-field">
+                                <label asp-for="OriginalCount">Original Count</label>
+                                <input asp-for="OriginalCount" type="number" />
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="CopyCount">Copy Count</label>
+                                <input asp-for="CopyCount" type="number" />
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="IncotermId">Incoterm</label>
+                                <select asp-for="IncotermId" asp-items="Model.Incoterms">
+                                    <option value="">Select...</option>
+                                </select>
+                            </div>
+
+                            <!-- ===== Checkboxes (به‌صورت سلول اکسلی، یکسان با بقیه) ===== -->
+                            <div class="excel-field">
+                                <label asp-for="IssuedByUs"></label>
+                                <input asp-for="IssuedByUs" type="checkbox" class="excel-checkbox" />
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="IsSwitched"></label>
+                                <input asp-for="IsSwitched" type="checkbox" class="excel-checkbox" />
+                            </div>
+
+                            @* فیلدهای کامنت‌شده (BLStatusId و FreightTerms) عمداً منتقل نشدند *@
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="bl-card">
+                <div id="partiesCollapse">
+                    <div class="bl-card-body">
+                        <h6>2)Parties:</h6>
+                        <div class="aligned-excel-grid">
+                            <div class="excel-field">
+                                <label class="form-label">Shipper</label>
+                                <select id="ShipperSelect2" name="ShipperId" class="form-select form-select-sm">
+                                    @if (Model.ShipperPartyId != Guid.Empty)
+                                    {
+                                        <option value="@Model.ShipperPartyId" selected>@Model.ShipperPartyName</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="excel-field">
+                                <label class="form-label">Consignee</label>
+                                <select id="ConsigneeSelect2" name="ConsigneeId" class="form-select form-select-sm">
+                                    @if (Model.ConsigneePartyId != Guid.Empty)
+                                    {
+                                        <option value="@Model.ConsigneePartyId" selected>@Model.ConsigneePartyName</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="excel-field">
+                                <label class="form-label">Notify</label>
+                                <select id="NotifySelect2" name="NotifyId" class="form-select form-select-sm">
+                                    @if (Model.NotifyPartyId != Guid.Empty)
+                                    {
+                                        <option value="@Model.NotifyPartyId" selected>@Model.NotifyPartyName</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <!-- ==================== ROW 2: Addresses ==================== -->
+                            <div class="excel-field">
+                                <label asp-for="ShipperTextInBL">Shipper (Text)</label>
+                                <textarea asp-for="ShipperTextInBL" id="ShipperTextInBL" data-fill-if-empty="true" rows="4"></textarea>
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="ConsigneeTextInBL">Consignee (Text)</label>
+                                <textarea asp-for="ConsigneeTextInBL" id="ConsigneeTextInBL" data-fill-if-empty="true" rows="4"></textarea>
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="NotifyPartyTextInBL">Notify (Text)</label>
+                                <textarea asp-for="NotifyPartyTextInBL" id="NotifyPartyTextInBL" data-fill-if-empty="true" rows="4"></textarea>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="bl-card">
+                <div id="routingCollapse">
+                    <div class="bl-card-body">
+                        <h6>3)Routing Information:</h6>
+                        <div class="excel-grid">
+
+                            <div class="excel-field">
+                                <label class="form-label">Place Of Receipt</label>
+                                <select id="PORSelect2" name="PORId" class="form-select form-select-sm">
+                                    @if (Model.PORId != Guid.Empty)
+                                    {
+                                        <option value="@Model.PORId" selected>@Model.PORName</option>
+                                    }
+                                </select>
+                                <input asp-for="PORText" id="porText" placeholder="P.O.Receipt Text" />
+                            </div>
+
+                            <div class="excel-field">
+                                <label class="form-label">POL</label>
+                                <select id="POLSelect2" name="POLId" class="form-select form-select-sm">
+                                    @if (Model.POLId != Guid.Empty)
+                                    {
+                                        <option value="@Model.POLId" selected>@Model.POLName</option>
+                                    }
+                                </select>
+                                <input asp-for="POLText" id="polText" placeholder="POL Text in BL" />
+                            </div>
+
+                            <!-- POD: label + search + its text -->
+                            <div class="excel-field">
+                                <label class="form-label">POD</label>
+                                <select id="PODSelect2" name="PODId" class="form-select form-select-sm">
+                                    @if (Model.PODId != Guid.Empty)
+                                    {
+                                        <option value="@Model.PODId" selected>@Model.PODName</option>
+                                    }
+                                </select>
+                                <input asp-for="PODText" id="podText" placeholder="POD Text in BL" />
+                            </div>
+
+
+                            <!-- Place Of Delivery -->
+                            <div class="excel-field">
+                                <label class="form-label">Place Of Delivery</label>
+                                <select id="PODelSelect2" name="PODelId" class="form-select form-select-sm">
+                                    @if (Model.PODelId != Guid.Empty)
+                                    {
+                                        <option value="@Model.PODelId" selected>@Model.PODelName</option>
+                                    }
+                                </select>
+                                <input asp-for="PODelText" id="podelText" placeholder="PODel Text in BL" />
+                            </div>
+
+                            <!-- Final Destination (text only) -->
+                            <div class="excel-field">
+                                <label asp-for="FinalDestinationText">Final Destination</label>
+                                <input asp-for="FinalDestinationText" id="finalDestText" />
+                            </div>
+
+                            <!-- Transhipment Port -->
+                            <div class="excel-field">
+                                <label class="form-label">Transhipment Port</label>
+                                <select id="TranshipmentPortSelect2" name="TranshipmentPortId" class="form-select form-select-sm">
+                                    @if (Model.TranshipmentPortId != Guid.Empty)
+                                    {
+                                        <option value="@Model.TranshipmentPortId" selected>@Model.TranshipmentPortName</option>
+                                    }
+                                </select>
+                                <input asp-for="TranshipmentPortText" id="transhipmentportText" placeholder="Tranship port Text " />
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bl-card">
+                <div id="transportDetailsCollapse">
+                    <div class="transport-grid" data-transport-panel="1">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <h6 class="mb-0"> 4-1)Sea Voyages</h6>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <a href="@Url.Action("Index", "Vessels")"
+                                   class="btn btn-sm btn-outline-secondary"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
+                                    <i class="bi bi-water me-1"></i>
+                                    Vessels List
+                                </a>
+                                <a href="@Url.Action("Index", "Voyage")"
+                                   class="btn btn-sm btn-outline-secondary"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
+                                    <i class="bi bi-compass me-1"></i>
+                                    Manage Voyages
+                                </a>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary"
+                                        data-add-row="voyages">
+                                    <i class="bi bi-plus-lg me-1"></i>
+                                    Add Voyage
+                                </button>
+                            </div>
+                        </div>
+
+                        @*                         <div class="table-responsive overflow-y-hidden"> *@
+                        <div>
+                            <table class="table table-sm align-middle w-100 mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="min-width: 130px;">Voyage Type</th>
+                                        <th style="min-width: 220px;">Voyage</th>
+                                        <th style="min-width: 170px;">Vessel</th>
+                                        <th style="min-width: 130px;">Voyage No</th>
+                                        <th style="min-width: 120px;">Shipped On Board</th>
+                                        <th style="min-width: 120px;">Recved. For Shipment</th>
+                                        <th style="min-width: 50px;">Is Final?</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="voyagesBody">
+                                    @for (var i = 0; i < Model.Voyages.Count; i++)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="Voyages.Index" value="@i" />
+                                                <input type="hidden"
+                                                       asp-for="Voyages[i].Id" />
+
+                                                <select class="form-select form-select-sm table-input"
+                                                        asp-for="Voyages[i].VoyageTypeId"
+                                                        asp-items="Model.VoyageTypes">
+                                                    <option value="">Select type...</option>
+                                                </select>
+                                            </td>
+
+                                            <td>
+                                                <input type="hidden"
+                                                       asp-for="Voyages[i].VoyageId"
+                                                       class="voyage-id-input" />
+
+                                                <div class="input-group input-group-sm">
+                                                    <input type="text"
+                                                           asp-for="Voyages[i].SelectedVoyageText"
+                                                           class="form-control voyage-search-input"
+                                                           placeholder="Search voyage..."
+                                                           autocomplete="off"
+                                                           readonly />
+                                                    <button type="button"
+                                                            class="btn btn-outline-secondary btn-select-voyage"
+                                                            title="Search and select voyage"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#voyageLookupModal">
+                                                        <i class="bi bi-search"></i>
+                                                    </button>
+
+                                                    <button type="button"
+                                                            class="btn btn-outline-danger btn-clear-voyage"
+                                                            title="Clear selected voyage">
+                                                        <i class="bi bi-x-lg"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <input class="form-control form-control-sm table-input vessel-name-input"
+                                                       asp-for="Voyages[i].VesselName"
+                                                       placeholder="Vessel name" />
+                                            </td>
+
+                                            <td>
+                                                <input class="form-control form-control-sm table-input voyage-no-input"
+                                                       asp-for="Voyages[i].VoyageNo"
+                                                       placeholder="Voyage no." />
+                                            </td>
+
+                                            <td>
+                                                <input class="form-control form-control-sm table-input"
+                                                       type="date"
+                                                       asp-for="Voyages[i].ShippedOnBoardDate" />
+                                            </td>
+
+                                            <td>
+                                                <input class="form-control form-control-sm table-input"
+                                                       type="date"
+                                                       asp-for="Voyages[i].ReceivedForShipmentDate" />
+                                            </td>
+                                            @*                                             <td class="text-center align-middle">
+                                                <input type="checkbox"
+                                                       class="form-check-input is-final-check"
+                                                       asp-for="Voyages[i].IsFinal" />
+                                            </td> *@
+
+                                            <td class="excel-checkbox-cell">
+                                                <label class="excel-checkbox-wrapper">
+                                                    <input type="checkbox"
+                                                           class="excel-checkbox-input is-final-check"
+                                                           asp-for="Voyages[i].IsFinal" />
+                                                    <span class="excel-checkbox-custom"></span>
+                                                </label>
+                                            </td>
+
+
+                                            <td class="text-nowrap">
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        title="Remove"
+                                                        data-remove-row>
+                                                    <i class="bi bi-trash"></i>
+
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="transport-grid" data-transport-panel="2">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <h6 class="mb-0">4-2)Road Trips</h6>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <a href="@Url.Action("Index", "Trips", new { blId = Model.Id })"
+                                   class="btn btn-sm btn-outline-secondary"
+                                   target="_blank">
+                                    <i class="bi bi-truck me-1"></i>
+                                    Manage Trips
+                                </a>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary"
+                                        data-add-row="trips">
+                                    <i class="bi bi-plus-lg me-1"></i>
+                                    Add Trip
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle">
+                                <thead>
+                                    <tr>
+                                        <th style="min-width:150px;">Trip</th>
+                                        <th style="min-width:100px;">Truck No</th>
+                                        <th style="min-width:100px;">Trailer No</th>
+                                        <th style="min-width:100px;">Driver Name</th>
+                                        <th style="min-width:70px;">#Pkg</th>
+                                        <th style="min-width:70px;">Gross Weight</th>
+                                        <th style="min-width:70px;">CMR</th>
+                                        <th style="min-width:70px;">TIR</th>
+                                        <th style="min-width:70px;">Manifest</th>
+                                        <th style="width:1%;"></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="tripsBody">
+                                    @for (var i = 0; i < Model.Trips.Count; i++)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @* برای collection binding، خصوصاً پس از حذف/افزودن ردیف *@
+                                                <input type="hidden" name="Trips.Index" value="@i" />
+
+                                                <input type="hidden"
+                                                       asp-for="Trips[i].Id" />
+
+                                                <input type="hidden"
+                                                       asp-for="Trips[i].TripId"
+                                                       class="trip-id-input" />
+
+                                                <div class="input-group input-group-sm">
+                                                    <input type="text"
+                                                           asp-for="Trips[i].SelectedTripText"
+                                                           class="form-control trip-search-input"
+                                                           placeholder="Select trip..."
+                                                           autocomplete="off"
+                                                           readonly />
+
+                                                    <button type="button"
+                                                            class="btn btn-outline-secondary btn-select-trip"
+                                                            title="Search and select trip"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#tripLookupModal">
+                                                        <i class="bi bi-search"></i>
+                                                    </button>
+
+                                                    <button type="button"
+                                                            class="btn btn-outline-danger btn-clear-trip"
+                                                            title="Clear selected trip">
+                                                        <i class="bi bi-x-lg"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <input class="form-control form-control-sm table-input truck-no-input"
+                                                       asp-for="Trips[i].TruckNo"
+                                                       placeholder="Truck no." />
+                                            </td>
+
+                                            <td>
+                                                <input class="form-control form-control-sm table-input trailer-no-input"
+                                                       asp-for="Trips[i].TrailerNo"
+                                                       placeholder="Trailer no." />
+                                            </td>
+
+                                            <td>
+                                                <input class="form-control form-control-sm table-input driver-name-input"
+                                                       asp-for="Trips[i].DriverName"
+                                                       placeholder="Driver name" />
+                                            </td>
+                                            <td>
+                                                <input asp-for="Trips[i].PackageCount"
+                                                       type="number"
+                                                       min="0"
+                                                       class="form-control form-control-sm table-input package-count-input"
+                                                       placeholder="0" />
+                                            </td>
+
+                                            <td>
+                                                <input asp-for="Trips[i].GrossWeight"
+                                                       type="number"
+                                                       min="0"
+                                                       step="0.001"
+                                                       class="form-control form-control-sm table-input gross-weight-input"
+                                                       placeholder="0.000" />
+                                            </td>
+                                            <td>
+                                                <input asp-for="Trips[i].CMRNo"
+                                                       type="text"
+                                                       class="form-control form-control-sm table-input" />
+                                            </td>
+                                            <td>
+                                                <input asp-for="Trips[i].TIRNo"
+                                                       type="text"
+                                                       class="form-control form-control-sm table-input" />
+                                            </td>
+                                            <td>
+                                                <input asp-for="Trips[i].ManifestNo"
+                                                       type="text"
+                                                       class="form-control form-control-sm table-input" />
+                                            </td>
+
+
+
+                                            <td class="text-nowrap text-center">
+                                                @{
+                                                    var tripRecordId = Model.Trips[i].Id;
+                                                    var isSaved = tripRecordId.HasValue && tripRecordId != Guid.Empty;
+                                                }
+                                                @if (isSaved)
+                                                {
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-outline-primary me-1"
+                                                            title="Allocate Containers"
+                                                            hx-get="@Url.Action("GetContainerAllocationModal", "TransportDocuments", new { blId = Model.Id, roadTripId = tripRecordId })"
+                                                            hx-target="#containerAllocationModalContent"
+                                                            hx-swap="innerHTML"
+                                                            onclick="openAllocationModal()">
+                                                        <i class="bi bi-box-seam"></i>
+                                                        <span class="badge bg-primary ms-1">@Model.Trips[i].AllocatedContainersCount</span>
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <span class="d-inline-block me-1"
+                                                          tabindex="0"
+                                                          data-bs-toggle="tooltip"
+                                                          data-bs-placement="top"
+                                                          title="Save Changes to Activate Allocation">
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-outline-secondary disabled"
+                                                                style="pointer-events: none;"
+                                                                disabled>
+                                                            <i class="bi bi-box-seam"></i>
+                                                        </button>
+                                                    </span>
+                                                }
+                                                <!-- دکمه Remove -->
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        data-remove-row
+                                                        title="Remove">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+
+
+                            </table>
+                        </div>
+                    </div>
+                    <div class="transport-grid" data-transport-panel="3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <h6 class="mb-0">4-3)Rail Journeys</h6>
+                            </div>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-primary"
+                                    data-add-row="rail">
+                                <i class="bi bi-plus-lg"></i>
+                                Add Rail Journey
+                            </button>
+                        </div>
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Train No</th>
+                                    <th>Wagon No</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="railBody">
+                                @for (var i = 0; i < Model.RailJourneys.Count; i++)
+                                {
+                                    <tr>
+                                        <td>
+                                            <input type="hidden" asp-for="RailJourneys[i].Id" />
+                                            <input class="form-control table-input" asp-for="RailJourneys[i].TrainNo" />
+                                        </td>
+                                        <td>
+                                            <input class="form-control table-input" asp-for="RailJourneys[i].WagonNo" />
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" title="Remove" data-remove-row>
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="transport-grid" data-transport-panel="4">
+
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <h6 class="mb-0">4-4)Flights</h6>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="@Url.Action("Index", "Flight")"
+                                   class="btn btn-sm btn-outline-secondary"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
+                                    <i class="bi bi-airplane me-1"></i>
+                                    Manage Flights
+                                </a>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary"
+                                        data-add-row="flights">
+                                    <i class="bi bi-plus-lg me-1"></i>
+                                    Add Flight
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle">
+                                <thead>
+                                    <tr>
+                                        <th style="min-width:240px;">Flight</th>
+                                        <th style="min-width:220px;">Flight Date</th>
+                                        <th style="min-width:150px;">Airline</th>
+                                        <th style="min-width:120px;">Flight No</th>
+                                        <th style="min-width:170px;">Value for Carriage</th>
+                                        <th style="min-width:170px;">Value for Customs</th>
+                                        <th style="min-width:250px;">Handling Information</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="flightsBody">
+                                    @for (var i = 0; i < Model.Flights.Count; i++)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="Flights.Index" value="@i" />
+
+                                                <input type="hidden"
+                                                       asp-for="Flights[i].Id" />
+
+                                                <input type="hidden"
+                                                       asp-for="Flights[i].FlightId"
+                                                       class="flight-id-input" />
+
+                                                <div class="input-group input-group-sm">
+                                                    <input type="text"
+                                                           asp-for="Flights[i].SelectedFlightText"
+                                                           class="form-control flight-search-input"
+                                                           placeholder="Select flight..."
+                                                           autocomplete="off"
+                                                           readonly />
+
+                                                    <button type="button"
+                                                            class="btn btn-outline-secondary btn-select-flight"
+                                                            title="Search and select flight"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#flightLookupModal">
+                                                        <i class="bi bi-search"></i>
+                                                    </button>
+
+                                                    <button type="button"
+                                                            class="btn btn-outline-danger btn-clear-flight"
+                                                            title="Clear selected flight">
+                                                        <i class="bi bi-x-lg"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <input type="hidden"
+                                                       asp-for="Flights[i].FlightDateId"
+                                                       class="flight-date-id-input" />
+
+                                                <div class="input-group input-group-sm">
+                                                    <input type="text"
+                                                           asp-for="Flights[i].SelectedFlightDateText"
+                                                           class="form-control flight-date-search-input"
+                                                           placeholder="Select flight date..."
+                                                           autocomplete="off"
+                                                           readonly />
+
+                                                    <button type="button"
+                                                            class="btn btn-outline-secondary btn-select-flight-date"
+                                                            title="Search and select flight date"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#flightDateLookupModal">
+                                                        <i class="bi bi-calendar-event"></i>
+                                                    </button>
+
+                                                    <button type="button"
+                                                            class="btn btn-outline-danger btn-clear-flight-date"
+                                                            title="Clear selected flight date">
+                                                        <i class="bi bi-x-lg"></i>
+                                                    </button>
+                                                </div>
+
+                                                <input type="hidden"
+                                                       asp-for="Flights[i].FlightDateDate"
+                                                       class="flight-date-date-input" />
+
+                                                <input type="hidden"
+                                                       asp-for="Flights[i].FlightDateLocal"
+                                                       class="flight-date-local-input" />
+                                            </td>
+
+                                            <td>
+                                                <input type="hidden"
+                                                       asp-for="Flights[i].AirlineId"
+                                                       class="airline-id-input" />
+
+                                                <input class="form-control form-control-sm table-input airline-name-input"
+                                                       value="@Model.Flights[i].AirlineName"
+                                                       placeholder="Airline"
+                                                       readonly />
+                                            </td>
+
+                                            <td>
+                                                <input class="form-control form-control-sm table-input flight-no-input"
+                                                       asp-for="Flights[i].FlightNo"
+                                                       placeholder="Flight no." />
+                                            </td>
+
+                                            <td>
+                                                <input class="form-control form-control-sm table-input declared-value-carriage-input"
+                                                       asp-for="Flights[i].DeclaredValueForCarriage"
+                                                       placeholder="NVD or USD 10,000" />
+                                            </td>
+
+                                            <td>
+                                                <input class="form-control form-control-sm table-input declared-value-customs-input"
+                                                       asp-for="Flights[i].DeclaredValueForCustoms"
+                                                       placeholder="NCV or USD 10,000" />
+                                            </td>
+
+                                            <td>
+                                                <textarea asp-for="Flights[i].HandlingInformation"
+                                                          class="form-control form-control-sm table-input handling-information-input"
+                                                          rows="2"
+                                                          placeholder="Handling instructions..."></textarea>
+                                            </td>
+
+                                            <td class="text-nowrap">
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        data-remove-row>
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <section class="bl-card">
+                <div id="cargoSummaryCollapse" class="">
+                    <div class="bl-card-body">
+                        <h6>5)Cargo Summary:</h6>
+                        <div class="excel-grid">
+
+                            <!-- ===== Package Type (Autocomplete) ===== -->
+                            <div class="excel-field">
+                                <label class="form-label">Package Type</label>
+                                <select id="PackageTypeSelect2" name="PackageTypeId" class="form-select form-select-sm">
+                                    @if (Model.PackageTypeId.HasValue && Model.PackageTypeId != 0)
+                                    {
+                                        <option value="@Model.PackageTypeId" selected>@Model.PackageTypeName</option>
+                                    }
+                                </select>
+                                @*<input asp-for="PackageTypeText" id="packagetypeText" placeholder="package type Text in BL" /> *@
+                            </div>
+
+                            <!-- ===== Package Text / Totals ===== -->
+                            <div class="excel-field">
+                                <label asp-for="PackageTypeText"></label>
+                                <input asp-for="PackageTypeText" id="PackageTypeText" />
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="TotalPackages"></label>
+                                <input asp-for="TotalPackages" type="number" />
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="TotalContainers"></label>
+                                <input asp-for="TotalContainers" type="number" />
+                            </div>
+
+                            <!-- ===== Weights & Volume ===== -->
+                            <div class="excel-field">
+                                <label asp-for="GrossWeightKg"></label>
+                                <input asp-for="GrossWeightKg" type="number" step="0.001" />
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="NetWeightKg"></label>
+                                <input asp-for="NetWeightKg" type="number" step="0.001" />
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="VolumeCBM"></label>
+                                <input asp-for="VolumeCBM" type="number" step="0.001" />
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="ChargeableWeight"></label>
+                                <input asp-for="ChargeableWeight" type="number" step="0.001" />
+                            </div>
+
+                            <!-- ===== Marks & Numbers (تمام‌عرض) ===== -->
+                            <div class="excel-field span-3">
+                                <label asp-for="MarksAndNumbers"></label>
+                                <textarea asp-for="MarksAndNumbers" class="excel-textarea-lg"></textarea>
+                            </div>
+
+                            <!-- ===== Goods Description (تمام‌عرض) ===== -->
+                            <div class="excel-field span-3">
+                                <label asp-for="GoodsDescription"></label>
+                                <textarea asp-for="GoodsDescription" class="excel-textarea-lg"></textarea>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="bl-card">
+                <div id="remarksCustomsBankingCollapse" class="">
+                    <div class="bl-card-body">
+                        <h6>6)Remarks &amp; Misc.:</h6>
+                        <div class="excel-grid">
+
+                            <!-- ============ ROW 1 ============ -->
+                            @*                             <div class="excel-field">
+                                <label asp-for="ClauseRemarks"></label>
+                                <textarea asp-for="ClauseRemarks"></textarea>
+                                <span asp-validation-for="ClauseRemarks" class="validation-message"></span>
+                            </div>
+ *@
+                            <div class="excel-field">
+                                <label asp-for="RemarksInBL"></label>
+                                <textarea asp-for="RemarksInBL"></textarea>
+                                <span asp-validation-for="RemarksInBL" class="validation-message"></span>
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="RemarksInManifest"></label>
+                                <textarea asp-for="RemarksInManifest"></textarea>
+                                <span asp-validation-for="RemarksInManifest" class="validation-message"></span>
+                            </div>
+
+                            <!-- ============ ROW 2 ============ -->
+                            @*                          <div class="excel-field">
+                                <label asp-for="InternalNotes"></label>
+                                <textarea asp-for="InternalNotes"></textarea>
+                                <span asp-validation-for="InternalNotes" class="validation-message"></span>
+                            </div>
+ *@
+                            <div class="excel-field">
+                                <label asp-for="POLDetentionTariffId">POL Det. Tariff</label>
+                                <select asp-for="POLDetentionTariffId" asp-items="Model.DetentionTariffs">
+                                    <option value="">Select...</option>
+                                </select>
+                                <span asp-validation-for="POLDetentionTariffId" class="validation-message"></span>
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="PODDetentionTariffId">POD Det. Tariff</label>
+                                <select asp-for="PODDetentionTariffId" asp-items="Model.DetentionTariffs">
+                                    <option value="">Select...</option>
+                                </select>
+                                <span asp-validation-for="PODDetentionTariffId" class="validation-message"></span>
+                            </div>
+                            <!-- ============ ROW 3 ============ -->
+                            <div class="excel-field">
+                                <label asp-for="MRN"></label>
+                                <input asp-for="MRN" />
+                                <span asp-validation-for="MRN" class="validation-message"></span>
+                            </div>
+
+                            @*                             <div class="excel-field">
+                                <label asp-for="PursuitCode"></label>
+                                <input asp-for="PursuitCode" />
+                                <span asp-validation-for="PursuitCode" class="validation-message"></span>
+                            </div>
+ *@
+                            <div class="excel-field">
+                                <label asp-for="OrderRegistrationNo"></label>
+                                <input asp-for="OrderRegistrationNo" />
+                                <span asp-validation-for="OrderRegistrationNo" class="validation-message"></span>
+                            </div>
+
+                            <!-- ============ ROW 4 ============ -->
+                            <div class="excel-field">
+                                <label asp-for="LCNo"></label>
+                                <input asp-for="LCNo" />
+                                <span asp-validation-for="LCNo" class="validation-message"></span>
+                            </div>
+
+                            <div class="excel-field">
+                                <label asp-for="LCBankName"></label>
+                                <input asp-for="LCBankName" />
+                                <span asp-validation-for="LCBankName" class="validation-message"></span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+
+
+            @if (Model.Id != null && Model.Id != Guid.Empty)
+            {
+                <section class="bl-card mt-3">
+                    <div id="cargoDetailsCollapse">
+                        <div class="bl-card-body">
+                            <h6>7)Cargo Details:</h6>
+                            <div id="blCargoDetailsPanel"
+                                 hx-get="@Url.Action("Panel", "CargoDetails", new CargoDetailFilterVm { BLId = Model.Id })"
+                                 hx-trigger="load"
+                                 hx-swap="innerHTML">
+                                <div class="text-muted">Loading cargo details...</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="bl-card">
+                    <div id="containersCollapse" class="">
+                        @await Html.PartialAsync("_ContainersPanel", Model)
+                    </div>
+                </section>
+            }
+            else
+            {
+                <div class="alert alert-info mt-3">
+                    Please save the BL first, then you can add cargo details.
+                </div>
+            }
+            <section class="bl-card mt-3">
+                <div>
+                    <button type="submit" class="btn btn-primary">
+                        Save BL
+                    </button>
+                </div>
+            </section>
+
+
+
+        </main>
+
+        <aside class="bl-sidebar">
+            <section class="bl-card">
+                <div class="bl-card-header">
+                    <h2>BL Status</h2>
+                </div>
+
+                <div class="bl-card-body">
+                    <div class="field">
+                        <label>Current Status</label>
+                        <input value="@statusName" readonly />
+                    </div>
+                    <div class="field section-gap">
+                        <label>Job No/File No</label>
+                        <input value="@(Model.JobNo ?? "-")" readonly />
+                    </div>
+
+                    <div class="field section-gap">
+                        <label>BL No</label>
+                        <input value="@documentNo" readonly />
+                    </div>
+
+                    @*                     <div class="field section-gap">
+                        <label>Total Charges</label>
+                        <input value="@Model.SummaryTotalCharges" readonly />
+                    </div>
+ *@
+                </div>
+            </section>
+            <section class="bl-card">
+                <div class="bl-card-header">
+                    <h2>Actions</h2>
+                </div>
+
+                <div class="bl-card-body">
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            Save BL
+                        </button>
+
+                        @if (isEdit)
+                        {
+                            @*                             <button type="submit"
+                                    formaction="@Url.Action("Issue", "BL", new { id = Model.Id })"
+                                    formmethod="post"
+                                    class="btn btn-success">
+                                Finalize
+                            </button>
+ *@
+                            @*                             <button type="submit"
+                                    formaction="@Url.Action("Void", "BL", new { id = Model.Id })"
+                                    formmethod="post"
+                                    class="btn btn-warning">
+                                Void Document
+                            </button>
+
+                            <button type="submit"
+                                    formaction="@Url.Action("Delete", "BL", new { id = Model.Id })"
+                                    formmethod="post"
+                                    class="btn btn-danger"
+                                    onclick="return confirm('Delete this BL?');">
+                                Delete
+                            </button>
+ *@                        }
+
+                            @*                             <a asp-controller="Job"
+                               asp-action="Edit"
+                               asp-route-id="@Model.JobId"
+                               class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+ *@                            <a asp-controller="Jobs"
+                                                             asp-action="Details"
+                                                             asp-route-id="@Model.JobId"
+                                                             class="btn btn-outline-secondary">
+                                Back to Job
+                            </a>
+
+                        </div>
+                    </div>
+                </section>
+            </aside>
+        </div>
+    </form>
+    <div id="modalContainer"></div>
+    <div class="modal fade"
+         id="voyageLookupModal"
+         tabindex="-1"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Select Sea Voyage</h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input id="voyageLookupSearch"
+                           name="search"
+                           type="search"
+                           class="form-control"
+                           placeholder="Search by vessel name or voyage number..."
+                           autocomplete="off"
+                           hx-get="@Url.Action("SearchVoyages", "TransportDocuments")"
+                           hx-trigger="keyup changed delay:350ms, search"
+                           hx-target="#voyageLookupResults"
+                           hx-include="this" />
+
+                    <div id="voyageLookupResults" class="mt-3">
+                        <div class="text-muted small">
+                            Type at least 2 characters to search.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade"
+         id="tripLookupModal"
+         tabindex="-1"
+         aria-labelledby="tripLookupModalLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tripLookupModalLabel">
+                        Select Road Trip
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <input id="tripLookupSearch"
+                           name="search"
+                           type="search"
+                           class="form-control"
+                           placeholder="Search by truck no, trailer no, driver name, CMR or TIR..."
+                           autocomplete="off"
+                           hx-get="@Url.Action("SearchTrips", "TransportDocuments")"
+                           hx-trigger="keyup changed delay:350ms, search"
+                           hx-target="#tripLookupResults"
+                           hx-include="this" />
+
+                    <div id="tripLookupResults" class="mt-3">
+                        <div class="text-muted small">
+                            Type at least 2 characters to search.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="modal fade" id="containerAllocationModal" tabindex="-1" aria-labelledby="containerAllocationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content" id="containerAllocationModalContent">
+                <div class="p-4 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="modal fade"
+         id="flightLookupModal"
+         tabindex="-1"
+         aria-labelledby="flightLookupModalLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="flightLookupModalLabel">
+                        Select Flight
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <input id="flightLookupSearch"
+                           name="search"
+                           type="search"
+                           class="form-control"
+                           placeholder="Search by flight no, airline, origin or destination..."
+                           autocomplete="off"
+                           hx-get="@Url.Action("SearchFlights", "TransportDocuments")"
+                           hx-trigger="keyup changed delay:350ms, search"
+                           hx-target="#flightLookupResults"
+                           hx-include="this" />
+
+                    <div id="flightLookupResults" class="mt-3">
+                        <div class="text-muted small">
+                            Type at least 2 characters to search.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="modal fade"
+         id="flightDateLookupModal"
+         tabindex="-1"
+         aria-labelledby="flightDateLookupModalLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="flightDateLookupModalLabel">
+                        Select Flight Date
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden"
+                           id="flightDateLookupFlightId"
+                           name="flightId" />
+
+                    <div id="flightDateLookupResults">
+                        <div class="text-muted small">
+                            Select a flight first.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+
+        @*         <script src="~/js/jquery.min.js"></script>
+        <script src="~/js/select2.min.js" asp-append-version="true"></script>
+ *@
+
+
+
+
+        <script>
+            (() => {
+                const transportSelect = document.querySelector('[name="TransportTypeId"]');
+
+                const rowIndexes = {
+                    voyages: document.querySelectorAll('#voyagesBody tr').length,
+                    flights: document.querySelectorAll('#flightsBody tr').length,
+                    trips: document.querySelectorAll('#tripsBody tr').length,
+                    rail: document.querySelectorAll('#railBody tr').length
+                };
+
+            let activeVoyageRow = null;
+            let activeTripRow = null;
+            let activeFlightRow = null;
+            let activeFlightDateRow = null;
+
+
+
+            const voyageTypeOptionsHtml = `
+                 @foreach (var item in Model.VoyageTypes)
+                 {
+                                                                                 <option value="@item.Value">@item.Text</option>
+                 }
+             `;
+
+
+            function syncTransportPanels() {
+                const selected = transportSelect?.value;
+
+                // نگاشت انواع حمل به پنل‌هایی که باید فعال و نمایش داده شوند
+                // مقادیر آرایه‌ها همان مقادیر data-transport-panel در HTML هستند (مثلاً "1" برای دریایی، "2" برای جاده‌ای و ...)
+                const transportModesMap = {
+                    "1": ["1"],               // Sea
+                    "2": ["2"],               // Road
+                    "3": ["3"],               // Rail
+                    "4": ["4"],               // Air
+                    "5": ["1", "2", "3","4"]      // MultiModal -> فعال‌سازی همزمان
+                };
+
+                // لیست پنل‌هایی که برای مد انتخاب‌شده باید فعال باشند
+                const activePanels = transportModesMap[selected] || [];
+
+                document.querySelectorAll('[data-transport-panel]').forEach(panel => {
+                    const panelType = panel.dataset.transportPanel;
+                    const isActive = activePanels.includes(panelType);
+
+                    // ۱. نمایش یا مخفی کردن پنل
+                    panel.hidden = !isActive;
+
+                    // ۲. فعال یا غیرفعال کردن اینپوت‌ها و دکمه‌ها
+                    // (این کار مانع از ارسال مقادیر فرم پنل‌های مخفی به سرور می‌شود)
+                    panel.querySelectorAll('input, select, textarea, button').forEach(el => {
+                        // اگر ردیف جدید ذخیره‌نشده است، دکمه allocate باید همچنان غیرفعال بماند
+                        if (el.classList.contains('disabled') && el.hasAttribute('disabled') && !isActive) {
+                            el.disabled = true;
+                            return;
+                        }
+
+                        el.disabled = !isActive;
+                    });
+                });
+            }
+
+
+
+
+
+
+
+            function addVoyageRow() {
+                const i = rowIndexes.voyages++;
+
+                document.querySelector('#voyagesBody').insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>
+                            <input type="hidden" name="Voyages.Index" value="${i}" />
+                            <input type="hidden" name="Voyages[${i}].Id" value="" />
+
+                            <select class="form-select form-select-sm table-input"
+                                    name="Voyages[${i}].VoyageTypeId">
+                                <option value="">Select type...</option>
+                                ${voyageTypeOptionsHtml}
+                            </select>
+                        </td>
+
+                        <td>
+                            <input type="hidden"
+                                   class="voyage-id-input"
+                                   name="Voyages[${i}].VoyageId"
+                                   value="" />
+
+                            <div class="input-group input-group-sm">
+                                <input type="text"
+                                       class="form-control voyage-search-input"
+                                       name="Voyages[${i}].SelectedVoyageText"
+                                       value=""
+                                       placeholder="Search voyage..."
+                                       autocomplete="off"
+                                       readonly />
+
+                                <button type="button"
+                                        class="btn btn-outline-secondary btn-select-voyage"
+                                        title="Search and select voyage"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#voyageLookupModal">
+                                    <i class="bi bi-search"></i>
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-clear-voyage"
+                                        title="Clear selected voyage">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </td>
+
+                        <td>
+                            <input class="form-control form-control-sm table-input vessel-name-input"
+                                   name="Voyages[${i}].VesselName"
+                                   value=""
+                                   placeholder="Vessel name" />
+                        </td>
+
+                        <td>
+                            <input class="form-control form-control-sm table-input voyage-no-input"
+                                   name="Voyages[${i}].VoyageNo"
+                                   value=""
+                                   placeholder="Voyage no." />
+                        </td>
+
+                        <td>
+                            <input class="form-control form-control-sm table-input"
+                                   type="date"
+                                   name="Voyages[${i}].ShippedOnBoardDate"
+                                   value="" />
+                        </td>
+
+                        <td>
+                            <input class="form-control form-control-sm table-input"
+                                   type="date"
+                                   name="Voyages[${i}].ReceivedForShipmentDate"
+                                   value="" />
+                        </td>
+
+                                            <td class="excel-checkbox-cell">
+                                                <label class="excel-checkbox-wrapper">
+                                                    <input type="checkbox"
+                                                           class="excel-checkbox-input is-final-check"
+                                                           asp-for="Voyages[${i}].IsFinal" />
+                                                    <span class="excel-checkbox-custom"></span>
+                                                </label>
+                                            </td>
+
+
+
+                        <td class="text-nowrap">
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    title="Remove"
+                                    data-remove-row>
+                                <i class="bi bi-trash"></i>
+
+                            </button>
+                        </td>
+                    </tr>
+                `);
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+            function getAirlineOptionsHtml() {
+                return document.querySelector('#airlineOptionsSource')?.innerHTML ?? '<option value="">Select...</option>';
+            }
+
+            function addFlightRow() {
+                const i = rowIndexes.flights++;
+
+                document.querySelector('#flightsBody').insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>
+                            <input type="hidden" name="Flights.Index" value="${i}" />
+                            <input type="hidden" name="Flights[${i}].Id" value="" />
+
+                            <input type="hidden"
+                                   class="flight-id-input"
+                                   name="Flights[${i}].FlightId"
+                                   value="" />
+
+                            <div class="input-group input-group-sm">
+                                <input type="text"
+                                       class="form-control flight-search-input"
+                                       name="Flights[${i}].SelectedFlightText"
+                                       value=""
+                                       placeholder="Select flight..."
+                                       autocomplete="off"
+                                       readonly />
+
+                                <button type="button"
+                                        class="btn btn-outline-secondary btn-select-flight"
+                                        title="Search and select flight"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#flightLookupModal">
+                                    <i class="bi bi-search"></i>
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-clear-flight"
+                                        title="Clear selected flight">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </td>
+
+                        <td>
+                            <input type="hidden"
+                                   class="flight-date-id-input"
+                                   name="Flights[${i}].FlightDateId"
+                                   value="" />
+
+                            <div class="input-group input-group-sm">
+                                <input type="text"
+                                       class="form-control flight-date-search-input"
+                                       name="Flights[${i}].SelectedFlightDateText"
+                                       value=""
+                                       placeholder="Select flight date..."
+                                       autocomplete="off"
+                                       readonly />
+
+                                <button type="button"
+                                        class="btn btn-outline-secondary btn-select-flight-date"
+                                        title="Search and select flight date"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#flightDateLookupModal">
+                                    <i class="bi bi-calendar-event"></i>
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-clear-flight-date"
+                                        title="Clear selected flight date">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+
+                            <input type="hidden"
+                                   class="flight-date-date-input"
+                                   name="Flights[${i}].FlightDateDate"
+                                   value="" />
+
+                            <input type="hidden"
+                                   class="flight-date-local-input"
+                                   name="Flights[${i}].FlightDateLocal"
+                                   value="" />
+                        </td>
+
+                        <td>
+                            <input type="hidden"
+                                   class="airline-id-input"
+                                   name="Flights[${i}].AirlineId"
+                                   value="" />
+
+                            <input type="text"
+                                   class="form-control form-control-sm table-input airline-name-input"
+                                   value=""
+                                   placeholder="Airline"
+                                   readonly />
+                        </td>
+
+                        <td>
+                            <input class="form-control form-control-sm table-input flight-no-input"
+                                   name="Flights[${i}].FlightNo"
+                                   value=""
+                                   placeholder="Flight no." />
+                        </td>
+
+                        <td>
+                            <input class="form-control form-control-sm table-input declared-value-carriage-input"
+                                   name="Flights[${i}].DeclaredValueForCarriage"
+                                   value=""
+                                   placeholder="NVD or USD 10,000" />
+                        </td>
+
+                        <td>
+                            <input class="form-control form-control-sm table-input declared-value-customs-input"
+                                   name="Flights[${i}].DeclaredValueForCustoms"
+                                   value=""
+                                   placeholder="NCV or USD 10,000" />
+                        </td>
+
+                        <td>
+                            <textarea class="form-control form-control-sm table-input handling-information-input"
+                                      name="Flights[${i}].HandlingInformation"
+                                      rows="2"
+                                      placeholder="Handling instructions..."></textarea>
+                        </td>
+
+                        <td class="text-nowrap">
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    title="Remove"
+                                    data-remove-row>
+                                <i class="bi bi-trash"></i>
+
+                            </button>
+                        </td>
+                    </tr>
+                `);
+            }
+            function addTripRow() {
+                const i = rowIndexes.trips++;
+
+                document.querySelector('#tripsBody').insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>
+                            <input type="hidden" name="Trips.Index" value="${i}" />
+                            <input type="hidden" name="Trips[${i}].Id" value="" />
+
+                            <input type="hidden"
+                                   class="trip-id-input"
+                                   name="Trips[${i}].TripId"
+                                   value="" />
+
+                            <div class="input-group input-group-sm">
+                                <input type="text"
+                                       class="form-control trip-search-input"
+                                       name="Trips[${i}].SelectedTripText"
+                                       value=""
+                                       placeholder="Select trip..."
+                                       autocomplete="off"
+                                       readonly />
+
+                                <button type="button"
+                                        class="btn btn-outline-secondary btn-select-trip"
+                                        title="Search and select trip"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#tripLookupModal">
+                                    <i class="bi bi-search"></i>
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-clear-trip"
+                                        title="Clear selected trip">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </td>
+
+                        <td>
+                            <input class="form-control form-control-sm table-input truck-no-input"
+                                   name="Trips[${i}].TruckNo"
+                                   value=""
+                                   placeholder="Truck no." />
+                        </td>
+
+                        <td>
+                            <input class="form-control form-control-sm table-input trailer-no-input"
+                                   name="Trips[${i}].TrailerNo"
+                                   value=""
+                                   placeholder="Trailer no." />
+                        </td>
+
+                        <td>
+                            <input class="form-control form-control-sm table-input driver-name-input"
+                                   name="Trips[${i}].DriverName"
+                                   value=""
+                                   placeholder="Driver name" />
+                        </td>
+
+                        <td>
+                           <input type="number"
+                                  min="0"
+                                  class="form-control form-control-sm table-input package-count-input"
+                                  name="Trips[${i}].PackageCount"
+                                  placeholder="0" />
+                       </td>
+
+                       <td>
+                           <input type="number"
+                                  min="0"
+                                  step="0.001"
+                                  class="form-control form-control-sm table-input gross-weight-input"
+                                  name="Trips[${i}].GrossWeight"
+                                  placeholder="0.000" />
+                       </td>
+
+
+                        <td>
+                           <input class="form-control form-control-sm table-input cmr-no-input"
+                                  name="Trips[${i}].CMRNo"
+                                  placeholder="CMR no." />
+                       </td>
+
+                       <td>
+                           <input class="form-control form-control-sm table-input tir-no-input"
+                                  name="Trips[${i}].TIRNo"
+                                  placeholder="TIR no." />
+                       </td>
+
+                       <td>
+                           <input class="form-control form-control-sm table-input manifest-no-input"
+                                  name="Trips[${i}].ManifestNo"
+                                  placeholder="Manifest no." />
+                       </td>
+                        <td class="text-nowrap">
+
+                            <span class="d-inline-block me-1"
+                                  tabindex="0"
+                                  data-bs-toggle="tooltip"
+                                  data-bs-placement="top"
+                                  title="Please save changes first to enable allocation">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-secondary disabled"
+                                        style="pointer-events: none;"
+                                        disabled>
+                                    <i class="bi bi-box-seam"></i>
+                                </button>
+                            </span>
+
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    data-remove-row
+                                    title="Remove">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `);
+            }
+
+                function addRailRow() {
+                    const i = rowIndexes.rail++;
+                    document.querySelector('#railBody').insertAdjacentHTML('beforeend', `
+                        <tr>
+                            <td>
+                                <input type="hidden" name="RailJourneys[${i}].Id" />
+                                <input class="form-control table-input" name="RailJourneys[${i}].TrainNo" />
+                            </td>
+                            <td>
+                                <input class="form-control table-input" name="RailJourneys[${i}].WagonNo" />
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-danger" title="Remove"  data-remove-row>
+                                <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `);
+                }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                document.addEventListener('click', e => {
+            // کاربر روی Search Voyage کلیک کرده است.
+              // قبل از بازشدن Modal باید بدانیم انتخاب نهایی
+              // متعلق به کدام ردیف جدول است.
+              const selectVoyageButton = e.target.closest('.btn-select-voyage');
+
+              if (selectVoyageButton) {
+                  activeVoyageRow = selectVoyageButton.closest('tr');
+                  return;
+              }
+
+              // کاربر Voyage انتخاب‌شده را پاک می‌کند.
+              const clearVoyageButton = e.target.closest('.btn-clear-voyage');
+
+              if (clearVoyageButton) {
+                  const row = clearVoyageButton.closest('tr');
+
+                  row.querySelector('.voyage-id-input').value = '';
+                  row.querySelector('.voyage-search-input').value = '';
+
+                  // اختیاری:
+                  // اگر می‌خواهید با Clear شدن Voyage،
+                  // نام کشتی و شماره سفر هم پاک شوند، این‌ها را فعال کنید:
+                  //
+                  // row.querySelector('.vessel-name-input').value = '';
+                  // row.querySelector('.voyage-no-input').value = '';
+
+                  return;
+              }
+
+              // دکمه Select داخل Modal نتایج جست‌وجوی Voyage
+              const chooseVoyageButton = e.target.closest('.btn-choose-voyage');
+
+              if (chooseVoyageButton) {
+                  if (!activeVoyageRow) {
+                      console.warn('No active voyage row was found.');
+                      return;
+                  }
+
+                  const voyageId = chooseVoyageButton.dataset.voyageId;
+                  const vesselName = chooseVoyageButton.dataset.vesselName;
+                  const voyageNo = chooseVoyageButton.dataset.voyageNo;
+                  const displayText = chooseVoyageButton.dataset.displayText;
+
+                  activeVoyageRow.querySelector('.voyage-id-input').value = voyageId ?? '';
+                  activeVoyageRow.querySelector('.voyage-search-input').value =
+                      displayText ?? `${vesselName ?? ''} - ${voyageNo ?? ''}`;
+
+                  // این دو input readonly نیستند؛
+                  // پس پس از مقداردهی، کاربر همچنان می‌تواند اصلاحشان کند.
+                  activeVoyageRow.querySelector('.vessel-name-input').value = vesselName ?? '';
+                  activeVoyageRow.querySelector('.voyage-no-input').value = voyageNo ?? '';
+
+                  const modalElement = chooseVoyageButton.closest('.modal');
+
+                  if (modalElement) {
+                      bootstrap.Modal
+                          .getOrCreateInstance(modalElement)
+                          .hide();
+                  }
+
+                  return;
+              }
+
+
+
+
+
+
+
+                    const addButton = e.target.closest('[data-add-row]');
+                    if (addButton) {
+                        const type = addButton.dataset.addRow;
+
+                        if (type === 'voyages') addVoyageRow();
+                        if (type === 'flights') addFlightRow();
+                        if (type === 'trips') addTripRow();
+                        if (type === 'rail') addRailRow();
+
+                        syncTransportPanels();
+                        return;
+                    }
+
+                    const removeButton = e.target.closest('[data-remove-row]');
+                    if (removeButton) {
+                        removeButton.closest('tr')?.remove();
+                    }
+                });
+
+                transportSelect?.addEventListener('change', syncTransportPanels);
+                syncTransportPanels();
+            })();
+        </script>
+        <script>
+            document.body.addEventListener('htmx:afterSwap', function (event) {
+                if (event.detail.target.id === 'modalContainer') {
+                    const modalElement = event.detail.target.querySelector('.modal');
+
+                    if (modalElement) {
+                        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+                        modal.show();
+                    }
+                }
+            });
+
+            document.body.addEventListener('hidden.bs.modal', function (event) {
+                if (event.target.closest('#modalContainer')) {
+                    document.getElementById('modalContainer').innerHTML = '';
+                }
+            });
+        </script>
+
+        <script>
+            document.body.addEventListener('htmx:beforeRequest', function (event) {
+                const elt = event.detail.elt;
+                if (!elt) return;
+
+                const targetSelector = elt.getAttribute('hx-target');
+                if (!targetSelector) return;
+
+                const target = document.querySelector(targetSelector);
+                if (!target || target.tagName !== 'TEXTAREA') return;
+
+                const forceReplace =
+                    elt.hasAttribute('hx-vals') &&
+                    elt.getAttribute('hx-vals').includes('forceReplace: true');
+
+                if (forceReplace) {
+                    target.dataset.forceReplace = 'true';
+                } else {
+                    delete target.dataset.forceReplace;
+                }
+            });
+
+            document.body.addEventListener('htmx:beforeSwap', function (event) {
+                const target = event.detail.target;
+                if (!target || target.tagName !== 'TEXTAREA') return;
+
+                const newText = event.detail.xhr.responseText || '';
+                const currentText = (target.value || '').trim();
+                const forceReplace = target.dataset.forceReplace === 'true';
+                const fillIfEmpty = target.dataset.fillIfEmpty === 'true';
+
+                event.detail.shouldSwap = false;
+
+                if (forceReplace) {
+                    target.value = newText;
+                    delete target.dataset.forceReplace;
+                    return;
+                }
+
+                if (fillIfEmpty && currentText.length === 0 && newText.trim().length > 0) {
+                    target.value = newText;
+                }
+            });
+        </script>
+
+        <script>
+            let activeTripRow = null;
+
+            document.addEventListener('click', function (e) {
+                console.log('Document clicked');
+
+                const selectTripButton = e.target.closest('.btn-select-trip');
+
+                if (selectTripButton) {
+                    activeTripRow = selectTripButton.closest('tr');
+
+                    const searchInput = document.querySelector('#tripLookupSearch');
+                    const resultsContainer = document.querySelector('#tripLookupResults');
+
+                    if (searchInput) {
+                        searchInput.value = '';
+                        searchInput.focus();
+                    }
+
+                    if (resultsContainer) {
+                        resultsContainer.innerHTML = `
+                            <div class="text-muted small">
+                                Type at least 2 characters to search.
+                            </div>`;
+                    }
+
+                    return;
+                }
+
+                const clearTripButton = e.target.closest('.btn-clear-trip');
+
+                if (clearTripButton) {
+                    const row = clearTripButton.closest('tr');
+
+                    if (!row) {
+                        return;
+                    }
+
+                    const tripIdInput = row.querySelector('.trip-id-input');
+                    const tripSearchInput = row.querySelector('.trip-search-input');
+                    const truckNoInput = row.querySelector('.truck-no-input');
+                    const trailerNoInput = row.querySelector('.trailer-no-input');
+                    const driverNameInput = row.querySelector('.driver-name-input');
+
+                    if (tripIdInput) {
+                        tripIdInput.value = '';
+                    }
+
+                    if (tripSearchInput) {
+                        tripSearchInput.value = '';
+                    }
+
+                    if (truckNoInput) {
+                        truckNoInput.value = '';
+                    }
+
+                    if (trailerNoInput) {
+                        trailerNoInput.value = '';
+                    }
+
+                    if (driverNameInput) {
+                        driverNameInput.value = '';
+                    }
+
+                    return;
+                }
+
+                const chooseTripButton = e.target.closest('.btn-choose-trip');
+
+                if (chooseTripButton) {
+                    if (!activeTripRow) {
+                        console.warn('No active trip row was found.');
+                        return;
+                    }
+                    const tripId = chooseTripButton.dataset.tripId ?? '';
+                    const truckNo = chooseTripButton.dataset.truckNo ?? '';
+                    const trailerNo = chooseTripButton.dataset.trailerNo ?? '';
+                    const driverName = chooseTripButton.dataset.driverName ?? '';
+
+                    const displayText = chooseTripButton.dataset.displayText
+                        ?? `${truckNo} - ${trailerNo} - ${driverName}`;
+
+                    const tripIdInput = activeTripRow.querySelector('.trip-id-input');
+                    const tripSearchInput = activeTripRow.querySelector('.trip-search-input');
+                    const truckNoInput = activeTripRow.querySelector('.truck-no-input');
+                    const trailerNoInput = activeTripRow.querySelector('.trailer-no-input');
+                    const driverNameInput = activeTripRow.querySelector('.driver-name-input');
+
+                    if (tripIdInput) {
+                        tripIdInput.value = tripId;
+                    }
+
+                    if (tripSearchInput) {
+                        tripSearchInput.value = displayText;
+                    }
+
+                    if (truckNoInput) {
+                        truckNoInput.value = truckNo;
+                    }
+
+                    if (trailerNoInput) {
+                        trailerNoInput.value = trailerNo;
+                    }
+
+                    if (driverNameInput) {
+                        driverNameInput.value = driverName;
+                    }
+
+                    const modalElement = chooseTripButton.closest('.modal');
+
+                    if (modalElement) {
+                        bootstrap.Modal
+                            .getOrCreateInstance(modalElement)
+                            .hide();
+                    }
+
+                    return;
+                }
+            });
+        </script>
+
+
+        <script>
+            let activeFlightRow = null;
+            let activeFlightDateRow = null;
+
+            document.addEventListener('click', function (e) {
+            const selectFlightButton = e.target.closest('.btn-select-flight');
+            if (selectFlightButton) {
+                activeFlightRow = selectFlightButton.closest('tr');
+
+                const searchInput = document.querySelector('#flightLookupSearch');
+                const results = document.querySelector('#flightLookupResults');
+
+                if (searchInput) {
+                    searchInput.value = '';
+                    setTimeout(() => searchInput.focus(), 250);
+                }
+
+                if (results) {
+                    results.innerHTML = `
+                        <div class="text-muted small">
+                            Type at least 2 characters to search.
+                        </div>`;
+                }
+                return;
+            }
+
+            const selectFlightDateButton = e.target.closest('.btn-select-flight-date');
+
+            if (selectFlightDateButton) {
+                activeFlightDateRow = selectFlightDateButton.closest('tr');
+
+                if (!activeFlightDateRow) {
+                    return;
+                }
+
+                const flightId = activeFlightDateRow
+                    .querySelector('.flight-id-input')
+                    ?.value;
+
+                const results = document.querySelector('#flightDateLookupResults');
+
+                if (!flightId) {
+                    if (results) {
+                        results.innerHTML = `
+                            <div class="alert alert-warning mb-0">
+                                Please select a flight first.
+                            </div>`;
+                    }
+
+                    return;
+                }
+
+                const lookupFlightId = document.querySelector('#flightDateLookupFlightId');
+
+                if (lookupFlightId) {
+                    lookupFlightId.value = flightId;
+                }
+
+                htmx.ajax(
+                    'GET',
+                    '@Url.Action("SearchFlightDates", "TransportDocuments")',
+                    {
+                        target: '#flightDateLookupResults',
+                        values: { flightId: flightId }
+                    });
+
+                return;
+            }
+            const chooseFlightButton = e.target.closest('.btn-choose-flight');
+            if (chooseFlightButton) {
+                if (!activeFlightRow) {
+                    console.warn('No active flight row was found.');
+                    return;
+                }
+                const flightId = chooseFlightButton.dataset.flightId ?? '';
+                const airlineId = chooseFlightButton.dataset.airlineId ?? '';
+                const airlineName = chooseFlightButton.dataset.airlineName ?? '';
+                const flightNo = chooseFlightButton.dataset.flightNo ?? '';
+                const displayText = chooseFlightButton.dataset.displayText
+                    ?? `${airlineName} - ${flightNo}`;
+
+                const flightIdInput =
+                    activeFlightRow.querySelector('.flight-id-input');
+
+                const airlineIdInput =
+                    activeFlightRow.querySelector('.airline-id-input');
+
+                const airlineNameInput =
+                    activeFlightRow.querySelector('.airline-name-input');
+
+                const flightNoInput =
+                    activeFlightRow.querySelector('.flight-no-input');
+
+                const flightSearchInput =
+                    activeFlightRow.querySelector('.flight-search-input');
+
+                const flightDateIdInput =
+                    activeFlightRow.querySelector('.flight-date-id-input');
+
+                const flightDateSearchInput =
+                    activeFlightRow.querySelector('.flight-date-search-input');
+
+                const flightDateDateInput =
+                    activeFlightRow.querySelector('.flight-date-date-input');
+
+                const flightDateLocalInput =
+                    activeFlightRow.querySelector('.flight-date-local-input');
+
+                if (flightIdInput) flightIdInput.value = flightId;
+                if (airlineIdInput) airlineIdInput.value = airlineId;
+                if (airlineNameInput) airlineNameInput.value = airlineName;
+                if (flightNoInput) flightNoInput.value = flightNo;
+                if (flightSearchInput) flightSearchInput.value = displayText;
+
+                // تغییر Flight، FlightDate قبلی را نامعتبر می‌کند.
+                if (flightDateIdInput) flightDateIdInput.value = '';
+                if (flightDateSearchInput) flightDateSearchInput.value = '';
+                if (flightDateDateInput) flightDateDateInput.value = '';
+                if (flightDateLocalInput) flightDateLocalInput.value = '';
+
+                const modalElement = chooseFlightButton.closest('.modal');
+
+                if (modalElement) {
+                    bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+                }
+
+                return;
+            }
+
+
+            const chooseFlightDateButton = e.target.closest('.btn-choose-flight-date');
+
+            if (chooseFlightDateButton) {
+                if (!activeFlightDateRow) {
+                    console.warn('No active flight date row was found.');
+                    return;
+                }
+
+                const flightDateId = chooseFlightDateButton.dataset.flightDateId ?? '';
+                const etd = chooseFlightDateButton.dataset.etd ?? '';
+                const localDate = chooseFlightDateButton.dataset.localDate ?? '';
+                const displayText = chooseFlightDateButton.dataset.displayText ?? etd;
+
+                const flightDateIdInput =
+                    activeFlightDateRow.querySelector('.flight-date-id-input');
+
+                const flightDateSearchInput =
+                    activeFlightDateRow.querySelector('.flight-date-search-input');
+
+                const flightDateDateInput =
+                    activeFlightDateRow.querySelector('.flight-date-date-input');
+
+                const flightDateLocalInput =
+                    activeFlightDateRow.querySelector('.flight-date-local-input');
+
+                if (flightDateIdInput) flightDateIdInput.value = flightDateId;
+                if (flightDateSearchInput) flightDateSearchInput.value = displayText;
+
+                // باید تاریخ ISO باشد: yyyy-MM-ddTHH:mm:ss
+                if (flightDateDateInput) flightDateDateInput.value = etd;
+                if (flightDateLocalInput) flightDateLocalInput.value = localDate;
+
+                const modalElement = chooseFlightDateButton.closest('.modal');
+
+                if (modalElement) {
+                    bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+                }
+
+                return;
+            }
+            const clearFlightButton = e.target.closest('.btn-clear-flight');
+
+            if (clearFlightButton) {
+                const row = clearFlightButton.closest('tr');
+
+                if (!row) return;
+
+                const fields = [
+                    '.flight-id-input',
+                    '.flight-search-input',
+                    '.airline-id-input',
+                    '.airline-name-input',
+                    '.flight-no-input',
+                    '.flight-date-id-input',
+                    '.flight-date-search-input',
+                    '.flight-date-date-input',
+                    '.flight-date-local-input'
+                ];
+
+                fields.forEach(selector => {
+                    const input = row.querySelector(selector);
+
+                    if (input) {
+                        input.value = '';
+                    }
+                });
+
+                return;
+            }
+            const clearFlightDateButton = e.target.closest('.btn-clear-flight-date');
+            if (clearFlightDateButton) {
+                const row = clearFlightDateButton.closest('tr');
+
+                if (!row) return;
+
+                const fields = [
+                    '.flight-date-id-input',
+                    '.flight-date-search-input',
+                    '.flight-date-date-input',
+                    '.flight-date-local-input'
+                ];
+
+                fields.forEach(selector => {
+                    const input = row.querySelector(selector);
+
+                    if (input) {
+                        input.value = '';
+                    }
+                });
+
+                return;
+            }
+            });
+        </script>
+        <script>
+            $(document).ready(function () {
+                // 🌟 تابع همه‌منظوره برای ساخت انواع Select2 ایجکسی
+                function initDynamicSelect2(options) {
+                    var $select = $(options.selectId);
+                    var $targetInput = options.targetTextId ? $(options.targetTextId) : null;
+
+                    $select.select2({
+                        theme: 'bootstrap-5',
+                        placeholder: options.placeholder || 'Select...',
+                        allowClear: true,
+                        minimumInputLength: options.minInput || 1,
+                        ajax: {
+                            url: options.url,
+                            dataType: 'json',
+                            delay: 250,
+                            data: function (params) {
+                                return { q: params.term };
+                            },
+                            processResults: function (data) {
+                                return {
+                                    results: data.results || $.map(data, function (item) {
+                                        return { id: item.id, text: item.text };
+                                    })
+                                };
+                            }
+                        }
+                    });
+
+                    // اگر فیلد متنی هدف داشت، مقداردهی خودکار انجام شود
+                    if ($targetInput && $targetInput.length) {
+                        $select.on('select2:select', function (e) {
+                            var fullText = (e.params.data.text || '').trim();
+
+                            // اگر تابع تبدیل متن (مثل حذف ۸ کاراکتر) پاس داده شده بود، اجرا شود؛ در غیر این صورت کل متن
+                            var finalText = options.textTransform ? options.textTransform(fullText) : fullText;
+
+                            if (!$targetInput.val().trim()) {
+                                $targetInput.val(finalText).trigger('change');
+                            }
+                        });
+                    }
+                }
+
+                // -------------------------------------------------------------
+                // ۱. استفاده برای پورت‌ها (با حذف ۸ کاراکتر اول)
+                // -------------------------------------------------------------
+                var stripPortCode = function(t) { return t.length > 8 ? t.substring(8).trim() : t; };
+
+
+                initDynamicSelect2({
+                    selectId: '#PORSelect2',
+                    targetTextId: '#porText',
+                    placeholder: 'Search POR...',
+                    url: '/Locations/GetPortsJson',
+                    textTransform: stripPortCode
+                });
+
+
+                initDynamicSelect2({
+                    selectId: '#POLSelect2',
+                    targetTextId: '#polText',
+                    placeholder: 'Search POL...',
+                    url: '/Locations/GetPortsJson',
+                    textTransform: stripPortCode
+                });
+
+                initDynamicSelect2({
+                    selectId: '#PODSelect2',
+                    targetTextId: '#podText',
+                    placeholder: 'Search POD...',
+                    url: '/Locations/GetPortsJson',
+                    textTransform: stripPortCode
+                });
+
+                initDynamicSelect2({
+                    selectId: '#PODelSelect2',
+                    targetTextId: '#podelText',
+                    placeholder: 'Search PODel...',
+                    url: '/Locations/GetPortsJson',
+                    textTransform: stripPortCode
+                });
+
+                initDynamicSelect2({
+                    selectId: '#TranshipmentPortSelect2',
+                    targetTextId: '#transhipmentportText',
+                    placeholder: 'Search Tranship...',
+                    url: '/Locations/GetPortsJson',
+                    textTransform: stripPortCode
+                });
+
+                initDynamicSelect2({
+                    selectId: '#ShipperSelect2',
+                    targetTextId: '#ShipperTextInBL',
+                    placeholder: 'Search Shipper...',
+                    url: '/Persons/GetPersonsJson'
+                });
+
+                initDynamicSelect2({
+                    selectId: '#ConsigneeSelect2',
+                    targetTextId: '#ConsigneeTextInBL',
+                    placeholder: 'Search Consignee...',
+                    url: '/Persons/GetPersonsJson'
+                });
+                initDynamicSelect2({
+                    selectId: '#NotifySelect2',
+                    targetTextId: '#NotifyPartyTextInBL',
+                    placeholder: 'Search Notify...',
+                    url: '/Persons/GetPersonsJson'
+                });
+                initDynamicSelect2({
+                    selectId: '#IssuerPartySelect2',
+                    placeholder: 'Search Issuer...',
+                    url: '/Persons/GetPersonsJson'
+                });
+
+                initDynamicSelect2({
+                    selectId: '#PackageTypeSelect2',
+                    targetTextId: '#PackageTypeText',
+                    placeholder: 'Search Package Type...',
+                    url: '/PackageTypes/GetPackageTypesJson'
+                });
+            });
+        </script>
+
+        <script>
+            function openAllocationModal() {
+                const modalEl = document.getElementById('containerAllocationModal');
+                if (modalEl) {
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modal.show();
+                } else {
+                    console.error('allocationModal element was not found in the DOM.');
+                }
+            }
+            $(document).on('change', '.is-final-check', function () {
+                if (this.checked) {
+                    $('.is-final-check').not(this).prop('checked', false);
+                }
+            });
+        </script>
+
+
+
+    }

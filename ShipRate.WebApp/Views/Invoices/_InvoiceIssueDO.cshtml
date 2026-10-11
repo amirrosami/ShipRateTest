@@ -1,0 +1,321 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model InvoiceEditVm
+
+<style>
+    /* ───── Modal tuning ───── */
+    .do-invoice-modal .modal-header {
+        padding: .65rem 1rem;
+        border-bottom: 1px solid #d1d9e0;
+        background: #f8fbff;
+    }
+
+    .do-invoice-modal .modal-title {
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    /* ───── Excel-like grid ───── */
+    .excel-grid {
+        display: grid;
+        gap: 0;
+        border: 1px solid #d1d9e0;
+        background: #fff;
+    }
+
+    .excel-grid-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .excel-field {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 0.5px solid #d1d9e0;
+        background: #fff;
+        padding: 4px 6px;
+        position: relative;
+        width: 100%;
+        min-height: 48px;
+    }
+
+        .excel-field > label {
+            width: 145px;
+            min-width: 145px;
+            margin: 0;
+            padding: 6px 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+            white-space: nowrap;
+            text-align: start;
+            background: #eef6ff;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+    .excel-input-wrap {
+        flex: 1 1 auto;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        position: relative;
+        min-width: 0;
+    }
+
+    .excel-field input,
+    .excel-field select,
+    .excel-field textarea,
+    .excel-field .form-control,
+    .excel-field .form-select {
+        width: 100% !important;
+        font-size: 14px !important;
+    }
+
+    .excel-field textarea {
+        resize: vertical;
+        min-height: 42px;
+    }
+
+    .excel-field select {
+        cursor: pointer;
+    }
+
+    /* span controls */
+    .excel-field.span-2 {
+        grid-column: span 2;
+    }
+
+    .excel-field.span-3 {
+        grid-column: span 3;
+    }
+
+    /* Focus only on control */
+    .excel-field input:focus,
+    .excel-field select:focus,
+    .excel-field textarea:focus,
+    .excel-field .form-control:focus,
+    .excel-field .form-select:focus,
+    #PartyNameDisplay:focus {
+        background-color: #fff9c4 !important;
+        border-color: #ffc107 !important;
+        box-shadow: 0 0 0 .2rem rgba(255, 193, 7, .25) !important;
+        outline: none;
+    }
+
+    /* Validation */
+    .excel-field span.text-danger {
+        position: absolute;
+        bottom: -7px;
+        right: 6px;
+        font-size: 11px;
+        line-height: 1.1;
+        background: #fff;
+        padding: 0 4px;
+        border-radius: 2px;
+        z-index: 2;
+        white-space: nowrap;
+    }
+
+    .validation-box {
+        border: 1px solid #f1b0b7;
+        background: #fff5f5;
+        color: #842029;
+        padding: .5rem .75rem;
+        margin-bottom: .75rem;
+        border-radius: .25rem;
+        font-size: 13px;
+    }
+
+        .validation-box .validation-summary-errors ul,
+        .validation-box .validation-summary-valid ul {
+            margin-bottom: 0;
+            padding-left: 1rem;
+        }
+
+    .party-display {
+        min-height: 38px;
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+
+    .action-bar {
+        margin-top: 12px;
+    }
+
+    @@media (max-width: 991.98px) {
+        .excel-grid-3 {
+            grid-template-columns: 1fr;
+        }
+
+        .excel-field,
+        .excel-field.span-2,
+        .excel-field.span-3 {
+            grid-column: span 1;
+        }
+
+        .excel-field {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+            .excel-field > label {
+                width: 100%;
+                min-width: 100%;
+            }
+
+            .excel-field span.text-danger {
+                position: static;
+                margin-top: 4px;
+                padding: 0;
+                background: transparent;
+                white-space: normal;
+            }
+    }
+</style>
+
+<div class="do-invoice-modal">
+    <div class="modal-header">
+        <h5 class="modal-title">@(Model.Id.HasValue ? "Edit DO Invoice" : "New DO Invoice")</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    <input type="hidden" asp-for="JobId" />
+
+    <div class="modal-body">
+        <div id="invoice-header-form-container">
+            <form hx-post="@Url.Action("SaveDOInvoice", "Invoices")"
+                  hx-target="#invoice-modal-content"
+                  hx-swap="innerHTML">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="PartyId" />
+                <input type="hidden" asp-for="JobId" />
+
+                @if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
+                {
+                    <div class="validation-box">
+                        <div class="d-flex align-items-center mb-1 fw-bold">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            Please correct the following errors:
+                        </div>
+                        <div asp-validation-summary="All" class="mb-0"></div>
+                    </div>
+                }
+
+                <div class="excel-grid excel-grid-3">
+                    <!-- Row 1 -->
+                    <div class="excel-field">
+                        <label asp-for="CompanyId">Company</label>
+                        <div class="excel-input-wrap">
+                            <select asp-for="CompanyId" class="form-select form-select-sm w-100">
+                                <option value="">Select...</option>
+                                @foreach (var item in Model.Companies)
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                            <span asp-validation-for="CompanyId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="excel-field">
+                        <label asp-for="BranchId">Branch</label>
+                        <div class="excel-input-wrap">
+                            <select asp-for="BranchId" class="form-select form-select-sm w-100">
+                                <option value="">Select...</option>
+                                @foreach (var item in Model.Branches)
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                            <span asp-validation-for="BranchId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="excel-field">
+                        <label asp-for="ClearanceTypeId">Clearance Type</label>
+                        <div class="excel-input-wrap">
+                            <select asp-for="ClearanceTypeId" class="form-select form-select-sm w-100">
+                                <option value="">Select...</option>
+                                @foreach (var item in Model.ClearanceTypes)
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                            <span asp-validation-for="ClearanceTypeId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Row 2 -->
+                    <div class="excel-field span-2">
+                        <label asp-for="BLId">BL</label>
+                        <div class="excel-input-wrap">
+                            <select asp-for="BLId" class="form-select form-select-sm w-100">
+                                <option value="">Select...</option>
+                                @foreach (var item in Model.BLs)
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                            <span asp-validation-for="BLId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="excel-field">
+                        <label asp-for="DefaultTaxPercent">Tax Percent</label>
+                        <div class="excel-input-wrap">
+                            <input asp-for="DefaultTaxPercent" class="form-control form-control-sm w-100" />
+                            <span asp-validation-for="DefaultTaxPercent" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Row 3 -->
+                    <div class="excel-field span-3">
+                        <label>Party</label>
+                        <div class="excel-input-wrap gap-2">
+                            <span id="PartyNameDisplay"
+                                  class="form-control form-control-sm bg-light text-truncate party-display flex-grow-1"
+                                  tabindex="0">
+                                @(string.IsNullOrWhiteSpace(Model.PartyName) ? "Select Party..." : Model.PartyName)
+                            </span>
+
+                            <div class="d-flex gap-1 flex-shrink-0 ms-auto">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary px-3"
+                                        hx-get="@Url.Action("PartyLookupModal", "Invoices", new { jobId = Model.JobId })"
+                                        hx-target="#party-lookup-modal-content"
+                                        hx-swap="innerHTML"
+                                        onclick="openPartyLookupModal()">
+                                    Select
+                                </button>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger px-3"
+                                        onclick="clearSelectedParty()">
+                                    Clear
+                                </button>
+                            </div>
+
+                            <span asp-validation-for="PartyId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Row 4 -->
+                    <div class="excel-field span-3">
+                        <label asp-for="Remarks">Remarks In Invoice</label>
+                        <div class="excel-input-wrap">
+                            <textarea asp-for="Remarks" class="form-control form-control-sm w-100" rows="2"></textarea>
+                            <span asp-validation-for="Remarks" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 action-bar">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-3">Save And Calculate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,56 @@
+﻿@using ShipRate.Application.ViewModels
+@model List<DetentionItemDetailListItemVm>
+
+<style>
+    .table-compact-details th,
+    .table-compact-details td {
+        padding-top: 0.2rem !important;
+        padding-bottom: 0.2rem !important;
+        font-size: 0.82rem;
+        line-height: 1.15;
+    }
+</style>
+
+<div class="card border-secondary">
+    <div class="card-header bg-secondary text-white py-1 px-3 fs-6">
+        Calculation Details (Daily Rates)
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-striped table-hover table-compact-details align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="py-1">From</th>
+                        <th class="py-1">To</th>
+                        <th class="py-1 text-center">Days</th>
+                        <th class="py-1 text-end">Rate / Day</th>
+                        <th class="py-1 text-end">Sub Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var detail in Model)
+                        {
+                            <tr>
+                                <td>@detail.FromDate.ToString("yyyy-MM-dd")</td>
+                                <td>@detail.ToDate.ToString("yyyy-MM-dd")</td>
+                                <td class="text-center fw-semibold">@detail.TotalDays</td>
+                                <td class="text-end text-muted">@detail.RatePerDay.ToString("N2")</td>
+                                <td class="text-end fw-semibold @(detail.Amount > 0 ? "text-danger" : "text-success")">
+                                    @detail.Amount.ToString("N2")
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-2">No details available.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

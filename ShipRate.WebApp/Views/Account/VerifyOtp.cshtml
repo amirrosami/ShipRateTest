@@ -1,0 +1,272 @@
+﻿@model VerifyTwoFactorVm
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two-Factor Verification — ShipRate</title>
+
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
+
+    <style>
+        :root {
+            --bg-body: #f1f5f9;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-input: rgba(248, 250, 252, 0.8);
+            --bg-input-focus: #ffffff;
+            --border-card: rgba(255, 255, 255, 0.6);
+            --border-input: #cbd5e1;
+            --border-input-focus: #2563eb;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --text-placeholder: #94a3b8;
+            --shadow-card: 0 20px 40px rgba(15, 23, 42, 0.08);
+            --shadow-btn: 0 4px 14px rgba(37, 99, 235, 0.35);
+            --focus-ring: rgba(37, 99, 235, 0.15);
+            --toggle-bg: #ffffff;
+            --toggle-icon: #64748b;
+            --blob-color-1: rgba(147, 197, 253, 0.4);
+            --blob-color-2: rgba(196, 181, 253, 0.4);
+            --brand-gradient: linear-gradient(135deg, #1e3a8a, #3b82f6);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0b0f19;
+            --bg-card: rgba(30, 41, 59, 0.75);
+            --bg-input: rgba(15, 23, 42, 0.6);
+            --bg-input-focus: #0f172a;
+            --border-card: rgba(255, 255, 255, 0.08);
+            --border-input: rgba(255, 255, 255, 0.15);
+            --border-input-focus: #3b82f6;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --text-placeholder: #64748b;
+            --shadow-card: 0 20px 40px rgba(0, 0, 0, 0.4);
+            --shadow-btn: 0 4px 14px rgba(37, 99, 235, 0.45);
+            --focus-ring: rgba(59, 130, 246, 0.25);
+            --toggle-bg: #1e293b;
+            --toggle-icon: #f1f5f9;
+            --blob-color-1: rgba(30, 58, 138, 0.4);
+            --blob-color-2: rgba(88, 28, 135, 0.35);
+            --brand-gradient: linear-gradient(135deg, #0f172a, #1e3a8a);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-body);
+            transition: background 0.4s ease;
+            overflow-x: hidden;
+        }
+
+        .page-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 960px;
+            margin: 20px;
+            display: flex;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+        }
+
+        .brand-banner {
+            flex: 1.1;
+            background: var(--brand-gradient);
+            padding: 48px;
+            color: #fff;
+        }
+
+        .form-section {
+            flex: 1;
+            padding: 48px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo-icon {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            color: #fff;
+            font-size: 25px;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            height: 52px;
+            padding: 0 16px 0 46px;
+            border: 1.5px solid var(--border-input);
+            border-radius: 10px;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.65rem;
+            text-align: center;
+            color: var(--text-primary);
+            background: var(--bg-input);
+        }
+
+        .btn-login {
+            width: 100%;
+            height: 48px;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 1px solid var(--border-card);
+            background: var(--toggle-bg);
+            z-index: 100;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-toggle" type="button" onclick="toggleTheme()" title="Toggle Theme">
+        <i class="bi bi-moon-fill"></i><i class="bi bi-sun-fill"></i>
+    </button>
+
+    <div class="page-wrapper">
+        <div class="brand-banner">
+            <h3>ShipRate TMS</h3>
+            <p>Secure access to your freight operations.</p>
+        </div>
+
+        <div class="form-section">
+            <div class="logo">
+                <div class="logo-icon"><i class="bi bi-shield-lock-fill"></i></div>
+                <h1>Ship<span>Rate</span></h1>
+                <p>Transportation Management System</p>
+            </div>
+
+            <h2 class="form-title text-center">Two-Factor Authentication</h2>
+            <p class="form-description">
+                We sent a 5-digit code to <strong>@Model.MaskedMobile</strong>
+            </p>
+
+            <form asp-action="VerifyOtp" asp-controller="Account" method="post" id="otpForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="UserId" />
+                <input type="hidden" asp-for="RememberMe" />
+                <input type="hidden" asp-for="ReturnUrl" />
+
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <input asp-for="Code" id="otpCode" type="text" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" placeholder="•••••" autofocus />
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-login" id="verifyButton">Verify and Sign In</button>
+            </form>
+
+            <div class="otp-actions">
+                <a asp-action="Login" asp-controller="Account">Back to Login</a>
+                <div>
+                    <button type="button" id="btnResend" style="display:none;">Resend Code</button>
+                    <span id="timerText" class="timer-text">Resend in <strong id="seconds">@Model.ResendSeconds</strong>s</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('shiprate-theme', next);
+        }
+
+        // Initialize Theme
+        (function() {
+            const saved = localStorage.getItem('shiprate-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', saved);
+        })();
+
+        // Timer Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            let remainingSeconds = parseInt('@Model.ResendSeconds', 10) || 0;
+            const btnResend = document.getElementById('btnResend');
+            const timerText = document.getElementById('timerText');
+            const secondsElement = document.getElementById('seconds');
+
+            function startTimer() {
+                const interval = setInterval(() => {
+                    remainingSeconds--;
+                    secondsElement.textContent = remainingSeconds;
+
+                    if (remainingSeconds <= 0) {
+                        clearInterval(interval);
+                        timerText.style.display = 'none';
+                        btnResend.style.display = 'inline';
+                        btnResend.disabled = false;
+                    }
+                }, 1000);
+            }
+
+            if (remainingSeconds > 0) {
+                btnResend.style.display = 'none';
+                startTimer();
+            } else {
+                timerText.style.display = 'none';
+                btnResend.style.display = 'inline';
+            }
+
+            // Resend Click
+            btnResend.addEventListener('click', async function() {
+                this.disabled = true;
+                const response = await fetch('@Url.Action("ResendOtp", "Account")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value },
+                    body: new URLSearchParams({ userId: '@Model.UserId' })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    remainingSeconds = data.remainingSeconds || 120;
+                    secondsElement.textContent = remainingSeconds;
+                    timerText.style.display = 'inline';
+                    btnResend.style.display = 'none';
+                    startTimer();
+                } else {
+                    alert(data.message || 'Error occurred.');
+                    this.disabled = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.Base_Info
+@using ShipRate.WebApp.ViewModels
+@using ShipRate.WebApp.ViewModels.Location
+@using ShipRate.WebApp.ViewModels.TerritoryVms
+@model GridViewModel
+
+<input type="hidden" name="masterId" id="selected-master-id" />
+
+@if (!Model.Data.Items.Any())
+{
+    <tr>
+        <td colspan="6" class="text-center py-5 text-muted">
+            <i class="bi bi-inbox display-4 d-block mb-2"></i>
+            No Records found.
+        </td>
+    </tr>
+}
+else
+{
+    int counter = (Model.Data.Page - 1) * Model.Data.PageSize;
+    @foreach (var item in Model.Data.Items)
+    {
+        var vm = (TerritoryListViewModel)item;
+        counter++;
+        <tr>
+            <td>@counter</td>
+            <td class="fw-medium">@vm.TerritoryName</td>
+            <td class="fw-medium">@vm.Remarks</td>
+            <td class="fw-medium"><span class="badge bg-info">@vm.CityCount</span></td>
+@*             <td class="fw-medium">
+                @if (vm.IsActive)
+                {
+                    <span class="badge text-bg-success">
+                        Active
+                    </span>
+                }
+                else
+                {
+                    <span class="badge text-bg-danger">
+                        Inactive
+                    </span>
+                }
+            </td>
+ *@            
+            <td class="text-center">
+                <div class="btn-group btn-group-sm">
+                    <button type="button"
+                            class="btn btn-outline-warning"
+                            title="Cities"
+                            hx-get="@Url.Action("CitiesGrid", "Territory")"
+                            hx-target="#detail-container"
+                            hx-swap="innerHTML"
+                            hx-vals='js:{ territoryId: "@vm.Id"}'
+                            hx-on:htmx:before-request="
+                                           console.log('beforeRequest');
+                                           document.getElementById('selected-master-id').value='@vm.Id'
+                                                        ">
+                        <i class="bi bi-card-list"></i>
+                    </button>
+                   
+                    <button type="button"
+                            class="btn btn-outline-primary"
+                            title="Edit"
+                            hx-get="@Url.Action("EditTerritory", "Territory", new { id = vm.Id })"
+                            hx-target="#app-modal-content"
+                            hx-swap="innerHTML">
+                        <i class="bi bi-pencil"></i>
+
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline-danger"
+                            title="Delete"
+                            hx-get="@Url.Action("DeleteTerritory", "Territory", new { id = vm.Id })"
+                            hx-target="#app-modal-content"
+                            hx-swap="innerHTML">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                    
+                    
+                </div>
+            </td>
+        </tr>
+    }
+}
+

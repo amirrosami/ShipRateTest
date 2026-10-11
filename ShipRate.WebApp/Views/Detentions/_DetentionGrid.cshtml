@@ -1,0 +1,253 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.ViewModels
+@model PagedResultDto<DetentionListItemVm>
+
+@{
+    int pageNum = Model.PageNumber > 0 ? Model.PageNumber : 1;
+    int pageSize = Model.PageSize > 0 ? Model.PageSize : 10;
+    int rowNum = ((pageNum - 1) * pageSize) + 1;
+}
+
+<style>
+    /* اطمینان از اسکرول افقی نرم در حالت موبایل */
+    .table-responsive {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 0.5rem;
+    }
+
+    .detention-table-compact {
+        min-width: 780px; /* این مقدار باعث فعال شدن اسکرول درون کانتینر در موبایل می‌شود */
+    }
+
+        .detention-table-compact th,
+        .detention-table-compact td {
+            padding: 0.3rem 0.45rem !important;
+            font-size: 0.8rem;
+            line-height: 1.2;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .detention-table-compact .badge {
+            font-size: 0.72rem;
+            padding: 0.25rem 0.45rem;
+        }
+
+        .detention-table-compact .btn-xs {
+            padding: 0.15rem 0.4rem;
+            font-size: 0.72rem;
+            line-height: 1.1;
+            border-radius: 0.2rem;
+        }
+
+    .detention-pagination .page-link {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.78rem;
+        line-height: 1.1;
+    }
+</style>
+
+<div class="table-responsive shadow-sm border rounded">
+    <table class="table table-bordered table-sm table-hover detention-table-compact mb-0">
+        <thead class="table-light">
+            <tr>
+                <!-- ستون چک‌باکس انتخاب سطرها -->
+                <th class="text-center" style="width: 40px;">#</th>
+                <th>BL No</th>
+                <th>Booking No</th>
+                <th class="text-center">Issue Type</th>
+                <th>Party</th>
+                <th>To Date</th>
+                <th class="text-end">Amount</th>
+                <th class="text-end">Final Amount</th>
+                <th class="text-end">Settled</th>
+                <th class="text-end">Remain</th>
+                <th class="text-center">Status</th>
+                <th class="text-center" style="min-width: 200px;">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model.Items != null && Model.Items.Any())
+            {
+                foreach (var item in Model.Items)
+                {
+                    <tr>
+
+                        <td class="text-center text-muted fw-semibold">@(rowNum++)</td>
+                        <td class="fw-bold">@item.BLNo</td>
+                        <td>@item.BookingNo</td>
+                        <td class="text-center">
+                            <span class="badge @(item.IsFinal ? "bg-success" : "bg-warning text-dark")">
+                                @(item.IsFinal ? "Final" : "Part")
+                            </span>
+                        </td>
+                        <td>@item.PartyName</td>
+                        <td>@item.DetentionToDate.ToString("yyyy-MM-dd")</td>
+
+                        <td class="text-end fw-semibold">
+                            @item.Amount.ToString("N2") <small class="text-muted">@item.Currency</small>
+                        </td>
+                        <td class="text-end fw-semibold">
+                            @item.FinalAmount.ToString("N2") <small class="text-muted">@item.FinalCurrency</small>
+                        </td>
+                        <td class="text-end fw-semibold">
+                            @item.SettledAmount.ToString("N2") 
+                        </td>
+                        <td class="text-end fw-semibold">
+                            @item.RemainAmount.ToString("N2")
+                        </td>
+
+                        <td class="text-center">
+                            @{
+                                var badgeClass = item.StatusId switch
+                                {
+                                    -1 => "bg-warning text-dark",
+                                    1 => "bg-info",
+                                    2 => "bg-success",
+                                    99 => "bg-danger",
+                                    _ => "bg-secondary"
+                                };
+                            }
+                            <span class="badge @badgeClass">
+                                @item.StatusName
+                            </span>
+                        </td>
+
+                        <td class="text-center">
+                            <div class="d-inline-flex gap-1">
+                                <button type="button"
+                                        class="btn btn-info btn-xs text-white"
+                                        hx-get="@Url.Action("GetItems", new { id = item.Id })"
+                                        hx-target="#items-grid-container"
+                                        hx-swap="innerHTML"
+                                        hx-on="click: document.getElementById('details-grid-container').innerHTML = ''">
+                                    Items
+                                </button>
+                                <a href="@Url.Action("Print", "Detentions", new { id = item.Id })"
+                                   target="_blank"
+                                   class="btn btn-outline-secondary btn-xs"
+                                   title="Print Statement">
+                                    <i class="bi bi-printer"></i> Print
+                                </a>
+                                <a href="@Url.Action("PrintFarsi", "Detentions", new { id = item.Id })"
+                                   target="_blank"
+                                   class="btn btn-outline-secondary btn-xs"
+                                   title="Print Statement">
+                                    <i class="bi bi-printer"></i> چاپ
+                                </a>
+                                <a href="@Url.Action("PrintStatement", "Detentions", new { id = item.Id })"
+                                   target="_blank"
+                                   class="btn btn-outline-danger btn-xs"
+                                   title="Print Details (PDF)">
+                                    <i class="bi bi-file-earmark-pdf"></i> Details
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="10" class="text-center text-muted py-3">
+                        No detentions found.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <div class="card-footer py-2 bg-light border">
+        <nav aria-label="Detention pagination">
+            <ul class="pagination pagination-sm justify-content-center detention-pagination mb-0">
+
+                @{
+                    var previousPage = Model.PageNumber - 1;
+                    var nextPage = Model.PageNumber + 1;
+
+                    var blNo = Context.Request.Query["BLNo"].ToString();
+                    var bookingNo = Context.Request.Query["BookingNo"].ToString();
+                    var detentionStatusId = Context.Request.Query["DetentionStatusId"].ToString();
+                    var issuedByUs = Context.Request.Query["IssuedByUs"].ToString();
+                    var isFinal = Context.Request.Query["IsFinal"].ToString();
+                    var showInactive = Context.Request.Query["ShowInactive"].ToString();
+                    var jobfileNo = Context.Request.Query["JobFileNo"].ToString();
+                }
+
+                <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
+                    <button type="button"
+                            class="page-link"
+                            @(Model.PageNumber <= 1 ? "disabled" : "")
+                            hx-get="@Url.Action("Index", "Detentions", new
+                            {
+                                Page = previousPage,
+                                PageSize = Model.PageSize,
+                                BLNo = blNo,
+                                BookingNo = bookingNo,
+                                DetentionStatusId = detentionStatusId,
+                                IssuedByUs = issuedByUs,
+                                IsFinal = isFinal,
+                                ShowInactive = showInactive,
+                                JobFileNo=jobfileNo
+                            })"
+                        hx-target="#detention-grid-container"
+                        hx-swap="innerHTML">
+                    Previous
+                </button>
+            </li>
+
+            @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+                {
+                    <li class="page-item @(pageNumber == Model.PageNumber ? "active" : "")">
+                        <button type="button"
+                                class="page-link"
+                                hx-get="@Url.Action("Index", "Detentions", new
+                                {
+                                    Page = pageNumber,
+                                    PageSize = Model.PageSize,
+                                    BLNo = blNo,
+                                    BookingNo = bookingNo,
+                                    DetentionStatusId = detentionStatusId,
+                                    IssuedByUs = issuedByUs,
+                                    isFinal = isFinal,
+                                    showInactive = showInactive,
+                                    JobFileNo = jobfileNo
+                                })"
+                        hx-target="#detention-grid-container"
+                        hx-swap="innerHTML">
+                    @pageNumber
+                </button>
+            </li>
+                        }
+
+                <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")">
+                    <button type="button"
+                            class="page-link"
+                            @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")
+                            hx-get="@Url.Action("Index", "Detentions", new
+                            {
+                                Page = nextPage,
+                                PageSize = Model.PageSize,
+                                BLNo = blNo,
+                                BookingNo = bookingNo,
+                                DetentionStatusId = detentionStatusId,
+                                IssuedByUs = issuedByUs,
+                                IsFinal = isFinal,
+                                ShowInactive = showInactive
+                            })"
+                        hx-target="#detention-grid-container"
+                        hx-swap="innerHTML">
+                    Next
+                </button>
+            </li>
+        </ul>
+    </nav>
+</div>
+}

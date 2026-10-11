@@ -1,0 +1,104 @@
+﻿@using ShipRate.Web.ViewModels.PermissionGroupsManagement
+@model List<PermissionGroupListViewModel>
+
+@{
+    ViewData["Title"] = "Permission Groups Management";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>@ViewData["Title"]</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> New Group
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model.Count == 0)
+    {
+        <div class="alert alert-info">
+            No Groups . Create a group
+        </div>
+    }
+    else
+    {
+        <table class="table table-striped table-hover">
+            <thead class="table-primary">
+                <tr>
+                    <th>Group Name</th>
+                    <th>Remarks</th>
+                    <th>Permissions Count</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var group in Model)
+                {
+                    <tr>
+                        <td><strong>@group.Name</strong></td>
+                        <td>@(group.Description ?? "-")</td>
+                        <td>
+                            <span class="badge bg-info">@group.PermissionCount</span>
+                        </td>
+                        <td>
+                            @if (group.IsActive)
+                            {
+                                <span class="badge bg-success m-1 align-items-center">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary m-1">InActive</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a asp-action="Details" asp-route-id="@group.Id"
+                                   class="btn btn-sm btn-info m-1" title="Details">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@group.Id"
+                                   class="btn btn-sm btn-warning m-1 " title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form asp-action="ToggleStatus" asp-route-id="@group.Id"
+                                      method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-secondary m-1"
+                                            title="Change Status">
+                                        <i class="bi bi-toggle-@(group.IsActive ? "on" : "off")"></i>
+                                    </button>
+                                </form>
+
+                                <!-- 🆕 دکمه مدیریت کاربران -->
+                                <a asp-action="ManageUsers" asp-route-id="@group.Id"
+                                   class="btn btn-sm btn-primary m-1"
+                                   title="Users Management">
+                                    <i class="bi bi-people"></i>
+                                </a>
+
+
+                                <form asp-action="Delete" asp-route-id="@group.Id"
+                                      method="post" class="d-inline"
+                                      onsubmit="return confirm('Are you sure؟');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-danger m-1"
+                                            title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

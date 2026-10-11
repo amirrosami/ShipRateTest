@@ -1,0 +1,13 @@
+﻿@using ShipRate.Domain.Entities.Lines
+@model Carrier
+
+<div id="carrierBox">
+
+    <input type="hidden" name="CarrierId" value="@Model.Id" />
+
+    <input type="text"
+           class="form-control"
+           value="@Model.Person.PersonName"
+           readonly />
+
+</div>

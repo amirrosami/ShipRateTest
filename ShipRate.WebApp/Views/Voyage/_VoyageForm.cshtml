@@ -1,0 +1,156 @@
+﻿@using ShipRate.WebApp.ViewModels
+@using ShipRate.WebApp.ViewModels.Location
+@using ShipRate.WebApp.ViewModels.TerritoryVms
+@using ShipRate.WebApp.ViewModels.VoyageVms
+@model VoyageFormViewModel
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+}
+
+<form hx-post="@Url.Action(isCreateMode?"CreateVoyage":"EditVoyage", "Voyage")"
+      hx-target="#app-modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header form-caption-bg  text-white">
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add Voyage</h5>
+        }
+        else
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Edit Voyage</h5>
+            <input type="hidden" asp-for="Id" />
+        }
+        <input type="hidden" name="CompanyId" value="@Model.CompanyId" />
+
+
+        <button type="button"
+                class="btn-close"
+                onclick="AppModal.close()">
+        </button>
+    </div>
+
+
+    <div class="modal-body row">
+
+        @await Html.PartialAsync("_ModelStateError")
+
+
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Vessel <span class="text-danger">*</span></label>
+            <select asp-for="VesselId" asp-items="@Model.Vessels" class="form-select form-select-sm">
+                <option value="">-- Select --</option>
+            </select>
+            <span asp-validation-for="VesselId" class="text-danger small"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Voyage No <span class="text-danger">*</span></label>
+            <input type="text" name="VoyageNo" value="@Model.VoyageNo"
+                   class="form-control form-control-sm" maxlength="30" />
+            <span asp-validation-for="VoyageNo" class="text-danger small"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Shipping Line <span class="text-danger">*</span></label>
+            <select asp-for="ShippingLineId" asp-items="@Model.ShippingLines" class="form-select form-select-sm">
+                <option value="">-- Select --</option>
+                
+            </select>
+            <span asp-validation-for="ShippingLineId" class="text-danger small"></span>
+        </div>
+
+        <!-- Row 2 -->
+
+        <div class="mb-3 col-md-4">
+            <label>Origin Port</label>
+            <input type="hidden" asp-for="OriginPortId" id="OriginPortId" />
+            <input type="text"
+                   id="OriginPortSearchText"
+                   name="OriginPort"
+                   value="@Model.OriginPortName"
+                   class="form-control"
+                   placeholder="Search Origin Port..."
+                   autocomplete="off"
+                   hx-get="@Url.Action("SearchLocations", "Locations")"
+                   hx-trigger="keyup changed delay:400ms"
+                   hx-target="#originportSearchResults"
+                   hx-swap="innerHTML"
+                   hx-vals='js:{
+                            term: document.getElementById("OriginPortSearchText").value,
+                            targetHiddenInputId: "OriginPortId",
+                            targetTextInputId: "OriginPortSearchText"
+                       }' />
+
+            <div id="originportSearchResults"
+                 class="position-relative">
+            </div>
+            <span asp-validation-for="OriginPortId" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3 col-md-4">
+            <label>Destination Port</label>
+            <input type="hidden" asp-for="DestinationPortId" id="DestinationPortId" />
+            <input type="text"
+                   id="DestinationPortSearchText"
+                   name="DestinationPort"
+                   value="@Model.DestinationPortName"
+                   class="form-control"
+                   placeholder="Search Destination Port..."
+                   autocomplete="off"
+                   hx-get="@Url.Action("SearchLocations", "Locations")"
+                   hx-trigger="keyup changed delay:400ms"
+                   hx-target="#destinationportSearchResults"
+                   hx-swap="innerHTML"
+                   hx-vals='js:{
+                            term: document.getElementById("DestinationPortSearchText").value,
+                            targetHiddenInputId: "DestinationPortId",
+                            targetTextInputId: "DestinationPortSearchText"
+                       }' />
+
+            <div id="destinationportSearchResults"
+                 class="position-relative">
+            </div>
+            <span asp-validation-for="DestinationPortId" class="text-danger small"></span>
+        </div>
+
+
+
+        <div class="col-md-4 mb-3">
+        </div>
+ 
+        <!-- Row 3 -->
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Start Date</label>
+            <input type="date" name="VoyageStartDate" value="@Model.VoyageStartDate?.ToString("yyyy-MM-dd")"
+                   class="form-control form-control-sm" />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">End Date</label>
+            <input type="date" name="VoyageEndDate" value="@Model.VoyageEndDate?.ToString("yyyy-MM-dd")"
+                   class="form-control form-control-sm" />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Transit Time (days)</label>
+            <input type="number" name="TransitTime" value="@Model.TransitTime" min="0" max="999"
+                   class="form-control form-control-sm" />
+        </div>
+    </div>
+
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="AppModal.close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>

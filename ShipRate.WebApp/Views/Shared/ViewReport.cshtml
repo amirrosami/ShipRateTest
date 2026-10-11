@@ -1,0 +1,17 @@
+﻿@using ShipRate.Common.Report
+@model ReportViewModel
+
+    @{
+        var report = Model.Viewer;
+        if(report == null)
+        {
+            throw new Exception("Error in Rendering report");    
+        }
+        else
+        {
+         var rendered = await report.Render();
+         <div>
+            @rendered
+         </div>
+        }
+}

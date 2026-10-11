@@ -1,0 +1,283 @@
+﻿@using ShipRate.Application.ViewModels
+@model IEnumerable<ShipmentLegListItemVm>
+
+@functions {
+    string GetTransportIcon(int? transportTypeId)
+        => transportTypeId switch
+        {
+            1 => "bi-water",
+            2 => "bi-truck",
+            3 => "bi-train-freight-front",
+            4 => "bi-airplane",
+            _ => "bi-arrow-right-circle"
+        };
+
+    string GetTransportBg(int? transportTypeId)
+        => transportTypeId switch
+        {
+            1 => "route-mode-sea",
+            2 => "route-mode-truck",
+            3 => "route-mode-rail",
+            4 => "route-mode-air",
+            _ => "route-mode-default"
+        };
+
+    string GetStatusClass(int? statusId)
+        => statusId switch
+        {
+            1 => "bg-success-subtle text-success-emphasis",
+            2 => "bg-warning-subtle text-warning-emphasis",
+            3 => "bg-danger-subtle text-danger-emphasis",
+            _ => "bg-secondary-subtle text-secondary-emphasis"
+        };
+
+    string Abbr(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return "---";
+
+        var parts = value
+            .Trim()
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        if (parts.Length == 1)
+        {
+            var word = parts[0];
+            return word.Length <= 3
+                ? word.ToUpper()
+                : word.Substring(0, 3).ToUpper();
+        }
+
+        return string.Concat(parts.Select(x => char.ToUpper(x[0])).Take(3));
+    }
+}
+
+@{
+    var legs = Model?.OrderBy(x => x.SequenceNo).ToList() ?? new List<ShipmentLegListItemVm>();
+}
+
+@if (!legs.Any())
+{
+    <div class="text-muted small">No transport legs defined.</div>
+    return;
+}
+
+<div class="route-strip-wrap">
+    <div class="route-strip" role="list">
+        @foreach (var leg in legs)
+        {
+            var fromAbbr = Abbr(leg.FromLocationName);
+            var toAbbr = Abbr(leg.ToLocationName);
+
+            <div class="route-card" role="listitem" title="@leg.FromLocationName → @leg.ToLocationName">
+                <div class="route-card-top">
+                    <span class="route-seq">Leg @leg.SequenceNo</span>
+
+                    @if (!string.IsNullOrWhiteSpace(leg.LegStatusName))
+                    {
+                        <span class="badge rounded-pill @GetStatusClass(leg.LegStatusId)">
+                            @leg.LegStatusName
+                        </span>
+                    }
+                </div>
+
+                <div class="route-card-main">
+                    <div class="route-point">
+                        <div class="route-abbr">@fromAbbr</div>
+                        <div class="route-name text-truncate" title="@leg.FromLocationName">
+                            @leg.FromLocationName
+                        </div>
+                    </div>
+
+                    <div class="route-center-line">
+                        <span class="route-line"></span>
+                        <span class="route-mode @GetTransportBg(leg.TransportTypeId)">
+                            <i class="bi @GetTransportIcon(leg.TransportTypeId)"></i>
+                        </span>
+                        <span class="route-line"></span>
+                    </div>
+
+                    <div class="route-point">
+                        <div class="route-abbr">@toAbbr</div>
+                        <div class="route-name text-truncate" title="@leg.ToLocationName">
+                            @leg.ToLocationName
+                        </div>
+                    </div>
+                </div>
+
+@*                 @if (leg.PlannedDepartureDate.HasValue)
+                {
+                    <div class="route-card-footer">
+                        <i class="bi bi-calendar-event me-1"></i>
+                        @leg.PlannedDepartureDate.Value.ToString("yyyy/MM/dd")
+                    </div>
+                }
+ *@            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .route-strip-wrap {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: .4rem;
+    }
+
+    .route-strip {
+        display: flex;
+        gap: .75rem;
+        flex-wrap: nowrap;
+        min-width: max-content;
+        align-items: stretch;
+    }
+
+    .route-card {
+        min-width: 300px;
+        max-width: 340px;
+        background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+        border: 1px solid #e8edf5;
+        border-radius: 18px;
+        padding: .85rem 1rem;
+        box-shadow: 0 .2rem .6rem rgba(16, 24, 40, .05);
+        transition: all .18s ease-in-out;
+    }
+
+        .route-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 .45rem 1rem rgba(16, 24, 40, .10);
+            border-color: #cfdafc;
+        }
+
+    .route-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .5rem;
+        margin-bottom: .8rem;
+    }
+
+    .route-seq {
+        font-size: .78rem;
+        font-weight: 700;
+        color: #4f5d75;
+        background: #eef2f7;
+        padding: .25rem .55rem;
+        border-radius: 999px;
+    }
+
+    .route-card-main {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: .65rem;
+    }
+
+    .route-point {
+        min-width: 0;
+        text-align: center;
+    }
+
+    .route-abbr {
+        font-size: 1rem;
+        font-weight: 800;
+        letter-spacing: .08em;
+        color: #1f2a44;
+        line-height: 1.1;
+    }
+
+    .route-name {
+        font-size: .72rem;
+        color: #6c757d;
+        margin-top: .2rem;
+    }
+
+    .route-center-line {
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+    }
+
+    .route-line {
+        width: 26px;
+        height: 2px;
+        background: linear-gradient(90deg, #d7deea 0%, #b9c7e6 100%);
+        border-radius: 999px;
+    }
+
+    .route-mode {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid transparent;
+        font-size: 1rem;
+        flex: 0 0 auto;
+    }
+
+    .route-card-footer {
+        margin-top: .75rem;
+        font-size: .72rem;
+        color: #6c757d;
+        text-align: end;
+    }
+
+    .route-mode-truck {
+        background: #fff4db;
+        color: #b7791f;
+        border-color: #ffe2a8;
+    }
+
+    .route-mode-rail {
+        background: #eef1f4;
+        color: #5c6773;
+        border-color: #d9e0e7;
+    }
+
+    .route-mode-sea {
+        background: #e7f1ff;
+        color: #0d6efd;
+        border-color: #cfe2ff;
+    }
+
+    .route-mode-air {
+        background: #e8f7fb;
+        color: #0aa2c0;
+        border-color: #bfeaf3;
+    }
+
+    .route-mode-warehouse {
+        background: #e9f8ee;
+        color: #198754;
+        border-color: #ccebd7;
+    }
+
+    .route-mode-default {
+        background: #f3f4f6;
+        color: #6c757d;
+        border-color: #e5e7eb;
+    }
+
+    @@media (max-width: 576px) {
+        .route-card {
+            min-width: 260px;
+            padding: .75rem .85rem;
+        }
+
+        .route-abbr {
+            font-size: .92rem;
+        }
+
+        .route-line {
+            width: 18px;
+        }
+
+        .route-mode {
+            width: 34px;
+            height: 34px;
+        }
+    }
+</style>

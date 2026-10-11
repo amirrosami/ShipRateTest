@@ -1,0 +1,29 @@
+﻿@using ShipRate.Application.DTOs.Messaging
+@model AddInternalParticipantViewModel
+
+<form method="post"
+      action="@Url.Action("AddParticipant", "Messaging")"
+      hx-post="@Url.Action("AddParticipant", "Messaging")"
+      hx-target="#conversationParticipantsHost"
+      hx-swap="innerHTML"
+      hx-disabled-elt="button[type='submit']">
+    @Html.AntiForgeryToken()
+
+    <input asp-for="ConversationId" type="hidden" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+    <div class="input-group">
+        <select asp-for="UserId"
+                asp-items="Model.AvailableUsers"
+                class="form-select">
+            <option value="">Select user...</option>
+        </select>
+
+        <button type="submit" class="btn btn-outline-primary">
+            Add
+        </button>
+    </div>
+
+    <span asp-validation-for="UserId" class="text-danger"></span>
+</form>

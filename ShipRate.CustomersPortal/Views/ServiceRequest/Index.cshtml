@@ -1,0 +1,343 @@
+﻿@using Microsoft.Extensions.Localization
+@using ShipRate.Application.DTOs
+@using ShipRate.Application.JobsViewModels
+@using ShipRate.WebAppCustomers
+@using ShipRate.WebAppCustomers.ViewModels
+@using System.Globalization
+@model ServiceRequestIndexDto
+@inject IStringLocalizer<SharedResource> Localizer
+@{
+    var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isFa = culture == "fa";
+    var lang = isFa ? "fa" : "en";
+    var dir = isFa ? "rtl" : "ltr";
+}
+
+@{
+    ViewData["Title"] = $"{Localizer["Jobs"]}";
+}
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="mb-0"><i class="bi bi-globe me-2"></i>@Localizer["Shipments"]</h2>
+            <small class="text-muted"></small>
+        </div>
+
+        <button class="btn btn-outline-primary"
+                hx-get="@Url.Action("NewRequestMenu", "ServiceRequest")"
+                hx-target="#app-modal-content">
+            New Request
+        </button>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            @Localizer["Search"]
+        </div>
+
+        <div class="card-body">
+
+            <form id="ServiceRequestSearchForm"
+                  hx-get="/ServiceRequest/List"
+                  hx-target="#tableContainer"
+                  hx-push-url="true">
+
+                <div class="row g-1">
+
+                    <div class="col-md-2">
+                        <label class="form-label">@(isFa ? "شماره درخواست" : "Request No")</label>
+                        <input type="text" class="form-control" name="RequestNo" value="@Model.Search.RequestNo">
+                    </div>
+                    <div class="col-md-3" >
+
+                    <label class="form-label small mb-1">Type</label>
+                    <select name="RequestTypeId"
+                            class="form-select form-select filter-select-md">
+                        <option value="">All</option>
+                        @foreach (var item in Model.RequestTypes)
+                        {
+                            <option value="@item.Id" selected="@(Model.Search.RequestTypeId == item.Id)">
+                                @item.Name
+                            </option>
+                        }
+                    </select>
+
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button class="btn btn-outline-primary me-2" type="submit">@(isFa ? "جستجو" : "Search")</button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="tableContainer"
+         hx-get="@Url.Action("List","ServiceRequest")"
+         hx-trigger="ServiceRequestChanged from:body"
+         hx-swap="innerHTML"
+         hx-include="#ServiceRequestSearchForm">
+        @await Html.PartialAsync("_List", Model)
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@* @{
+    ViewData["Title"] = "Service Requests";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="sr-page">
+    <div class="sr-header">
+        <div>
+            <h1 class="sr-title">Service Requests</h1>
+            <p class="sr-subtitle">Manage your BL amendment, consolidation, and split requests</p>
+        </div>
+        <button class="btn-primary"
+                hx-get="@Url.Action("NewRequestMenu", "ServiceRequest")"
+                hx-target="#modal-content"
+                hx-trigger="click"
+                onclick="openModal()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            New Request
+        </button>
+    </div>
+
+    <div id="request-list"
+         hx-get="@Url.Action("List", "ServiceRequest")"
+         hx-trigger="load, requestCreated from:body"
+         hx-swap="innerHTML">
+        <div class="sr-skeleton">
+            @for (int i = 0; i < 4; i++)
+            {
+                <div class="skeleton-row"></div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@section Styles {
+    <style>
+        :root {
+            --c-bg: oklch(97% 0.005 255);
+            --c-surface: oklch(100% 0 0);
+            --c-raised: oklch(99% 0.003 255);
+            --c-border: oklch(88% 0.008 255);
+            --c-text: oklch(18% 0.01 255);
+            --c-muted: oklch(52% 0.01 255);
+            --c-accent: oklch(52% 0.18 255);
+            --c-accent-h: oklch(46% 0.18 255);
+            --c-success: oklch(52% 0.15 145);
+            --c-warning: oklch(58% 0.16 60);
+            --c-danger: oklch(52% 0.18 25);
+            --c-info: oklch(54% 0.15 220);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px oklch(0% 0 0 / 8%), 0 0 0 1px var(--c-border);
+            --shadow-md: 0 4px 16px oklch(0% 0 0 / 10%), 0 0 0 1px var(--c-border);
+            --transition: 120ms ease;
+        }
+
+        @@media (prefers-color-scheme: dark) {
+            :root {
+                --c-bg: oklch(14% 0.01 255);
+                --c-surface: oklch(18% 0.01 255);
+                --c-raised: oklch(22% 0.01 255);
+                --c-border: oklch(30% 0.01 255);
+                --c-text: oklch(94% 0.005 255);
+                --c-muted: oklch(62% 0.01 255);
+                --c-accent: oklch(68% 0.16 255);
+                --c-accent-h: oklch(74% 0.16 255);
+            }
+        }
+
+        @@media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                transition: none !important;
+                animation: none !important;
+            }
+        }
+
+        /* Page layout */
+        .sr-page {
+            margin: 0 auto;
+            padding: 10px 10px;
+        }
+
+        .sr-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .sr-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--c-text);
+            margin: 0 0 4px;
+            line-height: 1.25;
+        }
+
+        .sr-subtitle {
+            font-size: .875rem;
+            color: var(--c-muted);
+            margin: 0;
+        }
+
+        /* Button */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--c-accent);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 10px 18px;
+            font-size: .875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background var(--transition);
+            white-space: nowrap;
+            min-height: 44px;
+        }
+
+            .btn-primary:hover {
+                background: var(--c-accent-h);
+            }
+
+            .btn-primary:focus-visible {
+                outline: 2px solid var(--c-accent);
+                outline-offset: 2px;
+            }
+
+        /* Skeleton */
+        .sr-skeleton {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .skeleton-row {
+            height: 64px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(90deg, var(--c-border) 25%, var(--c-surface) 50%, var(--c-border) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+        }
+
+        @@keyframes shimmer {
+            from {
+                background-position: 200% 0;
+            }
+
+            to {
+                background-position: -200% 0;
+            }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: oklch(0% 0 0 / 45%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+            .modal-overlay[hidden] {
+                display: none;
+            }
+
+        .modal-box {
+            background: var(--c-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            width: 100%;
+            max-width: 640px;
+            max-height: calc(100vh - 48px);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px 0;
+            gap: 12px;
+        }
+
+        .modal-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--c-text);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--c-muted);
+            padding: 4px;
+            border-radius: var(--radius-sm);
+            transition: color var(--transition);
+            line-height: 0;
+            min-height: 44px;
+            min-width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .modal-close:hover {
+                color: var(--c-text);
+            }
+
+            .modal-close:focus-visible {
+                outline: 2px solid var(--c-accent);
+                outline-offset: 2px;
+            }
+
+        .modal-content {
+            padding: 20px 24px 24px;
+        }
+    </style>
+} *@

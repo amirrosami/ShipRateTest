@@ -1,0 +1,153 @@
+﻿@using ShipRate.WebApp.ViewModels.TransitViewModels
+@model List<DriverVM>
+@{
+    var totalCount = (int)ViewBag.TotalCount;
+    var page = (int)ViewBag.Page;
+    var totalPages = (int)ViewBag.TotalPages;
+    var pageSize = (int)ViewBag.PageSize;
+    var search = (DriverSearchVM)ViewBag.Search;
+}
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-striped table-sm mb-0 align-middle" dir="ltr">
+            <thead class="table-primary">
+                <tr>
+                    <th style="width:40px">#</th>
+                    <th>Driver Name</th>
+                    <th>Carrier</th>
+                    <th>Passport No</th>
+                    <th>License No</th>
+                    <th>Smart Card</th>
+                    <th>Mobile</th>
+@*                     <th class="text-center" style="width:80px">Status</th>
+ *@                    <th class="text-center" style="width:160px">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count == 0)
+                {
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-4">
+                            <i class="bi bi-inbox fs-3 d-block mb-1"></i>
+                            No drivers found.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    var rowNum = (page - 1) * pageSize;
+                    @foreach (var d in Model)
+                    {
+                        rowNum++;
+                        <tr>
+                            <td class="text-muted">@rowNum</td>
+                            <td class="fw-semibold">@d.DriverName</td>
+                            <td>@d.CarrierName</td>
+                            <td><code>@d.PassportNo</code></td>
+                            <td><code>@d.LicenseNumber</code></td>
+                            <td><code>@d.SmartCardNo</code></td>
+                            <td>@(d.Mobile ?? "—")</td>
+@*                             <td class="text-center">
+                                @if (d.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </td>
+ *@                            <td class="text-center">
+                                <div class="btn-group btn-group-sm">
+                                    <!-- Edit -->
+                                    <button class="btn btn-outline-primary" title="Edit"
+                                            hx-get="/Driver/Edit/@d.Id"
+                                            hx-target="#modalBody"
+                                            hx-swap="innerHTML"
+                                            onclick="document.getElementById('modalTitle').textContent='Edit Driver'; new bootstrap.Modal(document.getElementById('crudModal')).show();">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+
+                                    <!-- View Documents (placeholder) -->
+
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            hx-get="/DocumentManager/Index?objectId=@d.Id&objectTypeId=480"
+                                            hx-target="#document-manager-content"
+                                            hx-swap="innerHTML"
+                                            title="ِDocuments"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#documentManagerModal">
+                                        <i class="bi bi-folder2-open me-1"></i>
+                                    </button>
+                                    <!-- Delete -->
+                                    <button class="btn btn-outline-danger" title="Delete"
+                                            hx-post="/Driver/Delete/@d.Id"
+                                            hx-confirm="Are you sure you want to remove this driver?"
+                                            hx-target="#gridContainer"
+                                            hx-swap="innerHTML">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ===== Footer: Count + Pagination ===== -->
+    <div class="card-footer d-flex justify-content-between align-items-center py-2 small">
+        <span class="text-muted">
+            Total: <strong>@totalCount</strong> driver(s)
+            @if (totalPages > 1)
+            {
+@*                 <span>— Page @page of @totalPages</span>
+ *@
+            }
+        </span>
+
+        @if (totalPages > 1)
+        {
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    @{
+                        string BuildUrl(int p)
+                        {
+                            var qs = $"Page={p}&PageSize={pageSize}";
+                            if (!string.IsNullOrEmpty(search?.DriverName)) qs += $"&DriverName={Uri.EscapeDataString(search.DriverName)}";
+                            if (search?.CarrierId.HasValue == true) qs += $"&CarrierId={search.CarrierId}";
+                            if (search?.IsActive.HasValue == true) qs += $"&IsActive={search.IsActive}";
+                            return "/Driver/Grid?" + qs;
+                        }
+                    }
+
+                    <li class="page-item @(page <= 1 ? "disabled" : "")">
+                        <a class="page-link" href="#"
+                           hx-get="@BuildUrl(page - 1)"
+                           hx-target="#gridContainer"
+                           hx-swap="innerHTML">&laquo;</a>
+                    </li>
+
+                    @for (int i = Math.Max(1, page - 2); i <= Math.Min(totalPages, page + 2); i++)
+                    {
+                        <li class="page-item @(i == page ? "active" : "")">
+                            <a class="page-link" href="#"
+                               hx-get="@BuildUrl(i)"
+                               hx-target="#gridContainer"
+                               hx-swap="innerHTML">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(page >= totalPages ? "disabled" : "")">
+                        <a class="page-link" href="#"
+                           hx-get="@BuildUrl(page + 1)"
+                           hx-target="#gridContainer"
+                           hx-swap="innerHTML">&raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    </div>
+</div>

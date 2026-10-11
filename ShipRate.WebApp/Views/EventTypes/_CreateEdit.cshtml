@@ -1,0 +1,115 @@
+﻿@using ShipRate.WebApp.ViewModels.Location
+@model EventTypesViewModel
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+}
+
+<form hx-post="@Url.Action(isCreateMode?"Create":"Edit", "EventTypes")"
+      hx-target="#app-modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header form-caption-bg  text-white">
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add EventType</h5>
+        }
+        else
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Edit EventType</h5>
+            <input type="hidden" asp-for="Id" />
+        }
+
+
+        <button type="button"
+                class="btn-close"
+                onclick="AppModal.close()">
+        </button>
+    </div>
+
+    
+    <div class="modal-body row">
+        @await Html.PartialAsync("_ModelStateError")
+
+        
+      
+        <div class="mb-1 col-md-6">
+            <label class="form-label fw-medium">
+                Category <span class="text-danger">*</span>
+            </label>
+            <div class="d-flex align-items-center gap-2">
+                <select asp-for="CategoryId"
+                        asp-items="@Model.EventCategories"
+                        class="form-select @(ViewData.ModelState.ContainsKey("CategoryId") && ViewData.ModelState["CategoryId"]!.Errors.Any() ? "is-invalid" : "")">
+                </select>
+            </div>
+        </div>
+
+     
+
+        <div class="mb-1 col-md-6">
+            <label class="form-label fw-medium">
+                EventType Code <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="EventTypeCode"
+                   value="@Model.EventTypeCode"
+                   class="form-control @(ViewData.ModelState.ContainsKey("EventTypeCode") && ViewData.ModelState["EventTypeCode"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                     />
+        </div>
+
+       
+        <div class="mb-1 col-md-6">
+            <label class="form-label fw-medium">EventType Name</label>
+            <input type="text"
+                   name="EventTypeName"
+                   value="@Model.EventTypeName"
+                   class="form-control @(ViewData.ModelState.ContainsKey("EventTypeName") && ViewData.ModelState["EventTypeName"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                    />
+        </div>
+
+            <div class="mb-1 col-md-6">
+            <label class="form-label fw-medium">EventType Remarks</label>
+                <input type="text"
+                   name="EventTypeRemarks"
+                       value="@Model.EventTypeRemarks"
+                   class="form-control @(ViewData.ModelState.ContainsKey("EventTypeRemarks") && ViewData.ModelState["EventTypeRemarks"]!.Errors.Any() ? "is-invalid" : "")"
+                       placeholder=""
+                       />
+            </div>
+
+            <div class="mb-1 col-md-6">
+                <label class="form-label fw-medium">
+                Object Type <span class="text-danger">*</span>
+                </label>
+                <div class="d-flex align-items-center gap-2">
+                    <select asp-for="ObjectTypeId"
+                            asp-items="@Model.SystemObjectTypes"
+                        class="form-select @(ViewData.ModelState.ContainsKey("ObjectTypeId") && ViewData.ModelState["ObjectTypeId"]!.Errors.Any() ? "is-invalid" : "")">
+                    </select>
+                </div>
+            </div>  
+     </div>
+    
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="AppModal.close()" >Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>
+
+

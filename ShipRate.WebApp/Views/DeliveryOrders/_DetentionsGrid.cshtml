@@ -1,0 +1,71 @@
+﻿@using ShipRate.Application.ViewModels
+@model DeliveryOrderDetentionsVm
+
+@if (Model.BLId == null)
+{
+    <div class="p-3 text-warning">
+        No BL is linked to this Delivery Order.
+    </div>
+}
+else if (Model.Items == null || Model.Items.Count == 0)
+{
+    <div class="p-3 text-muted">
+        No detention records found for BL: <strong>@(Model.BLNo ?? "-")</strong>
+    </div>
+}
+else
+{
+    <div class="p-3 border-bottom bg-light">
+        <strong>Related Detentions for BL:</strong> @(Model.BLNo ?? "-")
+        <div class="p-3 border-bottom bg-light">
+            <strong>Delivery Order:</strong> @Model.DeliveryOrderId
+            <span class="mx-2">|</span>
+            <strong>BL:</strong> @(Model.BLNo ?? "-")
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>To Date</th>
+                    <th>Issuer</th>
+                    <th>Issued To</th>
+                    <th>Tariff</th>
+                    <th>Status</th>
+                    <th class="text-end">Gross</th>
+                    <th class="text-end">VAT</th>
+                    <th class="text-end">Amount</th>
+                    <th>Final</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.DetentionToDate.ToString("yyyy/MM/dd")</td>
+                        <td>@(item.PartyName ?? "-")</td>
+                        <td>@(item.PartyName ?? "-")</td>
+                        <td>@(item.TariffTitle ?? "-")</td>
+                        <td>@(item.StatusTitle ?? "-")</td>
+                        <td class="text-end">@item.GrossAmount.ToString("N0")</td>
+                        <td class="text-end">@item.VATAmount.ToString("N0")</td>
+                        <td class="text-end">@item.Amount.ToString("N0")</td>
+                        <td>
+                            @if (item.IsFinal)
+                            {
+                                <span class="badge bg-success">Final</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Draft</span>
+                            }
+                        </td>
+                        <td>@(string.IsNullOrWhiteSpace(item.Remarks) ? "-" : item.Remarks)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

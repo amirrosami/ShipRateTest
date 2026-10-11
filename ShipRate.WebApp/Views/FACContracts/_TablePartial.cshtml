@@ -1,0 +1,71 @@
+﻿@using ShipRate.Domain.Entities.Contract
+@model IEnumerable<FACContract>
+
+<table class="table table-bordered">
+
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Carrier</th>
+            <th>Forwarder</th>
+            <th>Currency</th>
+            <th>FAC Percent</th>
+            <th>FAC Value Per TEU</th>
+            <th>FAC Value Per CBM</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+
+                <td>@item.FacContractTitle</td>
+                <td>@item.Carrier?.Person.PersonName</td>
+                <td>@item.Customer?.Person.PersonName</td>
+                <td>@item.Currency?.CurrencyCode</td>
+                <td>@item.FACPercent</td>
+                <td>@item.FACPerTEU</td>
+                <td>@item.FACPerCBM</td>
+                <td>
+
+                    <button class="btn btn-sm btn-warning"
+                            hx-get="/FACContracts/Edit/@item.Id"
+                            hx-target="#modalBody"
+                            data-bs-toggle="modal"
+                            data-bs-target="#facModal">
+                        Edit
+                    </button>
+
+                    <button class="btn btn-sm btn-danger"
+                            hx-post="/FACContracts/Delete/@item.Id"
+                            hx-confirm="Delete this record?"
+                            hx-trigger="click">
+                        Delete
+                    </button>
+
+                </td>
+
+            </tr>
+        }
+
+    </tbody>
+
+</table>
+
+<div class="mt-3">
+
+    @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+    {
+        <a class="btn btn-sm btn-outline-primary"
+           hx-get="/FACContracts/Index?page=@i&search=@ViewBag.Search"
+           hx-target="#tableContainer">
+
+            @i
+
+        </a>
+    }
+
+</div>

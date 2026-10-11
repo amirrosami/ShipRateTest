@@ -1,0 +1,99 @@
+﻿@using ShipRate.Application.ViewModels
+@model TIRUsageCreateEditVm
+
+@{
+    var isEdit = Model.Id.HasValue;
+    var actionName = isEdit ? "EditUsage" : "CreateUsage";
+    var modalTitle = isEdit ? "Edit Usage" : "Create Usage";
+}
+
+<div class="modal-header">
+    <h5 class="modal-title">@modalTitle</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<form hx-post="@Url.Action(actionName, "TIRCarnets")"
+      hx-target="#mainModalContent"
+      hx-swap="innerHTML">
+    @Html.AntiForgeryToken()
+
+    <div class="modal-body">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div asp-validation-summary="All" class="alert alert-danger"></div>
+        }
+
+        @if (isEdit)
+        {
+            <input type="hidden" asp-for="Id" />
+        }
+
+        <input type="hidden" asp-for="TIRAssignmentId" />
+        <input type="hidden" asp-for="TIRCarnetId" />
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label">TIR Carnet</label>
+                <input type="text" class="form-control" value="@Model.TIRCarnetNumber" readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Truck</label>
+                <input type="text" class="form-control" value="@Model.TruckDisplay" readonly />
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="VoletNo" class="form-label"></label>
+                <input asp-for="VoletNo" class="form-control" autocomplete="off" />
+                <span asp-validation-for="VoletNo" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="TIRUsageUsedAt" class="form-label"></label>
+                <input asp-for="TIRUsageUsedAt" type="date" class="form-control" />
+                <span asp-validation-for="TIRUsageUsedAt" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="BorderId" class="form-label"></label>
+                <select asp-for="BorderId" asp-items="Model.Borders" class="form-select">
+                    <option value="">Select...</option>
+                </select>
+                <span asp-validation-for="BorderId" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="InOutId" class="form-label"></label>
+                <select asp-for="InOutId" asp-items="Model.InOutItems" class="form-select">
+                    <option value="">Select...</option>
+                </select>
+                <span asp-validation-for="InOutId" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="CustomsOfficeId" class="form-label"></label>
+                <select asp-for="CustomsOfficeId" asp-items="Model.CustomsOffices" class="form-select">
+                    <option value="">Select...</option>
+                </select>
+                <span asp-validation-for="CustomsOfficeId" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-12">
+                <label asp-for="Remarks" class="form-label"></label>
+                <textarea asp-for="Remarks" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Remarks" class="text-danger"></span>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            Cancel
+        </button>
+        <button type="submit" class="btn btn-primary">
+            Save
+        </button>
+    </div>
+</form>

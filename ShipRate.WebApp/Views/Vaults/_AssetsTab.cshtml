@@ -1,0 +1,24 @@
+﻿@using ShipRate.Application.DTOs
+@model List<VaultAssetDto>
+
+<div class="row g-3">
+    @if (!Model.Any())
+    {
+        <div class="col-12"><div class="alert alert-info py-2">No assets initialized in this vault.</div></div>
+    }
+    else
+    {
+        @foreach (var asset in Model)
+        {
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0 bg-light">
+                    <div class="card-body p-3">
+                        <span class="text-muted fw-bold">@asset.CurrencyCode</span>
+                        <h4 class="mt-2 mb-0 fw-bold text-dark">@asset.Amount.ToString("N2")</h4>
+                        <small class="text-muted" style="font-size:0.75rem;">Updated: @asset.LastUpdated.ToString("yyyy-MM-dd HH:mm")</small>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

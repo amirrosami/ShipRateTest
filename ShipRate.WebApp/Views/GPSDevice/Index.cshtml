@@ -1,0 +1,138 @@
+﻿@model PagedResult<GPSDeviceListItem>
+@using ShipRate.Application.DTOs.Base_Info
+@using ShipRate.WebApp.ViewModels
+@using ShipRate.WebApp.ViewModels.Location
+@using ShipRate.WebApp.ViewModels.TerritoryVms
+@using ShipRate.WebApp.ViewModels.TransitViewModels
+
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0"><i class="bi bi-box-seam me-2"></i>GPS Devices</h2>
+        <small class="text-muted"></small>
+    </div>
+    <button type="button"
+            class="btn btn-primary"
+            hx-get="@Url.Action("Create", "GPSDevice")"
+            hx-target="#app-modal-content"
+            hx-swap="innerHTML">
+        <i class="bi bi-plus-lg me-1"></i>New
+    </button>
+</div>
+
+@await Html.PartialAsync(
+"_GridFilters",
+    new GridFilterViewModel
+    {
+        Page = Model.Page,
+        PageSize = Model.PageSize,
+        SearchTerm = Model.SearchTerm,
+        SortColumn = Model.SortColumn,
+        SortDirection = Model.SortDirection,
+        ListUrl = Url.Action("List", "GPSDevice"),
+        CustomFilterPartial = "",
+        CustomFilterValues = Model.CustomFilterValues,
+    }
+)
+
+
+
+
+<div id="table-container"
+     hx-post="@Url.Action("List", "GPSDevice")"
+     hx-trigger="load, GridChanged from:body"
+     hx-swap="innerHTML"
+     hx-include="#grid-filters, #table-sort-info">
+</div>
+
+
+
+
+
+@* @using ShipRate.WebApp.ViewModels.TransitViewModels
+@model GPSDeviceIndexViewModel
+
+@{
+    ViewData["Title"] = "GPS Devices";
+}
+
+<div class="container-fluid mt-3">
+
+    <!-- ══════ Header ══════ -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-2">
+            <h5 class="mb-0">
+                <i class="bi bi-broadcast me-2"></i>GPS Devices
+            </h5>
+            <button class="btn btn-sm btn-light"
+                    hx-get="@Url.Action("Create")"
+                    hx-target="#modalContainer"
+                    hx-swap="innerHTML">
+                <i class="bi bi-plus-lg me-1"></i>New Device
+            </button>
+        </div>
+
+        <div class="card-body pb-2">
+
+            <!-- ══════ Search ══════ -->
+            <form hx-get="@Url.Action("List")"
+                  hx-target="#gridArea"
+                  hx-swap="innerHTML"
+                  hx-trigger="submit"
+                  class="row g-2 align-items-end mb-3">
+
+                <div class="col-md-3">
+                    <label class="form-label form-label-sm mb-1">Serial Number</label>
+                    <input type="text" name="searchSerial" class="form-control form-control-sm"
+                           placeholder="Search serial..." />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label form-label-sm mb-1">GPS Provider</label>
+                    <select name="searchProviderId" class="form-select form-select-sm">
+                        <option value="">-- All Providers --</option>
+                        @foreach (var p in Model.Providers)
+                        {
+                            <option value="@p.Value">@p.Text</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label form-label-sm mb-1">Status</label>
+                    <select name="searchStatusId" class="form-select form-select-sm">
+                        <option value="">-- All Statuses --</option>
+                        @foreach (var s in Model.Statuses)
+                        {
+                            <option value="@s.Value">@s.Text</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-search me-1"></i>Search
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+                    </a>
+                </div>
+            </form>
+
+            <!-- ══════ Grid ══════ -->
+            <div id="gridArea"
+                 hx-get="@Url.Action("List")"
+                 hx-trigger="load, gridRefresh from:body"
+                 hx-swap="innerHTML">
+                <div class="text-center py-4">
+                    <div class="spinner-border spinner-border-sm text-primary"></div>
+                    Loading...
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ══════ Modal Container ══════ -->
+<div id="modalContainer"></div> *@

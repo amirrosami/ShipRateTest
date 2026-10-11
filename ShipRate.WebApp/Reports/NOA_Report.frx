@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="08/16/2026 12:00:00" ReportInfo.Modified="09/17/2026 10:56:06" ReportInfo.CreatorVersion="2026.1.0.0">
+  <Dictionary>
+    <TableDataSource Name="NOA" ReferenceName="NOA" DataType="System.Int32" Enabled="true">
+      <Column Name="NOANumber" DataType="System.String"/>
+      <Column Name="CompanyName" DataType="System.String"/>
+      <Column Name="CompanyAbb" DataType="System.String"/>
+      <Column Name="CompanyLogo" DataType="System.Byte[]" BindableControl="Picture"/>
+      <Column Name="IssuedDate" DataType="System.DateTime"/>
+      <Column Name="ArrivalDate" DataType="System.DateTime"/>
+      <Column Name="AvailableForPickupDate" DataType="System.DateTime"/>
+      <Column Name="MasterNOANo" DataType="System.String"/>
+      <Column Name="ConsigneeName" DataType="System.String"/>
+      <Column Name="ConsigneeAddress" DataType="System.String"/>
+      <Column Name="ConsigneePhone" DataType="System.String"/>
+      <Column Name="NotifyPartyName" DataType="System.String"/>
+      <Column Name="NotifyPartyAddress" DataType="System.String"/>
+      <Column Name="NotifyPartyPhone" DataType="System.String"/>
+      <Column Name="ShipperName" DataType="System.String"/>
+      <Column Name="ShipperAddress" DataType="System.String"/>
+      <Column Name="ShipperPhone" DataType="System.String"/>
+      <Column Name="BLNumber" DataType="System.String"/>
+      <Column Name="VesselName" DataType="System.String"/>
+      <Column Name="VoyageNo" DataType="System.String"/>
+      <Column Name="GoodsDescription" DataType="System.String"/>
+      <Column Name="MarksAndNumbers" DataType="System.String"/>
+      <Column Name="PackageTypeText" DataType="System.String"/>
+      <Column Name="TotalPackages" DataType="System.Int32"/>
+      <Column Name="GrossWeightKg" DataType="System.Decimal"/>
+      <Column Name="VolumeCBM" DataType="System.Decimal"/>
+      <Column Name="TotalContainers" DataType="System.Int32"/>
+      <Column Name="ArrivalPortName" DataType="System.String"/>
+      <Column Name="DischargeTerminalName" DataType="System.String"/>
+      <Column Name="SpecialInstructions" DataType="System.String"/>
+      <Column Name="Remarks" DataType="System.String"/>
+      <Column Name="ClosingText" DataType="System.String"/>
+      <Column Name="FooterText" DataType="System.String"/>
+      <Column Name="PageFooterText" DataType="System.String"/>
+      <Column Name="CashDepositTip" DataType="System.Decimal"/>
+      <Column Name="CashDepositStrip" DataType="System.Decimal"/>
+      <Column Name="ChequeGuaranteeTip" DataType="System.Decimal"/>
+      <Column Name="ChequeGuaranteeStrip" DataType="System.Decimal"/>
+    </TableDataSource>
+    <TableDataSource Name="PriceLines" ReferenceName="PriceLines" DataType="System.Int32" Enabled="true">
+      <Column Name="ChargeTypeName" DataType="System.String"/>
+      <Column Name="TipInitialValue" DataType="System.Decimal"/>
+      <Column Name="TipVATAmount" DataType="System.Decimal"/>
+      <Column Name="TipTotalValue" DataType="System.Decimal"/>
+      <Column Name="StripInitialValue" DataType="System.Decimal"/>
+      <Column Name="StripVATAmount" DataType="System.Decimal"/>
+      <Column Name="StripTotalValue" DataType="System.Decimal"/>
+    </TableDataSource>
+    <Total Name="TotalTipInit" Expression="[PriceLines.TipInitialValue]" Evaluator="DataCharges" PrintOn="ReportSummary1" ResetOnReprint="true"/>
+    <Total Name="TotalTipVAT" Expression="[PriceLines.TipVATAmount]" Evaluator="DataCharges" PrintOn="ReportSummary1" ResetOnReprint="true"/>
+    <Total Name="TotalTipAmount" Expression="[PriceLines.TipTotalValue]" Evaluator="DataCharges" PrintOn="ReportSummary1" ResetOnReprint="true"/>
+    <Total Name="TotalStripInit" Expression="[PriceLines.StripInitialValue]" Evaluator="DataCharges" PrintOn="ReportSummary1" ResetOnReprint="true"/>
+    <Total Name="TotalStripVAT" Expression="[PriceLines.StripVATAmount]" Evaluator="DataCharges" PrintOn="ReportSummary1" ResetOnReprint="true"/>
+    <Total Name="TotalStripAmount" Expression="[PriceLines.StripTotalValue]" Evaluator="DataCharges" PrintOn="ReportSummary1" ResetOnReprint="true"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" Watermark.Font="Tahoma, 60pt">
+    <PageHeaderBand Name="PageHeader1" Width="718.2" Height="117.18" Border.Lines="Bottom" Border.Width="1.5">
+      <PictureObject Name="PictureLogo" Left="567" Top="9.45" Width="132.3" Height="96.39" DataColumn="NOA.CompanyLogo"/>
+      <TextObject Name="TextTitle" Left="170.1" Top="3.78" Width="378" Height="26.46" Text="اعلامیه ورود کالا (Notice of Arrival)" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="B Nazanin, 13pt, style=Bold" TextFill.Color="0, 0, 192"/>
+      <TextObject Name="TextCompany" Left="170.1" Top="30.24" Width="378" Height="22.68" Text="[NOA.CompanyName]" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="B Nazanin, 10pt, style=Bold" TextFill.Color="0, 0, 192"/>
+      <TextObject Name="TextMeta" Left="9.45" Top="13.23" Width="170.1" Height="94.5" Text="شماره اعلامیه: [NOA.NOANumber]&#13;&#10;تاریخ صدور: [FormatDateTime([NOA.IssuedDate], &quot;yyyy/MM/dd&quot;)]&#13;&#10;تاریخ ورود: [FormatDateTime([NOA.ArrivalDate], &quot;yyyy/MM/dd&quot;)]&#13;&#10;آماده تحویل: [FormatDateTime([NOA.AvailableForPickupDate], &quot;yyyy/MM/dd&quot;)]" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 6.5pt" LineHeight="18"/>
+    </PageHeaderBand>
+    <DataBand Name="DataPartiesCargo" Top="121.18" Width="718.2" Height="240" DataSource="NOA">
+      <ShapeObject Name="ShapeParties" Top="5" Width="718.2" Height="95" Border.Color="LightGray" Fill.Color="WhiteSmoke"/>
+      <TextObject Name="LblShipper" Left="480" Top="8" Width="230" Height="18" Text="فرستنده (Shipper):" RightToLeft="true" Font="Tahoma, 8pt, style=Bold" TextFill.Color="Red"/>
+      <TextObject Name="ValShipper" Left="480" Top="28" Width="230" Height="68" Text="[NOA.ShipperName]&#13;&#10;[NOA.ShipperAddress]&#13;&#10;تلفن: [NOA.ShipperPhone]" RightToLeft="true" Font="Tahoma, 7.5pt"/>
+      <TextObject Name="LblConsignee" Left="240" Top="8" Width="230" Height="18" Text="گیرنده (Consignee):" RightToLeft="true" Font="Tahoma, 8pt, style=Bold" TextFill.Color="Red"/>
+      <TextObject Name="ValConsignee" Left="240" Top="28" Width="230" Height="68" Text="[NOA.ConsigneeName]&#13;&#10;[NOA.ConsigneeAddress]&#13;&#10;تلفن: [NOA.ConsigneePhone]" RightToLeft="true" Font="Tahoma, 7.5pt"/>
+      <TextObject Name="LblNotify" Left="5" Top="8" Width="230" Height="18" Text="مطلع شونده (Notify Party):" RightToLeft="true" Font="Tahoma, 8pt, style=Bold" TextFill.Color="Red"/>
+      <TextObject Name="ValNotify" Left="5" Top="28" Width="230" Height="68" Text="[NOA.NotifyPartyName]&#13;&#10;[NOA.NotifyPartyAddress]&#13;&#10;تلفن: [NOA.NotifyPartyPhone]" RightToLeft="true" Font="Tahoma, 7.5pt"/>
+      <ShapeObject Name="ShapeCargo" Top="105" Width="718.2" Height="130" Border.Color="LightGray"/>
+      <TextObject Name="CargoTitle" Top="108" Width="718.2" Height="18" Fill.Color="Gainsboro" Text="مشخصات بارنامه و محموله" HorzAlign="Center" RightToLeft="true" Font="Tahoma, 8.5pt, style=Bold" TextFill.Color="0, 0, 192"/>
+      <TextObject Name="LblBL" Left="580" Top="130" Width="130" Height="18" Text="شماره بارنامه (B/L):" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+      <TextObject Name="ValBL" Left="460" Top="130" Width="120" Height="18" Text="[NOA.BLNumber]" HorzAlign="Right" Font="Tahoma, 8pt"/>
+      <TextObject Name="LblVessel" Left="340" Top="130" Width="110" Height="18" Text="کشتی / سفر:" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+      <TextObject Name="ValVessel" Left="220" Top="130" Width="120" Height="18" Text="[NOA.VesselName] / [NOA.VoyageNo]" RightToLeft="true" Font="Tahoma, 8pt"/>
+      <TextObject Name="LblPort" Left="110" Top="130" Width="100" Height="18" Text="بندر ورود / ترمینال:" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+      <TextObject Name="ValPort" Top="130" Width="110" Height="18" Text="[NOA.ArrivalPortName] / [NOA.DischargeTerminalName]" RightToLeft="true" Font="Tahoma, 8pt"/>
+      <TextObject Name="LblPackages" Left="580" Top="152" Width="130" Height="18" Text="تعداد و نوع بسته‌ها:" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+      <TextObject Name="ValPackages" Left="460" Top="152" Width="120" Height="18" Text="[NOA.TotalPackages] [NOA.PackageTypeText]" RightToLeft="true" Font="Tahoma, 8pt"/>
+      <TextObject Name="LblWeight" Left="340" Top="152" Width="110" Height="18" Text="وزن ناخالص (Kg):" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+      <TextObject Name="ValWeight" Left="220" Top="152" Width="120" Height="18" Text="[NOA.GrossWeightKg]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" Font="Tahoma, 8pt"/>
+      <TextObject Name="LblVolume" Left="110" Top="152" Width="100" Height="18" Text="حجم (CBM):" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+      <TextObject Name="ValVolume" Top="152" Width="110" Height="18" Text="[NOA.VolumeCBM]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" Font="Tahoma, 8pt"/>
+      <TextObject Name="LblDesc" Left="580" Top="175" Width="130" Height="18" Text="شرح کالا:" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+      <TextObject Name="ValDesc" Top="175" Width="580" Height="36" Text="[NOA.GoodsDescription]" RightToLeft="true" Font="Tahoma, 7.5pt"/>
+      <TextObject Name="LblMarks" Left="580" Top="212" Width="130" Height="18" Text="علائم و شماره‌ها:" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+      <TextObject Name="ValMarks" Top="212" Width="580" Height="18" Text="[NOA.MarksAndNumbers]" RightToLeft="true" Font="Tahoma, 7.5pt"/>
+    </DataBand>
+    <DataBand Name="DataCharges" Top="433.18" Width="718.2" Height="22" DataSource="PriceLines">
+      <TextObject Name="RRowNo" Left="680.2" Width="38" Height="22" Border.Lines="All" Text="[Row#]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7.5pt"/>
+      <TextObject Name="RTitle" Left="470.2" Width="210" Height="22" Border.Lines="All" Text="[PriceLines.ChargeTypeName]" Padding="0, 0, 4, 0" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.5pt, style=Bold"/>
+      <TextObject Name="RTipInit" Left="391.8" Width="78.4" Height="22" Border.Lines="All" Text="[PriceLines.TipInitialValue]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="0" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+      <TextObject Name="RTipVat" Left="313.4" Width="78.4" Height="22" Border.Lines="All" Text="[PriceLines.TipVATAmount]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="0" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+      <TextObject Name="RTipTotal" Left="235.1" Width="78.3" Height="22" Border.Lines="All" Text="[PriceLines.TipTotalValue]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="0" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt, style=Bold"/>
+      <TextObject Name="RStripInit" Left="156.7" Width="78.4" Height="22" Border.Lines="All" Text="[PriceLines.StripInitialValue]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="0" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+      <TextObject Name="RStripVat" Left="78.4" Width="78.3" Height="22" Border.Lines="All" Text="[PriceLines.StripVATAmount]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="0" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt"/>
+      <TextObject Name="RStripTotal" Width="78.4" Height="22" Border.Lines="All" Text="[PriceLines.StripTotalValue]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="0" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt, style=Bold"/>
+      <DataHeaderBand Name="DataHeader1" Top="365.18" Width="718.2" Height="64">
+        <TextObject Name="HChargesTitle" Width="718.2" Height="22" Text="هزینه‌ها (وجوه نقدی):" Padding="0, 0, 2, 0" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8.5pt, style=Bold" TextFill.Color="Red"/>
+        <TextObject Name="HRow" Left="680.2" Top="24" Width="38" Height="40" Border.Lines="All" Fill.Color="230, 230, 230" Text="ردیف" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.5pt, style=Bold"/>
+        <TextObject Name="HDesc" Left="470.2" Top="24" Width="210" Height="40" Border.Lines="All" Fill.Color="230, 230, 230" Text="شرح خدمات" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+        <TextObject Name="HTipGroup" Left="235.1" Top="24" Width="235.1" Height="20" Border.Lines="All" Fill.Color="220, 225, 235" Text="خروج کانتینر پر (ریال)" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.5pt, style=Bold"/>
+        <TextObject Name="HTipInit" Left="391.8" Top="44" Width="78.4" Height="20" Border.Lines="All" Fill.Color="235, 240, 248" Text="مبلغ خالص" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7pt, style=Bold"/>
+        <TextObject Name="HTipVat" Left="313.4" Top="44" Width="78.4" Height="20" Border.Lines="All" Fill.Color="235, 240, 248" Text="VAT" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt, style=Bold"/>
+        <TextObject Name="HTipTotal" Left="235.1" Top="44" Width="78.3" Height="20" Border.Lines="All" Fill.Color="235, 240, 248" Text="قابل پرداخت" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7pt, style=Bold"/>
+        <TextObject Name="HStripGroup" Top="24" Width="235.1" Height="20" Border.Lines="All" Fill.Color="220, 225, 235" Text="تخلیه در محوطه (ریال)" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.5pt, style=Bold"/>
+        <TextObject Name="HStripInit" Left="156.7" Top="44" Width="78.4" Height="20" Border.Lines="All" Fill.Color="235, 240, 248" Text="مبلغ خالص" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7pt, style=Bold"/>
+        <TextObject Name="HStripVat" Left="78.4" Top="44" Width="78.3" Height="20" Border.Lines="All" Fill.Color="235, 240, 248" Text="VAT" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt, style=Bold"/>
+        <TextObject Name="HStripTotal" Top="44" Width="78.4" Height="20" Border.Lines="All" Fill.Color="235, 240, 248" Text="قابل پرداخت" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7pt, style=Bold"/>
+      </DataHeaderBand>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="459.18" Width="718.2" Height="360" CanGrow="true">
+      <TextObject Name="LblGrandTotal" Left="470.2" Width="248" Height="24" Border.Lines="All" Fill.Color="240, 240, 240" Text="جمع کل قابل پرداخت:" Padding="0, 0, 4, 0" HorzAlign="Right" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+      <TextObject Name="TipGrandInit" Left="391.8" Width="78.4" Height="24" Border.Lines="All" Fill.Color="240, 240, 240" Text="[TotalTipInit]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="0" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt, style=Bold"/>
+      <TextObject Name="TipGrandVat" Left="313.4" Width="78.4" Height="24" Border.Lines="All" Fill.Color="240, 240, 240" Text="[TotalTipVAT]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" Font="Tahoma, 7pt, style=Bold"/>
+      <TextObject Name="TipGrandTotal" Left="235.1" Width="78.3" Height="24" Border.Lines="All" Fill.Color="240, 240, 240" Text="[TotalTipAmount]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="0" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt, style=Bold" TextFill.Color="DarkBlue"/>
+      <TextObject Name="StripGrandInit" Left="156.7" Width="78.4" Height="24" Border.Lines="All" Fill.Color="240, 240, 240" Text="[TotalStripInit]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="0" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt, style=Bold"/>
+      <TextObject Name="StripGrandVat" Left="78.4" Width="78.3" Height="24" Border.Lines="All" Fill.Color="240, 240, 240" Text="[TotalStripVAT]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" Font="Tahoma, 7pt, style=Bold"/>
+      <TextObject Name="StripGrandTotal" Width="78.4" Height="24" Border.Lines="All" Fill.Color="240, 240, 240" Text="[TotalStripAmount]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="0" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7pt, style=Bold" TextFill.Color="DarkBlue"/>
+      <TextObject Name="HDepositsTitle" Top="36" Width="718.2" Height="22" Text="سپرده‌ها و تضامین:" Padding="0, 0, 2, 0" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8.5pt, style=Bold" TextFill.Color="Red"/>
+      <TextObject Name="HDepType" Left="470.2" Top="60" Width="248" Height="22" Border.Lines="All" Fill.Color="230, 230, 230" Text="نوع سپرده / تضمین" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt, style=Bold"/>
+      <TextObject Name="HDepTip" Left="235.1" Top="60" Width="235.1" Height="22" Border.Lines="All" Fill.Color="220, 225, 235" Text="خروج کانتینر پر (ریال)" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.5pt, style=Bold"/>
+      <TextObject Name="HDepStrip" Top="60" Width="235.1" Height="22" Border.Lines="All" Fill.Color="220, 225, 235" Text="تخلیه در محوطه (ریال)" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.5pt, style=Bold"/>
+      <TextObject Name="LblCashDeposit" Left="470.2" Top="82" Width="248" Height="22" Border.Lines="All" Fill.Color="248, 249, 250" Text="سپرده نقدی (ریال)" Padding="0, 0, 4, 0" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.5pt, style=Bold"/>
+      <TextObject Name="ValCashDepositTip" Left="235.1" Top="82" Width="235.1" Height="22" Border.Lines="All" Fill.Color="248, 249, 250" Text="[Report.GetColumnValue(&quot;NOA.CashDepositTip&quot;)]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="0" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7.5pt, style=Bold"/>
+      <TextObject Name="ValCashDepositStrip" Top="82" Width="235.1" Height="22" Border.Lines="All" Fill.Color="248, 249, 250" Text="[Report.GetColumnValue(&quot;NOA.CashDepositStrip&quot;)]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="0" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7.5pt, style=Bold"/>
+      <TextObject Name="LblChequeGuarantee" Left="470.2" Top="104" Width="248" Height="22" Border.Lines="All" Fill.Color="248, 249, 250" Text="چک تضمین کانتینر (ریال)" Padding="0, 0, 4, 0" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.5pt, style=Bold"/>
+      <TextObject Name="ValChequeGuaranteeTip" Left="235.1" Top="104" Width="235.1" Height="22" Border.Lines="All" Fill.Color="248, 249, 250" Text="[Report.GetColumnValue(&quot;NOA.ChequeGuaranteeTip&quot;)]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="0" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7.5pt, style=Bold"/>
+      <TextObject Name="ValChequeGuaranteeStrip" Top="104" Width="235.1" Height="22" Border.Lines="All" Fill.Color="248, 249, 250" Text="[Report.GetColumnValue(&quot;NOA.ChequeGuaranteeStrip&quot;)]" Format="Number" Format.UseLocale="true" Format.DecimalDigits="0" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7.5pt, style=Bold"/>
+      <TextObject Name="TxtRemarks" Top="138" Width="718.2" Height="30" CanGrow="true" Text="دستورالعمل و ملاحظات: [Report.GetColumnValue(&quot;NOA.SpecialInstructions&quot;)] [Report.GetColumnValue(&quot;NOA.Remarks&quot;)]" RightToLeft="true" Font="Tahoma, 7.5pt"/>
+      <TextObject Name="TxtClosing" Top="173" Width="718.2" Height="40.55" CanGrow="true" Text="[Report.GetColumnValue(&quot;NOA.ClosingText&quot;)]" RightToLeft="true" Font="Tahoma, 8pt"/>
+      <TextObject Name="Text1" Top="218" Width="718.2" Height="140" CanGrow="true" Text="[Report.GetColumnValue(&quot;NOA.FooterText&quot;)]" HorzAlign="Right" Font="Tahoma, 7pt"/>
+    </ReportSummaryBand>
+    <PageFooterBand Name="PageFooter1" Top="823.18" Width="718.2" Height="48.9" Border.Lines="Top" Border.Color="LightGray">
+      <TextObject Name="TxtFooter" Left="90.55" Top="5" Width="618.2" Height="43.9" Text="[Report.GetColumnValue(&quot;NOA.PageFooterText&quot;)]" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 6pt"/>
+      <TextObject Name="TxtPageNum" Top="5" Width="100" Height="25" Text="صفحه [Page#] از [TotalPages#]" VertAlign="Center" Font="Tahoma, 7pt"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

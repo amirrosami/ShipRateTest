@@ -1,0 +1,134 @@
+﻿@{
+    ViewData["Title"] = "Drivers Management";
+    var carriers = (List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.Carriers;
+}
+
+<div class="container-fluid py-3" dir="ltr">
+
+    <!-- ===== Page Header ===== -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0"><i class="bi bi-person-badge me-2"></i>Drivers Management</h4>
+        <button class="btn btn-primary"
+                hx-get="/Driver/Create"
+                hx-target="#modalBody"
+                hx-swap="innerHTML"
+                onclick="document.getElementById('modalTitle').textContent='Register New Driver'; new bootstrap.Modal(document.getElementById('crudModal')).show();">
+            <i class="bi bi-plus-lg me-1"></i> New Driver
+        </button>
+    </div>
+
+    <!-- ===== Search Filters ===== -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-body py-2">
+            <form id="searchForm" class="row g-2 align-items-end">
+
+                <!-- Driver Name -->
+                <div class="col-md-3">
+                    <label class="form-label small mb-1">Driver Name</label>
+                    <input type="text" class="form-control form-control-sm" name="DriverName" id="filterDriverName"
+                           placeholder="Search by name..." />
+                </div>
+
+                <!-- Carrier -->
+                <div class="col-md-3">
+                    <label class="form-label small mb-1">Carrier</label>
+                    <select class="form-select form-select-sm" name="CarrierId" id="filterCarrierId">
+                        <option value="">-- All Carriers --</option>
+                        @foreach (var c in carriers)
+                        {
+                            @:
+                            <option value="@c.Value">@c.Text</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Active Status -->
+                <div class="col-md-2">
+                    <label class="form-label small mb-1">Status</label>
+                    <select class="form-select form-select-sm" name="IsActive" id="filterIsActive">
+                        <option value="">-- All --</option>
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+
+                <!-- Buttons -->
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="searchDrivers()">
+                        <i class="bi bi-search me-1"></i> Search
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearFilters()">
+                        <i class="bi bi-x-circle me-1"></i> Clear
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== Grid Container ===== -->
+    <div id="gridContainer"
+         hx-get="/Driver/Grid"
+         hx-trigger="load"
+         hx-swap="innerHTML">
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status"></div>
+        </div>
+    </div>
+
+    <!-- ===== Modal ===== -->
+    <div class="modal fade" id="crudModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Driver</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <div class="text-center py-3">
+                        <div class="spinner-border text-primary" role="status"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        // Search
+        function searchDrivers() {
+            const params = new URLSearchParams();
+            const name = document.getElementById('filterDriverName').value;
+            const carrier = document.getElementById('filterCarrierId').value;
+            const active = document.getElementById('filterIsActive').value;
+
+            if (name) params.set('DriverName', name);
+            if (carrier) params.set('CarrierId', carrier);
+            if (active) params.set('IsActive', active);
+            params.set('Page', '1');
+
+            htmx.ajax('GET', '/Driver/Grid?' + params.toString(), { target: '#gridContainer', swap: 'innerHTML' });
+        }
+
+        function clearFilters() {
+            document.getElementById('filterDriverName').value = '';
+            document.getElementById('filterCarrierId').value = '';
+            document.getElementById('filterIsActive').value = '';
+            searchDrivers();
+        }
+
+        // Close modal & refresh on HX-Trigger
+        document.body.addEventListener('closeModalAndRefresh', function () {
+            var modal = bootstrap.Modal.getInstance(document.getElementById('crudModal'));
+            if (modal) modal.hide();
+            searchDrivers();
+        });
+
+        // Allow Enter key in search
+        document.getElementById('searchForm').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); searchDrivers(); }
+        });
+    </script>
+}

@@ -1,0 +1,83 @@
+﻿@using ShipRate.WebApp.Controllers
+@model TestCreateEditVM
+
+<form hx-post="@Url.Action(Model.Id == null ? "Create" : "Edit", "Test2")"
+      hx-target="#app-modal-content"
+      hx-swap="innerHTML">
+
+    @Html.AntiForgeryToken()
+
+    <div class="modal-header">
+
+        <h5 class="modal-title">
+            @(Model.Id == null ? "Create Test" : "Edit Test")
+        </h5>
+
+        <button type="button"
+                class="btn-close"
+                onclick="AppModal.close()">
+        </button>
+
+    </div>
+
+    <div class="modal-body">
+
+        <div class="mb-3">
+
+            <label class="form-label">Name</label>
+
+            <input asp-for="Name" class="form-control" />
+
+            <span asp-validation-for="Name"></span>
+
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="number" name="Age" class="form-control" />
+        </div>
+        
+        <div class="mb-3">
+
+            <label for="exampleDataList" class="form-label">Datalist example</label>
+            <input class="form-control" name="test" list="datalistOptions" id="exampleDataList" placeholder="Type to search...">
+            <datalist id="datalistOptions">
+                <option value="0"> San F</option>
+                <option value="1">New York </option>
+                <option value="2">Seattle </option>
+                <option value="3"> Los Angeles</option>
+                <option value="4"> Chicago</option>
+            </datalist>
+        </div>
+
+        <div class="mb-3">
+
+            <label class="form-label">Dscp</label>
+
+            <input asp-for="Description" class="form-control" />
+
+            <span asp-validation-for="Description"></span>
+
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+
+        <button type="button"
+                class="btn btn-secondary"
+                onclick="AppModal.close()">
+
+            Cancel
+
+        </button>
+
+        <button class="btn btn-primary">
+
+            Save
+
+        </button>
+
+    </div>
+
+</form>

@@ -1,0 +1,114 @@
+﻿@using ShipRate.Application.JobsViewModels
+@model JobStatsViewModel
+
+
+
+<style>
+    .job-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 1.2rem;
+    }
+
+    .job-stat-card {
+        padding: 14px 16px;
+        border-radius: 5px;
+        min-height: 90px;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        font-weight: 500;
+    }
+
+/*     .job-stat-card:hover {
+        transform: translateY(-3px);
+    }
+ */
+    .job-stat-icon {
+        font-size: 1.2rem;
+        opacity: .9;
+        margin-bottom: 6px;
+    }
+
+    .job-stat-value {
+        font-size: 1.4rem;
+        font-weight: 700;
+        line-height: 1;
+        margin-bottom: 3px;
+    }
+
+    .job-stat-title {
+        font-size: .78rem;
+        opacity: .9;
+        line-height: 1;
+    }
+
+    /* Gradient Colors */
+/*     .grad-total     { background: linear-gradient(135deg, #0f172a, #334155); }
+    .grad-draft     { background: linear-gradient(135deg, #6b7280, #9ca3af); }
+    .grad-confirmed { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+    .grad-progress  { background: linear-gradient(135deg, #ca8a04, #facc15); }
+    .grad-completed { background: linear-gradient(135deg, #059669, #34d399); }
+    .grad-closed    { background: linear-gradient(135deg, #374151, #6b7280); }
+    .grad-canceled  { background: linear-gradient(135deg, #dc2626, #f87171); }
+    .grad-hold      { background: linear-gradient(135deg, #7c3aed, #a78bfa); }
+ */
+    /* Breakpoints */
+    @@media (max-width: 1399.98px) { .job-stats-grid { grid-template-columns: repeat(4, 1fr); } }
+    @@media (max-width: 991.98px)  { .job-stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    @@media (max-width: 575.98px)  { .job-stats-grid { grid-template-columns: 1fr; } }
+</style>
+
+<div class="job-stats-grid">
+
+    <div class="job-stat-card grad-total">
+        <div class="job-stat-icon"><i class="bi bi-briefcase"></i></div>
+        <div class="job-stat-value">@Model.TotalJobs</div>
+        <div class="job-stat-title">Total</div>
+    </div>
+
+    <div class="job-stat-card grad-draft">
+        <div class="job-stat-icon"><i class="bi bi-pencil"></i></div>
+        <div class="job-stat-value">@Model.Draft</div>
+        <div class="job-stat-title">Draft</div>
+    </div>
+
+    <div class="job-stat-card grad-confirmed">
+        <div class="job-stat-icon"><i class="bi bi-check2"></i></div>
+        <div class="job-stat-value">@Model.Confirmed</div>
+        <div class="job-stat-title">Confirmed</div>
+    </div>
+
+    <div class="job-stat-card grad-progress">
+        <div class="job-stat-icon"><i class="bi bi-hourglass-split"></i></div>
+        <div class="job-stat-value">@Model.InProgress</div>
+        <div class="job-stat-title">In Progress</div>
+    </div>
+
+    <div class="job-stat-card grad-completed">
+        <div class="job-stat-icon"><i class="bi bi-flag"></i></div>
+        <div class="job-stat-value">@Model.Completed</div>
+        <div class="job-stat-title">Completed</div>
+    </div>
+
+    <div class="job-stat-card grad-closed">
+        <div class="job-stat-icon"><i class="bi bi-archive"></i></div>
+        <div class="job-stat-value">@Model.Closed</div>
+        <div class="job-stat-title">Closed</div>
+    </div>
+
+    <div class="job-stat-card grad-canceled">
+        <div class="job-stat-icon"><i class="bi bi-x-octagon"></i></div>
+        <div class="job-stat-value">@Model.Canceled</div>
+        <div class="job-stat-title">Canceled</div>
+    </div>
+
+    <div class="job-stat-card grad-hold">
+        <div class="job-stat-icon"><i class="bi bi-pause-circle"></i></div>
+        <div class="job-stat-value">@Model.OnHold</div>
+        <div class="job-stat-title">On Hold</div>
+    </div>
+
+</div>

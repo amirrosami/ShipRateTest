@@ -1,0 +1,128 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.ViewModels
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model PagedResultDto<DetentionListItemVm>
+@{
+    var statusList = ViewBag.DetentionStatuses as List<SelectListItem> ?? new List<SelectListItem>();
+}
+
+<div class="container-fluid text-start" dir="ltr">
+    <div class="card-header d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Detentions Management</h4>
+
+    </div>
+    <!-- Search Panel -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <form hx-get="@Url.Action("Index")" hx-target="#detention-grid-container" class="row g-3">
+                <input type="hidden" name="Page" value="1" />
+                <input type="hidden" name="PageSize" value="10" />
+
+                <div class="col-md-2">
+                    <label class="form-label">Job File No</label>
+                    <input type="text" name="JobFileNo" class="form-control form-control-sm" value="@Context.Request.Query["JobFileNo"]">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">BL No</label>
+                    <input type="text" name="BLNo" class="form-control form-control-sm" value="@Context.Request.Query["BLNo"]">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Booking No</label>
+                    <input type="text" name="BookingNo" class="form-control form-control-sm" value="@Context.Request.Query["BookingNo"]">
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Issued To</label>
+                    <input type="text" name="IssuedTo" class="form-control form-control-sm" value="@Context.Request.Query["IssuedTo"]">
+                </div>
+                <!-- فیلد جدید IsFinal -->
+                <div class="col-md-2">
+                    <label class="form-label">Final / Part</label>
+                    <select name="IsFinal" class="form-select form-select-sm">
+                        <option value="">-- All --</option>
+                        <option value="false" selected="@(Context.Request.Query["IsFinal"] == "false")">Part</option>
+                        <option value="true" selected="@(Context.Request.Query["IsFinal"] == "true")">Final</option>
+                    </select>
+                </div>
+
+
+                <div class="col-md-2">
+                    <label class="form-label">Detention Status</label>
+                    <select name="DetentionStatusId" class="form-select form-select-sm" asp-items="statusList">
+                        <option value="">-- All Statuses --</option>
+                    </select>
+                </div>
+
+
+
+
+                <div class="col-md-2">
+                    <label class="form-label">Issued By</label>
+                    <select name="IssuedByUs" class="form-select form-select-sm">
+                        <option value="">-- All --</option>
+                        <option value="true"
+                                selected="@(Context.Request.Query["IssuedByUs"] == "true")">
+                            Us
+                        </option>
+                        <option value="false"
+                                selected="@(Context.Request.Query["IssuedByUs"] == "false")">
+                            Other Party
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-flex align-items-center pt-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               role="switch"
+                               id="showInactiveSwitch"
+                               name="ShowInactive"
+                               value="true"
+                               @(Context.Request.Query["ShowInactive"] == "true" ? "checked" : "")>
+                        <label class="form-check-label small" for="showInactiveSwitch">
+                            Show Inactive
+                        </label>
+                    </div>
+                </div>
+
+
+
+
+                <div class="col-md-2 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm w-100">Clear</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Grid (Level 1) -->
+    <div id="detention-grid-container">
+        @await Html.PartialAsync("_DetentionGrid", Model)
+    </div>
+
+    <!-- Items Grid (Level 2) -->
+    <div id="items-grid-container" class="mt-4"></div>
+
+    <!-- Details Grid (Level 3) -->
+    <div id="details-grid-container" class="mt-4"></div>
+    <div id="detention-modal-container"></div>
+</div>
+
+
+
+//برای احتیاط نگه داشتم
+@if(1==2)
+{
+<button type="button"
+        class="btn btn-primary btn-sm"
+        hx-get="@Url.Action("Create", "Detentions")"
+        hx-target="#detention-modal-container"
+        hx-swap="innerHTML">
+    <i class="bi bi-plus-circle"></i>
+    New Detention
+</button>
+}

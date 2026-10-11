@@ -1,0 +1,1037 @@
+﻿@{
+    ViewData["Title"] = "Marketing Hub";
+    ViewData["PageHeader"] = "Marketing Command Center";
+    ViewData["PageDescription"] = "Transport & Logistics Marketing Intelligence";
+}
+
+@* @section PageActions {
+    <a href="#" class="btn btn-sm btn-primary">
+        <i class="bi bi-megaphone me-1"></i> New Campaign
+    </a>
+    <a href="#" class="btn btn-sm btn-outline-secondary ms-1">
+        <i class="bi bi-download me-1"></i> Export Report
+    </a>
+}
+ *@
+<style>
+    /* ============ MARKETING DASHBOARD STYLES ============ */
+    .mk-card {
+        border: 1px solid rgba(78,115,223,0.12);
+        border-radius: 16px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+        .mk-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08) !important;
+        }
+
+        .mk-card .mk-stripe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+    .mk-stripe.blue {
+        background: linear-gradient(90deg, #4e73df, #224abe);
+    }
+
+    .mk-stripe.green {
+        background: linear-gradient(90deg, #1cc88a, #13855c);
+    }
+
+    .mk-stripe.orange {
+        background: linear-gradient(90deg, #f6c23e, #dda020);
+    }
+
+    .mk-stripe.red {
+        background: linear-gradient(90deg, #e74a3b, #be2617);
+    }
+
+    .mk-stripe.purple {
+        background: linear-gradient(90deg, #8b5cf6, #6d28d9);
+    }
+
+    .mk-stripe.cyan {
+        background: linear-gradient(90deg, #36b9cc, #1a8a9a);
+    }
+
+    .mk-stripe.pink {
+        background: linear-gradient(90deg, #e83e8c, #c21868);
+    }
+
+    /* KPI number */
+    .mk-kpi {
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -0.5px;
+    }
+
+    .mk-kpi-sm {
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1.1;
+    }
+
+    .mk-label {
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        font-weight: 600;
+    }
+
+    /* Trend badge */
+    .mk-trend {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 600;
+    }
+
+        .mk-trend.up {
+            background: rgba(28,200,138,0.12);
+            color: #1cc88a;
+        }
+
+        .mk-trend.down {
+            background: rgba(231,74,59,0.12);
+            color: #e74a3b;
+        }
+
+        .mk-trend.flat {
+            background: rgba(133,135,150,0.12);
+            color: #858796;
+        }
+
+    /* Funnel visualization */
+    .funnel-step {
+        position: relative;
+        text-align: center;
+        padding: 12px 0;
+    }
+
+    .funnel-bar {
+        margin: 0 auto;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all 0.3s;
+    }
+
+        .funnel-bar:hover {
+            filter: brightness(1.1);
+            transform: scaleX(1.03);
+        }
+
+    .funnel-arrow {
+        color: rgba(128,128,128,0.3);
+        font-size: 1rem;
+    }
+
+    .funnel-rate {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #1cc88a;
+    }
+
+    /* Campaign row */
+    .campaign-row {
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 8px;
+        transition: background 0.2s;
+    }
+
+        .campaign-row:hover {
+            background: rgba(78,115,223,0.04);
+        }
+
+    .campaign-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    /* Channel pill */
+    .channel-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        border: 1px solid transparent;
+    }
+
+        .channel-pill.google {
+            background: rgba(66,133,244,0.1);
+            color: #4285f4;
+            border-color: rgba(66,133,244,0.2);
+        }
+
+        .channel-pill.linkedin {
+            background: rgba(10,102,194,0.1);
+            color: #0a66c2;
+            border-color: rgba(10,102,194,0.2);
+        }
+
+        .channel-pill.email {
+            background: rgba(28,200,138,0.1);
+            color: #1cc88a;
+            border-color: rgba(28,200,138,0.2);
+        }
+
+        .channel-pill.trade {
+            background: rgba(246,194,62,0.1);
+            color: #c99a1e;
+            border-color: rgba(246,194,62,0.2);
+        }
+
+        .channel-pill.referral {
+            background: rgba(139,92,246,0.1);
+            color: #8b5cf6;
+            border-color: rgba(139,92,246,0.2);
+        }
+
+        .channel-pill.social {
+            background: rgba(232,62,140,0.1);
+            color: #e83e8c;
+            border-color: rgba(232,62,140,0.2);
+        }
+
+    /* Progress ring */
+    .progress-ring {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .progress-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring .ring-text {
+            position: absolute;
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+    /* Sparkline placeholder */
+    .mk-spark {
+        display: flex;
+        align-items: flex-end;
+        gap: 2px;
+        height: 32px;
+    }
+
+    .mk-spark-bar {
+        width: 6px;
+        border-radius: 3px 3px 0 0;
+        transition: height 0.3s;
+        opacity: 0.7;
+    }
+
+        .mk-spark-bar:hover {
+            opacity: 1;
+        }
+
+    /* Scrollbar terminal */
+    .mk-scroll::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .mk-scroll::-webkit-scrollbar-thumb {
+        background: rgba(128,128,128,0.2);
+        border-radius: 4px;
+    }
+
+    /* Animated gradient for header card */
+    .mk-hero-gradient {
+        background: linear-gradient(135deg, #4e73df 0%, #8b5cf6 50%, #e83e8c 100%);
+        background-size: 200% 200%;
+        animation: heroShift 6s ease infinite;
+    }
+
+    @@keyframes heroShift {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    /* Heatmap cell */
+    .heatmap-cell {
+        width: 100%;
+        aspect-ratio: 1;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #fff;
+        transition: transform 0.2s;
+    }
+
+        .heatmap-cell:hover {
+            transform: scale(1.15);
+            z-index: 1;
+        }
+</style>
+
+<!-- ==================== HERO BANNER ==================== -->
+<div class="mk-hero-gradient rounded-4 text-white p-4 mb-4 position-relative overflow-hidden">
+    <div class="row align-items-center">
+        <div class="col-lg-7">
+            <h4 class="fw-bold mb-1"><i class="bi bi-rocket-takeoff me-2"></i>Q4 Marketing Performance</h4>
+            <p class="mb-0 opacity-75" style="font-size:0.9rem;">
+                Tracking 12 active campaigns across 6 channels — Pipeline value <strong>$4.8M</strong> with <strong>23%</strong> conversion rate
+            </p>
+        </div>
+        <div class="col-lg-5 text-lg-end mt-3 mt-lg-0">
+            <div class="d-inline-flex align-items-center gap-4">
+                <div class="text-center">
+                    <div style="font-size:1.8rem;font-weight:800;">94.2%</div>
+                    <small class="opacity-75">Revenue Target</small>
+                </div>
+                <div style="width:1px;height:40px;background:rgba(255,255,255,0.3);"></div>
+                <div class="text-center">
+                    <div style="font-size:1.8rem;font-weight:800;">4.7x</div>
+                    <small class="opacity-75">Marketing ROI</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== TOP KPIs ==================== -->
+<div class="row g-3 mb-4">
+    <!-- Total Leads -->
+    <div class="col-6 col-xl-2">
+        <div class="card mk-card border-0 shadow-sm h-100">
+            <div class="mk-stripe blue"></div>
+            <div class="card-body text-center py-3">
+                <div class="mk-label text-muted mb-2">Total Leads</div>
+                <div class="mk-kpi text-primary" id="kpiLeads">3,847</div>
+                <div class="mk-trend up mt-1"><i class="bi bi-arrow-up-short"></i>18.2%</div>
+                <div class="mk-spark justify-content-center mt-2">
+                    <div class="mk-spark-bar" style="height:40%;background:#4e73df;"></div>
+                    <div class="mk-spark-bar" style="height:55%;background:#4e73df;"></div>
+                    <div class="mk-spark-bar" style="height:45%;background:#4e73df;"></div>
+                    <div class="mk-spark-bar" style="height:65%;background:#4e73df;"></div>
+                    <div class="mk-spark-bar" style="height:50%;background:#4e73df;"></div>
+                    <div class="mk-spark-bar" style="height:80%;background:#4e73df;"></div>
+                    <div class="mk-spark-bar" style="height:95%;background:#4e73df;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Qualified Leads -->
+    <div class="col-6 col-xl-2">
+        <div class="card mk-card border-0 shadow-sm h-100">
+            <div class="mk-stripe green"></div>
+            <div class="card-body text-center py-3">
+                <div class="mk-label text-muted mb-2">Qualified (MQL)</div>
+                <div class="mk-kpi" style="color:#1cc88a;">1,245</div>
+                <div class="mk-trend up mt-1"><i class="bi bi-arrow-up-short"></i>12.4%</div>
+                <div class="mk-spark justify-content-center mt-2">
+                    <div class="mk-spark-bar" style="height:35%;background:#1cc88a;"></div>
+                    <div class="mk-spark-bar" style="height:50%;background:#1cc88a;"></div>
+                    <div class="mk-spark-bar" style="height:60%;background:#1cc88a;"></div>
+                    <div class="mk-spark-bar" style="height:55%;background:#1cc88a;"></div>
+                    <div class="mk-spark-bar" style="height:70%;background:#1cc88a;"></div>
+                    <div class="mk-spark-bar" style="height:85%;background:#1cc88a;"></div>
+                    <div class="mk-spark-bar" style="height:90%;background:#1cc88a;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Conversion Rate -->
+    <div class="col-6 col-xl-2">
+        <div class="card mk-card border-0 shadow-sm h-100">
+            <div class="mk-stripe purple"></div>
+            <div class="card-body text-center py-3">
+                <div class="mk-label text-muted mb-2">Conversion</div>
+                <div class="mk-kpi" style="color:#8b5cf6;">23.4%</div>
+                <div class="mk-trend up mt-1"><i class="bi bi-arrow-up-short"></i>3.1pp</div>
+                <div class="progress-ring mt-2">
+                    <svg width="48" height="48">
+                        <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(139,92,246,0.15)" stroke-width="4" />
+                        <circle cx="24" cy="24" r="20" fill="none" stroke="#8b5cf6" stroke-width="4"
+                                stroke-dasharray="125.6" stroke-dashoffset="96.3" stroke-linecap="round" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- CAC -->
+    <div class="col-6 col-xl-2">
+        <div class="card mk-card border-0 shadow-sm h-100">
+            <div class="mk-stripe orange"></div>
+            <div class="card-body text-center py-3">
+                <div class="mk-label text-muted mb-2">CAC</div>
+                <div class="mk-kpi" style="color:#f6c23e;">$342</div>
+                <div class="mk-trend down mt-1"><i class="bi bi-arrow-down-short"></i>8.5%</div>
+                <small class="text-muted d-block mt-1" style="font-size:0.7rem;">Target: $380</small>
+            </div>
+        </div>
+    </div>
+    <!-- Pipeline Value -->
+    <div class="col-6 col-xl-2">
+        <div class="card mk-card border-0 shadow-sm h-100">
+            <div class="mk-stripe cyan"></div>
+            <div class="card-body text-center py-3">
+                <div class="mk-label text-muted mb-2">Pipeline</div>
+                <div class="mk-kpi" style="color:#36b9cc;">$4.8M</div>
+                <div class="mk-trend up mt-1"><i class="bi bi-arrow-up-short"></i>22.6%</div>
+                <small class="text-muted d-block mt-1" style="font-size:0.7rem;">128 active deals</small>
+            </div>
+        </div>
+    </div>
+    <!-- Avg Deal Size -->
+    <div class="col-6 col-xl-2">
+        <div class="card mk-card border-0 shadow-sm h-100">
+            <div class="mk-stripe pink"></div>
+            <div class="card-body text-center py-3">
+                <div class="mk-label text-muted mb-2">Avg Deal</div>
+                <div class="mk-kpi" style="color:#e83e8c;">$37.5K</div>
+                <div class="mk-trend up mt-1"><i class="bi bi-arrow-up-short"></i>5.2%</div>
+                <small class="text-muted d-block mt-1" style="font-size:0.7rem;">Cycle: 34 days</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== LEAD GEN TREND + FUNNEL ==================== -->
+<div class="row g-3 mb-4">
+    <!-- Lead Generation Trend -->
+    <div class="col-lg-7">
+        <div class="card mk-card border-0 shadow-sm h-100">
+            <div class="mk-stripe blue"></div>
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-graph-up-arrow me-2 text-primary"></i>Lead Generation Trend</h6>
+                <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-outline-secondary px-2 py-0" style="font-size:0.7rem;">6M</button>
+                    <button class="btn btn-sm btn-primary px-2 py-0" style="font-size:0.7rem;">12M</button>
+                </div>
+            </div>
+            <div class="card-body pt-0">
+                <div style="position:relative;height:290px;">
+                    <canvas id="chartLeadTrend"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Sales Funnel -->
+    <div class="col-lg-5">
+        <div class="card mk-card border-0 shadow-sm h-100">
+            <div class="mk-stripe purple"></div>
+            <div class="card-header bg-transparent border-0">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-funnel-fill me-2" style="color:#8b5cf6;"></i>Sales Funnel</h6>
+            </div>
+            <div class="card-body pt-0">
+                <div class="funnel-step">
+                    <div class="funnel-bar" style="width:100%;background:linear-gradient(90deg,#4e73df,#6e8ef7);">
+                        <span>3,847 Visitors</span>
+                    </div>
+                </div>
+                <div class="text-center funnel-arrow"><i class="bi bi-chevron-down"></i> <small style="font-size:0.68rem;color:#1cc88a;">68.2%</small></div>
+                <div class="funnel-step">
+                    <div class="funnel-bar" style="width:82%;background:linear-gradient(90deg,#36b9cc,#5ccfdd);">
+                        <span>2,624 Leads</span>
+                    </div>
+                </div>
+                <div class="text-center funnel-arrow"><i class="bi bi-chevron-down"></i> <small style="font-size:0.68rem;color:#1cc88a;">47.5%</small></div>
+                <div class="funnel-step">
+                    <div class="funnel-bar" style="width:60%;background:linear-gradient(90deg,#8b5cf6,#a78bfa);">
+                        <span>1,245 MQL</span>
+                    </div>
+                </div>
+                <div class="text-center funnel-arrow"><i class="bi bi-chevron-down"></i> <small style="font-size:0.68rem;color:#1cc88a;">35.8%</small></div>
+                <div class="funnel-step">
+                    <div class="funnel-bar" style="width:40%;background:linear-gradient(90deg,#f6c23e,#f7d26e);">
+                        <span>446 SQL</span>
+                    </div>
+                </div>
+                <div class="text-center funnel-arrow"><i class="bi bi-chevron-down"></i> <small style="font-size:0.68rem;color:#1cc88a;">28.7%</small></div>
+                <div class="funnel-step">
+                    <div class="funnel-bar" style="width:25%;background:linear-gradient(90deg,#1cc88a,#36dfa0);">
+                        <span>128 Deals</span>
+                    </div>
+                </div>
+                <div class="text-center mt-2">
+                    <small class="text-muted">Overall conversion: <strong class="text-success">3.33%</strong></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== CHANNEL MIX + ROI ==================== -->
+<div class="row g-3 mb-4">
+    <!-- Channel Performance -->
+    <div class="col-lg-4">
+        <div class="card mk-card border-0 shadow-sm h-100">
+            <div class="mk-stripe cyan"></div>
+            <div class="card-header bg-transparent border-0">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-pie-chart-fill me-2 text-info"></i>Channel Mix</h6>
+            </div>
+            <div class="card-body pt-0">
+                <div style="position:relative;height:220px;">
+                    <canvas id="chartChannelMix"></canvas>
+                </div>
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="channel-pill google"><i class="bi bi-google"></i> Google Ads</span>
+                        <strong style="font-size:0.85rem;">34%</strong>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="channel-pill linkedin"><i class="bi bi-linkedin"></i> LinkedIn</span>
+                        <strong style="font-size:0.85rem;">22%</strong>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="channel-pill email"><i class="bi bi-envelope-fill"></i> Email</span>
+                        <strong style="font-size:0.85rem;">18%</strong>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="channel-pill trade"><i class="bi bi-building"></i> Trade Shows</span>
+                        <strong style="font-size:0.85rem;">14%</strong>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="channel-pill referral"><i class="bi bi-people-fill"></i> Referral</span>
+                        <strong style="font-size:0.85rem;">12%</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Channel ROI Comparison -->
+    <div class="col-lg-8">
+        <div class="card mk-card border-0 shadow-sm h-100">
+            <div class="mk-stripe green"></div>
+            <div class="card-header bg-transparent border-0">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-cash-stack me-2 text-success"></i>Channel ROI & Cost Analysis</h6>
+            </div>
+            <div class="card-body pt-0">
+                <div style="position:relative;height:310px;">
+                    <canvas id="chartChannelROI"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== CAMPAIGNS TABLE + HEATMAP ==================== -->
+<div class="row g-3 mb-4">
+    <!-- Active Campaigns -->
+    <div class="col-lg-7">
+        <div class="card mk-card border-0 shadow-sm h-100">
+            <div class="mk-stripe orange"></div>
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-megaphone-fill me-2 text-warning"></i>Active Campaigns</h6>
+                <span class="badge bg-warning-subtle text-warning">12 Active</span>
+            </div>
+            <div class="card-body pt-0 mk-scroll" style="max-height:420px;overflow-y:auto;">
+                <!-- Campaign 1 -->
+                <div class="campaign-row d-flex align-items-center gap-3">
+                    <div class="campaign-icon" style="background:#4285f4;"><i class="bi bi-google"></i></div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold" style="font-size:0.88rem;">Freight Rate PPC — Q4 Push</div>
+                        <div class="d-flex align-items-center gap-2 mt-1">
+                            <span class="channel-pill google" style="font-size:0.65rem;">Google Ads</span>
+                            <small class="text-muted">Budget: $12,500</small>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold" style="color:#1cc88a;">5.2x ROI</div>
+                        <small class="text-muted">847 leads</small>
+                    </div>
+                </div>
+                <!-- Campaign 2 -->
+                <div class="campaign-row d-flex align-items-center gap-3">
+                    <div class="campaign-icon" style="background:#0a66c2;"><i class="bi bi-linkedin"></i></div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold" style="font-size:0.88rem;">Supply Chain Decision Makers</div>
+                        <div class="d-flex align-items-center gap-2 mt-1">
+                            <span class="channel-pill linkedin" style="font-size:0.65rem;">LinkedIn</span>
+                            <small class="text-muted">Budget: $8,200</small>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold" style="color:#1cc88a;">4.8x ROI</div>
+                        <small class="text-muted">312 leads</small>
+                    </div>
+                </div>
+                <!-- Campaign 3 -->
+                <div class="campaign-row d-flex align-items-center gap-3">
+                    <div class="campaign-icon" style="background:#1cc88a;"><i class="bi bi-envelope-fill"></i></div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold" style="font-size:0.88rem;">Cold Chain Logistics Nurture</div>
+                        <div class="d-flex align-items-center gap-2 mt-1">
+                            <span class="channel-pill email" style="font-size:0.65rem;">Email</span>
+                            <small class="text-muted">Budget: $2,100</small>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold" style="color:#1cc88a;">8.1x ROI</div>
+                        <small class="text-muted">198 leads</small>
+                    </div>
+                </div>
+                <!-- Campaign 4 -->
+                <div class="campaign-row d-flex align-items-center gap-3">
+                    <div class="campaign-icon" style="background:#e83e8c;"><i class="bi bi-instagram"></i></div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold" style="font-size:0.88rem;">Brand Awareness — Reels</div>
+                        <div class="d-flex align-items-center gap-2 mt-1">
+                            <span class="channel-pill social" style="font-size:0.65rem;">Social</span>
+                            <small class="text-muted">Budget: $4,800</small>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold" style="color:#f6c23e;">2.1x ROI</div>
+                        <small class="text-muted">540 leads</small>
+                    </div>
+                </div>
+                <!-- Campaign 5 -->
+                <div class="campaign-row d-flex align-items-center gap-3">
+                    <div class="campaign-icon" style="background:#f6c23e;"><i class="bi bi-building"></i></div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold" style="font-size:0.88rem;">Transport Expo Munich 2026</div>
+                        <div class="d-flex align-items-center gap-2 mt-1">
+                            <span class="channel-pill trade" style="font-size:0.65rem;">Trade Show</span>
+                            <small class="text-muted">Budget: $22,000</small>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold" style="color:#1cc88a;">6.3x ROI</div>
+                        <small class="text-muted">94 leads</small>
+                    </div>
+                </div>
+                <!-- Campaign 6 -->
+                <div class="campaign-row d-flex align-items-center gap-3">
+                    <div class="campaign-icon" style="background:#8b5cf6;"><i class="bi bi-people-fill"></i></div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold" style="font-size:0.88rem;">Client Referral Program</div>
+                        <div class="d-flex align-items-center gap-2 mt-1">
+                            <span class="channel-pill referral" style="font-size:0.65rem;">Referral</span>
+                            <small class="text-muted">Budget: $3,500</small>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold" style="color:#1cc88a;">11.2x ROI</div>
+                        <small class="text-muted">156 leads</small>
+                    </div>
+                </div>
+                <!-- Campaign 7 -->
+                <div class="campaign-row d-flex align-items-center gap-3">
+                    <div class="campaign-icon" style="background:#4285f4;"><i class="bi bi-search"></i></div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold" style="font-size:0.88rem;">SEO — Logistics Keywords</div>
+                        <div class="d-flex align-items-center gap-2 mt-1">
+                            <span class="channel-pill google" style="font-size:0.65rem;">Organic</span>
+                            <small class="text-muted">Budget: $5,400</small>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold" style="color:#1cc88a;">7.4x ROI</div>
+                        <small class="text-muted">620 leads</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Weekly Heatmap -->
+    <div class="col-lg-5">
+        <div class="card mk-card border-0 shadow-sm h-100">
+            <div class="mk-stripe red"></div>
+            <div class="card-header bg-transparent border-0">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-calendar-week me-2 text-danger"></i>Lead Activity Heatmap</h6>
+                <small class="text-muted">Leads by day & hour (last 4 weeks)</small>
+            </div>
+            <div class="card-body pt-2">
+                <div class="d-flex gap-1 mb-1">
+                    <div style="width:50px;"></div>
+                    <div class="flex-grow-1 d-flex gap-1">
+                        <small class="text-muted text-center flex-fill" style="font-size:0.6rem;">6AM</small>
+                        <small class="text-muted text-center flex-fill" style="font-size:0.6rem;">9AM</small>
+                        <small class="text-muted text-center flex-fill" style="font-size:0.6rem;">12PM</small>
+                        <small class="text-muted text-center flex-fill" style="font-size:0.6rem;">3PM</small>
+                        <small class="text-muted text-center flex-fill" style="font-size:0.6rem;">6PM</small>
+                        <small class="text-muted text-center flex-fill" style="font-size:0.6rem;">9PM</small>
+                    </div>
+                </div>
+                <div id="heatmapGrid"></div>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <small class="text-muted" style="font-size:0.7rem;">Low activity</small>
+                    <div class="d-flex gap-1">
+                        <div style="width:18px;height:10px;border-radius:2px;background:rgba(78,115,223,0.1);"></div>
+                        <div style="width:18px;height:10px;border-radius:2px;background:rgba(78,115,223,0.3);"></div>
+                        <div style="width:18px;height:10px;border-radius:2px;background:rgba(78,115,223,0.55);"></div>
+                        <div style="width:18px;height:10px;border-radius:2px;background:rgba(78,115,223,0.8);"></div>
+                        <div style="width:18px;height:10px;border-radius:2px;background:#4e73df;"></div>
+                    </div>
+                    <small class="text-muted" style="font-size:0.7rem;">High activity</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== BOTTOM ROW: Conversion + Pipeline ==================== -->
+<div class="row g-3 mb-4">
+    <!-- Conversion by Service -->
+    <div class="col-lg-5">
+        <div class="card mk-card border-0 shadow-sm h-100">
+            <div class="mk-stripe green"></div>
+            <div class="card-header bg-transparent border-0">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-truck me-2 text-success"></i>Conversion by Service Line</h6>
+            </div>
+            <div class="card-body pt-0">
+                <div style="position:relative;height:280px;">
+                    <canvas id="chartServiceConversion"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Monthly Revenue from Marketing -->
+    <div class="col-lg-7">
+        <div class="card mk-card border-0 shadow-sm h-100">
+            <div class="mk-stripe pink"></div>
+            <div class="card-header bg-transparent border-0">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-currency-dollar me-2" style="color:#e83e8c;"></i>Marketing-Sourced Revenue</h6>
+            </div>
+            <div class="card-body pt-0">
+                <div style="position:relative;height:280px;">
+                    <canvas id="chartRevenue"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== BOTTOM STATS BAR ==================== -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card mk-card border-0 shadow-sm">
+            <div class="mk-stripe blue"></div>
+            <div class="card-body py-3 text-center">
+                <div class="mk-label text-muted mb-1">Website Visits</div>
+                <div class="mk-kpi-sm text-primary">48.2K</div>
+                <div class="mk-trend up mt-1"><i class="bi bi-arrow-up-short"></i>24%</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card mk-card border-0 shadow-sm">
+            <div class="mk-stripe green"></div>
+            <div class="card-body py-3 text-center">
+                <div class="mk-label text-muted mb-1">Email Open Rate</div>
+                <div class="mk-kpi-sm" style="color:#1cc88a;">32.8%</div>
+                <div class="mk-trend up mt-1"><i class="bi bi-arrow-up-short"></i>2.1pp</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card mk-card border-0 shadow-sm">
+            <div class="mk-stripe purple"></div>
+            <div class="card-body py-3 text-center">
+                <div class="mk-label text-muted mb-1">Social Engagement</div>
+                <div class="mk-kpi-sm" style="color:#8b5cf6;">12.4K</div>
+                <div class="mk-trend up mt-1"><i class="bi bi-arrow-up-short"></i>31%</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card mk-card border-0 shadow-sm">
+            <div class="mk-stripe orange"></div>
+            <div class="card-body py-3 text-center">
+                <div class="mk-label text-muted mb-1">Content Downloads</div>
+                <div class="mk-kpi-sm" style="color:#f6c23e;">2,847</div>
+                <div class="mk-trend up mt-1"><i class="bi bi-arrow-up-short"></i>18%</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const C = {
+                primary: '#4e73df', success: '#1cc88a', info: '#36b9cc',
+                warning: '#f6c23e', danger: '#e74a3b', purple: '#8b5cf6',
+                pink: '#e83e8c', google: '#4285f4', linkedin: '#0a66c2'
+            };
+            function txtClr() { return getComputedStyle(document.documentElement).getPropertyValue('--bs-body-color').trim() || '#555'; }
+            function grdClr() { return 'rgba(128,128,128,0.1)'; }
+
+            // ===== 1. LEAD GENERATION TREND (Area + Bar combo) =====
+            new Chart(document.getElementById('chartLeadTrend'), {
+                type: 'bar',
+                data: {
+                    labels: ['Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb'],
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: 'MQL (Qualified)',
+                            data: [68,74,82,78,95,110,105,118,125,132,140,148],
+                            borderColor: C.purple,
+                            backgroundColor: 'transparent',
+                            tension: 0.4, pointRadius: 4, pointBackgroundColor: '#fff',
+                            pointBorderWidth: 2, borderWidth: 2.5, yAxisID: 'y', order: 0
+                        },
+                        {
+                            label: 'Total Leads',
+                            data: [220,248,275,260,310,365,340,380,410,430,460,490],
+                            backgroundColor: 'rgba(78,115,223,0.6)',
+                            borderRadius: 6, barPercentage: 0.55, yAxisID: 'y', order: 1
+                        },
+                        {
+                            label: 'Organic Leads',
+                            data: [80,92,105,98,125,148,140,160,172,185,195,210],
+                            backgroundColor: 'rgba(28,200,138,0.5)',
+                            borderRadius: 6, barPercentage: 0.55, yAxisID: 'y', order: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { usePointStyle: true, padding: 14, color: txtClr(), font: { size: 11 } } }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: txtClr() }, stacked: true },
+                        y: { grid: { color: grdClr() }, ticks: { color: txtClr() }, stacked: true, beginAtZero: true }
+                    }
+                }
+            });
+
+            // ===== 2. CHANNEL MIX (Doughnut) =====
+            new Chart(document.getElementById('chartChannelMix'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Google Ads','LinkedIn','Email','Trade Shows','Referral'],
+                    datasets: [{
+                        data: [34,22,18,14,12],
+                        backgroundColor: [C.google, C.linkedin, C.success, C.warning, C.purple],
+                        borderWidth: 0, hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    cutout: '68%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: ctx => ctx.label + ': ' + ctx.parsed + '%' } }
+                    }
+                }
+            });
+
+            // ===== 3. CHANNEL ROI (Grouped bar with line) =====
+            new Chart(document.getElementById('chartChannelROI'), {
+                type: 'bar',
+                data: {
+                    labels: ['Google Ads','LinkedIn','Email','Trade Shows','Referral','SEO','Social Media'],
+                    datasets: [
+                        {
+                            label: 'Spend ($K)',
+                            data: [12.5, 8.2, 2.1, 22.0, 3.5, 5.4, 4.8],
+                            backgroundColor: 'rgba(231,74,59,0.7)',
+                            borderRadius: 4, barPercentage: 0.4, categoryPercentage: 0.8
+                        },
+                        {
+                            label: 'Revenue ($K)',
+                            data: [65.0, 39.4, 17.0, 138.6, 39.2, 40.0, 10.1],
+                            backgroundColor: 'rgba(28,200,138,0.7)',
+                            borderRadius: 4, barPercentage: 0.4, categoryPercentage: 0.8
+                        },
+                        {
+                            type: 'line',
+                            label: 'ROI (x)',
+                            data: [5.2, 4.8, 8.1, 6.3, 11.2, 7.4, 2.1],
+                            borderColor: C.purple,
+                            backgroundColor: 'transparent',
+                            tension: 0.4, pointRadius: 5, pointBackgroundColor: '#fff',
+                            pointBorderWidth: 2.5, borderWidth: 2.5, yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { usePointStyle: true, padding: 14, color: txtClr(), font: { size: 11 } } }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: txtClr(), font: { size: 10 } } },
+                        y: { grid: { color: grdClr() }, ticks: { color: txtClr(), callback: v => '$' + v + 'K' }, beginAtZero: true, position: 'left' },
+                        y1: { grid: { display: false }, ticks: { color: C.purple, callback: v => v + 'x' }, beginAtZero: true, position: 'right' }
+                    }
+                }
+            });
+
+            // ===== 4. CONVERSION BY SERVICE LINE (Horizontal bar) =====
+            new Chart(document.getElementById('chartServiceConversion'), {
+                type: 'bar',
+                data: {
+                    labels: ['Ocean Freight','Air Freight','Road Transport','Warehousing','Customs Brokerage','Last Mile'],
+                    datasets: [
+                        {
+                            label: 'Conversion Rate %',
+                            data: [28.5, 22.1, 31.4, 18.7, 35.2, 24.8],
+                            backgroundColor: [
+                                'rgba(78,115,223,0.75)', 'rgba(54,185,204,0.75)', 'rgba(28,200,138,0.75)',
+                                'rgba(246,194,62,0.75)', 'rgba(139,92,246,0.75)', 'rgba(232,62,140,0.75)'
+                            ],
+                            borderRadius: 6, barPercentage: 0.6
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: ctx => ctx.parsed.x + '% conversion' } }
+                    },
+                    scales: {
+                        x: { grid: { color: grdClr() }, ticks: { color: txtClr(), callback: v => v + '%' }, max: 40, beginAtZero: true },
+                        y: { grid: { display: false }, ticks: { color: txtClr(), font: { size: 11 } } }
+                    }
+                }
+            });
+
+            // ===== 5. MARKETING-SOURCED REVENUE (Stacked area) =====
+            new Chart(document.getElementById('chartRevenue'), {
+                type: 'line',
+                data: {
+                    labels: ['Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb'],
+                    datasets: [
+                        {
+                            label: 'Paid Channels',
+                            data: [120,135,142,130,165,190,185,210,225,240,255,270],
+                            borderColor: C.primary, backgroundColor: 'rgba(78,115,223,0.15)',
+                            fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2
+                        },
+                        {
+                            label: 'Organic / SEO',
+                            data: [80,88,95,92,110,125,120,138,148,155,168,180],
+                            borderColor: C.success, backgroundColor: 'rgba(28,200,138,0.12)',
+                            fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2
+                        },
+                        {
+                            label: 'Referral',
+                            data: [40,45,50,48,58,65,62,72,78,82,90,95],
+                            borderColor: C.purple, backgroundColor: 'rgba(139,92,246,0.1)',
+                            fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2
+                        },
+                        {
+                            label: 'Events',
+                            data: [0,0,0,65,0,0,0,0,85,0,0,0],
+                            borderColor: C.warning, backgroundColor: 'rgba(246,194,62,0.15)',
+                            fill: true, tension: 0.1, pointRadius: 3, pointBackgroundColor: C.warning,
+                            borderWidth: 1.5, borderDash: [4,4]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { usePointStyle: true, padding: 14, color: txtClr(), font: { size: 11 } } },
+                        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': $' + ctx.parsed.y + 'K' } }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: txtClr() } },
+                        y: { stacked: true, grid: { color: grdClr() }, ticks: { color: txtClr(), callback: v => '$' + v + 'K' }, beginAtZero: true }
+                    }
+                }
+            });
+
+            // ===== 6. HEATMAP GENERATOR =====
+            const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+            const hours = [6,9,12,15,18,21];
+            const heatmapData = [
+                [12,35,58,72,45,18], // Mon
+                [15,42,65,78,52,22], // Tue
+                [10,38,70,85,60,20], // Wed
+                [18,45,62,80,48,15], // Thu
+                [14,40,55,68,38,12], // Fri
+                [5,12,20,15,8,3],    // Sat
+                [3,8,14,10,6,2]      // Sun
+            ];
+            const gridEl = document.getElementById('heatmapGrid');
+            days.forEach((day, di) => {
+                const row = document.createElement('div');
+                row.className = 'd-flex gap-1 mb-1 align-items-center';
+                row.innerHTML = '<small class="text-muted fw-semibold" style="width:50px;font-size:0.72rem;">' + day + '</small>';
+                const cellsWrap = document.createElement('div');
+                cellsWrap.className = 'flex-grow-1 d-flex gap-1';
+                hours.forEach((h, hi) => {
+                    const val = heatmapData[di][hi];
+                    const maxVal = 85;
+                    const intensity = Math.max(0.08, val / maxVal);
+                    const cell = document.createElement('div');
+                    cell.className = 'heatmap-cell flex-fill';
+                    cell.style.background = 'rgba(78,115,223,' + intensity + ')';
+                    cell.title = day + ' ' + h + ':00 — ' + val + ' leads';
+                    if (intensity > 0.5) cell.textContent = val;
+                    else { cell.style.color = 'transparent'; cell.textContent = val; }
+                    cell.addEventListener('mouseenter', function() { this.style.color = '#fff'; });
+                    cell.addEventListener('mouseleave', function() { if (intensity <= 0.5) this.style.color = 'transparent'; });
+                    cellsWrap.appendChild(cell);
+                });
+                row.appendChild(cellsWrap);
+                gridEl.appendChild(row);
+            });
+
+            // ===== COUNTER ANIMATIONS =====
+            function animateVal(el, start, end, dur, prefix, suffix) {
+                prefix = prefix || ''; suffix = suffix || '';
+                let startTime = null;
+                const step = (ts) => {
+                    if (!startTime) startTime = ts;
+                    const p = Math.min((ts - startTime) / dur, 1);
+                    const eased = 1 - Math.pow(1 - p, 3);
+                    const val = Math.floor(eased * (end - start) + start);
+                    el.textContent = prefix + val.toLocaleString() + suffix;
+                    if (p < 1) requestAnimationFrame(step);
+                };
+                requestAnimationFrame(step);
+            }
+            animateVal(document.getElementById('kpiLeads'), 0, 3847, 2000, '', '');
+
+        });
+    </script>
+}

@@ -1,0 +1,58 @@
+﻿@using ShipRate.Application.Services
+@model ContainerRecommendationResult
+
+<div class="modal fade" id="cargoDetailModal" tabindex="-1" aria-hidden="true" dir="ltr">
+    <div class="modal-dialog modal-dialog-centered">
+        <!-- حذف modal-lg برای جمع‌وجورتر شدن -->
+        <div class="modal-content">
+            @if (Model != null)
+            {
+                @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+                {
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        @Model.ErrorMessage
+                    </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                }
+                else
+                {
+
+
+
+                    <div class="modal-header bg-light py-2">
+                        <h6 class="modal-title fw-bold">Container Recommendation</h6>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body py-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="text-primary mb-0">@Model.Container.ShortName</h4>
+                            <span class="badge bg-primary fs-6">@Model.RequiredQuantity Unit(s)</span>
+                        </div>
+
+                        <p class="text-muted small mb-3 border-bottom pb-2">@Model.RecommendationNotes</p>
+
+                        <div class="small">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Volume Efficiency</span>
+                                <span class="fw-bold">@Model.VolumeUtilizationPercentage%</span>
+                            </div>
+                            <div class="progress mb-3" style="height: 8px;">
+                                <div class="progress-bar bg-info" style="width: @Model.VolumeUtilizationPercentage%"></div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Weight Efficiency</span>
+                                <span class="fw-bold">@Model.WeightUtilizationPercentage%</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-warning" style="width: @Model.WeightUtilizationPercentage%"></div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>

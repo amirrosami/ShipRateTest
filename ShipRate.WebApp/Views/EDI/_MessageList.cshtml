@@ -1,0 +1,186 @@
+﻿@using ShipRate.Application.DTOs.EDI
+@model EDIMessageListViewModel
+
+@{
+    var totalCount = Model.Result?.TotalCount ?? 0;
+    var items = Model.Result?.Items ?? new List<EDIMessageRowDto>();
+    var totalPages = Model.PageSize > 0
+        ? (int)Math.Ceiling((double)totalCount / Model.PageSize)
+        : 1;
+}
+
+<div class="card" dir="ltr">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="mb-0">Messages - @Model.MessageTypeCode / @Model.MessageTypeName</h5>
+        </div>
+        <div>
+            <button class="btn btn-sm btn-success"
+                    hx-get="@Url.Action("CreateModal", "EDI", new { messageTypeId = Model.MessageTypeId })"
+                    hx-target="#ediModalBody"
+                    hx-swap="innerHTML"
+                    hx-on::after-request="showEdiModal()">
+                Add
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <form
+            hx-get="@Url.Action("MessageList", "EDI")"
+            hx-target="#message-list-container"
+            hx-swap="innerHTML"
+            class="row g-3 mb-3">
+            
+            <input type="hidden" name="messageTypeId" value="@Model.MessageTypeId" />
+            <input type="hidden" name="pageNumber" value="1" />
+
+            <div class="col-md-4">
+                <label class="form-label">Search Term</label>
+                <input type="text" name="searchTerm" value="@Model.SearchTerm" class="form-control" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Page Size</label>
+                <select name="pageSize" class="form-select">
+                    @foreach (var size in new[] { 5, 10, 20, 50, 100 })
+                    {
+                        if (size == Model.PageSize)
+                        {
+                            <option value="@size" selected>@size</option>
+                        }
+                        else
+                        {
+                            <option value="@size">@size</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-3 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary">Search</button>
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        hx-get="@Url.Action("MessageList", "EDI", new { messageTypeId = Model.MessageTypeId, pageNumber = 1, pageSize = Model.PageSize })"
+                        hx-target="#message-list-container"
+                        hx-swap="innerHTML">
+                    Reset
+                </button>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Reference No</th>
+                        <th>In/Out</th>
+                        <th>Received At</th>
+                        <th>Processed At</th>
+                        <th>Error Message</th>
+                        <th>Remarks</th>
+                        <th>Created At</th>
+                        <th>Active</th>
+                        <th style="width:120px;">Payload</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (items.Any())
+                {
+                    foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.ReferenceNumber</td>
+                            <td>@item.InOutName</td>
+                            <td>@item.ReceivedAt?.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@item.ProcessedAt?.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@item.ErrorMessage</td>
+                            <td>@item.Remarks</td>
+                            <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="badge bg-success">Yes</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">No</span>
+                                }
+                            </td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-primary"
+                                   href="@Url.Action("DownloadPayload", "EDI", new { id = item.Id })">
+                                    Download
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="9" class="text-center">No records found.</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+                Total: <strong>@totalCount</strong>
+            </div>
+
+            <nav>
+                <ul class="pagination mb-0">
+                    <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
+                        <button class="page-link"
+                                @(Model.PageNumber <= 1 ? "disabled" : "")
+                                hx-get="@Url.Action("MessageList", "EDI", new {
+                                    messageTypeId = Model.MessageTypeId,
+                                    searchTerm = Model.SearchTerm,
+                                    pageNumber = Model.PageNumber - 1,
+                                    pageSize = Model.PageSize
+                                })"
+                                hx-target="#message-list-container"
+                                hx-swap="innerHTML">
+                            Previous
+                        </button>
+                    </li>
+
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                            <button class="page-link"
+                                    hx-get="@Url.Action("MessageList", "EDI", new {
+                                        messageTypeId = Model.MessageTypeId,
+                                        searchTerm = Model.SearchTerm,
+                                        pageNumber = i,
+                                        pageSize = Model.PageSize
+                                    })"
+                                    hx-target="#message-list-container"
+                                    hx-swap="innerHTML">
+                                @i
+                            </button>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.PageNumber >= totalPages ? "disabled" : "")">
+                        <button class="page-link"
+                                @(Model.PageNumber >= totalPages ? "disabled" : "")
+                                hx-get="@Url.Action("MessageList", "EDI", new {
+                                    messageTypeId = Model.MessageTypeId,
+                                    searchTerm = Model.SearchTerm,
+                                    pageNumber = Model.PageNumber + 1,
+                                    pageSize = Model.PageSize
+                                })"
+                                hx-target="#message-list-container"
+                                hx-swap="innerHTML">
+                            Next
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,38 @@
+﻿@{
+    var id = (Guid)ViewBag.Id;
+    var seriesId = (Guid)ViewBag.SeriesId;
+}
+
+<div class="modal fade show" style="display:block;" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="ConfirmDeleteBatchAssign"
+                  method="post"
+                  hx-post="@Url.Action("ConfirmDeleteBatchAssign")"
+                  hx-target="body"
+                  hx-swap="none">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@id" />
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Batch Assignment</h5>
+                    <button type="button" class="btn-close" onclick="this.closest('.modal').remove();"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this batch assignment?
+                </div>
+                <div class="modal-footer">
+                    <button type="submit"
+                            class="btn btn-danger"
+                            hx-on::after-request="
+                            htmx.ajax('GET', '@Url.Action("BatchAssignGrid")?seriesId=@seriesId', '#batchAssignGridContainer');
+                            htmx.ajax('GET', '@Url.Action("SerialGrid")?seriesId=@seriesId', '#serialGridContainer');
+                            this.closest('.modal').remove();
+                        ">
+                        Delete
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove();">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

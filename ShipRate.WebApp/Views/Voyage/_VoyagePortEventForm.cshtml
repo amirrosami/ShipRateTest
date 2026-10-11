@@ -1,0 +1,106 @@
+﻿@using ShipRate.WebApp.ViewModels
+@using ShipRate.WebApp.ViewModels.Location
+@using ShipRate.WebApp.ViewModels.TerritoryVms
+@using ShipRate.WebApp.ViewModels.VoyageVms
+@model VoyagePortEventFormViewModel
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+
+    var OutString = "";
+    if (@ViewBag.OutboundVoyageNo != null)
+    {
+        OutString = " Outbound Voyage : " + @ViewBag.OutboundVoyageNo;
+    }
+}
+
+<form hx-post="@Url.Action(isCreateMode?"CreateVoyagePortEvent":"EditVoyagePortEvent", "Voyage")"
+      hx-target="#app-modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header form-caption-bg  text-white">
+        <input type="hidden" asp-for="VoyagePortId" />
+
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add Event For Voyage: @ViewBag.VoyageNo @OutString In Port:@ViewBag.PortName</h5>
+        }
+        else
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Edit Country HSCode</h5>
+            <input type="hidden" asp-for="Id" />
+        }
+
+
+        <button type="button"
+                class="btn-close"
+                onclick="AppModal.close()">
+        </button>
+    </div>
+
+
+    <div class="modal-body row">
+
+        @Html.AntiForgeryToken()
+        @if (!ViewData.ModelState.IsValid)
+        {
+            var allErrors = ViewData.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            if (allErrors.Any())
+            {
+                <div class="alert alert-danger py-2 mb-1">
+                    <ul class="mb-0 small">
+                        @foreach (var err in allErrors)
+                        {
+                            <li>@err</li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+
+        <div class="col-md-4">
+            <label class="form-label">Event <span class="text-danger">*</span></label>
+            <select name="EventTypeId" class="form-select form-select-sm" required>
+                <option value="">-- Select --</option>
+                @foreach (var item in Model.EventTypes)
+                {
+                    <option value="@item.Value" selected="@(item.Value == Model.EventTypeId.ToString())">@item.Text</option>
+                }
+            </select>
+            <span asp-validation-for="EventTypeId" class="text-danger small"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="VoyagePortEventDateTime" class="form-label fw-semibold">
+                <i class="bi bi-box-arrow-in-right me-1 text-success"></i>Event Date Time
+            </label>
+            <input asp-for="VoyagePortEventDateTime" class="form-control" type="datetime-local" />
+        </div>
+        <div class="col-md-12">
+            <label class="form-label">Remarks</label>
+            <textarea name="VoyagePortEventRemarks" class="form-control form-control-sm" rows="2" maxlength="500">@Model.VoyagePortEventRemarks</textarea>
+        </div>
+
+
+    </div>
+
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="AppModal.close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>
+
+
+

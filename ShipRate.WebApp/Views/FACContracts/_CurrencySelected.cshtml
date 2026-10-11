@@ -1,0 +1,13 @@
+﻿@using ShipRate.Domain.Entities.BaseInfo.Finance
+@model Currency
+
+<div id="currencyBox">
+
+    <input type="hidden" name="CurrencyId" value="@Model.Id" />
+
+    <input type="text"
+           class="form-control"
+           value="@Model.CurrencyCode"
+           readonly />
+
+</div>

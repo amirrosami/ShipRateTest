@@ -1,0 +1,103 @@
+﻿@using ShipRate.Application.DTOs
+@model ServiceRequestApprovalFormDto
+
+<div class="modal fade" id="approvalModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post"
+                  hx-post="@Url.Action("SaveApproval", "ServiceRequests")"
+                  hx-target="#approvals-panel"
+                  hx-swap="innerHTML">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="ServiceRequestId" />
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @(Model.Id.HasValue ? "Edit Approval" : "Add Approval")
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="ApprovalTypeId" class="form-label"></label>
+                            <select asp-for="ApprovalTypeId" asp-items="Model.ApprovalTypes" class="form-select">
+                                <option value="">-- Select --</option>
+                            </select>
+                            <span asp-validation-for="ApprovalTypeId" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="ApprovalStatusId" class="form-label"></label>
+                            <select asp-for="ApprovalStatusId" asp-items="Model.ApprovalStatuses" class="form-select">
+                                <option value="">-- Select --</option>
+                            </select>
+                            <span asp-validation-for="ApprovalStatusId" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="ApproverUserId" class="form-label"></label>
+                            <select asp-for="ApproverUserId" asp-items="Model.ApproverUsers" class="form-select">
+                                <option value="">-- Select --</option>
+                            </select>
+                            <span asp-validation-for="ApproverUserId" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="ApprovedAt" class="form-label"></label>
+                            <input asp-for="ApprovedAt" type="datetime-local" class="form-control" />
+                            <span asp-validation-for="ApprovedAt" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-8">
+                            <label asp-for="Remarks" class="form-label"></label>
+                            <input asp-for="Remarks" class="form-control" />
+                            <span asp-validation-for="Remarks" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+@* <script>
+    document.body.addEventListener('htmx:afterSwap', function (e) {
+        if (e.detail.target.id === 'modal-container') {
+            const modalEl = document.getElementById('approvalModal');
+            if (modalEl) {
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+
+                modalEl.addEventListener('hidden.bs.modal', function () {
+                    document.getElementById('modal-container').innerHTML = '';
+                }, { once: true });
+            }
+        }
+    });
+
+    document.body.addEventListener('htmx:beforeSwap', function (e) {
+        if (e.detail.target.id === 'approvals-panel') {
+            const modalEl = document.getElementById('approvalModal');
+            if (modalEl) {
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) {
+                    modal.hide();
+                }
+            }
+        }
+    });
+</script>
+ *@
+
+

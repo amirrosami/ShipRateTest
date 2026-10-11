@@ -1,0 +1,159 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.Finance
+@model PagedResultDto<PettyCashListItemDto>
+
+@{
+    var search = (PettyCashIndexSearchDto)ViewBag.Search;
+    var totalPages = Model.PageSize == 0 ? 1 : (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize);
+    var startPage = Math.Max(1, Model.PageNumber - 2);
+    var endPage = Math.Min(totalPages, Model.PageNumber + 2);
+}
+
+<div class="card mb-3" dir="ltr">
+    <div class="card-header d-flex justify-content-between">
+        <span>Petty Cashes</span>
+        <span>Total: @Model.TotalCount</span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-sm table-striped table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Title</th>
+                    <th>Owner Person</th>
+                    <th>Custodian User</th>
+                    <th class="text-end">Initial</th>
+                    <th class="text-end">Balance</th>
+                    <th>Active</th>
+                    <th style="width:360px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.Code</td>
+                        <td>@item.Title</td>
+                        <td>@item.PersonName</td>
+                        <td>@item.CustodianUserName</td>
+                        <td class="text-end">@item.InitialAmount.ToString("N2")</td>
+                        <td class="text-end">@item.CurrentBalance.ToString("N2")</td>
+                        <td>@(item.IsActive ? "Yes" : "No")</td>
+                        <td>
+                            <input type="hidden" name="activePettyCashId" value="@item.Id" />
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-primary"
+                                    title="Edit"
+                                    aria-label="Edit"
+                                    hx-get="@Url.Action("EditPettyCash", "PettyCash", new { id = item.Id })"
+                                    hx-target="#pettyModalBody"
+                                    hx-swap="innerHTML"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#pettyModal">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+
+                            <form class="d-inline"
+                                  hx-post="@Url.Action("DeletePettyCash", "PettyCash", new { id = item.Id })"
+                                  hx-confirm="Delete this petty cash?"
+                                  hx-target="closest tr"
+                                  hx-swap="none">
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-danger"
+                                        title="Delete"
+                                        aria-label="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-info"
+                                    title="Expenses"
+                                    aria-label="Expenses"
+                                    hx-get="@Url.Action("Expenses", "PettyCash", new { pettyCashId = item.Id })"
+                                    hx-target="#expensesPanel"
+                                    hx-swap="innerHTML">
+                                <i class="bi bi-receipt"></i>
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-info"
+                                    title="Recharges"
+                                    aria-label="Recharges"
+                                    hx-get="@Url.Action("Recharges", "PettyCash", new { pettyCashId = item.Id })"
+                                    hx-target="#rechargesPanel"
+                                    hx-swap="innerHTML">
+                                <i class="bi bi-wallet2"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    hx-get="/DocumentManager/Index?objectId=@item.Id&objectTypeId=250"
+                                    hx-target="#document-manager-content"
+                                    hx-swap="innerHTML"
+                                    data-bs-toggle="modal"
+                                    title="Documents"
+                                    data-bs-target="#documentManagerModal">
+                                <i class="bi bi-paperclip"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-footer">
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       hx-get="@Url.Action("Grid", "PettyCash", new { search.Term, search.CompanyId, Page = Model.PageNumber - 1, search.PageSize })"
+                       hx-target="#pettyCashGrid"
+                       hx-include="#searchForm">Prev</a>
+                </li>
+
+                @if (startPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link"
+                           hx-get="@Url.Action("Grid", "PettyCash", new { search.Term, search.CompanyId, Page = 1, search.PageSize })"
+                           hx-target="#pettyCashGrid"
+                           hx-include="#searchForm">1</a>
+                    </li>
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                }
+
+                @for (var i = startPage; i <= endPage; i++)
+                {
+                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                        <a class="page-link"
+                           hx-get="@Url.Action("Grid", "PettyCash", new { search.Term, search.CompanyId, Page = i, search.PageSize })"
+                           hx-target="#pettyCashGrid"
+                           hx-include="#searchForm">@i</a>
+                    </li>
+                }
+
+                @if (endPage < totalPages)
+                {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                    <li class="page-item">
+                        <a class="page-link"
+                           hx-get="@Url.Action("Grid", "PettyCash", new { search.Term, search.CompanyId, Page = totalPages, search.PageSize })"
+                           hx-target="#pettyCashGrid"
+                           hx-include="#searchForm">@totalPages</a>
+                    </li>
+                }
+
+                <li class="page-item @(Model.PageNumber >= totalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       hx-get="@Url.Action("Grid", "PettyCash", new { search.Term, search.CompanyId, Page = Model.PageNumber + 1, search.PageSize })"
+                       hx-target="#pettyCashGrid"
+                       hx-include="#searchForm">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>

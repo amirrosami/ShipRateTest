@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["Title"] = "Utilities Hub";
+}
+
+<div class="container-fluid py-3">
+    <div class="hub-page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="fw-bold mb-1"><i class="bi bi-tools text-primary me-2"></i>System Utilities & Comms</h5>
+            <span class="text-muted small">Central document repository, official correspondences, postal dispatches, and EDI</span>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <auth-policy policy="Utilities.Documents.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Documents" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-paperclip"></i></div>
+                    <div>
+                        <div class="hub-title">Documents</div>
+                        <p class="hub-desc">Central DMS repository for uploaded customs scans and BL files.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Utilities.Correspondences.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Correspondences" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-envelope-paper"></i></div>
+                    <div>
+                        <div class="hub-title">Correspondences</div>
+                        <p class="hub-desc">Secretariat office, incoming/outgoing official letters, and archiving.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Utilities.PostalDispatch.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="PostalDispatches" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-mailbox"></i></div>
+                    <div>
+                        <div class="hub-title">Postal Dispatch</div>
+                        <p class="hub-desc">Courier tracking, barcode delivery receipts, and postal logging.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Utilities.EDIMessages.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="EDI" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-cpu"></i></div>
+                    <div>
+                        <div class="hub-title">EDI Messages</div>
+                        <p class="hub-desc">EDIFACT messages, customs transmissions, and electronic manifests.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Utilities.Maps.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Maps" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-map"></i></div>
+                    <div>
+                        <div class="hub-title">Map Viewer</div>
+                        <p class="hub-desc">GIS geographic dashboard for port visualization and transit tracks.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+    </div>
+</div>

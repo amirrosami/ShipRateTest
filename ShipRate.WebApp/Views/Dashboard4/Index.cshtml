@@ -1,0 +1,1508 @@
+﻿@{
+    ViewData["Title"] = "Transit Logistics Command Center";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Transit Logistics Command Center</title>
+    <style>
+        @@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap');
+
+        *{margin:0;padding:0;box-sizing:border-box}
+
+        :root{
+            --bg-primary:#0a0e1a;
+            --bg-secondary:#111827;
+            --bg-card:#1a1f35;
+            --bg-card-hover:#222845;
+            --accent-cyan:#00e5ff;
+            --accent-orange:#ff6d00;
+            --accent-green:#00e676;
+            --accent-red:#ff1744;
+            --accent-purple:#d500f9;
+            --accent-yellow:#ffd600;
+            --accent-blue:#2979ff;
+            --text-primary:#e8eaed;
+            --text-secondary:#9aa0b8;
+            --text-muted:#5a6178;
+            --border-color:#2a3050;
+            --glow-cyan:0 0 20px rgba(0,229,255,.3);
+            --glow-orange:0 0 20px rgba(255,109,0,.3);
+            --glow-green:0 0 20px rgba(0,230,118,.3);
+        }
+
+        body{
+            background:var(--bg-primary);
+            color:var(--text-primary);
+            font-family:'Rajdhani',sans-serif;
+            min-height:100vh;
+            overflow-x:hidden;
+        }
+
+        /* ====== ANIMATED BACKGROUND ====== */
+        .bg-animation{
+            position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(0,229,255,.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(255,109,0,.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(0,230,118,.03) 0%, transparent 50%);
+        }
+        .grid-overlay{
+            position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;
+            background-image:
+                linear-gradient(rgba(0,229,255,.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,229,255,.03) 1px, transparent 1px);
+            background-size:60px 60px;
+            animation:gridMove 20s linear infinite;
+        }
+        @@keyframes gridMove{
+            0%{transform:translate(0,0)}
+            100%{transform:translate(60px,60px)}
+        }
+
+        /* ====== HEADER ====== */
+        .header{
+            position:relative;z-index:10;
+            padding:16px 30px;
+            background:linear-gradient(135deg, rgba(26,31,53,.95), rgba(17,24,39,.95));
+            border-bottom:1px solid var(--border-color);
+            display:flex;align-items:center;justify-content:space-between;
+            backdrop-filter:blur(20px);
+        }
+        .header-left{display:flex;align-items:center;gap:20px}
+        .logo-icon{
+            width:52px;height:52px;
+            background:linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            border-radius:14px;
+            display:flex;align-items:center;justify-content:center;
+            font-size:26px;
+            box-shadow:var(--glow-cyan);
+            animation:logoPulse 3s ease-in-out infinite;
+        }
+        @@keyframes logoPulse{
+            0%,100%{box-shadow:0 0 15px rgba(0,229,255,.3)}
+            50%{box-shadow:0 0 30px rgba(0,229,255,.6)}
+        }
+        .header-title h1{
+            font-family:'Orbitron',monospace;
+            font-size:22px;font-weight:700;
+            background:linear-gradient(90deg,var(--accent-cyan),#fff,var(--accent-orange));
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+            letter-spacing:2px;
+        }
+        .header-title p{
+            font-size:12px;color:var(--text-secondary);
+            font-family:'Share Tech Mono',monospace;letter-spacing:1px;
+        }
+        .header-right{display:flex;align-items:center;gap:24px}
+        .live-clock{
+            font-family:'Share Tech Mono',monospace;
+            font-size:18px;color:var(--accent-cyan);
+            padding:8px 16px;
+            border:1px solid rgba(0,229,255,.3);
+            border-radius:8px;
+            background:rgba(0,229,255,.05);
+        }
+        .status-badge{
+            display:flex;align-items:center;gap:8px;
+            padding:8px 16px;border-radius:20px;
+            background:rgba(0,230,118,.1);
+            border:1px solid rgba(0,230,118,.3);
+            font-size:13px;font-weight:600;color:var(--accent-green);
+        }
+        .status-dot{
+            width:8px;height:8px;border-radius:50%;
+            background:var(--accent-green);
+            animation:blink 1.5s ease-in-out infinite;
+        }
+        @@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+        /* ====== SCROLLING TICKER ====== */
+        .ticker-bar{
+            position:relative;z-index:10;
+            background:linear-gradient(90deg,rgba(255,109,0,.1),rgba(0,229,255,.1),rgba(255,109,0,.1));
+            border-bottom:1px solid var(--border-color);
+            overflow:hidden;height:36px;
+            display:flex;align-items:center;
+        }
+        .ticker-content{
+            display:flex;align-items:center;gap:40px;
+            white-space:nowrap;
+            animation:tickerScroll 40s linear infinite;
+            font-family:'Share Tech Mono',monospace;
+            font-size:12px;color:var(--text-secondary);
+        }
+        @@keyframes tickerScroll{
+            0%{transform:translateX(0)}
+            100%{transform:translateX(-50%)}
+        }
+        .ticker-item{display:flex;align-items:center;gap:8px}
+        .ticker-item .up{color:var(--accent-green)}
+        .ticker-item .down{color:var(--accent-red)}
+        .ticker-sep{color:var(--text-muted);font-size:8px}
+
+        /* ====== MAIN LAYOUT ====== */
+        .main-content{
+            position:relative;z-index:5;
+            padding:20px 24px;
+            display:flex;flex-direction:column;gap:20px;
+            max-width:1920px;margin:0 auto;
+        }
+
+        /* ====== TOP KPI STRIP ====== */
+        .kpi-strip{
+            display:grid;
+            grid-template-columns:repeat(6, 1fr);
+            gap:16px;
+        }
+        .kpi-card{
+            background:var(--bg-card);
+            border:1px solid var(--border-color);
+            border-radius:14px;
+            padding:18px 20px;
+            position:relative;
+            overflow:hidden;
+            transition:all .3s ease;
+            cursor:default;
+        }
+        .kpi-card:hover{
+            transform:translateY(-3px);
+            border-color:var(--accent-cyan);
+            box-shadow:var(--glow-cyan);
+        }
+        .kpi-card::before{
+            content:'';position:absolute;top:0;left:0;right:0;height:3px;
+            border-radius:14px 14px 0 0;
+        }
+        .kpi-card:nth-child(1)::before{background:linear-gradient(90deg,var(--accent-cyan),var(--accent-blue))}
+        .kpi-card:nth-child(2)::before{background:linear-gradient(90deg,var(--accent-orange),var(--accent-yellow))}
+        .kpi-card:nth-child(3)::before{background:linear-gradient(90deg,var(--accent-green),#69f0ae)}
+        .kpi-card:nth-child(4)::before{background:linear-gradient(90deg,var(--accent-purple),#e040fb)}
+        .kpi-card:nth-child(5)::before{background:linear-gradient(90deg,var(--accent-red),#ff5252)}
+        .kpi-card:nth-child(6)::before{background:linear-gradient(90deg,var(--accent-yellow),var(--accent-orange))}
+
+        .kpi-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+        .kpi-label{font-size:12px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+        .kpi-icon{font-size:20px;opacity:.7}
+        .kpi-value{
+            font-family:'Orbitron',monospace;
+            font-size:28px;font-weight:700;
+            margin-bottom:8px;
+        }
+        .kpi-card:nth-child(1) .kpi-value{color:var(--accent-cyan)}
+        .kpi-card:nth-child(2) .kpi-value{color:var(--accent-orange)}
+        .kpi-card:nth-child(3) .kpi-value{color:var(--accent-green)}
+        .kpi-card:nth-child(4) .kpi-value{color:var(--accent-purple)}
+        .kpi-card:nth-child(5) .kpi-value{color:var(--accent-red)}
+        .kpi-card:nth-child(6) .kpi-value{color:var(--accent-yellow)}
+
+        .kpi-change{
+            display:flex;align-items:center;gap:6px;
+            font-size:12px;font-weight:600;
+        }
+        .kpi-change.positive{color:var(--accent-green)}
+        .kpi-change.negative{color:var(--accent-red)}
+        .kpi-spark{
+            position:absolute;bottom:10px;right:14px;
+            opacity:.2;
+        }
+
+        /* ====== SECTION GRID ====== */
+        .section-row{
+            display:grid;gap:20px;
+        }
+        .row-2-1{grid-template-columns:2fr 1fr}
+        .row-1-1{grid-template-columns:1fr 1fr}
+        .row-1-1-1{grid-template-columns:1fr 1fr 1fr}
+        .row-3-col{grid-template-columns:1.2fr 1fr .8fr}
+
+        /* ====== CARD PANELS ====== */
+        .panel{
+            background:var(--bg-card);
+            border:1px solid var(--border-color);
+            border-radius:16px;
+            overflow:hidden;
+            transition:all .3s;
+        }
+        .panel:hover{border-color:rgba(0,229,255,.2)}
+        .panel-header{
+            padding:16px 20px;
+            border-bottom:1px solid var(--border-color);
+            display:flex;align-items:center;justify-content:space-between;
+            background:rgba(0,0,0,.2);
+        }
+        .panel-title{
+            font-family:'Orbitron',monospace;
+            font-size:13px;font-weight:600;
+            text-transform:uppercase;letter-spacing:2px;
+            color:var(--text-primary);
+            display:flex;align-items:center;gap:10px;
+        }
+        .panel-title .dot{
+            width:8px;height:8px;border-radius:50%;
+            background:var(--accent-cyan);
+            box-shadow:0 0 8px var(--accent-cyan);
+        }
+        .panel-badge{
+            font-size:11px;padding:3px 10px;border-radius:12px;
+            font-family:'Share Tech Mono',monospace;
+        }
+        .badge-live{background:rgba(255,23,68,.15);color:var(--accent-red);border:1px solid rgba(255,23,68,.3)}
+        .badge-info{background:rgba(0,229,255,.1);color:var(--accent-cyan);border:1px solid rgba(0,229,255,.3)}
+        .panel-body{padding:20px}
+
+        /* ====== TRANSIT CORRIDOR MAP ====== */
+        .corridor-map{
+            position:relative;
+            height:380px;
+            background:
+                radial-gradient(ellipse at center, rgba(0,229,255,.03) 0%, transparent 70%);
+            border-radius:12px;
+            overflow:hidden;
+        }
+        .map-grid{
+            position:absolute;inset:0;
+            background-image:
+                linear-gradient(rgba(0,229,255,.05) 1px, transparent 1px),
+                linear-gradient(90deg,rgba(0,229,255,.05) 1px, transparent 1px);
+            background-size:40px 40px;
+        }
+        /* Country Nodes */
+        .country-node{
+            position:absolute;
+            display:flex;flex-direction:column;align-items:center;gap:4px;
+            z-index:5;
+            cursor:pointer;
+            transition:transform .3s;
+        }
+        .country-node:hover{transform:scale(1.15)}
+        .node-dot{
+            width:16px;height:16px;border-radius:50%;
+            position:relative;
+        }
+        .node-dot::after{
+            content:'';position:absolute;inset:-6px;
+            border-radius:50%;
+            border:2px solid;
+            opacity:.4;
+            animation:nodeRing 2s ease-out infinite;
+        }
+        @@keyframes nodeRing{
+            0%{transform:scale(1);opacity:.4}
+            100%{transform:scale(2);opacity:0}
+        }
+        .node-origin .node-dot{background:var(--accent-cyan);box-shadow:0 0 15px var(--accent-cyan)}
+        .node-origin .node-dot::after{border-color:var(--accent-cyan)}
+        .node-transit .node-dot{background:var(--accent-orange);box-shadow:0 0 15px var(--accent-orange)}
+        .node-transit .node-dot::after{border-color:var(--accent-orange)}
+        .node-dest .node-dot{background:var(--accent-green);box-shadow:0 0 15px var(--accent-green)}
+        .node-dest .node-dot::after{border-color:var(--accent-green)}
+        .node-hub .node-dot{background:var(--accent-purple);box-shadow:0 0 15px var(--accent-purple)}
+        .node-hub .node-dot::after{border-color:var(--accent-purple)}
+
+        .node-label{
+            font-size:10px;font-weight:700;
+            text-transform:uppercase;letter-spacing:1px;
+            padding:2px 8px;border-radius:4px;
+            background:rgba(0,0,0,.7);
+            white-space:nowrap;
+        }
+        .node-volume{
+            font-family:'Share Tech Mono',monospace;
+            font-size:9px;color:var(--text-muted);
+        }
+
+        /* Route Lines (SVG) */
+        .route-svg{
+            position:absolute;inset:0;z-index:2;
+        }
+        .route-line{
+            fill:none;stroke-width:2;
+            stroke-dasharray:8 4;
+            animation:routeFlow 3s linear infinite;
+        }
+        @@keyframes routeFlow{
+            0%{stroke-dashoffset:0}
+            100%{stroke-dashoffset:-24}
+        }
+        .route-active{stroke:var(--accent-cyan);stroke-width:2.5;opacity:.7}
+        .route-secondary{stroke:var(--accent-orange);opacity:.4}
+        .route-warning{stroke:var(--accent-red);opacity:.5;stroke-dasharray:4 4}
+
+        /* Moving Trucks */
+        .truck-icon{
+            position:absolute;z-index:6;
+            font-size:18px;
+            filter:drop-shadow(0 0 6px rgba(0,229,255,.5));
+            transition:all .1s linear;
+        }
+
+        /* Map Legend */
+        .map-legend{
+            position:absolute;bottom:12px;left:12px;z-index:8;
+            display:flex;gap:16px;
+            padding:8px 14px;border-radius:8px;
+            background:rgba(0,0,0,.7);
+            backdrop-filter:blur(6px);
+            font-size:11px;
+        }
+        .legend-item{display:flex;align-items:center;gap:6px}
+        .legend-dot{width:8px;height:8px;border-radius:50%}
+
+        /* Map Stats overlay */
+        .map-stats{
+            position:absolute;top:12px;right:12px;z-index:8;
+            display:flex;flex-direction:column;gap:6px;
+        }
+        .map-stat{
+            padding:6px 12px;border-radius:8px;
+            background:rgba(0,0,0,.7);backdrop-filter:blur(6px);
+            font-family:'Share Tech Mono',monospace;
+            font-size:12px;display:flex;align-items:center;gap:8px;
+        }
+
+        /* ====== LIVE SHIPMENT TRACKER ====== */
+        .shipment-list{
+            max-height:340px;
+            overflow-y:auto;
+            display:flex;flex-direction:column;gap:8px;
+        }
+        .shipment-list::-webkit-scrollbar{width:4px}
+        .shipment-list::-webkit-scrollbar-track{background:transparent}
+        .shipment-list::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:4px}
+
+        .shipment-item{
+            display:grid;
+            grid-template-columns:auto 1fr auto;
+            gap:14px;align-items:center;
+            padding:12px 14px;
+            border-radius:10px;
+            background:rgba(255,255,255,.02);
+            border:1px solid rgba(255,255,255,.04);
+            transition:all .3s;
+            cursor:pointer;
+        }
+        .shipment-item:hover{
+            background:rgba(0,229,255,.05);
+            border-color:rgba(0,229,255,.15);
+        }
+        .shipment-status{
+            width:36px;height:36px;border-radius:10px;
+            display:flex;align-items:center;justify-content:center;
+            font-size:16px;
+        }
+        .st-transit{background:rgba(0,229,255,.15)}
+        .st-customs{background:rgba(255,109,0,.15)}
+        .st-delivered{background:rgba(0,230,118,.15)}
+        .st-delayed{background:rgba(255,23,68,.15)}
+        .shipment-info h4{font-size:13px;font-weight:600;margin-bottom:3px}
+        .shipment-info p{font-size:11px;color:var(--text-muted)}
+        .shipment-route{
+            font-family:'Share Tech Mono',monospace;
+            font-size:11px;color:var(--text-secondary);
+        }
+        .shipment-eta{
+            text-align:right;
+        }
+        .shipment-eta .time{
+            font-family:'Orbitron',monospace;
+            font-size:14px;font-weight:600;
+        }
+        .shipment-eta .label{font-size:10px;color:var(--text-muted)}
+
+        /* ====== PROGRESS BAR ====== */
+        .progress-bar{
+            height:4px;border-radius:2px;
+            background:rgba(255,255,255,.06);
+            margin-top:8px;overflow:hidden;
+        }
+        .progress-fill{
+            height:100%;border-radius:2px;
+            transition:width 1s ease;
+            position:relative;
+        }
+        .progress-fill::after{
+            content:'';position:absolute;top:0;right:0;
+            width:20px;height:100%;
+            background:linear-gradient(90deg,transparent,rgba(255,255,255,.4));
+            animation:progressShine 2s ease-in-out infinite;
+        }
+        @@keyframes progressShine{0%,100%{opacity:0}50%{opacity:1}}
+
+        /* ====== CUSTOMS PIPELINE ====== */
+        .customs-pipeline{
+            display:flex;flex-direction:column;gap:12px;
+        }
+        .pipeline-stage{
+            display:flex;align-items:center;gap:14px;
+            padding:14px;border-radius:10px;
+            background:rgba(255,255,255,.02);
+            border-left:3px solid;
+            transition:all .3s;
+        }
+        .pipeline-stage:hover{background:rgba(255,255,255,.04)}
+        .stage-pre{border-left-color:var(--accent-blue)}
+        .stage-inspect{border-left-color:var(--accent-orange)}
+        .stage-clear{border-left-color:var(--accent-green)}
+        .stage-hold{border-left-color:var(--accent-red)}
+
+        .stage-icon{
+            width:40px;height:40px;border-radius:10px;
+            display:flex;align-items:center;justify-content:center;
+            font-size:18px;flex-shrink:0;
+        }
+        .stage-pre .stage-icon{background:rgba(41,121,255,.15)}
+        .stage-inspect .stage-icon{background:rgba(255,109,0,.15)}
+        .stage-clear .stage-icon{background:rgba(0,230,118,.15)}
+        .stage-hold .stage-icon{background:rgba(255,23,68,.15)}
+
+        .stage-info{flex:1}
+        .stage-info h4{font-size:13px;font-weight:600;margin-bottom:2px}
+        .stage-info p{font-size:11px;color:var(--text-muted)}
+        .stage-count{
+            font-family:'Orbitron',monospace;
+            font-size:22px;font-weight:700;
+        }
+        .stage-pre .stage-count{color:var(--accent-blue)}
+        .stage-inspect .stage-count{color:var(--accent-orange)}
+        .stage-clear .stage-count{color:var(--accent-green)}
+        .stage-hold .stage-count{color:var(--accent-red)}
+
+        /* ====== CHART CONTAINERS ====== */
+        .chart-container{
+            position:relative;
+            width:100%;
+        }
+        .chart-container canvas{
+            width:100%!important;
+        }
+
+        /* ====== CORRIDOR RANKING ====== */
+        .corridor-rank{
+            display:flex;flex-direction:column;gap:10px;
+        }
+        .corridor-item{
+            display:flex;align-items:center;gap:12px;
+            padding:10px 12px;border-radius:8px;
+            background:rgba(255,255,255,.02);
+            transition:all .3s;
+        }
+        .corridor-item:hover{background:rgba(255,255,255,.04)}
+        .corridor-rank-num{
+            font-family:'Orbitron',monospace;
+            font-size:16px;font-weight:700;
+            width:30px;text-align:center;
+        }
+        .corridor-name{flex:1}
+        .corridor-name h4{font-size:13px;font-weight:600}
+        .corridor-name p{font-size:10px;color:var(--text-muted)}
+        .corridor-bar-wrap{
+            flex:1.5;
+        }
+        .corridor-bar{
+            height:8px;border-radius:4px;
+            background:rgba(255,255,255,.05);
+            overflow:hidden;
+        }
+        .corridor-bar-fill{
+            height:100%;border-radius:4px;
+            background:linear-gradient(90deg,var(--accent-cyan),var(--accent-blue));
+            transition:width 1.5s ease;
+        }
+        .corridor-vol{
+            font-family:'Share Tech Mono',monospace;
+            font-size:13px;font-weight:600;
+            width:60px;text-align:right;
+        }
+
+        /* ====== FLEET STATUS ====== */
+        .fleet-grid{
+            display:grid;
+            grid-template-columns:repeat(4,1fr);
+            gap:10px;
+        }
+        .fleet-box{
+            text-align:center;
+            padding:16px 10px;
+            border-radius:12px;
+            border:1px solid var(--border-color);
+            transition:all .3s;
+        }
+        .fleet-box:hover{transform:translateY(-2px)}
+        .fleet-emoji{font-size:28px;margin-bottom:8px;display:block}
+        .fleet-num{
+            font-family:'Orbitron',monospace;
+            font-size:24px;font-weight:700;
+            display:block;margin-bottom:4px;
+        }
+        .fleet-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
+        .fleet-box.fb-truck{background:rgba(0,229,255,.05);border-color:rgba(0,229,255,.2)}
+        .fleet-box.fb-truck .fleet-num{color:var(--accent-cyan)}
+        .fleet-box.fb-rail{background:rgba(255,109,0,.05);border-color:rgba(255,109,0,.2)}
+        .fleet-box.fb-rail .fleet-num{color:var(--accent-orange)}
+        .fleet-box.fb-ship{background:rgba(41,121,255,.05);border-color:rgba(41,121,255,.2)}
+        .fleet-box.fb-ship .fleet-num{color:var(--accent-blue)}
+        .fleet-box.fb-air{background:rgba(213,0,249,.05);border-color:rgba(213,0,249,.2)}
+        .fleet-box.fb-air .fleet-num{color:var(--accent-purple)}
+
+        /* ====== DWELL TIME GAUGE ====== */
+        .gauge-grid{
+            display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+        }
+        .gauge-item{text-align:center}
+        .gauge-ring{
+            width:100px;height:100px;
+            margin:0 auto 10px;
+            position:relative;
+        }
+        .gauge-ring svg{transform:rotate(-90deg)}
+        .gauge-ring circle{
+            fill:none;stroke-width:8;
+            cx:50;cy:50;r:42;
+        }
+        .gauge-bg{stroke:rgba(255,255,255,.06)}
+        .gauge-fill{
+            stroke-linecap:round;
+            transition:stroke-dashoffset 1.5s ease;
+        }
+        .gauge-val{
+            position:absolute;inset:0;
+            display:flex;align-items:center;justify-content:center;
+            font-family:'Orbitron',monospace;
+            font-size:18px;font-weight:700;
+        }
+        .gauge-label{font-size:11px;color:var(--text-secondary);font-weight:600}
+        .gauge-sub{font-size:10px;color:var(--text-muted)}
+
+        /* ====== DOCUMENT STATUS TABLE ====== */
+        .doc-table{width:100%;border-collapse:collapse}
+        .doc-table th{
+            text-align:left;padding:8px 12px;
+            font-size:11px;text-transform:uppercase;
+            letter-spacing:1px;color:var(--text-muted);
+            border-bottom:1px solid var(--border-color);
+        }
+        .doc-table td{
+            padding:10px 12px;font-size:13px;
+            border-bottom:1px solid rgba(255,255,255,.03);
+        }
+        .doc-table tr:hover td{background:rgba(0,229,255,.03)}
+        .doc-badge{
+            display:inline-flex;align-items:center;gap:4px;
+            padding:3px 10px;border-radius:12px;
+            font-size:11px;font-weight:600;
+        }
+        .doc-ok{background:rgba(0,230,118,.1);color:var(--accent-green)}
+        .doc-pending{background:rgba(255,214,0,.1);color:var(--accent-yellow)}
+        .doc-issue{background:rgba(255,23,68,.1);color:var(--accent-red)}
+
+        /* ====== ALERT FEED ====== */
+        .alert-feed{
+            display:flex;flex-direction:column;gap:8px;
+            max-height:260px;overflow-y:auto;
+        }
+        .alert-feed::-webkit-scrollbar{width:3px}
+        .alert-feed::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+        .alert-item{
+            display:flex;gap:12px;
+            padding:10px 12px;border-radius:8px;
+            border-left:3px solid;
+            animation:alertSlide .5s ease;
+        }
+        @@keyframes alertSlide{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+        .alert-critical{background:rgba(255,23,68,.05);border-left-color:var(--accent-red)}
+        .alert-warning{background:rgba(255,109,0,.05);border-left-color:var(--accent-orange)}
+        .alert-info{background:rgba(0,229,255,.05);border-left-color:var(--accent-cyan)}
+        .alert-success{background:rgba(0,230,118,.05);border-left-color:var(--accent-green)}
+        .alert-icon{font-size:18px;flex-shrink:0;margin-top:2px}
+        .alert-text h5{font-size:12px;font-weight:600;margin-bottom:2px}
+        .alert-text p{font-size:11px;color:var(--text-muted)}
+        .alert-time{
+            font-family:'Share Tech Mono',monospace;
+            font-size:10px;color:var(--text-muted);
+            margin-left:auto;white-space:nowrap;flex-shrink:0;
+        }
+
+        /* ====== FOOTER ====== */
+        .footer{
+            position:relative;z-index:10;
+            text-align:center;padding:16px;
+            border-top:1px solid var(--border-color);
+            font-size:11px;color:var(--text-muted);
+            font-family:'Share Tech Mono',monospace;
+        }
+
+        /* ====== ANIMATIONS ====== */
+        @@keyframes fadeInUp{
+            from{opacity:0;transform:translateY(20px)}
+            to{opacity:1;transform:translateY(0)}
+        }
+        .animate-in{animation:fadeInUp .6s ease forwards;opacity:0}
+        .delay-1{animation-delay:.1s}
+        .delay-2{animation-delay:.2s}
+        .delay-3{animation-delay:.3s}
+        .delay-4{animation-delay:.4s}
+        .delay-5{animation-delay:.5s}
+        .delay-6{animation-delay:.6s}
+
+        /* ====== RESPONSIVE ====== */
+        @@media(max-width:1200px){
+            .kpi-strip{grid-template-columns:repeat(3,1fr)}
+            .row-2-1,.row-1-1,.row-1-1-1,.row-3-col{grid-template-columns:1fr}
+            .fleet-grid{grid-template-columns:repeat(2,1fr)}
+        }
+        @@media(max-width:768px){
+            .kpi-strip{grid-template-columns:repeat(2,1fr)}
+            .header{flex-direction:column;gap:12px;text-align:center}
+            .header-right{justify-content:center}
+            .gauge-grid{grid-template-columns:repeat(2,1fr)}
+        }
+    </style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-animation"></div>
+<div class="grid-overlay"></div>
+
+<!-- Header -->
+<header class="header">
+    <div class="header-left">
+        <div class="logo-icon">🌐</div>
+        <div class="header-title">
+            <h1>SHIPRATE TRANSIT LOGISTICS HQ</h1>
+            <p>Cross-Border Corridor Intelligence System v4.0</p>
+        </div>
+    </div>
+    <div class="header-right">
+        <div class="status-badge">
+            <span class="status-dot"></span>
+            ALL CORRIDORS ACTIVE
+        </div>
+        <div class="live-clock" id="liveClock">--:--:--</div>
+    </div>
+</header>
+
+<!-- Ticker -->
+<div class="ticker-bar">
+    <div class="ticker-content" id="ticker">
+        <span class="ticker-item">🚛 TR-IR Corridor <span class="up">▲ 12%</span></span><span class="ticker-sep">●</span>
+        <span class="ticker-item">📦 Active Shipments: 2,847</span><span class="ticker-sep">●</span>
+        <span class="ticker-item">⏱ Avg Transit Time: 4.2 days</span><span class="ticker-sep">●</span>
+        <span class="ticker-item">🏗 Bazargan BCP <span class="up">▲ 8% throughput</span></span><span class="ticker-sep">●</span>
+        <span class="ticker-item">⚠ Astara BCP: 3hr delay</span><span class="ticker-sep">●</span>
+        <span class="ticker-item">🚢 Bandar Abbas Port <span class="up">▲ 15% TEU</span></span><span class="ticker-sep">●</span>
+        <span class="ticker-item">🛤 Rail Freight <span class="up">▲ 22%</span></span><span class="ticker-sep">●</span>
+        <span class="ticker-item">📋 Customs Clearance Avg: 18hrs</span><span class="ticker-sep">●</span>
+        <span class="ticker-item">🚛 TR-IR Corridor <span class="up">▲ 12%</span></span><span class="ticker-sep">●</span>
+        <span class="ticker-item">📦 Active Shipments: 2,847</span><span class="ticker-sep">●</span>
+        <span class="ticker-item">⏱ Avg Transit Time: 4.2 days</span><span class="ticker-sep">●</span>
+        <span class="ticker-item">🏗 Bazargan BCP <span class="up">▲ 8% throughput</span></span><span class="ticker-sep">●</span>
+        <span class="ticker-item">⚠ Astara BCP: 3hr delay</span><span class="ticker-sep">●</span>
+        <span class="ticker-item">🚢 Bandar Abbas Port <span class="up">▲ 15% TEU</span></span><span class="ticker-sep">●</span>
+        <span class="ticker-item">🛤 Rail Freight <span class="up">▲ 22%</span></span><span class="ticker-sep">●</span>
+        <span class="ticker-item">📋 Customs Clearance Avg: 18hrs</span><span class="ticker-sep">●</span>
+    </div>
+</div>
+
+<!-- Main Content -->
+<main class="main-content">
+
+    <!-- KPI Strip -->
+    <div class="kpi-strip">
+        <div class="kpi-card animate-in delay-1">
+            <div class="kpi-header">
+                <span class="kpi-label">Active Shipments</span>
+                <span class="kpi-icon">📦</span>
+            </div>
+            <div class="kpi-value" id="kpiShipments">0</div>
+            <div class="kpi-change positive">▲ 12.4% vs last month</div>
+        </div>
+        <div class="kpi-card animate-in delay-2">
+            <div class="kpi-header">
+                <span class="kpi-label">Transit Volume (TEU)</span>
+                <span class="kpi-icon">🏗</span>
+            </div>
+            <div class="kpi-value" id="kpiTEU">0</div>
+            <div class="kpi-change positive">▲ 8.7% growth</div>
+        </div>
+        <div class="kpi-card animate-in delay-3">
+            <div class="kpi-header">
+                <span class="kpi-label">On-Time Delivery</span>
+                <span class="kpi-icon">✅</span>
+            </div>
+            <div class="kpi-value" id="kpiOTD">0%</div>
+            <div class="kpi-change positive">▲ 3.2% improved</div>
+        </div>
+        <div class="kpi-card animate-in delay-4">
+            <div class="kpi-header">
+                <span class="kpi-label">Active Corridors</span>
+                <span class="kpi-icon">🛤</span>
+            </div>
+            <div class="kpi-value" id="kpiCorridors">0</div>
+            <div class="kpi-change positive">▲ 2 new routes</div>
+        </div>
+        <div class="kpi-card animate-in delay-5">
+            <div class="kpi-header">
+                <span class="kpi-label">Customs Holds</span>
+                <span class="kpi-icon">⛔</span>
+            </div>
+            <div class="kpi-value" id="kpiHolds">0</div>
+            <div class="kpi-change negative">▲ 5 since yesterday</div>
+        </div>
+        <div class="kpi-card animate-in delay-6">
+            <div class="kpi-header">
+                <span class="kpi-label">Revenue ($M)</span>
+                <span class="kpi-icon">💰</span>
+            </div>
+            <div class="kpi-value" id="kpiRevenue">0</div>
+            <div class="kpi-change positive">▲ 18.3% YoY</div>
+        </div>
+    </div>
+
+    <!-- Row 1: Corridor Map + Live Tracker -->
+    <div class="section-row row-2-1 animate-in delay-2">
+        <!-- Corridor Map -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title"><span class="dot"></span>TRANSIT CORRIDOR MAP</span>
+                <span class="panel-badge badge-live">● LIVE</span>
+            </div>
+            <div class="panel-body" style="padding:0;">
+                <div class="corridor-map" id="corridorMap">
+                    <div class="map-grid"></div>
+
+                    <!-- SVG Routes -->
+                    <svg class="route-svg" viewBox="0 0 800 380" preserveAspectRatio="none">
+                        <!-- Turkey to Iran -->
+                        <path class="route-line route-active" d="M120,120 C200,100 280,140 370,160"/>
+                        <!-- Iran to Turkmenistan -->
+                        <path class="route-line route-secondary" d="M370,160 C430,130 500,100 560,80"/>
+                        <!-- Iran to Afghanistan -->
+                        <path class="route-line route-active" d="M370,160 C440,170 520,180 600,170"/>
+                        <!-- Iran to Pakistan -->
+                        <path class="route-line route-secondary" d="M370,160 C420,210 500,260 580,280"/>
+                        <!-- Turkey to Europe -->
+                        <path class="route-line route-active" d="M120,120 C80,100 50,80 30,60"/>
+                        <!-- Iran to Iraq -->
+                        <path class="route-line route-secondary" d="M370,160 C320,200 260,230 200,240"/>
+                        <!-- Gulf Route -->
+                        <path class="route-line route-active" d="M370,160 C380,220 390,280 400,330"/>
+                        <!-- Iran to CIS -->
+                        <path class="route-line route-secondary" d="M370,160 C380,100 400,60 440,30"/>
+                        <!-- Warning route -->
+                        <path class="route-line route-warning" d="M560,80 C620,60 680,50 740,40"/>
+                    </svg>
+
+                    <!-- Country Nodes -->
+                    <div class="country-node node-origin" style="left:95px;top:100px">
+                        <div class="node-dot"></div>
+                        <span class="node-label">TURKEY</span>
+                        <span class="node-volume">842 TEU/day</span>
+                    </div>
+                    <div class="country-node node-hub" style="left:345px;top:138px">
+                        <div class="node-dot"></div>
+                        <span class="node-label">IRAN (HUB)</span>
+                        <span class="node-volume">2,180 TEU/day</span>
+                    </div>
+                    <div class="country-node node-transit" style="left:535px;top:58px">
+                        <div class="node-dot"></div>
+                        <span class="node-label">TURKMENISTAN</span>
+                        <span class="node-volume">324 TEU/day</span>
+                    </div>
+                    <div class="country-node node-dest" style="left:575px;top:148px">
+                        <div class="node-dot"></div>
+                        <span class="node-label">AFGHANISTAN</span>
+                        <span class="node-volume">518 TEU/day</span>
+                    </div>
+                    <div class="country-node node-dest" style="left:555px;top:260px">
+                        <div class="node-dot"></div>
+                        <span class="node-label">PAKISTAN</span>
+                        <span class="node-volume">672 TEU/day</span>
+                    </div>
+                    <div class="country-node node-transit" style="left:175px;top:220px">
+                        <div class="node-dot"></div>
+                        <span class="node-label">IRAQ</span>
+                        <span class="node-volume">456 TEU/day</span>
+                    </div>
+                    <div class="country-node node-origin" style="left:5px;top:40px">
+                        <div class="node-dot"></div>
+                        <span class="node-label">EUROPE</span>
+                        <span class="node-volume">1,250 TEU/day</span>
+                    </div>
+                    <div class="country-node node-dest" style="left:375px;top:310px">
+                        <div class="node-dot"></div>
+                        <span class="node-label">PERSIAN GULF</span>
+                        <span class="node-volume">1,890 TEU/day</span>
+                    </div>
+                    <div class="country-node node-transit" style="left:415px;top:8px">
+                        <div class="node-dot"></div>
+                        <span class="node-label">CIS</span>
+                        <span class="node-volume">780 TEU/day</span>
+                    </div>
+                    <div class="country-node node-dest" style="left:715px;top:20px">
+                        <div class="node-dot"></div>
+                        <span class="node-label">CENTRAL ASIA</span>
+                        <span class="node-volume">290 TEU/day</span>
+                    </div>
+
+                    <!-- Moving Trucks -->
+                    <div class="truck-icon" id="truck1" style="left:200px;top:115px">🚛</div>
+                    <div class="truck-icon" id="truck2" style="left:450px;top:145px">🚛</div>
+                    <div class="truck-icon" id="truck3" style="left:380px;top:250px">🚢</div>
+                    <div class="truck-icon" id="truck4" style="left:280px;top:190px">🚛</div>
+
+                    <!-- Legend -->
+                    <div class="map-legend">
+                        <div class="legend-item"><div class="legend-dot" style="background:var(--accent-cyan)"></div>Origin</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:var(--accent-purple)"></div>Hub</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:var(--accent-orange)"></div>Transit</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:var(--accent-green)"></div>Destination</div>
+                    </div>
+
+                    <!-- Map Stats -->
+                    <div class="map-stats">
+                        <div class="map-stat">🌐 <span style="color:var(--accent-cyan)">14</span> Active Routes</div>
+                        <div class="map-stat">🚛 <span style="color:var(--accent-orange)">847</span> In Transit</div>
+                        <div class="map-stat">⚡ <span style="color:var(--accent-green)">98.2%</span> Uptime</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Shipment Tracker -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title"><span class="dot" style="background:var(--accent-orange);box-shadow:0 0 8px var(--accent-orange)"></span>LIVE TRACKER</span>
+                <span class="panel-badge badge-info">24 Active</span>
+            </div>
+            <div class="panel-body">
+                <div class="shipment-list" id="shipmentList">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: Customs Pipeline + Volume Chart + Fleet Status -->
+    <div class="section-row row-1-1-1 animate-in delay-3">
+        <!-- Customs Pipeline -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title"><span class="dot" style="background:var(--accent-orange);box-shadow:0 0 8px var(--accent-orange)"></span>CUSTOMS PIPELINE</span>
+                <span class="panel-badge badge-info">4 Stages</span>
+            </div>
+            <div class="panel-body">
+                <div class="customs-pipeline">
+                    <div class="pipeline-stage stage-pre">
+                        <div class="stage-icon">📋</div>
+                        <div class="stage-info">
+                            <h4>Pre-Clearance</h4>
+                            <p>Document verification & classification</p>
+                            <div class="progress-bar"><div class="progress-fill" style="width:82%;background:var(--accent-blue)"></div></div>
+                        </div>
+                        <div class="stage-count">128</div>
+                    </div>
+                    <div class="pipeline-stage stage-inspect">
+                        <div class="stage-icon">🔍</div>
+                        <div class="stage-info">
+                            <h4>Inspection Queue</h4>
+                            <p>Physical & X-ray scanning</p>
+                            <div class="progress-bar"><div class="progress-fill" style="width:54%;background:var(--accent-orange)"></div></div>
+                        </div>
+                        <div class="stage-count">67</div>
+                    </div>
+                    <div class="pipeline-stage stage-clear">
+                        <div class="stage-icon">✅</div>
+                        <div class="stage-info">
+                            <h4>Cleared Today</h4>
+                            <p>Released for transit continuation</p>
+                            <div class="progress-bar"><div class="progress-fill" style="width:91%;background:var(--accent-green)"></div></div>
+                        </div>
+                        <div class="stage-count">342</div>
+                    </div>
+                    <div class="pipeline-stage stage-hold">
+                        <div class="stage-icon">⛔</div>
+                        <div class="stage-info">
+                            <h4>On Hold / Flagged</h4>
+                            <p>Requires additional documentation</p>
+                            <div class="progress-bar"><div class="progress-fill" style="width:18%;background:var(--accent-red)"></div></div>
+                        </div>
+                        <div class="stage-count">23</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Volume Chart -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title"><span class="dot" style="background:var(--accent-green);box-shadow:0 0 8px var(--accent-green)"></span>MONTHLY TRANSIT VOLUME</span>
+            </div>
+            <div class="panel-body">
+                <div class="chart-container">
+                    <canvas id="volumeChart" height="280"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fleet Status -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title"><span class="dot" style="background:var(--accent-purple);box-shadow:0 0 8px var(--accent-purple)"></span>FLEET STATUS</span>
+            </div>
+            <div class="panel-body">
+                <div class="fleet-grid">
+                    <div class="fleet-box fb-truck">
+                        <span class="fleet-emoji">🚛</span>
+                        <span class="fleet-num" id="fleetTruck">0</span>
+                        <span class="fleet-label">Trucks</span>
+                    </div>
+                    <div class="fleet-box fb-rail">
+                        <span class="fleet-emoji">🚂</span>
+                        <span class="fleet-num" id="fleetRail">0</span>
+                        <span class="fleet-label">Rail Cars</span>
+                    </div>
+                    <div class="fleet-box fb-ship">
+                        <span class="fleet-emoji">🚢</span>
+                        <span class="fleet-num" id="fleetShip">0</span>
+                        <span class="fleet-label">Vessels</span>
+                    </div>
+                    <div class="fleet-box fb-air">
+                        <span class="fleet-emoji">✈️</span>
+                        <span class="fleet-num" id="fleetAir">0</span>
+                        <span class="fleet-label">Air Cargo</span>
+                    </div>
+                </div>
+
+                <!-- Dwell Time Gauges -->
+                <div style="margin-top:20px">
+                    <h4 style="font-size:12px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;text-align:center">
+                        Avg Dwell Time at BCPs
+                    </h4>
+                    <div class="gauge-grid">
+                        <div class="gauge-item">
+                            <div class="gauge-ring">
+                                <svg width="100" height="100" viewBox="0 0 100 100">
+                                    <circle class="gauge-bg"/>
+                                    <circle class="gauge-fill" id="gaugeBazargan" style="stroke:var(--accent-cyan);stroke-dasharray:264;stroke-dashoffset:264"/>
+                                </svg>
+                                <div class="gauge-val" style="color:var(--accent-cyan)" id="gaugeValBaz">0h</div>
+                            </div>
+                            <div class="gauge-label">Bazargan</div>
+                            <div class="gauge-sub">Target: &lt; 12h</div>
+                        </div>
+                        <div class="gauge-item">
+                            <div class="gauge-ring">
+                                <svg width="100" height="100" viewBox="0 0 100 100">
+                                    <circle class="gauge-bg"/>
+                                    <circle class="gauge-fill" id="gaugeAstara" style="stroke:var(--accent-orange);stroke-dasharray:264;stroke-dashoffset:264"/>
+                                </svg>
+                                <div class="gauge-val" style="color:var(--accent-orange)" id="gaugeValAst">0h</div>
+                            </div>
+                            <div class="gauge-label">Astara</div>
+                            <div class="gauge-sub">Target: &lt; 10h</div>
+                        </div>
+                        <div class="gauge-item">
+                            <div class="gauge-ring">
+                                <svg width="100" height="100" viewBox="0 0 100 100">
+                                    <circle class="gauge-bg"/>
+                                    <circle class="gauge-fill" id="gaugeDogharoun" style="stroke:var(--accent-green);stroke-dasharray:264;stroke-dashoffset:264"/>
+                                </svg>
+                                <div class="gauge-val" style="color:var(--accent-green)" id="gaugeValDog">0h</div>
+                            </div>
+                            <div class="gauge-label">Dogharoun</div>
+                            <div class="gauge-sub">Target: &lt; 8h</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 3: Corridor Ranking + Mode Split + Alerts -->
+    <div class="section-row row-3-col animate-in delay-4">
+        <!-- Corridor Ranking -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title"><span class="dot"></span>TOP TRANSIT CORRIDORS</span>
+                <span class="panel-badge badge-info">By Volume</span>
+            </div>
+            <div class="panel-body">
+                <div class="corridor-rank" id="corridorRank">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Mode Split Donut + BCP Chart -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title"><span class="dot" style="background:var(--accent-yellow);box-shadow:0 0 8px var(--accent-yellow)"></span>TRANSPORT MODE SPLIT</span>
+            </div>
+            <div class="panel-body">
+                <div class="chart-container" style="margin-bottom:20px">
+                    <canvas id="modeSplitChart" height="200"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="bcpChart" height="160"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Feed -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title"><span class="dot" style="background:var(--accent-red);box-shadow:0 0 8px var(--accent-red)"></span>ALERT CENTER</span>
+                <span class="panel-badge badge-live">● LIVE</span>
+            </div>
+            <div class="panel-body">
+                <div class="alert-feed" id="alertFeed">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 4: Document Status + Corridor Performance -->
+    <div class="section-row row-1-1 animate-in delay-5">
+        <!-- Document Status -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title"><span class="dot" style="background:var(--accent-yellow);box-shadow:0 0 8px var(--accent-yellow)"></span>DOCUMENT STATUS</span>
+                <span class="panel-badge badge-info">Recent 8</span>
+            </div>
+            <div class="panel-body" style="padding:10px">
+                <table class="doc-table">
+                    <thead>
+                        <tr>
+                            <th>Shipment ID</th>
+                            <th>Route</th>
+                            <th>CMR</th>
+                            <th>TIR</th>
+                            <th>Invoice</th>
+                            <th>Customs Dec.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="docTableBody">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Corridor Performance Chart -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title"><span class="dot" style="background:var(--accent-blue);box-shadow:0 0 8px var(--accent-blue)"></span>CORRIDOR PERFORMANCE (DAYS)</span>
+            </div>
+            <div class="panel-body">
+                <div class="chart-container">
+                    <canvas id="corridorPerfChart" height="260"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+    TRANSIT LOGISTICS COMMAND CENTER &bull; Real-time Cross-Border Intelligence &bull; Data refreshes every 30s &bull; &copy; 2026
+</footer>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+
+    // ====== CLOCK ======
+    function updateClock(){
+        const now=new Date();
+        document.getElementById('liveClock').textContent=
+            now.toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    }
+    setInterval(updateClock,1000);updateClock();
+
+    // ====== COUNTER ANIMATION ======
+    function animateCounter(el,target,suffix='',prefix='',duration=2000){
+        const start=0;
+        const startTime=performance.now();
+        const isFloat=String(target).includes('.');
+        function update(now){
+            const elapsed=now-startTime;
+            const progress=Math.min(elapsed/duration,1);
+            const eased=1-Math.pow(1-progress,3);
+            const current=start+(target-start)*eased;
+            if(isFloat){
+                el.textContent=prefix+current.toFixed(1)+suffix;
+            } else {
+                el.textContent=prefix+Math.floor(current).toLocaleString()+suffix;
+            }
+            if(progress<1)requestAnimationFrame(update);
+        }
+        requestAnimationFrame(update);
+    }
+
+    // KPI Animations
+    setTimeout(()=>{
+        animateCounter(document.getElementById('kpiShipments'),2847);
+        animateCounter(document.getElementById('kpiTEU'),14520);
+        animateCounter(document.getElementById('kpiOTD'),94.7,'%');
+        animateCounter(document.getElementById('kpiCorridors'),14);
+        animateCounter(document.getElementById('kpiHolds'),23);
+        animateCounter(document.getElementById('kpiRevenue'),42.8,'M','$');
+    },300);
+
+    // Fleet Counters
+    setTimeout(()=>{
+        animateCounter(document.getElementById('fleetTruck'),1248);
+        animateCounter(document.getElementById('fleetRail'),186);
+        animateCounter(document.getElementById('fleetShip'),47);
+        animateCounter(document.getElementById('fleetAir'),12);
+    },600);
+
+    // ====== GAUGE ANIMATION ======
+    function animateGauge(el,valEl,hours,maxHours,unit='h'){
+        const circumference=264;
+        const pct=hours/maxHours;
+        const offset=circumference-(pct*circumference);
+        setTimeout(()=>{
+            el.style.strokeDashoffset=offset;
+            valEl.textContent=hours+unit;
+        },800);
+    }
+    animateGauge(
+        document.getElementById('gaugeBazargan'),
+        document.getElementById('gaugeValBaz'),
+        14,24
+    );
+    animateGauge(
+        document.getElementById('gaugeAstara'),
+        document.getElementById('gaugeValAst'),
+        19,24
+    );
+    animateGauge(
+        document.getElementById('gaugeDogharoun'),
+        document.getElementById('gaugeValDog'),
+        7,24
+    );
+
+    // ====== SHIPMENT LIST ======
+    const shipments=[
+        {id:'TRN-28471',status:'transit',icon:'🚛',cls:'st-transit',from:'Istanbul',to:'Kabul',via:'Bazargan→Dogharoun',eta:'14:30',progress:62,color:'var(--accent-cyan)'},
+        {id:'TRN-28465',status:'customs',icon:'📋',cls:'st-customs',from:'Hamburg',to:'Karachi',via:'Bazargan→Mirjaveh',eta:'18:00',progress:41,color:'var(--accent-orange)'},
+        {id:'TRN-28459',status:'transit',icon:'🚂',cls:'st-transit',from:'Moscow',to:'Bandar Abbas',via:'Astara→South',eta:'22:15',progress:78,color:'var(--accent-cyan)'},
+        {id:'TRN-28452',status:'delivered',icon:'✅',cls:'st-delivered',from:'Ankara',to:'Herat',via:'Bazargan→Islam Qala',eta:'Done',progress:100,color:'var(--accent-green)'},
+        {id:'TRN-28448',status:'delayed',icon:'⚠️',cls:'st-delayed',from:'Dubai',to:'Ashgabat',via:'BandarAbbas→Sarakhs',eta:'Delayed',progress:33,color:'var(--accent-red)'},
+        {id:'TRN-28440',status:'transit',icon:'🚛',cls:'st-transit',from:'Trabzon',to:'Islamabad',via:'Bazargan→Taftan',eta:'06:45',progress:55,color:'var(--accent-cyan)'},
+        {id:'TRN-28437',status:'customs',icon:'🔍',cls:'st-customs',from:'Baku',to:'Chabahar',via:'Astara→South',eta:'11:20',progress:28,color:'var(--accent-orange)'},
+        {id:'TRN-28431',status:'transit',icon:'🚢',cls:'st-transit',from:'Mumbai',to:'Istanbul',via:'Chabahar→Bazargan',eta:'Tomorrow',progress:47,color:'var(--accent-cyan)'},
+    ];
+    const shipmentList=document.getElementById('shipmentList');
+    shipments.forEach(s=>{
+        shipmentList.innerHTML+=`
+        <div class="shipment-item">
+            <div class="shipment-status ${s.cls}">${s.icon}</div>
+            <div class="shipment-info">
+                <h4>${s.id}</h4>
+                <p class="shipment-route">${s.from} → ${s.to}</p>
+                <p style="font-size:10px;color:var(--text-muted);margin-top:2px">via ${s.via}</p>
+                <div class="progress-bar" style="margin-top:6px"><div class="progress-fill" style="width:${s.progress}%;background:${s.color}"></div></div>
+            </div>
+            <div class="shipment-eta">
+                <div class="time" style="color:${s.color}">${s.eta}</div>
+                <div class="label">ETA</div>
+            </div>
+        </div>`;
+    });
+
+    // ====== CORRIDOR RANKING ======
+    const corridors=[
+        {name:'Turkey → Afghanistan',sub:'via Iran (Bazargan–Dogharoun)',vol:4280,pct:100},
+        {name:'Europe → Central Asia',sub:'via Turkey–Iran–Turkmenistan',vol:3650,pct:85},
+        {name:'Persian Gulf → CIS',sub:'via Bandar Abbas–North Corridor',vol:3120,pct:73},
+        {name:'India → Central Asia',sub:'via Chabahar–Sarakhs',vol:2540,pct:59},
+        {name:'Turkey → Pakistan',sub:'via Iran (Bazargan–Mirjaveh)',vol:2180,pct:51},
+        {name:'Iraq → Afghanistan',sub:'via Iran (Khosravi–Dogharoun)',vol:1740,pct:41},
+    ];
+    const crEl=document.getElementById('corridorRank');
+    corridors.forEach((c,i)=>{
+        crEl.innerHTML+=`
+        <div class="corridor-item">
+            <div class="corridor-rank-num" style="color:${i<3?'var(--accent-cyan)':'var(--text-muted)'}">#${i+1}</div>
+            <div class="corridor-name"><h4>${c.name}</h4><p>${c.sub}</p></div>
+            <div class="corridor-bar-wrap">
+                <div class="corridor-bar">
+                    <div class="corridor-bar-fill" style="width:0%" data-target="${c.pct}"></div>
+                </div>
+            </div>
+            <div class="corridor-vol">${c.vol.toLocaleString()}</div>
+        </div>`;
+    });
+    // Animate bars
+    setTimeout(()=>{
+        document.querySelectorAll('.corridor-bar-fill').forEach(bar=>{
+            bar.style.width=bar.dataset.target+'%';
+        });
+    },500);
+
+    // ====== ALERTS ======
+    const alerts=[
+        {type:'critical',icon:'🚨',title:'Customs Hold: TRN-28448','text':'Shipment flagged at Sarakhs BCP — missing phytosanitary certificate',time:'2 min ago'},
+        {type:'warning',icon:'⚠️',title:'Delay: Astara Border','text':'Queue length exceeded 180 trucks — estimated 3hr additional wait',time:'8 min ago'},
+        {type:'info',icon:'📡',title:'GPS Signal Lost: TRN-28419','text':'Last known position: 35.2°N, 59.1°E (Mashhad corridor)',time:'15 min ago'},
+        {type:'success',icon:'✅',title:'Cleared: Batch #B-4472','text':'42 shipments cleared at Bazargan — all documents verified',time:'22 min ago'},
+        {type:'warning',icon:'🌡️',title:'Temperature Alert: TRN-28455','text':'Reefer unit temp 6.2°C — threshold is 4°C for pharma cargo',time:'31 min ago'},
+        {type:'critical',icon:'🛑',title:'Route Closure: Mirjaveh','text':'Security checkpoint closure — estimated reopening in 4 hours',time:'45 min ago'},
+        {type:'info',icon:'📊',title:'Volume Spike: Bazargan','text':'Throughput 18% above daily average — additional lanes activated',time:'1 hr ago'},
+        {type:'success',icon:'🏆',title:'Record: Dogharoun BCP','text':'Fastest clearance time this quarter: avg 5.2h today',time:'1.5 hr ago'},
+    ];
+    const alertEl=document.getElementById('alertFeed');
+    alerts.forEach(a=>{
+        alertEl.innerHTML+=`
+        <div class="alert-item alert-${a.type}">
+            <span class="alert-icon">${a.icon}</span>
+            <div class="alert-text"><h5>${a.title}</h5><p>${a.text}</p></div>
+            <span class="alert-time">${a.time}</span>
+        </div>`;
+    });
+
+    // ====== DOCUMENT TABLE ======
+    const docs=[
+        {id:'TRN-28471',route:'IST→KBL',cmr:'ok',tir:'ok',inv:'ok',cust:'ok'},
+        {id:'TRN-28465',route:'HAM→KHI',cmr:'ok',tir:'pending',inv:'ok',cust:'pending'},
+        {id:'TRN-28459',route:'MOW→BND',cmr:'ok',tir:'ok',inv:'ok',cust:'ok'},
+        {id:'TRN-28452',route:'ANK→HEA',cmr:'ok',tir:'ok',inv:'ok',cust:'ok'},
+        {id:'TRN-28448',route:'DXB→ASB',cmr:'ok',tir:'ok',inv:'issue',cust:'issue'},
+        {id:'TRN-28440',route:'TRB→ISB',cmr:'ok',tir:'pending',inv:'ok',cust:'pending'},
+        {id:'TRN-28437',route:'BAK→CHB',cmr:'pending',tir:'ok',inv:'ok',cust:'pending'},
+        {id:'TRN-28431',route:'BOM→IST',cmr:'ok',tir:'ok',inv:'ok',cust:'ok'},
+    ];
+    function badge(st){
+        const m={ok:['doc-ok','✓ OK'],pending:['doc-pending','⏳ Pending'],issue:['doc-issue','✕ Issue']};
+        return `<span class="doc-badge ${m[st][0]}">${m[st][1]}</span>`;
+    }
+    const dtBody=document.getElementById('docTableBody');
+    docs.forEach(d=>{
+        dtBody.innerHTML+=`<tr>
+            <td style="font-family:'Share Tech Mono',monospace;font-weight:600">${d.id}</td>
+            <td>${d.route}</td>
+            <td>${badge(d.cmr)}</td>
+            <td>${badge(d.tir)}</td>
+            <td>${badge(d.inv)}</td>
+            <td>${badge(d.cust)}</td>
+        </tr>`;
+    });
+
+    // ====== TRUCK ANIMATION ======
+    const trucks=[
+        {el:document.getElementById('truck1'),x1:160,y1:110,x2:340,y2:145,speed:.0003},
+        {el:document.getElementById('truck2'),x1:390,y1:155,x2:565,y2:165,speed:.00025},
+        {el:document.getElementById('truck3'),x1:375,y1:200,x2:380,y2:320,speed:.0002},
+        {el:document.getElementById('truck4'),x1:340,y1:165,x2:200,y2:230,speed:.00035},
+    ];
+    let truckT=0;
+    function animateTrucks(){
+        truckT+=16;
+        trucks.forEach(t=>{
+            const p=(Math.sin(truckT*t.speed)+1)/2;
+            const x=t.x1+(t.x2-t.x1)*p;
+            const y=t.y1+(t.y2-t.y1)*p;
+            t.el.style.left=x+'px';
+            t.el.style.top=y+'px';
+        });
+        requestAnimationFrame(animateTrucks);
+    }
+    animateTrucks();
+
+    // ====== CHARTS ======
+    const chartFont={family:'Rajdhani',weight:500};
+    const gridColor='rgba(255,255,255,.06)';
+    const tickColor='#9aa0b8';
+
+    Chart.defaults.font.family='Rajdhani';
+    Chart.defaults.color=tickColor;
+
+    // Volume Chart (Bar + Line combo)
+    new Chart(document.getElementById('volumeChart'),{
+        type:'bar',
+        data:{
+            labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+            datasets:[
+                {
+                    label:'Road (TEU)',
+                    data:[8200,7800,9100,9800,10400,11200,10800,11600,12100,12800,13200,14100],
+                    backgroundColor:'rgba(0,229,255,.25)',
+                    borderColor:'rgba(0,229,255,.8)',
+                    borderWidth:1,borderRadius:4,
+                    order:2,
+                },
+                {
+                    label:'Rail (TEU)',
+                    data:[1800,2100,2400,2800,3200,3600,3400,3900,4200,4500,4800,5100],
+                    backgroundColor:'rgba(255,109,0,.25)',
+                    borderColor:'rgba(255,109,0,.8)',
+                    borderWidth:1,borderRadius:4,
+                    order:2,
+                },
+                {
+                    label:'Sea (TEU)',
+                    data:[3200,3000,3500,3800,4100,4600,4400,4900,5200,5600,5900,6200],
+                    backgroundColor:'rgba(41,121,255,.25)',
+                    borderColor:'rgba(41,121,255,.8)',
+                    borderWidth:1,borderRadius:4,
+                    order:2,
+                },
+                {
+                    label:'Total Trend',
+                    data:[13200,12900,15000,16400,17700,19400,18600,20400,21500,22900,23900,25400],
+                    type:'line',
+                    borderColor:'var(--accent-green)',
+                    borderWidth:2,
+                    pointRadius:3,
+                    pointBackgroundColor:'var(--accent-green)',
+                    tension:.4,fill:false,
+                    order:1,
+                }
+            ]
+        },
+        options:{
+            responsive:true,
+            interaction:{mode:'index',intersect:false},
+            scales:{
+                x:{grid:{color:gridColor},ticks:{font:chartFont}},
+                y:{grid:{color:gridColor},ticks:{font:chartFont,callback:v=>(v/1000)+'K'}}
+            },
+            plugins:{
+                legend:{position:'bottom',labels:{boxWidth:12,padding:12,font:{size:11}}},
+            }
+        }
+    });
+
+    // Mode Split Donut
+    new Chart(document.getElementById('modeSplitChart'),{
+        type:'doughnut',
+        data:{
+            labels:['Road Transport','Rail Freight','Maritime','Air Cargo'],
+            datasets:[{
+                data:[52,18,26,4],
+                backgroundColor:[
+                    'rgba(0,229,255,.7)',
+                    'rgba(255,109,0,.7)',
+                    'rgba(41,121,255,.7)',
+                    'rgba(213,0,249,.7)',
+                ],
+                borderColor:'var(--bg-card)',
+                borderWidth:3,
+                hoverOffset:8,
+            }]
+        },
+        options:{
+            responsive:true,
+            cutout:'65%',
+            plugins:{
+                legend:{position:'bottom',labels:{boxWidth:10,padding:10,font:{size:11}}},
+            }
+        }
+    });
+
+    // BCP Throughput Chart
+    new Chart(document.getElementById('bcpChart'),{
+        type:'bar',
+        data:{
+            labels:['Bazargan','Astara','Dogharoun','Mirjaveh','Sarakhs','Norduz','Lotfabad'],
+            datasets:[{
+                label:'Trucks/Day',
+                data:[420,280,350,190,210,85,120],
+                backgroundColor:[
+                    'rgba(0,229,255,.6)',
+                    'rgba(255,109,0,.6)',
+                    'rgba(0,230,118,.6)',
+                    'rgba(213,0,249,.6)',
+                    'rgba(255,214,0,.6)',
+                    'rgba(41,121,255,.6)',
+                    'rgba(255,23,68,.6)',
+                ],
+                borderRadius:6,
+                borderSkipped:false,
+            }]
+        },
+        options:{
+            indexAxis:'y',
+            responsive:true,
+            scales:{
+                x:{grid:{color:gridColor},ticks:{font:{size:10}}},
+                y:{grid:{display:false},ticks:{font:{size:10}}}
+            },
+            plugins:{legend:{display:false}}
+        }
+    });
+
+    // Corridor Performance (Radar)
+    new Chart(document.getElementById('corridorPerfChart'),{
+        type:'radar',
+        data:{
+            labels:['Transit Time','Cost Efficiency','Reliability','Customs Speed','Safety Rating','Capacity'],
+            datasets:[
+                {
+                    label:'North Corridor (Bazargan)',
+                    data:[85,72,90,78,92,88],
+                    borderColor:'rgba(0,229,255,.8)',
+                    backgroundColor:'rgba(0,229,255,.1)',
+                    pointBackgroundColor:'var(--accent-cyan)',
+                    borderWidth:2,
+                },
+                {
+                    label:'East Corridor (Dogharoun)',
+                    data:[78,85,82,88,86,72],
+                    borderColor:'rgba(0,230,118,.8)',
+                    backgroundColor:'rgba(0,230,118,.1)',
+                    pointBackgroundColor:'var(--accent-green)',
+                    borderWidth:2,
+                },
+                {
+                    label:'South Corridor (Bandar Abbas)',
+                    data:[65,90,75,70,88,95],
+                    borderColor:'rgba(255,109,0,.8)',
+                    backgroundColor:'rgba(255,109,0,.1)',
+                    pointBackgroundColor:'var(--accent-orange)',
+                    borderWidth:2,
+                }
+            ]
+        },
+        options:{
+            responsive:true,
+            scales:{
+                r:{
+                    grid:{color:'rgba(255,255,255,.08)'},
+                    ticks:{display:false},
+                    pointLabels:{font:{size:11,family:'Rajdhani'},color:tickColor},
+                    angleLines:{color:'rgba(255,255,255,.08)'},
+                    suggestedMin:0,suggestedMax:100,
+                }
+            },
+            plugins:{
+                legend:{position:'bottom',labels:{boxWidth:10,padding:10,font:{size:11}}}
+            }
+        }
+    });
+
+    // ====== LIVE DATA SIMULATION ======
+    setInterval(()=>{
+        // Random KPI micro-updates
+        const shipEl=document.getElementById('kpiShipments');
+        const current=parseInt(shipEl.textContent.replace(/,/g,''))||2847;
+        const delta=Math.floor(Math.random()*5)-2;
+        shipEl.textContent=(current+delta).toLocaleString();
+    },5000);
+
+});
+</script>
+
+</body>
+</html>

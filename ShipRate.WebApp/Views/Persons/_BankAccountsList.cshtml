@@ -1,0 +1,69 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.Base_Info
+@using ShipRate.Domain.Entities.BaseInfo.Cargos
+@model List<BankAccountDto>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Row</th>
+                    <th>Bank</th>
+                    <th>AccountNumber</th>
+                    <th>IBAN</th>
+                    <th>Purpose</th>
+                    <th class="text-center" style="width:160px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center fw-medium text-muted">
+                            @* <i class="bi bi-inbox display-2 d-block mb-2"></i> *@
+                            No Records found.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    int counter = 0;
+                    @foreach (var item in Model)
+                    {
+                        counter++;
+                        <tr>
+                            <td>@counter</td>
+                            <td class="fw-medium">@item.BankName</td>
+                            <td class="fw-medium">@item.AccountNumber</td>
+                            <td class="fw-medium">@item.IBAN</td>
+                            <td class="fw-medium">@item.BankAccountPurposeName</td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button"
+                                            class="btn btn-outline-primary"
+                                            title="Edit"
+                                            hx-get="@Url.Action("EditBankAccount", "Persons", new { id = item.Id })"
+                                            hx-target="#app-modal-content-second"
+                                            hx-swap="innerHTML"
+                                            >
+                                        <i class="bi bi-pencil"></i>
+
+                                    </button>
+                                    <button type="button"
+                                            class="btn btn-outline-danger"
+                                            title="Delete"
+                                            hx-get="@Url.Action("DeleteBankAccount", "Persons", new { id = item.Id })"
+                                            hx-target="#app-modal-content-second"
+                                            hx-swap="innerHTML"
+                                            >
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,72 @@
+﻿@using ShipRate.Application.JobsViewModels
+@model JobCompanyRoleCreateVm
+
+<div class="card mb-1 role-row">
+    <div class="card-body py-2">
+        <input type="hidden" name="JobCompanyRoles.Index" value="@Model.Index" />
+
+        @*         <div class="d-flex justify-content-between align-items-center mb-2">
+            <strong>Package @(Model.Index + 1)</strong>
+            <button type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    onclick="this.closest('.role-row').remove()">
+                Remove
+            </button>
+        </div>
+ *@
+        <div class="row g-2 align-items-center">
+            <div class="col-md-1">
+                <label asp-for="CompanyId" class="form-label small fw-semibold" title="نام شرکت خودی">Company:</label>
+            </div>
+            <div class="col-md-3">
+                <select name="JobCompanyRoles[@Model.Index].CompanyId" class="form-select form-select-sm">
+                    <option value="">...</option>
+                    @foreach (var item in Model.Companies)
+                    {
+                        <option value="@item.Value" selected="@(item.Value == Model.CompanyId.ToString() ? "selected" : null)">
+                            @item.Text
+                        </option>
+                    }
+                </select>
+            </div>
+
+
+
+            <div class="col-md-1">
+                <label asp-for="CompanyRoleTypeId" class="form-label small fw-semibold" title="نقش شرکت">Role:</label>
+            </div>
+            <div class="col-md-3">
+                <select name="JobCompanyRoles[@Model.Index].CompanyRoleTypeId" class="form-select form-select-sm">
+                    <option value="">...</option>
+                    @foreach (var item in Model.CompanyRoleTypes)
+                    {
+                        <option value="@item.Value" selected="@(item.Value == Model.CompanyRoleTypeId.ToString() ? "selected" : null)">
+                            @item.Text
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-1">
+                <label asp-for="ServiceTypeId" class="form-label small fw-semibold" title="نوع سرویس">Service:</label>
+            </div>
+            <div class="col-md-3">
+                <div class="input-group input-group-sm">
+                    <select name="JobCompanyRoles[@Model.Index].ServiceTypeId" class="form-select form-select-sm">
+                        <option value="">...</option>
+                        @foreach (var item in Model.ServiceTypes)
+                        {
+                            <option value="@item.Value" selected="@(item.Value == Model.ServiceTypeId.ToString() ? "selected" : null)">
+                                @item.Text
+                            </option>
+                        }
+                    </select>
+                    <button type="button" title="حذف "
+                            class="btn-close m-2"
+                            onclick="this.closest('.role-row').remove()">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

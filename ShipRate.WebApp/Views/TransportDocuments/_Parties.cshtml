@@ -1,0 +1,134 @@
+﻿@using ShipRate.Application.ViewModels
+@model TransportDocumentUpsertVm
+
+<div class="row g-3">
+
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header fw-semibold">
+                Shipper
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label asp-for="ShipperPartyId" class="form-label"></label>
+                    <select asp-for="ShipperPartyId"
+                            asp-items="Model.Parties"
+                            class="form-select">
+                        <option value="">-- Select --</option>
+                    </select>
+                    <span asp-validation-for="ShipperPartyId" class="text-danger"></span>
+                </div>
+
+                <div>
+                    <label asp-for="ShipperTextInBL" class="form-label"></label>
+                    <textarea asp-for="ShipperTextInBL"
+                              class="form-control"
+                              rows="5"></textarea>
+                    <span asp-validation-for="ShipperTextInBL" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header fw-semibold">
+                Consignee
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label asp-for="ConsigneePartyId" class="form-label"></label>
+                    <select asp-for="ConsigneePartyId"
+                            asp-items="Model.Parties"
+                            class="form-select">
+                        <option value="">-- Select --</option>
+                    </select>
+                    <span asp-validation-for="ConsigneePartyId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ConsigneeTextInBL" class="form-label"></label>
+                    <textarea asp-for="ConsigneeTextInBL"
+                              class="form-control"
+                              rows="5"></textarea>
+                    <span asp-validation-for="ConsigneeTextInBL" class="text-danger"></span>
+                </div>
+
+                <div class="form-check">
+                    <input asp-for="IsConsigneeToOrder" class="form-check-input" />
+                    <label asp-for="IsConsigneeToOrder" class="form-check-label"></label>
+                </div>
+
+                <div class="form-check">
+                    <input asp-for="IsConsigneeToOrderOf" class="form-check-input" />
+                    <label asp-for="IsConsigneeToOrderOf" class="form-check-label"></label>
+                </div>
+
+                <div class="form-check">
+                    <input asp-for="IsConsigneeToBearer" class="form-check-input" />
+                    <label asp-for="IsConsigneeToBearer" class="form-check-label"></label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header fw-semibold">
+                Notify Party
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label asp-for="NotifyPartyId" class="form-label"></label>
+                    <select asp-for="NotifyPartyId"
+                            asp-items="Model.Parties"
+                            class="form-select">
+                        <option value="">-- Select --</option>
+                    </select>
+                    <span asp-validation-for="NotifyPartyId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="NotifyPartyTextInBL" class="form-label"></label>
+                    <textarea asp-for="NotifyPartyTextInBL"
+                              class="form-control"
+                              rows="5"></textarea>
+                    <span asp-validation-for="NotifyPartyTextInBL" class="text-danger"></span>
+                </div>
+
+                <div class="form-check">
+                    <input asp-for="IsNotifySameAsConsignee" class="form-check-input" />
+                    <label asp-for="IsNotifySameAsConsignee" class="form-check-label"></label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header fw-semibold">
+                Agent
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label asp-for="AgentPartyId" class="form-label"></label>
+                    <select asp-for="AgentPartyId"
+                            asp-items="Model.Parties"
+                            class="form-select">
+                        <option value="">-- Select --</option>
+                    </select>
+                    <span asp-validation-for="AgentPartyId" class="text-danger"></span>
+                </div>
+
+                <div>
+                    <label asp-for="AgentTextInBL" class="form-label"></label>
+                    <textarea asp-for="AgentTextInBL"
+                              class="form-control"
+                              rows="5"></textarea>
+                    <span asp-validation-for="AgentTextInBL" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

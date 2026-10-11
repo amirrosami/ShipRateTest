@@ -1,0 +1,38 @@
+﻿@using ShipRate.Application.ViewModels
+@model AddExportDocsReceiptDocumentVm
+
+<div class="card" dir="ltr">
+    <div class="card-body">
+        <form hx-post="@Url.Action("AddDocument", "ExportDocsReceipt")"
+              hx-target="#documents-pane"
+              hx-swap="innerHTML">
+
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ExportDocsReceiptId" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row g-3 align-items-end">
+                <div class="col-md-8">
+                    <label asp-for="DocumentId" class="form-label">Document</label>
+                    <select asp-for="DocumentId" asp-items="Model.Documents" class="form-select">
+                        <option value="">Select...</option>
+                    </select>
+                    <span asp-validation-for="DocumentId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Add</button>
+
+                    <button type="button"
+                            class="btn btn-light"
+                            hx-get="@Url.Action("EmptyDocumentsForm", "ExportDocsReceipt")"
+                            hx-target="#documentsFormContainer"
+                            hx-swap="innerHTML">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

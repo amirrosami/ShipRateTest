@@ -1,0 +1,124 @@
+﻿@using ShipRate.Application.ViewModels
+@model List<VendorQuoteResponseRowVm>
+
+<style>
+    .table-compact {
+        font-size: 14px !important;
+    }
+
+        .table-compact th {
+            padding: 0.5rem !important;
+            background-color: #f8f9fa;
+        }
+
+        .table-compact td {
+            padding: 0.4rem 0.5rem !important;
+            vertical-align: middle;
+        }
+
+    .btn-table {
+        padding: 0.2rem 0.5rem;
+        font-size: 12px;
+        line-height: 1.2;
+    }
+</style>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="p-3 border rounded bg-light text-center small text-muted">
+        No quote responses submitted yet.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered table-sm table-compact mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Quote No</th>
+                    <th>Date</th>
+                    <th>Service</th>
+                    <th>Carrier</th>
+                    <th>Vendor</th>
+                    <th>Transport</th>
+                    <th>T.Time</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Creator</th>
+                    <th>Editor</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var badgeClass = item.StatusId switch
+                    {
+                        1 => "bg-secondary",
+                        2 => "bg-primary",
+                        3 => "bg-success",
+                        4 => "bg-danger",
+                        6 => "bg-warning",
+                        _ => "bg-light text-dark border"
+                    };
+                    <tr>
+                        <td class="fw-bold">@item.QuoteNo</td>
+                        <td class="text-nowrap">@item.QuoteDate.ToString("yyyy/MM/dd HH:mm")</td>
+                        <td>@item.ServiceName</td>
+                        <td>@item.CarrierName</td>
+                        <td>@item.VendorName</td>
+                        <td>@item.TransportBy</td>
+                        <td>@item.TransitTime</td>
+                        <td class="text-nowrap">@item.TotalAmount.ToString("N0") <small class="text-muted">@item.Currency</small></td>
+                        <td>
+                            <span class="badge @badgeClass rounded-pill" style="font-size: 10px;">@item.Status</span>
+                        </td>
+                        <td>@item.CreatedByUserName</td>
+                        <td>@item.LastEditedByUserName</td>
+                        <td>
+                            <div class="d-flex gap-1 flex-nowrap">
+                                <button class="btn btn-outline-secondary btn-table"
+                                        hx-get="/RateRequests/GetRespondDetails?quoteId=@item.Id"
+                                        hx-target="#modal-content"
+                                        hx-swap="innerHTML">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+
+                                @if (item.StatusId == 1)
+                                {
+                                    <button type="button" class="btn btn-outline-primary btn-table"
+                                            hx-get="@Url.Action("EditQuote", "MyInquiries", new { quoteId = item.Id })"
+                                            hx-target="#quoteModalContent"
+                                            hx-swap="innerHTML"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#quoteModal">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-table"
+                                            hx-post="/MyInquiries/DeleteQuote?quoteId=@item.Id"
+                                            hx-confirm="Are you sure?"
+                                            hx-swap="none">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                }
+
+                                <button class="btn btn-primary btn-table"
+                                        hx-post="/MyInquiries/SendQuoteResponseInApp?quoteId=@item.Id"
+                                        hx-confirm="Send In App this inquiry?"
+                                        hx-target="#quoteModalContent"
+                                        hx-swap="innerHTML">
+                                    Send
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+<div class="card-footer p-2 text-end">
+    <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('vendorQuoteResponseGrid').innerHTML = ''">
+        Close
+    </button>
+</div>

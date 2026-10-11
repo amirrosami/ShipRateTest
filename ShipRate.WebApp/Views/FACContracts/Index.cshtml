@@ -1,0 +1,48 @@
+﻿@using ShipRate.Domain.Entities.Contract
+@model IEnumerable<FACContract>
+
+<div class="container-fluid mt-4">
+
+<div class="d-flex justify-content-between mb-3">
+
+<input type="text"
+       name="search"
+       class="form-control w-25"
+       placeholder="Search..."
+       hx-get="/FACContracts/Index"
+       hx-trigger="keyup changed delay:400ms"
+       hx-target="#tableContainer"
+       hx-include="this"/>
+
+<button class="btn btn-primary"
+        hx-get="/FACContracts/Create"
+        hx-target="#modalBody"
+        data-bs-toggle="modal"
+        data-bs-target="#facModal">
++ New Contract
+</button>
+
+</div>
+
+<div id="tableContainer"
+     hx-get="/FACContracts/Index"
+     hx-trigger="load">
+
+</div>
+
+</div>
+
+<div class="modal fade" id="facModal">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+
+<div class="modal-header">
+<h5 class="modal-title">FAC Contract</h5>
+<button class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body" id="modalBody"></div>
+
+</div>
+</div>
+</div>

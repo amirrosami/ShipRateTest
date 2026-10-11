@@ -1,0 +1,226 @@
+﻿@using ShipRate.Application.ViewModels
+@model RRDetailsVM
+
+
+<style>
+    .card-header {
+        padding: 0.35rem 0.75rem; /* کاهش ارتفاع */
+        font-size: 0.9rem; /* کوچک‌تر شدن فونت */
+        min-height: auto; /* جلوگیری از ارتفاع اضافی */
+    }
+
+        .card-header h5 {
+            margin: 0; /* حذف فاصله اضافی عنوان */
+            font-weight: 500; /* کمی ظریف‌تر */
+        }
+</style>
+<div class="card">
+    <div class="card-header bg-primary text-white ">
+        <h5>General Information</h5>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-2">Request No</dt>
+            <dd class="col-sm-2">@Model.RateRequestNumber</dd>
+
+            <dt class="col-sm-2">Request Date</dt>
+            <dd class="col-sm-2">@Model.RequestDate.ToString("yyyy-MM-dd HH:mm")</dd>
+
+            @if (Model.TransportTypes is not null && Model.TransportTypes.Count > 0)
+            {
+                <dt class="col-sm-2">Transport Mode(s)</dt>
+                <dd class="col-sm-2 text-danger">
+                    @{
+                        var tt = "";
+                    }
+                    @foreach (var item in Model.TransportTypes)
+                    {
+                        tt = tt + "," + item.TransportTypeName;
+                    }
+                    @tt.Substring(1)
+                </dd>
+            }
+            <dt class="col-sm-2">Customer Name</dt>
+            <dd class="col-sm-2">@Model.CustomerName</dd>
+
+            <dt class="col-sm-2">Contact Name</dt>
+            <dd class="col-sm-2">@Model.ContactName</dd>
+
+            <dt class="col-sm-2">Email Address</dt>
+            <dd class="col-sm-2">@Model.EmailAddress</dd>
+
+            <dt class="col-sm-2">Mobile Number</dt>
+            <dd class="col-sm-2">@Model.MobileNo</dd>
+
+            <dt class="col-sm-2 ">Origin</dt>
+            <dd class="col-sm-2 text-primary">@Model.Origin</dd>
+
+            <dt class="col-sm-2">Destination</dt>
+            <dd class="col-sm-2 text-success">@Model.Destination</dd>
+
+            <dt class="col-sm-2">Cargo Readiness Date</dt>
+            <dd class="col-sm-2">@Model.CargoReadyDate</dd>
+
+            @if (Model.Containers != null && Model.Containers.Count > 0)
+            {
+                <dt class="col-sm-2">Requested Container(s)</dt>
+                <dd class="col-sm-2 text-danger">
+                    @{
+                        var cc = "";
+                    }
+                    @foreach (var item in Model.Containers)
+                    {
+                        cc = cc + "," + item.Counts.ToString() + " X " + item.SizeTypeName;
+                    }
+                    @cc.Substring(1)
+                </dd>
+            }
+
+
+        </dl>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5>Shipment Information</h5>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-2">Cargo Commodities</dt>
+            <dd class="col-sm-2"></dd>
+
+            <dt class="col-sm-2">Cargo Nature</dt>
+            <dd class="col-sm-2"></dd>
+
+            <dt class="col-sm-2">Movement Type</dt>
+            <dd class="col-sm-2"></dd>
+
+            <dt class="col-sm-2">Load Type</dt>
+            <dd class="col-sm-2"></dd>
+
+            <dt class="col-sm-2">Pickup Required</dt>
+            <dd class="col-sm-2"></dd>
+
+            <dt class="col-sm-2">Pickup Address</dt>
+            <dd class="col-sm-2"></dd>
+
+            <dt class="col-sm-2">Origin Zip Code</dt>
+            <dd class="col-sm-2"></dd>
+
+            <dt class="col-sm-2">Delivery Required</dt>
+            <dd class="col-sm-2"></dd>
+
+            <dt class="col-sm-2">Delivery Address</dt>
+            <dd class="col-sm-2"></dd>
+
+            <dt class="col-sm-2">Destination Zip Code</dt>
+            <dd class="col-sm-2"></dd>
+
+            <dt class="col-sm-2">Conditions</dt>
+            <dd class="col-sm-2"></dd>
+
+            <dt class="col-sm-2">Required Services</dt>
+            <dd class="col-sm-2"></dd>
+        </dl>
+    </div>
+</div>
+
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5>Cargo Details Information</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <!-- اضافه کردن ردیف برای مدیریت ستون‌ها -->
+            @foreach (var cargo in Model.CargoDetails)
+            {
+                <div class="col-12 col-md-6 mb-4">
+                    <!-- کلاس mb-4 برای فاصله عمودی بین آیتم‌ها -->
+                    <div class="card h-100 shadow-sm">
+                        <!-- اضافه کردن کارت داخلی برای زیبایی -->
+                        <div class="card-body">
+                            <h6 class="card-title">Cargo Sequence: @cargo.Sequence</h6>
+                            <hr />
+                            <dl class="row">
+                                <dt class="col-sm-5">Description</dt>
+                                <dd class="col-sm-7">@cargo.CargoDescription</dd>
+
+                                <dt class="col-sm-5">Package Type</dt>
+                                <dd class="col-sm-7">@cargo.PackageTypeName</dd>
+
+                                <dt class="col-sm-5">Package Count</dt>
+                                <dd class="col-sm-7">@cargo.PackageCount</dd>
+
+                                <dt class="col-sm-5">Gross/Net Weight</dt>
+                                <dd class="col-sm-7">@cargo.GrossWeight / @cargo.NetWeight @cargo.WeightUnitName</dd>
+
+                                <dt class="col-sm-5">Dimensions</dt>
+                                <dd class="col-sm-7">@cargo.Length x @cargo.Width x @cargo.Height @cargo.DimensionUnitName</dd>
+
+                                <dt class="col-sm-4">HS Code</dt>
+                                <dd class="col-sm-8">@cargo.HSCode</dd>
+
+                                <dt class="col-sm-4">Dangerous Goods</dt>
+                                <dd class="col-sm-8">@(cargo.IsDG ? "Yes" : "No")</dd>
+
+                                <dt class="col-sm-4">DG Class</dt>
+                                <dd class="col-sm-8">@cargo.DGClassName</dd>
+
+                                <dt class="col-sm-4">UN Number</dt>
+                                <dd class="col-sm-8">@cargo.UNNumber</dd>
+
+                                <dt class="col-sm-4">Temperature Controlled</dt>
+                                <dd class="col-sm-8">@(cargo.IsTemperatureControlled ? "Yes" : "No")</dd>
+
+                                <dt class="col-sm-4">Temperature</dt>
+                                <dd class="col-sm-8">
+                                    Min: @cargo.MinTemp,
+                                    Normal: @cargo.NormalTemp,
+                                    Max: @cargo.MaxTemp
+                                    @cargo.TempUnitName
+                                </dd>
+
+                                <dt class="col-sm-4">Marks And Numbers</dt>
+                                <dd class="col-sm-8">@cargo.MarksAndNumbers</dd>
+
+                                <dt class="col-sm-4">Remarks</dt>
+                                <dd class="col-sm-8">@cargo.Remarks</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5>Remarks</h5>
+    </div>
+    <div class="card-body">
+        <div>@Model.Remarks</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5>Inquiry List & Related Responses</h5>
+    </div>
+    <div class="card-body">
+    </div>
+</div>
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5>Quotations Sent To Customer</h5>
+    </div>
+    <div class="card-body">
+    </div>
+</div>
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5>Activity Log(s)</h5>
+    </div>
+    <div class="card-body">
+    </div>
+</div>

@@ -1,0 +1,102 @@
+﻿@using ShipRate.Application.DTOs
+@model PagedResultDto<BlackListDto>
+
+@if (!Model.Items.Any())
+{
+    <tr>
+        <td colspan="8" class="text-center text-muted py-4">No records found.</td>
+    </tr>
+}
+else
+{
+    @foreach (var item in Model.Items)
+    {
+        <tr>
+            <td class="fw-bold">@item.PersonName</td>
+            <td><code>@item.NationalId</code></td>
+            <td><span class="badge bg-warning text-dark">@item.ReasonTitle</span></td>
+            <td>@item.BlackListEnterDateTime.ToString("yyyy-MM-dd HH:mm")</td>
+            <td class="text-truncate" style="max-width: 150px;" title="@item.EnterRemarks">@item.EnterRemarks</td>
+            <td>
+                @if (item.IsExited)
+                {
+                    <span class="badge bg-success"><i class="bi bi-check-circle"></i> Exited</span>
+                }
+                else
+                {
+                    <span class="badge bg-danger"><i class="bi bi-exclamation-triangle"></i> Blacklisted</span>
+                }
+            </td>
+            <td>
+                @if (item.IsExited)
+                {
+                    <span class="small text-muted">@item.ExitRemarks</span>
+                    <div class="xsmall text-secondary">@item.BlackListExitDateTime?.ToString("yyyy-MM-dd HH:mm")</div>
+                }
+                else
+                {
+                    <span class="text-muted italic">-</span>
+                }
+            </td>
+            <td class="text-center">
+                <div class="btn-group" role="group">
+                    <!-- دکمه خروج فقط برای رکوردهایی فعال است که هنوز خارج نشده‌اند -->
+                    @if (!item.IsExited)
+                    {
+                        <button class="btn btn-sm btn-outline-success"
+                                hx-get="@Url.Action("Exit", "BlackList", new { id = item.Id })"
+                                hx-target="#modal-container"
+                                data-bs-toggle="modal"
+                                data-bs-target="#actionModal"
+                                title="Exit from BlackList">
+                            <i class="bi bi-box-arrow-right"></i> Exit
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-sm btn-outline-success" disabled>
+                            <i class="bi bi-check-all"></i> Cleared
+                        </button>
+                    }
+                    @* <button class="btn btn-sm btn-outline-danger"
+                            hx-delete="@Url.Action("Delete", "BlackList", new { id = item.Id })"
+                            hx-confirm="Are you sure you want to delete this blacklist record?"
+                            title="Delete Permanently">
+                        <i class="bi bi-trash"></i>
+                    </button> *@
+                </div>
+            </td>
+        </tr>
+    }
+
+    <!-- بخش صفحه‌بندی (Pagination) -->
+    <tr>
+        <td colspan="8" class="bg-light">
+            <nav aria-label="Page navigation" class="d-flex justify-content-between align-items-center px-2">
+                <span class="text-secondary small">
+                    Showing @Model.Items.Count() of @Model.TotalCount records. Page @Model.PageNumber of @Model.TotalPages
+                </span>
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                        <a class="page-link" href="javascript:void(0)"
+                           hx-get="@Url.Action("Index", "BlackList", new { PageNumber = Model.PageNumber - 1 })"
+                           hx-target="#table-rows" hx-swap="innerHTML">Previous</a>
+                    </li>
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                            <a class="page-link" href="javascript:void(0)"
+                               hx-get="@Url.Action("Index", "BlackList", new { PageNumber = i })"
+                               hx-target="#table-rows" hx-swap="innerHTML">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                        <a class="page-link" href="javascript:void(0)"
+                           hx-get="@Url.Action("Index", "BlackList", new { PageNumber = Model.PageNumber + 1 })"
+                           hx-target="#table-rows" hx-swap="innerHTML">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </td>
+    </tr>
+}

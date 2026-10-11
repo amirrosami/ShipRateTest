@@ -1,0 +1,141 @@
+﻿@{
+    ViewData["Title"] = "Under Construction";
+    var pageName = ViewBag.PageName as string;
+}
+
+<div class="uc-container" dir="ltr">
+    <div class="uc-card">
+        <div class="card-header">
+            <span class="uc-badge">Coming Soon</span>
+            <h1>Under Construction</h1>
+            <p>
+                @(string.IsNullOrWhiteSpace(pageName)
+                                ? "This section is currently being developed and will be available soon."
+                                : $"The {pageName} page is currently being developed and will be available soon.")
+            </p>
+        </div>
+
+        <div class="uc-actions">
+            <a href="/" class="uc-btn uc-btn-primary">Go Home</a>
+            <button type="button" class="uc-btn uc-btn-light" onclick="history.back()">Go Back</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .uc-container {
+        width: 100%;
+        padding: 32px 16px;
+        direction: ltr;
+    }
+
+    .uc-card {
+        margin-top : 50px;
+        max-width: 760px;
+        margin: 0 auto;
+        background: #ffffff;
+        border: 1px solid #e9f1f7;
+        border-radius: 22px;
+        padding: 14px;
+        box-shadow: 0 10px 30px rgba(15, 76, 129, 0.06);
+    }
+
+    .uc-header {
+        background: linear-gradient(135deg, #f4fbff 0%, #dff1ff 45%, #cfeaff 100%);
+        border: 1px solid #d7ebfb;
+        border-radius: 18px;
+        padding: 38px 32px;
+        text-align: left;
+    }
+
+    .uc-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: #ffffff;
+        color: #1976d2;
+        border: 1px solid #d6e9f8;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+
+    .uc-header h1 {
+        margin: 0 0 10px;
+        color: #0f3d66;
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: -0.4px;
+    }
+
+    .uc-header p {
+        margin: 0;
+        color: #567089;
+        font-size: 15px;
+        line-height: 1.9;
+        max-width: 560px;
+    }
+
+    .uc-actions {
+        display: flex;
+        gap: 10px;
+        padding: 18px 6px 4px;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .uc-btn {
+        text-decoration: none;
+        border-radius: 12px;
+        padding: 10px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+
+    .uc-btn-primary {
+        background: #1976d2;
+        color: #ffffff;
+        border-color: #1976d2;
+    }
+
+        .uc-btn-primary:hover {
+            background: #1565c0;
+            border-color: #1565c0;
+        }
+
+    .uc-btn-light {
+        background: #ffffff;
+        color: #1976d2;
+        border-color: #d6e9f8;
+    }
+
+        .uc-btn-light:hover {
+            background: #f7fbff;
+        }
+
+    @@media (max-width: 768px) {
+        .uc-header {
+            padding: 28px 20px;
+        }
+
+            .uc-header h1 {
+                font-size: 24px;
+            }
+
+            .uc-header p {
+                font-size: 14px;
+            }
+
+        .uc-actions {
+            flex-direction: column;
+        }
+
+        .uc-btn {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>

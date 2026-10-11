@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "Shipment Map";
+}
+
+<link rel="stylesheet" href="~/lib/leaflet/leaflet.css" />
+<link rel="stylesheet" href="~/css/map.css" />
+
+<div class="map-shell">
+    <div class="map-header">
+        <div class="map-title">Shipment Map</div>
+        <div class="map-subtitle">Offline map with ports, airports, offices and routes</div>
+    </div>
+
+    <div id="map"></div>
+</div>
+
+<script src="~/lib/leaflet/leaflet.js"></script>
+<script src="~/js/shipment-map.js"></script>

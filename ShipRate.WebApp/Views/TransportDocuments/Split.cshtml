@@ -1,0 +1,897 @@
+﻿@model AdvancedBLSplitVm
+@using System.Text.Json
+@using ShipRate.Application.ViewModels
+
+@{
+    ViewData["Title"] = "Advanced BL Split";
+
+    // اصلاح شده: استفاده از ساختار کلید یکپارچه برای پشتیبانی از هر دو حالت
+    var initialJson = JsonSerializer.Serialize(new
+    {
+        blId = Model.BlId,
+        blNo = Model.BlNo,
+        jobId = Model.JobId,
+        jobNo = Model.JobNo,
+        splitRequestId = Model.SplitRequestId,
+        sourceLines = Model.SourceLines.Select(x => new
+        {
+            sourceLineKey = x.SourceLineKey, // کلید ترکیبی مثل ALLOC:guid یا CARGO:guid
+            sourceLineType = (int)x.SourceLineType,
+            sourceAllocationId = x.SourceAllocationId,
+            sourceCargoDetailId = x.SourceCargoDetailId,
+            containerNo = x.ContainerNo,
+            cargoNo = x.CargoNo,
+            description = x.Description,
+            availablePackages = x.AvailablePackages,
+            availableWeight = x.AvailableWeight,
+            availableVolume = x.AvailableVolume
+        }),
+        totals = new
+        {
+            packages = Model.Totals?.Packages ?? 0,
+            weight = Model.Totals?.Weight ?? 0,
+            volume = Model.Totals?.Volume ?? 0
+        }
+    });
+}
+@Html.AntiForgeryToken()
+<div class="container-fluid py-3" id="splitApp">
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+        <div>
+            <h3 class="mb-1">Advanced BL Split</h3>
+            <div class="text-muted small">
+                <span class="me-3"><strong>BL:</strong> @Model.BlNo</span>
+                <span><strong>Job:</strong> @Model.JobNo</span>
+            </div>
+        </div>
+
+        <div class="d-flex flex-wrap align-items-end gap-2">
+            <div>
+                <label class="form-label form-label-sm mb-1 small">Selected Target</label>
+                <select class="form-select form-select-sm" id="selectedTargetKey" style="min-width: 180px;"></select>
+            </div>
+
+            <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddTarget">
+                <i class="bi bi-plus-lg me-1"></i>Add Target
+            </button>
+
+            <button type="button" class="btn btn-sm btn-success" id="btnSubmit" disabled>
+                <i class="bi bi-check2-circle me-1"></i>Submit Split
+            </button>
+        </div>
+    </div>
+
+    <div class="alert alert-info py-2 mb-3">
+        Drag a source row into a target card. Then set split quantities for that target.
+        A single source allocation can be split across multiple targets.
+    </div>
+
+    <div class="row g-3">
+        @* --- Source Panel --- *@
+        <div class="col-12 col-xl-5">
+            <div class="card shadow-sm source-panel">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+                    <strong>Source Allocations</strong>
+                    <span class="badge bg-secondary" id="sourceLineCount">0</span>
+                </div>
+
+                <div class="card-body p-0 source-table-wrap">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover align-middle mb-0">
+                            <thead class="table-light text-nowrap">
+                                <tr>
+                                    <th style="width: 36px;"></th>
+                                    <th>Container</th>
+                                    <th>Cargo</th>
+                                    <th>Description</th>
+                                    <th class="text-end">Avail Pkg</th>
+                                    <th class="text-end">Avail Wt</th>
+                                    <th class="text-end">Avail Vol</th>
+                                    <th style="width: 52px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="sourceTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white">
+                    <div class="row g-2 small">
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 text-center">
+                                <div class="text-muted">Total Packages</div>
+                                <div class="fw-bold" id="sourceTotalPackages">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 text-center">
+                                <div class="text-muted">Total Weight</div>
+                                <div class="fw-bold" id="sourceTotalWeight">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 text-center">
+                                <div class="text-muted">Total Volume</div>
+                                <div class="fw-bold" id="sourceTotalVolume">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* --- Targets Panel --- *@
+        <div class="col-12 col-xl-7">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong>Target BLs</strong>
+                <span class="text-muted small">Drop source lines here or use Add from source list</span>
+            </div>
+            <div id="targetsContainer" class="d-grid gap-3"></div>
+        </div>
+    </div>
+</div>
+
+@* --- Templates --- *@
+<template id="targetCardTemplate">
+    <div class="card shadow-sm target-card" data-target-key="">
+        <div class="card-header bg-light py-2">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label form-label-sm mb-1 small">Title</label>
+                    <input type="text" class="form-control form-control-sm target-title" placeholder="New BL 1" />
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label form-label-sm mb-1 small">Existing BL No (optional)</label>
+                    <input type="text" class="form-control form-control-sm target-blno ltr-input" placeholder="Leave empty for new" />
+                </div>
+                <div class="col-md-2 text-end">
+                    <input type="hidden" class="target-key-view" />
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-target">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="dropzone border border-2 border-dashed rounded p-2 mb-2 text-center text-muted small">
+                Drop source allocation here or use Add
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead class="table-light text-nowrap">
+                        <tr>
+                            <th>Container</th>
+                            <th>Cargo</th>
+                            <th>Description</th>
+                            <th class="text-end">Packages</th>
+                            <th class="text-end">Weight</th>
+                            <th class="text-end">Volume</th>
+                            <th style="width: 100px;">Auto</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="assignmentTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-footer bg-white">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-3 text-center">
+                    <div class="border rounded p-2">
+                        <div class="text-muted small">Packages</div>
+                        <div class="fw-bold target-total-packages">0</div>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="border rounded p-2">
+                        <div class="text-muted small">Weight</div>
+                        <div class="fw-bold target-total-weight">0</div>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="border rounded p-2">
+                        <div class="text-muted small">Volume</div>
+                        <div class="fw-bold target-total-volume">0</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="small validation-summary"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="assignmentRowTemplate">
+    <tr data-assignment-id="">
+        <td class="assignment-container small"></td>
+        <td class="assignment-cargo small"></td>
+        <td class="assignment-description small"></td>
+        <td><input type="number" step="any" class="form-control form-control-sm text-end input-packages ltr-input" /></td>
+        <td><input type="number" step="any" class="form-control form-control-sm text-end input-weight ltr-input" /></td>
+        <td><input type="number" step="any" class="form-control form-control-sm text-end input-volume ltr-input" /></td>
+        <td><button type="button" class="btn btn-sm btn-outline-secondary btn-apply-ratio w-100">Ratio</button></td>
+        <td class="text-end"><button type="button" class="btn btn-sm btn-link text-danger btn-remove-assignment p-0"><i class="bi bi-x-circle-fill"></i></button></td>
+    </tr>
+</template>
+
+
+<style>
+    .ltr-input {
+        direction: ltr;
+        text-align: left;
+    }
+
+    /* Target Cards - Zebra Striping & Design */
+    .target-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background-color: #ffffff;
+        transition: all 0.2s ease;
+        margin-bottom: 1.5rem;
+    }
+
+        /* رنگ‌بندی یک‌درمیان */
+        .target-card:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        /* کارت فعال (انتخاب شده در Dropdown) */
+        .target-card.is-active {
+            border: 2px solid #0d6efd !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: scale(1.01);
+        }
+
+        /* هدر بسیار ساده */
+        .target-card .card-header {
+            background: transparent !important;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0.5rem 0.75rem;
+        }
+
+            /* تنظیمات تایپوگرافی */
+            .target-card .card-header .form-label {
+                color: #6b7280;
+                font-weight: 500;
+                font-size: 0.75rem;
+                margin-bottom: 0.25rem;
+            }
+
+    .target-title {
+        color: #111827;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .target-blno {
+        color: #374151;
+        font-family: monospace;
+        font-size: 0.85rem;
+    }
+
+    /* استایل‌های عمومی */
+    .dropzone {
+        transition: all .2s;
+        background: #ffffff;
+        min-height: 42px;
+        border: 1px dashed #d1d5db;
+    }
+
+        .dropzone.dropzone-active {
+            background: #e0f2fe;
+            border-color: #0d6efd !important;
+            color: #0d6efd !important;
+        }
+
+    .source-panel {
+        position: sticky;
+        top: 76px;
+        max-height: calc(100vh - 95px);
+    }
+
+    .source-table-wrap {
+        max-height: calc(100vh - 285px);
+        overflow: auto;
+    }
+
+        .source-table-wrap thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: #f8f9fa;
+        }
+
+    .target-card.invalid {
+        border-color: #dc3545 !important;
+        border-width: 2px !important;
+    }
+
+    .target-card.valid {
+        border-color: #198754 !important;
+    }
+
+    #targetsContainer {
+        gap: 0rem !important;
+    }
+    /* فاصله توسط margin کارت مدیریت می‌شود */
+
+    @@media (max-width: 1199.98px) {
+        .source-panel {
+            position: static;
+            max-height: none;
+        }
+
+        .source-table-wrap {
+            max-height: 360px;
+        }
+    }
+</style>
+
+
+
+
+@section Scripts {
+    <script>
+        (function () {
+            const initialState = @Html.Raw(initialJson);
+
+            const state = {
+                blId: initialState.blId,
+                blNo: initialState.blNo,
+                jobId: initialState.jobId,
+                jobNo: initialState.jobNo,
+                splitRequestId: initialState.splitRequestId,
+                sourceLines: initialState.sourceLines.map(x => ({
+                    sourceLineKey: x.sourceLineKey,
+                    sourceLineType: x.sourceLineType,
+                    sourceAllocationId: x.sourceAllocationId,
+                    sourceCargoDetailId: x.sourceCargoDetailId,
+                    containerNo: x.containerNo || "",
+                    cargoNo: x.cargoNo || "",
+                    description: x.description || "",
+                    availablePackages: toNumber(x.availablePackages),
+                    availableWeight: toNumber(x.availableWeight),
+                    availableVolume: toNumber(x.availableVolume)
+                })),
+                targets: [],
+                selectedTargetKey: null,
+                dragSourceLineKey: null,
+                targetIndexSeed: 1
+            };
+
+            const sourceTableBody = document.getElementById("sourceTableBody");
+            const targetsContainer = document.getElementById("targetsContainer");
+            const btnAddTarget = document.getElementById("btnAddTarget");
+            const btnSubmit = document.getElementById("btnSubmit");
+            const selectedTargetKey = document.getElementById("selectedTargetKey");
+            const targetCardTemplate = document.getElementById("targetCardTemplate");
+            const assignmentRowTemplate = document.getElementById("assignmentRowTemplate");
+
+            btnAddTarget.addEventListener("click", addTarget);
+            btnSubmit.addEventListener("click", submitSplit);
+            selectedTargetKey.addEventListener("change", e => {
+                state.selectedTargetKey = e.target.value;
+            });
+
+            // شروع با یک تارگت خالی
+            addTarget();
+            renderAll();
+
+            function addTarget() {
+                const index = state.targetIndexSeed++;
+                const key = "new-" + index;
+
+                state.targets.push({
+                    targetKey: key,
+                    targetBlNo: "",
+                    title: "New BL " + index,
+                    assignments: []
+                });
+
+                state.selectedTargetKey = key;
+                renderAll();
+            }
+
+            function removeTarget(targetKey) {
+                state.targets = state.targets.filter(x => x.targetKey !== targetKey);
+
+                if (state.selectedTargetKey === targetKey) {
+                    state.selectedTargetKey = state.targets.length ? state.targets[0].targetKey : null;
+                }
+
+                renderAll();
+            }
+
+            function addAssignment(targetKey, sourceLineKey) {
+                const target = findTarget(targetKey);
+                const source = findSource(sourceLineKey);
+                if (!target || !source) return;
+
+                // جلوگیری از اضافه کردن ردیف تکراری در یک تارگت
+                if (target.assignments.some(a => a.sourceLineKey === sourceLineKey)) return;
+
+                // مقدار پیش‌فرض = مقدار باقی‌مانده از این سورس بعد از assignmentهای قبلی
+                const remaining = getRemainingForSource(sourceLineKey, null);
+
+                target.assignments.push({
+                    assignmentId: cryptoId(),
+                    sourceLineKey: source.sourceLineKey,
+                    sourceLineType: source.sourceLineType,
+                    sourceAllocationId: source.sourceAllocationId,
+                    sourceCargoDetailId: source.sourceCargoDetailId,
+                    containerNo: source.containerNo,
+                    cargoNo: source.cargoNo,
+                    description: source.description,
+                    packages: remaining.packages,
+                    weight: remaining.weight,
+                    volume: remaining.volume
+                });
+
+                renderAll();
+            }
+
+            function addSourceToSelectedTarget(sourceLineKey) {
+                if (!state.selectedTargetKey) {
+                    alert("Please add or select a target BL first.");
+                    return;
+                }
+
+                addAssignment(state.selectedTargetKey, sourceLineKey);
+
+                const card = document.querySelector(`.target-card[data-target-key="${state.selectedTargetKey}"]`);
+                if (card) {
+                    card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                }
+            }
+
+            function removeAssignment(targetKey, assignmentId) {
+                const target = findTarget(targetKey);
+                if (!target) return;
+                target.assignments = target.assignments.filter(x => x.assignmentId !== assignmentId);
+                renderAll();
+            }
+
+            function updateAssignment(targetKey, assignmentId, field, value) {
+                const target = findTarget(targetKey);
+                if (!target) return;
+
+                const assignment = target.assignments.find(x => x.assignmentId === assignmentId);
+                if (!assignment) return;
+
+                // ذخیره مقدار به صورت عددی در استیت
+                assignment[field] = toNumber(value);
+
+                // آپدیت محاسبات بدون رندر مجدد کل جدول
+                updateLiveCalculations(targetKey, assignment.sourceLineKey);
+            }
+
+            function updateLiveCalculations(targetKey, sourceLineKey) {
+                // ۱. آپدیت جدول منبع (سمت چپ) برای نمایش باقیمانده جدید
+                renderSources();
+
+                // ۲. پیدا کردن کارت هدف در DOM
+                const target = findTarget(targetKey);
+                const card = document.querySelector(`.target-card[data-target-key="${targetKey}"]`);
+
+                if (card && target) {
+                    const tTotals = getTargetTotals(targetKey);
+
+                    // ۳. آپدیت کردن متن Totals در فوتر کارت
+                    card.querySelector(".target-total-packages").textContent = fmt(tTotals.packages);
+                    card.querySelector(".target-total-weight").textContent = fmt(tTotals.weight);
+                    card.querySelector(".target-total-volume").textContent = fmt(tTotals.volume);
+
+                    // ۴. اجرای ولیدیشن مخصوص همین کارت
+                    const errs = validateTarget(target);
+                    const summary = card.querySelector(".validation-summary");
+
+                    if (errs.length) {
+                        card.classList.remove("valid");
+                        card.classList.add("invalid");
+                        summary.innerHTML = errs.map(e => `<div class="text-danger small"><i class="bi bi-exclamation-circle me-1"></i>${escapeHtml(e)}</div>`).join("");
+                    } else {
+                        card.classList.remove("invalid");
+                        card.classList.add("valid");
+                        summary.innerHTML = `<div class="text-success small fw-bold"><i class="bi bi-check-circle me-1"></i>Valid</div>`;
+                    }
+                }
+
+                // ۵. آپدیت وضعیت دکمه Submit نهایی
+                renderValidation();
+            }
+
+            function applyRatio(targetKey, assignmentId) {
+                const target = findTarget(targetKey);
+                if (!target) return;
+                const assignment = target.assignments.find(x => x.assignmentId === assignmentId);
+                if (!assignment) return;
+
+                const remaining = getRemainingForSource(assignment.sourceLineKey, assignment.assignmentId);
+                assignment.packages = remaining.packages;
+                assignment.weight = remaining.weight;
+                assignment.volume = remaining.volume;
+
+                // آپدیت اینپوت‌های همان ردیف در DOM برای نمایش مقدار جدید
+                const row = document.querySelector(`tr[data-assignment-id="${assignmentId}"]`);
+                if (row) {
+                    row.querySelector(".input-packages").value = assignment.packages || "";
+                    row.querySelector(".input-weight").value = assignment.weight || "";
+                    row.querySelector(".input-volume").value = assignment.volume || "";
+                }
+
+                updateLiveCalculations(targetKey, assignment.sourceLineKey);
+            }
+
+            function findTarget(targetKey) { return state.targets.find(x => x.targetKey === targetKey); }
+            function findSource(key) { return state.sourceLines.find(x => x.sourceLineKey === key); }
+
+            function renderAll() {
+                renderTargetSelector();
+                renderSources();
+                renderTargets();
+                renderValidation();
+            }
+
+            function renderTargetSelector() {
+                selectedTargetKey.innerHTML = "";
+
+                state.targets.forEach(target => {
+                    const opt = document.createElement("option");
+                    opt.value = target.targetKey;
+                    opt.textContent = `${target.title || target.targetKey} (${target.assignments.length})`;
+                    selectedTargetKey.appendChild(opt);
+                });
+
+                if (!state.selectedTargetKey && state.targets.length) {
+                    state.selectedTargetKey = state.targets[0].targetKey;
+                }
+
+                selectedTargetKey.value = state.selectedTargetKey || "";
+                selectedTargetKey.disabled = state.targets.length === 0;
+            }
+
+            function renderSources() {
+                sourceTableBody.innerHTML = "";
+                state.sourceLines.forEach(source => {
+                    const used = getAssignedTotalsForSource(source.sourceLineKey);
+                    const remPkg = round3(source.availablePackages - used.packages);
+                    const remWt = round3(source.availableWeight - used.weight);
+                    const remVol = round3(source.availableVolume - used.volume);
+
+                    const tr = document.createElement("tr");
+                    tr.className = "source-row";
+                    tr.setAttribute("draggable", "true");
+                    tr.dataset.sourceKey = source.sourceLineKey;
+
+                    if (remPkg <= 0 && remWt <= 0 && remVol <= 0) tr.classList.add("source-balance-empty");
+                    else if (remPkg < source.availablePackages) tr.classList.add("source-balance-low");
+
+                    tr.addEventListener("dragstart", () => {
+                        state.dragSourceLineKey = source.sourceLineKey;
+                        tr.classList.add("dragging");
+                    });
+
+                    tr.addEventListener("dragend", () => {
+                        state.dragSourceLineKey = null;
+                        tr.classList.remove("dragging");
+                    });
+
+                    tr.innerHTML = `
+                        <td class="text-center"><i class="bi bi-grip-vertical"></i></td>
+                        <td class="small">${escapeHtml(source.containerNo || "-")}</td>
+                        <td class="small">${escapeHtml(source.cargoNo)}</td>
+                        <td class="small text-truncate" style="max-width:150px;">${escapeHtml(source.description)}</td>
+                        <td class="text-end fw-bold">${fmt(remPkg)}</td>
+                        <td class="text-end fw-bold">${fmt(remWt)}</td>
+                        <td class="text-end fw-bold">${fmt(remVol)}</td>
+                        <td class="text-end">
+                            <button type="button" class="btn btn-sm btn-outline-primary btn-add-source" title="Add to selected target">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </td>
+                    `;
+
+                    const addBtn = tr.querySelector(".btn-add-source");
+                    addBtn.onclick = () => addSourceToSelectedTarget(source.sourceLineKey);
+                    tr.ondblclick = () => addSourceToSelectedTarget(source.sourceLineKey);
+
+                    sourceTableBody.appendChild(tr);
+                });
+
+                document.getElementById("sourceLineCount").textContent = state.sourceLines.length;
+
+                const sTotals = state.sourceLines.reduce((acc, s) => {
+                    const u = getAssignedTotalsForSource(s.sourceLineKey);
+                    acc.p += (s.availablePackages - u.packages);
+                    acc.w += (s.availableWeight - u.weight);
+                    acc.v += (s.availableVolume - u.volume);
+                    return acc;
+                }, { p: 0, w: 0, v: 0 });
+
+                document.getElementById("sourceTotalPackages").textContent = fmt(sTotals.p);
+                document.getElementById("sourceTotalWeight").textContent = fmt(sTotals.w);
+                document.getElementById("sourceTotalVolume").textContent = fmt(sTotals.v);
+            }
+
+            function renderTargets() {
+                targetsContainer.innerHTML = "";
+                state.targets.forEach(target => {
+                    const frag = targetCardTemplate.content.cloneNode(true);
+                    const card = frag.querySelector(".target-card");
+
+                    // --- این خط را اضافه کنید ---
+                        if (target.targetKey === state.selectedTargetKey) {
+                            card.classList.add("is-active");
+                        }
+                        // ---------------------------
+
+
+
+
+                    const dropzone = frag.querySelector(".dropzone");
+                    const tbody = frag.querySelector(".assignmentTableBody");
+
+                    card.dataset.targetKey = target.targetKey;
+
+                    frag.querySelector(".target-key-view").value = target.targetKey;
+                    frag.querySelector(".target-title").value = target.title;
+                    frag.querySelector(".target-blno").value = target.targetBlNo;
+
+                    frag.querySelector(".target-title").oninput = e => {
+                        target.title = e.target.value;
+                        renderTargetSelector();
+                        renderValidation();
+                    };
+
+                    frag.querySelector(".target-blno").oninput = e => {
+                        target.targetBlNo = e.target.value;
+                        renderValidation();
+                    };
+
+                    frag.querySelector(".btn-remove-target").onclick = () => removeTarget(target.targetKey);
+
+                    attachDropzone(dropzone, target.targetKey);
+
+                    target.assignments.forEach(ass => {
+                        const rowFrag = assignmentRowTemplate.content.cloneNode(true);
+                        const row = rowFrag.querySelector("tr");
+                        row.dataset.assignmentId = ass.assignmentId;
+
+                        rowFrag.querySelector(".assignment-container").textContent = ass.containerNo || "-";
+                        rowFrag.querySelector(".assignment-cargo").textContent = ass.cargoNo;
+                        rowFrag.querySelector(".assignment-description").textContent = ass.description;
+
+                        const inP = rowFrag.querySelector(".input-packages");
+                        const inW = rowFrag.querySelector(".input-weight");
+                        const inV = rowFrag.querySelector(".input-volume");
+
+                        inP.value = ass.packages || "";
+                        inW.value = ass.weight || "";
+                        inV.value = ass.volume || "";
+
+                        inP.oninput = e => updateAssignment(target.targetKey, ass.assignmentId, "packages", e.target.value);
+                        inW.oninput = e => updateAssignment(target.targetKey, ass.assignmentId, "weight", e.target.value);
+                        inV.oninput = e => updateAssignment(target.targetKey, ass.assignmentId, "volume", e.target.value);
+
+                        rowFrag.querySelector(".btn-apply-ratio").onclick = () => applyRatio(target.targetKey, ass.assignmentId);
+                        rowFrag.querySelector(".btn-remove-assignment").onclick = () => removeAssignment(target.targetKey, ass.assignmentId);
+
+                        tbody.appendChild(rowFrag);
+                    });
+
+                    const tTotals = getTargetTotals(target.targetKey);
+                    frag.querySelector(".target-total-packages").textContent = fmt(tTotals.packages);
+                    frag.querySelector(".target-total-weight").textContent = fmt(tTotals.weight);
+                    frag.querySelector(".target-total-volume").textContent = fmt(tTotals.volume);
+
+                    const errs = validateTarget(target);
+                    const summary = frag.querySelector(".validation-summary");
+                    if (errs.length) {
+                        card.classList.add("invalid");
+                        summary.innerHTML = errs.map(e => `<div class="text-danger small"><i class="bi bi-exclamation-circle me-1"></i>${escapeHtml(e)}</div>`).join("");
+                    } else if (target.assignments.length) {
+                        card.classList.add("valid");
+                        summary.innerHTML = `<div class="text-success small fw-bold"><i class="bi bi-check-circle me-1"></i>Valid</div>`;
+                    }
+
+                    targetsContainer.appendChild(frag);
+                });
+            }
+
+            function attachDropzone(dz, tKey) {
+                dz.ondragover = e => {
+                    e.preventDefault();
+                    dz.classList.add("dropzone-active");
+                };
+
+                dz.ondragleave = () => dz.classList.remove("dropzone-active");
+
+                dz.ondrop = e => {
+                    e.preventDefault();
+                    dz.classList.remove("dropzone-active");
+                    if (state.dragSourceLineKey) addAssignment(tKey, state.dragSourceLineKey);
+                };
+            }
+
+            function getAssignedTotalsForSource(key) {
+                const totals = { packages: 0, weight: 0, volume: 0 };
+                state.targets.forEach(t => {
+                    t.assignments.filter(a => a.sourceLineKey === key).forEach(a => {
+                        totals.packages += toNumber(a.packages);
+                        totals.weight += toNumber(a.weight);
+                        totals.volume += toNumber(a.volume);
+                    });
+                });
+                return {
+                    packages: round3(totals.packages),
+                    weight: round3(totals.weight),
+                    volume: round3(totals.volume)
+                };
+            }
+
+            function getRemainingForSource(key, currentAssId) {
+                const src = findSource(key);
+                if (!src) return { packages: 0, weight: 0, volume: 0 };
+
+                let uP = 0, uW = 0, uV = 0;
+                state.targets.forEach(t => {
+                    t.assignments
+                        .filter(a => a.sourceLineKey === key && a.assignmentId !== currentAssId)
+                        .forEach(a => {
+                            uP += toNumber(a.packages);
+                            uW += toNumber(a.weight);
+                            uV += toNumber(a.volume);
+                        });
+                });
+
+                return {
+                    packages: Math.max(0, round3(src.availablePackages - uP)),
+                    weight: Math.max(0, round3(src.availableWeight - uW)),
+                    volume: Math.max(0, round3(src.availableVolume - uV))
+                };
+            }
+
+            function getTargetTotals(tKey) {
+                const t = findTarget(tKey);
+                if (!t) return { packages: 0, weight: 0, volume: 0 };
+
+                return t.assignments.reduce((acc, a) => {
+                    acc.packages += toNumber(a.packages);
+                    acc.weight += toNumber(a.weight);
+                    acc.volume += toNumber(a.volume);
+                    return acc;
+                }, { packages: 0, weight: 0, volume: 0 });
+            }
+
+            function validateTarget(t) {
+                const e = [];
+                if (!t.title?.trim()) e.push("Title required.");
+
+                // چک کردن اینکه آیا حداقل یکی از مقادیر بزرگتر از صفر است
+                const hasValue = t.assignments.some(a =>
+                    toNumber(a.packages) > 0.0001 ||
+                    toNumber(a.weight) > 0.0001 ||
+                    toNumber(a.volume) > 0.0001
+                );
+
+                if (!hasValue) e.push("No split values.");
+                return e;
+            }
+
+            function validateAll() {
+                const e = [];
+                if (!state.targets.length) e.push("Add at least one target.");
+                state.targets.forEach(t => validateTarget(t).forEach(err => e.push(`[${t.targetKey}] ${err}`)));
+
+                state.sourceLines.forEach(s => {
+                    const u = getAssignedTotalsForSource(s.sourceLineKey);
+                    if (u.packages > s.availablePackages + 0.0001) e.push(`Over-split: ${s.cargoNo} Packages`);
+                    if (u.weight > s.availableWeight + 0.0001) e.push(`Over-split: ${s.cargoNo} Weight`);
+                    if (u.volume > s.availableVolume + 0.0001) e.push(`Over-split: ${s.cargoNo} Volume`);
+                });
+
+                return e;
+            }
+
+            function renderValidation() {
+                const errs = validateAll();
+                btnSubmit.disabled = errs.length > 0;
+                btnSubmit.title = errs.length ? errs[0] : "Ready to Submit";
+            }
+
+            async function submitSplit() {
+                const payload = {
+                    sourceBlId: state.blId,
+                    splitRequestId: state.splitRequestId,
+                    jobId: state.jobId,
+                    targets: state.targets.map(t => ({
+                        targetKey: t.targetKey,
+                        targetBlNo: t.targetBlNo?.trim() || null,
+                        assignments: t.assignments
+                            .filter(a =>
+                                toNumber(a.packages) > 0 ||
+                                toNumber(a.weight) > 0 ||
+                                toNumber(a.volume) > 0
+                            )
+                            .map(a => ({
+                                sourceLineKey: a.sourceLineKey,
+                                sourceLineType: a.sourceLineType,
+                                sourceAllocationId: a.sourceAllocationId,
+                                sourceCargoDetailId: a.sourceCargoDetailId,
+                                packages: round3(a.packages),
+                                weight: round3(a.weight),
+                                volume: round3(a.volume)
+                            }))
+                    })).filter(t => t.assignments.length > 0)
+                };
+
+                console.log("Submit Payload:", payload);
+
+                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span>Submitting...`;
+
+                try {
+                    const response = await fetch("@Url.Action("SubmitAdvancedSplit", "ServiceRequests")", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "RequestVerificationToken": token
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(errorText || "Submit failed.");
+                    }
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert(result.message || "BL split submitted successfully.");
+
+                        if (result.redirectUrl) {
+                            window.location.href = result.redirectUrl;
+                        }
+                    } else {
+                        alert(result.message || "Submit failed.");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Error while submitting split.");
+                } finally {
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = `<i class="bi bi-check2-circle me-1"></i>Submit Split`;
+                    renderValidation();
+                }
+            }
+
+            // Helpers
+            function toNumber(v) {
+                if (v === "" || v === null || v === undefined) return 0;
+                const n = parseFloat(v);
+                return isNaN(n) ? 0 : n;
+            }
+
+            function clampNonNegative(v) { return Math.max(0, toNumber(v)); }
+            function round3(v) { return Math.round((toNumber(v) + Number.EPSILON) * 1000) / 1000; }
+            function fmt(v) { return round3(v).toLocaleString(); }
+            function cryptoId() { return "id-" + Date.now() + "-" + Math.floor(Math.random() * 1000); }
+            function escapeHtml(s) {
+                return String(s || "").replace(/[&<>"']/g, m => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[m]));
+            }
+        })();
+    </script>
+}

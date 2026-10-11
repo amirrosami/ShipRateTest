@@ -1,0 +1,92 @@
+﻿@using ShipRate.Application.DTOs.EDI
+@model EDIPageViewModel
+
+@{
+    ViewData["Title"] = "EDI Messages";
+}
+
+<div class="container-fluid mt-3" dir="ltr">
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">EDI Message Types</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Standard</th>
+                            <th style="width:260px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.MessageTypes)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@item.EDIMessageTypeCode</td>
+                                <td>@item.EDIMessageTypeName</td>
+                                <td>@item.EDIMessageTypeStandard</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary"
+                                            hx-get="@Url.Action("MessageList", "EDI", new { messageTypeId = item.Id, pageNumber = 1, pageSize = 10 })"
+                                            hx-target="#message-list-container"
+                                            hx-swap="innerHTML">
+                                        List
+                                    </button>
+
+                                    <button class="btn btn-sm btn-success"
+                                            hx-get="@Url.Action("CreateModal", "EDI", new { messageTypeId = item.Id })"
+                                            hx-target="#ediModalBody"
+                                            hx-swap="innerHTML"
+                                            hx-on::after-request="showEdiModal()">
+                                        Create
+                                    </button>
+
+                                    <button class="btn btn-sm btn-info text-white"
+                                            hx-get="@Url.Action("GetModal", "EDI", new { messageTypeId = item.Id })"
+                                            hx-target="#ediModalBody"
+                                            hx-swap="innerHTML"
+                                            hx-on::after-request="showEdiModal()">
+                                        Get
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="message-list-container">
+        <div class="alert alert-light border">
+            Please select a message type and click <strong>List</strong>.
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ediModal" tabindex="-1" aria-labelledby="ediModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">EDI Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="ediModalBody">
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showEdiModal() {
+            var modal = new bootstrap.Modal(document.getElementById('ediModal'));
+            modal.show();
+        }
+    </script>
+}

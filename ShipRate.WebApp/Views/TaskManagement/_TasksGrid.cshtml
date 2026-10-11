@@ -1,0 +1,95 @@
+﻿@using ShipRate.WebApp.ViewModels.TaskVms
+<!-- Views/TaskManagement/_TasksGrid.cshtml -->
+@model List<TaskViewModel>
+
+<div class="card-body">
+    <div class="d-flex justify-content-between mb-2">
+        <h6>Tasks</h6>
+
+        <button class="btn btn-success btn-sm"
+                hx-get="/TaskManagement/CreateTask?categoryId=@ViewBag.CategoryId"
+                hx-target="#appModal .modal-content"
+                hx-swap="innerHTML"
+                data-bs-toggle="modal"
+                data-bs-target="#appModal">
+            <i class="bi bi-plus-circle"></i> Add Task
+        </button>
+
+
+</div>
+
+    <input class="form-control mb-2"
+           placeholder="Search task..."
+           name="searchTaskName"
+           hx-get="/TaskManagement/LoadTasks"
+           hx-trigger="keyup changed delay:500ms"
+           hx-target="#tasksGridContainer"
+           hx-include="[name='categoryId']">
+
+    <input type="hidden" name="categoryId" value="@ViewBag.CategoryId" />
+
+    <table class="table table-sm table-hover">
+        <thead class="table-primary">
+            <tr>
+                <th>Task</th>
+                <th>Priority</th>
+                <th>Due</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var t in Model)
+            {
+                <tr>
+                    <td>@t.TaskName</td>
+                    <td>@t.PriorityName</td>
+                    <td>@t.DueDays</td>
+
+                    <td>
+
+                        <button class="btn btn-sm btn-primary"
+                                hx-get="/TaskManagement/LoadChecklist?taskId=@t.Id"
+                                hx-target="#checklistGridContainer"
+                                hx-swap="innerHTML"
+                                onclick="document.getElementById('checklistCard').style.display='block';document.getElementById('selectedTaskName').innerText='@t.TaskName'">
+                            Select
+                        </button>
+
+@*                         <button class="btn btn-sm btn-warning"
+                                hx-get="/TaskManagement/EditTask?id=@t.Id"
+                                hx-target="#modalContainer"
+                                hx-swap="innerHTML"
+                                data-bs-toggle="modal"
+                                data-bs-target="#crudModal">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+ *@
+
+
+
+                        <button class="btn btn-warning btn-sm"
+                                hx-get="/TaskManagement/EditTask?taskId=@t.Id"
+                                hx-target="#appModal .modal-content"
+                                hx-swap="innerHTML"
+                                data-bs-toggle="modal"
+                                data-bs-target="#appModal">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+
+
+
+                        <button class="btn btn-sm btn-danger"
+                                hx-delete="/TaskManagement/DeleteTask?id=@t.Id"
+                                hx-target="#tasksGridContainer"
+                                hx-confirm="Delete this task?">
+                            <i class="bi bi-trash"></i>
+                        </button>
+
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>

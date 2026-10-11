@@ -1,0 +1,23 @@
+﻿@using ShipRate.Application.ViewModels
+@model List<RateRequestContainerListItemVm>
+
+@{
+    var filter = ViewBag.Filter as RateRequestContainerFilterVm;
+}
+
+<div class="card" dir="ltr">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">Containers</h6>
+    </div>
+
+    <div class="card-body p-0"
+         id="containersListWrapper"
+         hx-get="@Url.Action("ContainersList", "Jobs", new {
+             jobId = filter?.JobId,
+         })"
+         hx-trigger="load from:body"
+         hx-target="this"
+         hx-swap="innerHTML">
+        @await Html.PartialAsync("~/Views/Jobs/_ContainersList.cshtml", Model)
+    </div>
+</div>

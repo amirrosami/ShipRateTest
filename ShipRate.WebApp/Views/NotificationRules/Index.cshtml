@@ -1,0 +1,159 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.Notif
+@model PagedResultDto<NotificationRuleIndexDto>
+@{
+    ViewData["Title"] = "Notification Rules";
+    var filter = ViewBag.Filter as NotificationRuleGetListInput;
+}
+
+<div class="container-fluid" dir="ltr">
+    <div class="row mb-3">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h3>Notification Rules</h3>
+            <button class="btn btn-primary" onclick="openCreateModal()">Create New</button>
+        </div>
+    </div>
+
+    <form method="get" class="row g-3 mb-3">
+        <div class="col-md-3">
+            <label class="form-label">Activity Type</label>
+            <input type="text" name="ActivityType" value="@filter?.ActivityType" class="form-control" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Page Size</label>
+            <select name="PageSize" class="form-select">
+                <option value="10" selected="@(filter?.PageSize == 10)">10</option>
+                <option value="20" selected="@(filter?.PageSize == 20)">20</option>
+                <option value="50" selected="@(filter?.PageSize == 50)">50</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Page Number</label>
+            <input type="number" min="1" name="PageNumber" value="@(filter?.PageNumber ?? 1)" class="form-control" />
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-secondary me-2">Search</button>
+            <a asp-action="Index" class="btn btn-light">Reset</a>
+        </div>
+    </form>
+
+    <div class="card">
+        <div class="card-body table-responsive">
+            <table class="table table-bordered table-striped align-middle text-start">
+                <thead>
+                    <tr>
+                        <th>Activity Type</th>
+                        <th>Entity Type</th>
+                        <th>Recipient Mode</th>
+                        <th>Should Notify</th>
+                        <th>Is Active</th>
+                        <th>Created At</th>
+                        <th style="width:220px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items != null && Model.Items.Any())
+                    {
+                        foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>@item.ActivityType</td>
+                                <td>@item.EntityTypeName</td>
+                                <td>@item.RecipientModeName</td>
+                                <td>@item.ShouldNotify</td>
+                                <td>@item.IsActive</td>
+                                <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>
+                                    <button class="btn btn-info btn-sm" onclick="openDetailsModal('@item.Id')">Details</button>
+                                    <button class="btn btn-warning btn-sm" onclick="openEditModal('@item.Id')">Edit</button>
+                                    <button class="btn btn-danger btn-sm" onclick="openDeleteModal('@item.Id')">Delete</button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center">No data found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="mt-3 d-flex justify-content-between">
+                <div>
+                    Total Count: <strong>@Model.TotalCount</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="mainModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="mainModalContent"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showModal(html) {
+            document.getElementById('mainModalContent').innerHTML = html;
+            const modal = new bootstrap.Modal(document.getElementById('mainModal'));
+            modal.show();
+        }
+
+        function openCreateModal() {
+            fetch('@Url.Action("Create")')
+                .then(response => response.text())
+                .then(html => showModal(html));
+        }
+
+        function openEditModal(id) {
+            fetch('@Url.Action("Edit")?id=' + id)
+                .then(response => response.text())
+                .then(html => showModal(html));
+        }
+
+        function openDetailsModal(id) {
+            fetch('@Url.Action("Details")?id=' + id)
+                .then(response => response.text())
+                .then(html => showModal(html));
+        }
+
+        function openDeleteModal(id) {
+            fetch('@Url.Action("Delete")?id=' + id)
+                .then(response => response.text())
+                .then(html => showModal(html));
+        }
+
+        function submitModalForm(form) {
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(async response => {
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    return response.json();
+                }
+                return response.text();
+            })
+            .then(result => {
+                if (typeof result === 'object' && result.success) {
+                    location.reload();
+                } else {
+                    document.getElementById('mainModalContent').innerHTML = result;
+                    initRecipientModeSections();
+                }
+            });
+
+            return false;
+        }
+    </script>
+}

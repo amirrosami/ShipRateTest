@@ -1,0 +1,93 @@
+﻿@using ShipRate.Application.ViewModels
+@model CustomsClearanceJobTabVm
+
+
+@* <div class="card-header d-flex justify-content-between align-items-center">
+    <span>Bookings</span>
+    <button type="button"
+            class="btn btn-primary"
+            hx-get="@Url.Action("OpenBookingModal", "Booking", new { jobId = Model.JobId })"
+            hx-target="#modal-content"
+            hx-swap="innerHTML"
+            data-bs-toggle="modal"
+            data-bs-target="#bookingModal">
+        + Add Booking
+    </button>
+</div>
+ *@
+
+
+<div class="card-header d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Customs Clearances</h5>
+    <button class="btn btn-primary"
+            hx-get="@Url.Action("CreateModal", "CustomsClearance", new { jobId = Model.JobId })"
+            hx-target="#modal-container"
+            hx-swap="innerHTML">
+        <i class="bi bi-plus-lg me-1"></i>Add Customs
+    </button>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Declaration No</th>
+                <th>Declaration Type</th>
+                <th>Custom Office</th>
+                <th>Importer / Exporter</th>
+                <th>Declaration Date</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Items != null && Model.Items.Any())
+            {
+                foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.DeclarationNumber</td>
+                        <td>@item.DeclarationTypeTitle</td>
+                        <td>@item.CustomOfficeName</td>
+                        <td>@item.ImporterExporterName</td>
+                        <td>@item.DeclarationDate?.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            <span class="badge bg-info text-dark">@item.StatusTitle</span>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a href="@Url.Action("Details", "CustomsClearance", new { id = item.Id })"
+                                   class="btn btn-outline-primary">
+                                    Details
+                                </a>
+
+                                <button class="btn btn-outline-secondary"
+                                        hx-get="@Url.Action("EditModal", "CustomsClearance", new { id = item.Id })"
+                                        hx-target="#modal-container"
+                                        hx-swap="innerHTML">
+                                    Edit
+                                </button>
+
+                                <button class="btn btn-outline-danger"
+                                        hx-post="@Url.Action("Delete", "CustomsClearance", new { id = item.Id, jobId = Model.JobId })"
+                                        hx-confirm="Are you sure you want to delete this record?"
+                                        hx-target="#job-customs-clearance-panel"
+                                        hx-swap="innerHTML">
+                                    Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                        No customs clearance records found.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,113 @@
+﻿@using ShipRate.WebApp.ViewModels
+@using ShipRate.WebApp.ViewModels.Location
+@using ShipRate.WebApp.ViewModels.TerritoryVms
+@model HSCodeFormViewModel
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+}
+
+<form hx-post="@Url.Action(isCreateMode?"Create":"Edit", "HSCodes")"
+      hx-target="#app-modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header form-caption-bg  text-white">
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add HSCode</h5>
+        }
+        else
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Edit HSCode</h5>
+            <input type="hidden" asp-for="Id" />
+        }
+
+
+        <button type="button"
+                class="btn-close"
+                onclick="AppModal.close()">
+        </button>
+    </div>
+
+
+    <div class="modal-body row">
+
+        @await Html.PartialAsync("_ModelStateError")
+
+
+
+
+
+        <div class="mb-3 col-md-4">
+            <label for="HSCodeCode">HS Code</label>
+            <input type="text" id="HSCodeCode" name="HSCodeCode"
+                   value="@Model.HSCodeCode" class="form-control"
+                   placeholder="" maxlength="12" />
+        </div>
+
+        <!-- Remarks -->
+        
+        <div class="mb-3 col-md-5">
+            <label for="HSCodeName">Name</label>
+            <input type="text" id="HSCodeName" name="HSCodeName"
+                   value="@Model.HSCodeName" class="form-control"
+                   placeholder="" maxlength="400" />
+        </div>
+
+        <div class="mb-3 col-md-5">
+            <label for="HSLevelId">HS Level</label>
+            <select asp-for="HSLevelId" class="form-control">
+                <option value=0>-- Select Level --</option>
+                @foreach (var level in Model.HSLevels)
+                {
+                    <!option value="@level.Id" @(Model.HSLevelId == level.Id ? "selected" : "")>
+                    @level.Name
+                    </!option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3 col-md-5">
+            <label for="ParentId">Parent HS Code</label>
+            <select asp-for="ParentId" class="form-control">
+                <option value="">-- None (Root) --</option>
+                @foreach (var parent in Model.ParentHSCodes)
+                {
+                    <!option value="@parent.Id" @(Model.ParentId == parent.Id ? "selected" : "")>
+                    @parent.Code - @parent.Name
+                    </!option>
+                }
+            </select>
+        </div>
+
+        <div class="form-check form-switch mb-3">
+            <label class="checkbox-label">
+                <input type="checkbox" name="IsActive" value="true"
+                       @(Model.IsActive ? "checked" : "") />
+                <span>Active</span>
+            </label>
+        </div>
+
+    </div>
+
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="AppModal.close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>
+
+
+

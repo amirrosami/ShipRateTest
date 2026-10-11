@@ -1,0 +1,55 @@
+﻿@using ShipRate.Application.DTOs.Base_Info
+@model CreateEventTypeDto
+
+<div class="modal-header">
+    <h5 class="modal-title">Create Event Type</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<form method="post"
+      hx-post="@Url.Action("Create", "EventTypes")"
+      hx-target="#modalContent"
+      hx-swap="innerHTML"
+      dir="ltr">
+    @Html.AntiForgeryToken()
+
+    <div class="modal-body">
+
+        @await Html.PartialAsync("_ModelStateError")
+
+        <div class="mb-3">
+            <label asp-for="CategoryId" class="form-label">Category</label>
+            <select asp-for="CategoryId" asp-items="Model.Categories" class="form-select">
+                <option value="">Select category</option>
+            </select>
+            <span asp-validation-for="CategoryId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="EventTypeCode" class="form-label">Code</label>
+            <input asp-for="EventTypeCode" class="form-control" />
+            <span asp-validation-for="EventTypeCode" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="EventTypeName" class="form-label">Name</label>
+            <input asp-for="EventTypeName" class="form-control" />
+            <span asp-validation-for="EventTypeName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="EventTypeRemarks" class="form-label">Remarks</label>
+            <textarea asp-for="EventTypeRemarks" class="form-control"></textarea>
+            <span asp-validation-for="EventTypeRemarks" class="text-danger"></span>
+        </div>
+
+        <div class="form-check mb-2">
+            <input type="checkbox" asp-for="IsActive" class="form-check-input" />
+            <label asp-for="IsActive" class="form-check-label">Is Active</label>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+</form>

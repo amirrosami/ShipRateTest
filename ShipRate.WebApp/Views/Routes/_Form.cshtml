@@ -1,0 +1,110 @@
+﻿@using ShipRate.WebApp.ViewModels.RouteVms
+@model RouteFormViewModel
+
+<div class="modal fade show d-block">
+
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form hx-post="/Routes/Save"
+                  hx-target="#modal-container"
+                  hx-swap="innerHTML">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Route</h5>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" name="RouteId" value="@Model.RouteId" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Route Name</label>
+                        <input name="RouteName" class="form-control" value="@Model.RouteName" />
+                    </div>
+
+                    <div class="mb-3 ">
+                        <label>Origin</label>
+                        <input type="hidden" asp-for="OriginId" id="OriginId" />
+                        <input type="text"
+                               id="OriginSearchText"
+                               name="Origin"
+                               value="@Model.OriginName"
+                               class="form-control"
+                               placeholder="Search Origin..."
+                               autocomplete="off"
+                               hx-get="@Url.Action("SearchLocations", "Locations")"
+                               hx-trigger="keyup changed delay:400ms"
+                               hx-target="#originSearchResults"
+                               hx-swap="innerHTML"
+                               hx-vals='js:{
+                            term: document.getElementById("OriginSearchText").value,
+                            targetHiddenInputId: "OriginId",
+                            targetTextInputId: "OriginSearchText"
+                       }' />
+
+                        <div id="originSearchResults"
+                             class="position-relative">
+                        </div>
+                        <span asp-validation-for="OriginId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3 ">
+                        <label>Destination</label>
+                        <input type="hidden" asp-for="DestinationId" id="DestinationId" />
+                        <input type="text"
+                               id="DestinationSearchText"
+                               name="Destination"
+                               value="@Model.DestinationName"
+                               class="form-control"
+                               placeholder="Search Destination..."
+                               autocomplete="off"
+                               hx-get="@Url.Action("SearchLocations", "Locations")"
+                               hx-trigger="keyup changed delay:400ms"
+                               hx-target="#destinationSearchResults"
+                               hx-swap="innerHTML"
+                               hx-vals='js:{
+                                        term: document.getElementById("DestinationSearchText").value,
+                                        targetHiddenInputId: "DestinationId",
+                                        targetTextInputId: "DestinationSearchText"
+                                       }' />
+                        <div id="destinationSearchResults"
+                             class="position-relative">
+                        </div>
+                        <span asp-validation-for="DestinationId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Mode</label>
+                        <select name="RouteModeId" class="form-select">
+
+                            @foreach (var m in Model.RouteModes)
+                            {
+                                <option value="@m.Value">@m.Text</option>
+                            }
+
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-label-secondary"
+                            onclick="document.getElementById('modal-container').innerHTML=''">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="btn btn-primary">
+                        Save
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>

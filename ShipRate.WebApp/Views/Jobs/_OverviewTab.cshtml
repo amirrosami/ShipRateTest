@@ -1,0 +1,245 @@
+﻿@using ShipRate.Application.JobsViewModels
+@model JobDetailsVm
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">General Information</h5>
+
+                <div class="row g-3">
+
+                    <div class="col-md-3">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Job No</div>
+                            <div class="fw-semibold">@Model.JobNumber</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Job File No</div>
+                            <div class="fw-semibold">@Model.JobFileNumber</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Sales Person</div>
+                            <div class="fw-semibold">@Model.SalesUserName</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Job Date</div>
+                            <div class="fw-semibold">@Model.JobDate?.ToString("yyyy-MM-dd")</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Trade Type</div>
+                            <div class="fw-semibold">@Model.TradeTypeName</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Transport Mode</div>
+                            <div class="fw-semibold">@Model.TransportTypeName</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Load Type</div>
+                            <div class="fw-semibold">@Model.LoadTypeName</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Cargo handling Type</div>
+                            <div class="fw-semibold">@Model.CargohandlingTypeName</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Movement Type</div>
+                            <div class="fw-semibold">@Model.MovementTypeName</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Cargo Ready Date</div>
+                            <div class="fw-semibold">@Model.CargoReadyDate?.ToString("yyyy/MM/dd")</div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-3">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Created By</div>
+                            <div class="fw-semibold">@Model.CreatedByUserName</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Updated By</div>
+                            <div class="fw-semibold">@Model.UpdatedByUserName</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="card shadow-sm rounded-0 border border-dark">
+                            <div class="bg-primary text-white py-2 px-3 border-bottom border-dark">
+                                <h6 class="mb-0 fw-semibold">Company Roles</h6>
+                            </div>
+
+                            <div class="card-body p-0 rounded-0">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover align-middle mb-0 company-roles-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Company Name</th>
+                                                <th>Role Type</th>
+                                                <th>Service Type</th>
+                                                <th>Service Type (Local)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (Model.JobCompanyRolesList != null && Model.JobCompanyRolesList.Any())
+                                            {
+                                                foreach (var item in Model.JobCompanyRolesList)
+                                                {
+                                                    <tr>
+                                                        <td class="fw-semibold">@item.CompanyName</td>
+                                                        <td>@item.CompanyRoleTypeName</td>
+                                                        <td>@item.ServiceTypeName</td>
+                                                        <td>@item.ServiceTypeLocalName</td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="4" class="text-center text-muted py-4">
+                                                        No company roles found.
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Commercial Information</h5>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Job Source Type</div>
+                            <div class="fw-semibold">@Model.JobSourceTypeName</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Rate Request No</div>
+                            <div class="fw-semibold">@Model.RateRequestNo</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Inquiry No</div>
+                            <div class="fw-semibold">@Model.InquiryNo</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Buy Quote No</div>
+                            <div class="fw-semibold">@Model.BuyQuoteNo</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Sell Quote No</div>
+                            <div class="fw-semibold">@Model.SellQuoteNo</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Customer Ref</div>
+                            <div class="fw-semibold">@Model.CustomerRef</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="bg-light rounded p-3">
+                            <div class="small text-muted">Incoterm</div>
+                            <div class="fw-semibold">@Model.Incoterm</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<style>
+    .company-roles-table {
+        border-collapse: collapse !important;
+        border: 1px solid #343a40 !important;
+    }
+
+        .company-roles-table thead th {
+            background-color: #0d6efd !important;
+            color: #fff !important;
+            font-weight: 600;
+            border: 1px solid #343a40 !important;
+            padding: 8px 10px;
+            white-space: nowrap;
+        }
+
+        .company-roles-table tbody td {
+            border: 1px solid #343a40 !important;
+            padding: 7px 10px;
+            color: #212529;
+        }
+
+        .company-roles-table tbody tr:nth-child(odd) td {
+            background-color: #eaf4ff !important;
+        }
+
+        .company-roles-table tbody tr:nth-child(even) td {
+            background-color: #ffffff !important;
+        }
+
+        .company-roles-table tbody tr:hover td {
+            background-color: #ffe8a1 !important;
+        }
+
+        .company-roles-table,
+        .company-roles-table th,
+        .company-roles-table td,
+        .card {
+            border-radius: 0 !important;
+        }
+</style>

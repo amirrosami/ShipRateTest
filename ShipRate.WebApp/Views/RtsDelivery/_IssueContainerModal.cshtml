@@ -1,0 +1,213 @@
+﻿@using ShipRate.Application.ViewModels
+@model IssueContainerCommand
+
+<div class="modal-header">
+    <div>
+        <h5 class="modal-title fw-bold" id="rtsIssueModalLabel">Deliver Empty Container</h5>
+        <small class="text-muted">Target Type: <span class="badge bg-secondary">@ViewBag.SizeTypeName</span></small>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<form hx-post="@Url.Action("IssueContainer", "RtsDelivery")"
+      hx-target="#modal-content-target"
+      hx-swap="innerHTML"
+      hx-indicator="#issue-submit-indicator"
+      autocomplete="off"
+      dir="ltr">
+
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="RTSInstructionId" />
+    <input type="hidden" asp-for="BookingId" />
+    <input type="hidden" asp-for="ContainerSizeTypeId" />
+
+    <div class="modal-body">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger pb-0">
+                <ul class="mb-2">
+                    @foreach (var modelState in ViewData.ModelState.Values)
+                    {
+                        foreach (var error in modelState.Errors)
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    }
+                </ul>
+            </div>
+        }
+
+        <div class="row g-3">
+            <!-- فیلد شماره کانتینر با فراخوانی HTMX -->
+            <div class="col-md-12">
+                <label asp-for="ContainerNumber" class="form-label fw-semibold">
+                    Container Number
+                    <span id="container-search-indicator" class="spinner-border spinner-border-sm text-primary htmx-indicator ms-1" role="status"></span>
+                </label>
+                <div class="input-group">
+                    <input asp-for="ContainerNumber"
+                           id="input-container-number"
+                           class="form-control text-uppercase fw-bold"
+                           placeholder=""
+                           maxlength="11"
+                           required
+                           hx-get="@Url.Action("LookupContainer", "Container")"
+                           hx-trigger="keyup[this.value.trim().length === 11] changed, search"
+                           hx-target="#container-lookup-result"
+                           hx-indicator="#container-search-indicator"
+                           hx-vals='js:{ targetSizeTypeId: "@Model.ContainerSizeTypeId" }' />
+                    <button class="btn btn-outline-secondary"
+                            type="button"
+                            onclick="document.getElementById('input-container-number').dispatchEvent(new Event('search'))">
+                        <i class="bi bi-search"></i> Check
+                    </button>
+
+                </div>
+                <span asp-validation-for="ContainerNumber" class="text-danger small"></span>
+            </div>
+
+            <!-- کادر نمایش نتیجه جستجو یا فرم مشخصات کانتینر جدید -->
+            <div class="col-12">
+                <div id="container-lookup-result">
+                    <!-- محتوای partial view لود می‌شود -->
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="ActionDateTime" class="form-label">Action Date</label>
+                <input asp-for="ActionDateTime"
+                       type="date"
+                       class="form-control"
+                       value="@Model.ActionDateTime?.ToString("yyyy-MM-dd")" />
+                <span asp-validation-for="ActionDateTime" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="SealNumber" class="form-label fw-semibold">Seal Number</label>
+                <input asp-for="SealNumber" class="form-control text-uppercase" placeholder="" required />
+                <span asp-validation-for="SealNumber" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="TareWeight" class="form-label fw-semibold">Tare Weight (kg)</label>
+                <input asp-for="TareWeight" id="field-tare-weight" type="number" min="0" class="form-control" />
+                <span asp-validation-for="TareWeight" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="GrossWeight" class="form-label fw-semibold">Gross Weight (kg)</label>
+                <input asp-for="GrossWeight" type="number" min="0" class="form-control" />
+                <span asp-validation-for="GrossWeight" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="DriverName" class="form-label fw-semibold">Driver Name</label>
+                <input asp-for="DriverName" class="form-control" placeholder="" />
+                <span asp-validation-for="DriverName" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="DriverPlate" class="form-label fw-semibold">Truck Plate</label>
+                <input asp-for="DriverPlate" class="form-control text-uppercase" placeholder="" />
+                <span asp-validation-for="DriverPlate" class="text-danger small"></span>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary px-4">
+            <span id="issue-submit-indicator" class="spinner-border spinner-border-sm htmx-indicator me-1" role="status"></span>
+            Issue Container
+        </button>
+    </div>
+</form>
+
+
+@* @using ShipRate.Application.ViewModels
+@model IssueContainerCommand
+
+<div class="modal-header">
+    <div>
+        <h5 class="modal-title fw-bold" id="rtsIssueModalLabel">Issue Empty Container</h5>
+        <small class="text-muted">Type: <span class="badge bg-secondary">@ViewBag.SizeTypeName</span></small>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<form hx-post="@Url.Action("IssueContainer", "RtsDelivery")"
+      hx-target="#modal-content-target"
+      hx-swap="innerHTML"
+      hx-indicator="#issue-submit-indicator"
+      autocomplete="off"
+      dir="ltr">
+
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="RTSInstructionId" />
+    <input type="hidden" asp-for="ContainerSizeTypeId" />
+
+    <div class="modal-body">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger pb-0">
+                <ul class="mb-2">
+                    @foreach (var modelState in ViewData.ModelState.Values)
+                    {
+                        foreach (var error in modelState.Errors)
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    }
+                </ul>
+            </div>
+        }
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="ContainerNumber" class="form-label fw-semibold">Container Number</label>
+                <input asp-for="ContainerNumber"
+                       class="form-control text-uppercase"
+                       placeholder=""
+                       maxlength="11"
+                       required />
+                <span asp-validation-for="ContainerNumber" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="SealNumber" class="form-label fw-semibold">Seal Number</label>
+                <input asp-for="SealNumber"
+                       class="form-control text-uppercase"
+                       placeholder=""
+                       required />
+                <span asp-validation-for="SealNumber" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="TareWeight" class="form-label fw-semibold">Tare Weight (kg)</label>
+                <input asp-for="TareWeight" type="number" min="0" class="form-control" />
+                <span asp-validation-for="TareWeight" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="GrossWeight" class="form-label fw-semibold">Gross Weight (kg)</label>
+                <input asp-for="GrossWeight" type="number" min="0" class="form-control" />
+                <span asp-validation-for="GrossWeight" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="DriverName" class="form-label fw-semibold">Driver Name</label>
+                <input asp-for="DriverName" class="form-control" placeholder="" />
+                <span asp-validation-for="DriverName" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="DriverPlate" class="form-label fw-semibold">Truck Plate</label>
+                <input asp-for="DriverPlate" class="form-control text-uppercase" placeholder="" />
+                <span asp-validation-for="DriverPlate" class="text-danger small"></span>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary px-4">
+            <span id="issue-submit-indicator" class="spinner-border spinner-border-sm htmx-indicator me-1" role="status"></span>
+            Issue Container
+        </button>
+    </div>
+</form>
+ *@

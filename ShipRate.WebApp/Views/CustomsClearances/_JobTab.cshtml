@@ -1,0 +1,26 @@
+﻿@using ShipRate.Application.ViewModels
+@model CustomsClearanceJobTabVm
+
+<div id="job-customs-clearance-panel"
+     hx-get="@Url.Action("JobTab", "CustomsClearance", new { jobId = Model.JobId })"
+     hx-trigger="customsClearanceChanged from:body"
+     hx-target="this"
+     hx-swap="innerHTML">
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            @await Html.PartialAsync("~/Views/CustomsClearances/_CustomsClearanceList.cshtml", Model)
+        </div>
+    </div>
+</div>
+
+<div id="modal-container"></div>
+<script>
+    function closeModal() {
+        document.getElementById('modal-container').innerHTML = '';
+    }
+
+    document.body.addEventListener('customsClearanceChanged', function () {
+        closeModal();
+    });
+</script>

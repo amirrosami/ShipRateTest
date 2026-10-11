@@ -1,0 +1,48 @@
+﻿@using ShipRate.Application.DTOs
+@model List<SLookupDto>
+
+
+<div class="card">
+    <div class="card-header">
+    <p class="nr-hint">Select the type of service request you want to create:</p>
+    </div>
+
+    <div class="card-body">
+    <div class="d-grid gap-1">
+        @foreach (var item in Model)
+        {
+            <button class="btn btn-outline-secondary "
+                        hx-get="@Url.Action("HandleNewRequest", "ServiceRequest", new { requestTypeId = item.Id })"
+                    hx-target="#app-modal-content"
+                    hx-swap="innerHTML">
+                <span class="nr-label">
+                    <strong>@item.Name</strong>
+                    <span></span>
+                </span>
+            </button>
+        }
+      
+
+        @* <button class="nr-option"
+                hx-get="@Url.Action("FormConsolidation", "ServiceRequest")"
+                hx22 22" fill="none">
+            <span class="nr-label">
+                <strong>Consolidation</strong>
+                <span>Merge two or more BLs into a single bill of lading</span>
+            </span>
+        </button>
+
+        <button class="nr-option"
+                hx-get="@Url.Action("FormSplit", "ServiceRequest")"
+                hx-target="#modal-content"
+                hx-swap="innerHTML"
+                onclick="setModalTitle('New Split Request')">
+            
+            <span class="nr-label">
+                <strong>BL Split</strong>
+                <span>Divide an existing BL into multiple separate bills of lading</span>
+            </span>
+        </button> *@
+    </div>
+</div>
+</div>

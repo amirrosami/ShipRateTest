@@ -1,0 +1,122 @@
+﻿@using ShipRate.Application.DTOs.Notif
+@model NavbarNotificationsViewModel
+
+
+<button class="navbar-icon-btn"
+        type="button"
+        title="Notifications"
+        data-bs-toggle="dropdown"
+        aria-expanded="false">
+    <i class="bi bi-bell"></i>
+
+    @*@if (Model.UnreadCount > 0)
+    {
+        <span class="badge-dot"></span>
+    }*@
+
+    @if (Model.UnreadCount > 0)
+    {
+        <span class="notification-count">
+            @Model.UnreadCount
+        </span>
+    }
+
+</button>
+
+<div class="dropdown-menu dropdown-menu-end notification-dropdown p-0">
+    <div class="dropdown-header d-flex justify-content-between align-items-center border-bottom">
+        <span class="fw-semibold">Notifications</span>
+
+        @if (Model.UnreadCount > 0)
+        {
+            <span class="badge bg-danger rounded-pill">
+                @Model.UnreadCount
+            </span>
+        }
+    </div>
+
+    @if (Model.Items == null || !Model.Items.Any())
+    {
+        <div class="dropdown-item text-muted">
+            No notifications found.
+        </div>
+    }
+    else
+    {
+        @foreach (var item in Model.Items)
+        {
+            <a class="dropdown-item notification-item @(item.IsRead ? "" : "is-unread")"
+               href="@(string.IsNullOrWhiteSpace(item.TargetUrl) ? "#" : item.TargetUrl)">
+                <div class="d-flex gap-2">
+                    <div>
+                        <i class="@(string.IsNullOrWhiteSpace(item.IconCssClass) ? "bi bi-bell" : item.IconCssClass)"></i>
+                    </div>
+
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold">
+                            @item.Title
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(item.Message))
+                        {
+                            <div class="small text-muted">
+                                @item.Message
+                            </div>
+                        }
+
+                        <div class="small text-muted">
+                            @item.CreatedAt.ToString("yyyy-MM-dd HH:mm")
+                        </div>
+                    </div>
+                </div>
+            </a>
+        }
+    }
+
+    <div class="dropdown-divider m-0"></div>
+
+    <a class="dropdown-item text-center"
+       href="@Url.Action("Index", "Notifications")">
+        View all notifications
+    </a>
+</div>
+
+
+
+
+
+
+
+
+<style>
+
+    .navbar-icon-btn {
+        position: relative;
+    }
+
+    .notification-count {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        border-radius: 999px;
+        background: #dc3545;
+        color: #fff;
+        font-size: 11px;
+        line-height: 18px;
+        text-align: center;
+    }
+
+    .notification-dropdown {
+        width: 340px;
+        max-height: 420px;
+        overflow-y: auto;
+    }
+
+    .notification-item.is-unread {
+        background-color: #f8f9ff;
+    }
+
+</style>

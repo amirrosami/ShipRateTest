@@ -1,0 +1,180 @@
+﻿@using ShipRate.Application.ViewModels
+@model CustomsClearanceTimelineTabVm
+<style>
+    .timeline-item {
+        position: relative;
+    }
+
+    .timeline-icon {
+        flex: 0 0 auto;
+    }
+</style>
+
+<div id="timeline-tab"
+     hx-get="@Url.Action("GetTimelineTab", "CustomsClearance", new { id = Model.CustomsClearanceId })"
+     hx-trigger="customsClearanceTimelineChanged from:body"
+     hx-swap="outerHTML">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h5 class="mb-1">Timeline</h5>
+            <p class="text-muted mb-0">
+                Track activity, history, status changes, and audit events for this customs clearance.
+            </p>
+        </div>
+    </div>
+
+    @if (Model.Entries != null && Model.Entries.Any())
+    {
+        <div class="d-flex flex-column gap-3">
+            @foreach (var item in Model.Entries)
+            {
+                var severity = (item.Severity ?? "").ToLowerInvariant();
+                var badgeClass = severity switch
+                {
+                    "success" => "bg-success",
+                    "warning" => "bg-warning text-dark",
+                    "danger" => "bg-danger",
+                    "error" => "bg-danger",
+                    "primary" => "bg-primary",
+                    "secondary" => "bg-secondary",
+                    _ => "bg-info text-dark"
+                };
+
+                var iconClass = string.IsNullOrWhiteSpace(item.IconCssClass)
+                    ? "bi bi-clock-history"
+                    : item.IconCssClass;
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <div class="d-flex gap-3">
+                            <div class="flex-shrink-0">
+                                <div class="rounded-circle @badgeClass d-flex align-items-center justify-content-center text-white"
+                                     style="width:44px;height:44px;">
+                                    <i class="@iconClass"></i>
+                                </div>
+                            </div>
+
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                                    <div>
+                                        <h6 class="mb-1">
+                                            @(!string.IsNullOrWhiteSpace(item.Title) ? item.Title : "Activity")
+                                        </h6>
+
+                                        <div class="small text-muted">
+                                            @item.ActivityDateTime.ToString("dd MMM yyyy, hh:mm tt")
+
+                                            @if (!string.IsNullOrWhiteSpace(item.PerformedByUserName))
+                                            {
+                                                <span> • By @item.PerformedByUserName</span>
+                                            }
+
+                                            @if (item.IsSystemGenerated)
+                                            {
+                                                <span> • System</span>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex flex-wrap gap-1">
+                                        @if (!string.IsNullOrWhiteSpace(item.Severity))
+                                        {
+                                            <span class="badge @badgeClass">@item.Severity</span>
+                                        }
+
+                                        @if (!string.IsNullOrWhiteSpace(item.ActivityType))
+                                        {
+                                            <span class="badge bg-light text-dark">@item.ActivityType</span>
+                                        }
+                                    </div>
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(item.Description))
+                                {
+                                    <p class="mb-2">@item.Description</p>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(item.ReferenceNo) ||
+                                     !string.IsNullOrWhiteSpace(item.SourceSystem) ||
+                                     !string.IsNullOrWhiteSpace(item.ExternalReferenceNo) ||
+                                     !string.IsNullOrWhiteSpace(item.LocationName))
+                                {
+                                    <div class="row g-2 small text-muted mb-2">
+                                        @if (!string.IsNullOrWhiteSpace(item.ReferenceNo))
+                                        {
+                                            <div class="col-md-4">
+                                                <span class="fw-semibold text-dark">Ref:</span> @item.ReferenceNo
+                                            </div>
+                                        }
+
+                                        @if (!string.IsNullOrWhiteSpace(item.SourceSystem))
+                                        {
+                                            <div class="col-md-4">
+                                                <span class="fw-semibold text-dark">Source:</span> @item.SourceSystem
+                                            </div>
+                                        }
+
+                                        @if (!string.IsNullOrWhiteSpace(item.ExternalReferenceNo))
+                                        {
+                                            <div class="col-md-4">
+                                                <span class="fw-semibold text-dark">External Ref:</span> @item.ExternalReferenceNo
+                                            </div>
+                                        }
+
+                                        @if (!string.IsNullOrWhiteSpace(item.LocationName))
+                                        {
+                                            <div class="col-md-4">
+                                                <span class="fw-semibold text-dark">Location:</span> @item.LocationName
+                                            </div>
+                                        }
+                                    </div>
+                                }
+
+                                @if ((!string.IsNullOrWhiteSpace(item.FromStatusName) || !string.IsNullOrWhiteSpace(item.ToStatusName)))
+                                {
+                                    <div class="alert alert-light border small mb-2">
+                                        <span class="fw-semibold">Status Change:</span>
+                                        <span class="text-muted">
+                                            @(string.IsNullOrWhiteSpace(item.FromStatusName) ? "-" : item.FromStatusName)
+                                            →
+                                            @(string.IsNullOrWhiteSpace(item.ToStatusName) ? "-" : item.ToStatusName)
+                                        </span>
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(item.FieldName))
+                                {
+                                    <div class="alert alert-light border small mb-0">
+                                        <span class="fw-semibold">Field Change:</span>
+                                        <span>@item.FieldName</span>
+
+                                        @if (!string.IsNullOrWhiteSpace(item.OldValue))
+                                        {
+                                            <span class="text-muted"> | Old:</span> <span>@item.OldValue</span>
+                                        }
+
+                                        @if (!string.IsNullOrWhiteSpace(item.NewValue))
+                                        {
+                                            <span class="text-muted"> | New:</span> <span>@item.NewValue</span>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="border rounded-3 p-5 text-center bg-light">
+            <i class="bi bi-clock-history fs-1 text-muted"></i>
+            <h6 class="mt-3 mb-1">No timeline activity yet</h6>
+            <p class="text-muted mb-0">
+                Activity logs related to this customs clearance will appear here.
+            </p>
+        </div>
+    }
+</div>

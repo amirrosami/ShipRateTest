@@ -1,0 +1,159 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model InvoiceEditVm
+
+<form hx-post="@Url.Action("SaveHeader", "Invoices")"
+      hx-target="#invoice-modal-content"
+      hx-swap="innerHTML"
+      class="row g-3">
+
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="PartyId" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="col-md-4">
+        <label asp-for="FinanceDirectionId" class="form-label">Finance Direction</label>
+        <select asp-for="FinanceDirectionId" class="form-select">
+            <option value="">Select...</option>
+            @foreach (var item in Model.FinanceDirections)
+            {
+                <option value="@item.Value">@item.Text</option>
+            }
+        </select>
+        <span asp-validation-for="FinanceDirectionId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="InvoiceTypeId" class="form-label">Invoice Type</label>
+        <select asp-for="InvoiceTypeId" class="form-select">
+            <option value="">Select...</option>
+            @foreach (var item in Model.InvoiceTypes)
+            {
+                <option value="@item.Value">@item.Text</option>
+            }
+        </select>
+        <span asp-validation-for="InvoiceTypeId" class="text-danger"></span>
+    </div>
+
+@*     <div class="col-md-3">
+        <label asp-for="InvoiceStatusId" class="form-label">Status</label>
+        <select asp-for="InvoiceStatusId" class="form-select">
+            <option value="">Select...</option>
+            @foreach (var item in Model.InvoiceStatuses)
+            {
+                <option value="@item.Value">@item.Text</option>
+            }
+        </select>
+        <span asp-validation-for="InvoiceStatusId" class="text-danger"></span>
+    </div>
+ *@
+
+
+    <div class="col-md-4">
+        <label asp-for="CurrencyId" class="form-label">Currency</label>
+        <select asp-for="CurrencyId" class="form-select">
+            <option value="">Select...</option>
+            @foreach (var item in Model.Currencies)
+            {
+                <option value="@item.Value">@item.Text</option>
+            }
+        </select>
+        <span asp-validation-for="CurrencyId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="InvoiceNo" class="form-label">Invoice No</label>
+        <input asp-for="InvoiceNo" class="form-control" />
+        <span asp-validation-for="InvoiceNo" class="text-danger"></span>
+    </div>
+
+@*     <div class="col-md-3">
+        <label asp-for="InvoicePNo" class="form-label">Invoice PNo</label>
+        <input asp-for="InvoicePNo" class="form-control" />
+        <span asp-validation-for="InvoicePNo" class="text-danger"></span>
+    </div>
+ *@
+    <div class="col-md-4">
+        <label asp-for="InvoiceDate" class="form-label">Invoice Date</label>
+        <input asp-for="InvoiceDate" type="date" class="form-control" />
+        <span asp-validation-for="InvoiceDate" class="text-danger"></span>
+    </div>
+
+@*     <div class="col-md-3">
+        <label asp-for="InvoicePDate" class="form-label">Invoice PDate</label>
+        <input asp-for="InvoicePDate" type="date" class="form-control" />
+        <span asp-validation-for="InvoicePDate" class="text-danger"></span>
+    </div>
+ *@
+
+
+    <div class="col-md-4">
+        <label asp-for="DueDate" class="form-label">Due Date</label>
+        <input asp-for="DueDate" type="date" class="form-control" />
+        <span asp-validation-for="DueDate" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="ExchangeRate" class="form-label">Exchange Rate</label>
+        <input asp-for="ExchangeRate" class="form-control" />
+        <span asp-validation-for="ExchangeRate" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-8">
+        <label class="form-label">Party</label>
+        <div class="input-group">
+
+            <span id="PartyNameDisplay"
+                  class="form-control bg-light text-muted"
+                  style="min-height: 38px;">
+                @(string.IsNullOrWhiteSpace(Model.PartyName) ? Html.Raw("&nbsp;") : Model.PartyName)
+            </span>
+
+
+
+            <input type="hidden" name="PartyId" value="@Model.PartyId" />
+
+            <button type="button"
+                    class="btn btn-outline-secondary"
+                    hx-get="@Url.Action("PartyLookupModal", "Invoices")"
+                    hx-target="#party-lookup-modal-content"
+                    hx-swap="innerHTML"
+                    onclick="openPartyLookupModal()">
+                Select
+            </button>
+            <button type="button" class="btn btn-outline-danger" onclick="clearSelectedParty()">Clear</button>
+        </div>
+        <span asp-validation-for="PartyId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-12">
+        <label asp-for="Remarks" class="form-label">Remarks</label>
+        <textarea asp-for="Remarks" class="form-control" rows="2"></textarea>
+        <span asp-validation-for="Remarks" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-12">
+        <label asp-for="Notes" class="form-label">Notes</label>
+        <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Notes" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-12">
+        @await Html.PartialAsync("_InvoiceTotals", new InvoiceTotalsVm
+        {
+            InvoiceId = Model.Id ?? Guid.Empty,
+                FirstTotal = Model.FirstTotal,
+                Discount = Model.Discount,
+                SubTotal = Model.SubTotal,
+                TaxAmount = Model.TaxAmount,
+                TotalAmount = Model.TotalAmount
+                })
+    </div>
+
+    <div class="col-md-12 d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save Header</button>
+    </div>
+</form>

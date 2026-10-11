@@ -1,0 +1,103 @@
+﻿@using ShipRate.Application.DTOs.Messaging
+@model SendInternalMessageViewModel
+
+<form method="post"
+      action="@Url.Action("SendMessage", "Messaging")"
+      hx-post="@Url.Action("SendMessage", "Messaging")"
+      hx-target="this"
+      hx-swap="outerHTML"
+      hx-disabled-elt="button[type='submit']"
+      enctype="multipart/form-data"
+      hx-encoding="multipart/form-data"
+      id="messageForm"
+      class="send-message-form"
+      dir="ltr">
+
+    @Html.AntiForgeryToken()
+
+    <input asp-for="ConversationId" type="hidden" />
+
+    <div class="send-message-shell">
+        <div class="send-message-input-wrap">
+            <label asp-for="Body" class="send-message-label">Message</label>
+
+            <textarea asp-for="Body"
+                      class="form-control send-message-textarea"
+                      rows="3"
+                      placeholder="Type your message..."></textarea>
+
+            <span asp-validation-for="Body" class="text-danger small"></span>
+            <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+
+            <label for="attachmentsInput" class="attachment-picker-btn">
+                <span>📎</span>
+                <span>Attach files</span>
+            </label>
+
+            <input type="file"
+                   asp-for="Attachments"
+                   id="attachmentsInput"
+                   class="send-message-file-input"
+                   multiple
+                   accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.zip,.rar,.txt" />
+
+            <div id="selectedFilesPreview" class="selected-files-preview"></div>
+        </div>
+
+        <div class="send-message-actions">
+            <button type="submit" class="btn send-message-btn">
+                <span class="send-message-btn-icon">➜</span>
+                <span>Send</span>
+            </button>
+        </div>
+    </div>
+</form>
+
+
+<script>
+    (function () {
+        function wireMessageForm(formRoot) {
+            if (!formRoot) return;
+
+            const textarea = formRoot.querySelector("textarea");
+            const fileInput = formRoot.querySelector("#attachmentsInput");
+            const preview = formRoot.querySelector("#selectedFilesPreview");
+
+            textarea?.focus();
+
+            function formatFileSize(bytes) {
+                if (bytes < 1024) return bytes + " B";
+                if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+                return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+            }
+
+            function renderPreview() {
+                if (!fileInput || !preview) return;
+
+                preview.innerHTML = "";
+
+                const files = Array.from(fileInput.files || []);
+                if (!files.length) return;
+
+                files.forEach(file => {
+                    const chip = document.createElement("div");
+                    chip.className = "selected-file-chip";
+                    chip.textContent = `${file.name} (${formatFileSize(file.size)})`;
+                    preview.appendChild(chip);
+                });
+            }
+
+            fileInput?.addEventListener("change", renderPreview);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            wireMessageForm(document.getElementById("messageForm"));
+        });
+
+        document.body.addEventListener("htmx:afterSwap", function (evt) {
+            if (evt.target && evt.target.id === "messageForm") {
+                wireMessageForm(evt.target);
+            }
+        });
+    })();
+</script>

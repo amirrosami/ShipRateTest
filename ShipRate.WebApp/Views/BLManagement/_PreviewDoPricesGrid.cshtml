@@ -1,0 +1,146 @@
+﻿@using ShipRate.Application.ViewModels
+@model DoPricePreviewViewModel
+
+<div class="table-responsive border rounded-3 overflow-hidden shadow-sm mb-3">
+    <table class="table table-hover align-middle mb-0" id="tblDoPrices">
+        <thead class="do-table-header">
+            <tr>
+                <th class="text-center" style="width: 40px;">
+                    <input class="form-check-input select-all-charges" type="checkbox" checked title="Select / Unselect All">
+                </th>
+                <th style="width: 50px;" class="text-center">#</th>
+                <th>Charge Description</th>
+                <th class="text-end" style="width: 80px;">Qty</th>
+                <th class="text-end" style="width: 130px;">Unit Price (IRR)</th>
+                <th class="text-end" style="width: 140px;">SubTotal (IRR)</th>
+                <th class="text-center" style="width: 80px;">Tax %</th>
+                <th class="text-end" style="width: 120px;">Tax (IRR)</th>
+                <th class="text-end pe-3" style="width: 150px;">Total (IRR)</th>
+            </tr>
+        </thead>
+        <tbody class="fs-7">
+            @if (Model.Items != null && Model.Items.Any())
+            {
+                foreach (var item in Model.Items)
+                {
+                    var isDeposit = item.ChargeTypeId is 140 or 141;
+                    <tr class="item-row @(isDeposit ? "bg-warning bg-opacity-10" : "")" 
+                        data-subtotal="@item.AmountAfterDiscount" 
+                        data-tax="@item.TaxAmount" 
+                        data-total="@item.TotalAmount">
+                        
+                        <td class="text-center">
+                            <input class="form-check-input charge-checkbox" type="checkbox" checked value="@item.Seq">
+                        </td>
+                        <td class="text-center text-muted fw-bold fs-8">@item.Seq</td>
+                        <td>
+                            <span class="fw-semibold text-slate-800">@item.Description</span>
+                            @if (isDeposit)
+                            {
+                                <span class="badge bg-warning text-dark border border-warning-subtle fs-8 ms-1">Deposit</span>
+                            }
+                        </td>
+                        <td class="text-end text-secondary">@item.Qty.ToString("0.####")</td>
+                        <td class="text-end text-slate-700">@item.UnitPrice.ToString("N0")</td>
+                        <td class="text-end fw-semibold text-slate-800">@item.AmountAfterDiscount.ToString("N0")</td>
+                        <td class="text-center">
+                            @if (item.TaxRatePercent > 0)
+                            {
+                                <span class="badge bg-light text-dark border border-secondary-subtle">@item.TaxRatePercent.ToString("0.##")%</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted fs-8">0%</span>
+                            }
+                        </td>
+                        <td class="text-end text-danger fw-medium">@item.TaxAmount.ToString("N0")</td>
+                        <td class="text-end pe-3 fw-bold text-primary">@item.TotalAmount.ToString("N0") <span class="currency-tag">IRR</span></td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="9" class="text-center py-5 text-muted">
+                        <i class="bi bi-exclamation-circle fs-2 d-block mb-2 text-warning"></i>
+                        No pricing rules match current parameters.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Financial Summary Section (IRR) -->
+<div class="row g-3">
+    <div class="col-md-3">
+        <div class="summary-card p-3">
+            <span class="fs-8 text-uppercase fw-bold text-muted d-block mb-1">Selected Count</span>
+            <div class="fs-5 fw-bold text-dark"><span id="lblSelectedCount">0</span> <small class="fs-8 text-muted fw-normal">Items</small></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="summary-card p-3">
+            <span class="fs-8 text-uppercase fw-bold text-muted d-block mb-1">Total Excl. Tax</span>
+            <div class="fs-5 fw-bold text-slate-800"><span id="lblSelectedSubTotal">0</span> <span class="currency-tag">IRR</span></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="summary-card p-3">
+            <span class="fs-8 text-uppercase fw-bold text-muted d-block mb-1">Total VAT / Tax</span>
+            <div class="fs-5 fw-bold text-danger"><span id="lblSelectedTax">0</span> <span class="currency-tag">IRR</span></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="summary-card p-3 bg-primary-subtle border-primary-subtle">
+            <span class="fs-8 text-uppercase fw-bold text-primary d-block mb-1">Grand Total (Payable)</span>
+            <div class="fs-4 fw-bolder text-primary"><span id="lblSelectedGrandTotal">0</span> <span class="currency-tag text-primary">IRR</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- JS Calculator Script -->
+<script>
+    (function () {
+        function recalculateSummary() {
+            let count = 0;
+            let subtotal = 0;
+            let tax = 0;
+            let total = 0;
+
+            document.querySelectorAll('#tblDoPrices tbody tr.item-row').forEach(row => {
+                const chk = row.querySelector('.charge-checkbox');
+                if (chk && chk.checked) {
+                    count++;
+                    subtotal += parseFloat(row.dataset.subtotal || 0);
+                    tax += parseFloat(row.dataset.tax || 0);
+                    total += parseFloat(row.dataset.total || 0);
+                }
+            });
+
+            // فرمت بدون اعشار برای ریال (IRR)
+            const formatter = new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+            document.getElementById('lblSelectedCount').innerText = count;
+            document.getElementById('lblSelectedSubTotal').innerText = formatter.format(subtotal);
+            document.getElementById('lblSelectedTax').innerText = formatter.format(tax);
+            document.getElementById('lblSelectedGrandTotal').innerText = formatter.format(total);
+        }
+
+        const selectAll = document.querySelector('.select-all-charges');
+        if (selectAll) {
+            selectAll.addEventListener('change', function () {
+                document.querySelectorAll('.charge-checkbox').forEach(chk => chk.checked = selectAll.checked);
+                recalculateSummary();
+            });
+        }
+
+        document.querySelectorAll('.charge-checkbox').forEach(chk => {
+            chk.addEventListener('change', function () {
+                recalculateSummary();
+            });
+        });
+
+        recalculateSummary();
+    })();
+</script>

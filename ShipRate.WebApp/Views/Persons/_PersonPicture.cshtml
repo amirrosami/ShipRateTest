@@ -1,0 +1,44 @@
+﻿@using ShipRate.WebApp.ViewModels
+@model PersonPictureViewModel
+
+@{
+    var typeName = Model.PictureType.ToString().ToLowerInvariant();
+    var containerId = $"picture-container-{typeName}";
+    var inputId = $"picture-file-input-{typeName}";
+}
+
+<div id="@containerId"
+     class="picture-upload-area"
+     data-person-id="@Model.PersonId"
+     data-picture-type="@typeName"
+     data-file-input-id="@inputId"
+     style="cursor:pointer; border:2px dashed #ccc; padding:20px; border-radius:8px;
+            min-height:200px; display:flex; align-items:center; justify-content:center;
+            flex-direction:column;">
+
+    @if (Model.HasPicture)
+    {
+        <img src="@Url.Action("GetPicture", "Persons", new
+             {
+                 personId = Model.PersonId,
+                 pictureType = Model.PictureType
+             })"
+         alt="@(Model.PictureType == PersonPictureType.Latin ? "Latin logo" : "Persian logo")"
+         style="max-width:100%; max-height:280px; border-radius:8px;" />
+        }
+    else
+    {
+        <div>
+            <i class="bi bi-camera" style="font-size:48px; color:#999;"></i>
+            <p class="text-muted mt-2 mb-0">Click to upload image</p>
+        </div>
+    }
+</div>
+
+<input type="file"
+       id="@inputId"
+       class="person-picture-file-input"
+       data-person-id="@Model.PersonId"
+       data-picture-type="@typeName"
+       accept="image/*"
+       hidden />

@@ -1,0 +1,43 @@
+﻿@using ShipRate.Application.ViewModels
+@model List<PartyLookupItemVm>
+
+@{
+    var targetHiddenInputId = ViewBag.TargetHiddenInputId as string ?? "PartyId";
+    var targetTextInputId = ViewBag.TargetTextInputId as string ?? "PartySearchText";
+}
+
+@if (Model != null && Model.Any())
+{
+    <div class="list-group position-absolute w-100 shadow-sm"
+         style="z-index: 1050; max-height: 260px; overflow-y: auto;">
+
+        @foreach (var item in Model)
+        {
+            <button type="button"
+                    class="list-group-item list-group-item-action"
+                    data-id="@item.Id"
+                    data-display-name="@item.DisplayName"
+                    data-email="@item.EmailAddress"
+                    data-contact="@item.ContactName"
+                    data-mobile="@item.Mobile"
+                    onclick="
+                        document.getElementById('@targetHiddenInputId').value = this.dataset.id || '';
+                        document.getElementById('@targetTextInputId').value = this.dataset.displayName || '';
+
+                        var _emailaddress = document.getElementById('_EmailAddress');
+                        var _contactname = document.getElementById('_ContactName');
+                        var _mobileno = document.getElementById('_MobileNo');
+
+                        if (_emailaddress) _emailaddress.value = this.dataset.email || '';
+                        if (_contactname) _contactname.value = this.dataset.contact || '';
+                        if (_mobileno) _mobileno.value = this.dataset.mobile || '';
+
+                        this.closest('.list-group').style.display = 'none';
+                        this.closest('.list-group').innerHTML = '';
+                    ">
+                <div class="small">@item.DisplayName</div>
+            </button>
+        }
+
+    </div>
+}

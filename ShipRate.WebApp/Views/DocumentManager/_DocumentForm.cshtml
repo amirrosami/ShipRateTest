@@ -1,0 +1,95 @@
+﻿@using ShipRate.WebApp.ViewModels
+@model DocumentFormViewModel
+
+@{
+    // تعیین تارگت هدف بر اساس اینکه در تب Job هستیم یا در پاپ‌آپ سایر فرم‌ها
+    var targetContainer = Model.ObjectTypeId == 300 ? "#document-manager-content-2" : "#document-manager-content";
+    var swapMode = Model.ObjectTypeId == 300 ? "outerHTML" : "innerHTML";
+}
+
+<div class="card border-primary mb-3 shadow-sm">
+    <div class="card-header py-1 px-2 bg-primary text-white d-flex justify-content-between align-items-center">
+        <span class="small fw-semibold">
+            <i class="bi @(Model.Id.HasValue ? "bi-pencil-square" : "bi-plus-circle") me-1"></i>
+            @(Model.Id.HasValue ? "Edit" : "New") Document
+        </span>
+        <button type="button" class="btn-close btn-close-white btn-sm"
+                aria-label="Close"
+                onclick="closeDocInlineForm();"></button>
+    </div>
+    <div class="card-body p-2">
+        <form hx-post="/DocumentManager/SaveDocument"
+              hx-target="@targetContainer"
+              hx-swap="@swapMode">
+
+            <input type="hidden" name="Id" value="@Model.Id" />
+            <input type="hidden" name="ObjectId" value="@Model.ObjectId" />
+            <input type="hidden" name="ObjectTypeId" value="@Model.ObjectTypeId" />
+
+            <div class="row g-2 mb-2">
+                <div class="col-md-4">
+                    <label class="form-label form-label-sm mb-0">Document Type</label>
+                    <select name="DocumentTypeId" class="form-select form-select-sm" required>
+                        <option value="">-- Select --</option>
+                        @foreach (var t in Model.DocumentTypes)
+                        {
+                            <option value="@t.Id" selected="@(t.Id == Model.DocumentTypeId)">@t.Title</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label form-label-sm mb-0">Title</label>
+                    <input type="text" name="DocumentTitle" value="@Model.DocumentTitle"
+                           class="form-control form-control-sm" />
+                </div>
+
+                <div class="col-md-2">
+                    <label asp-for="IsLast" class="form-label form-label-sm mb-0">Is Last</label>
+                    <div class="form-check form-switch mt-1">
+                        <input asp-for="IsLast" class="form-check-input"
+                               type="checkbox" value="true" />
+                        <label class="form-check-label small" asp-for="IsLast">Last Doc</label>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label form-label-sm mb-0">Doc No</label>
+                    <input type="text" name="DocumentNo" value="@Model.DocumentNo"
+                           class="form-control form-control-sm" />
+                </div>
+            </div>
+
+            <div class="row g-2 mb-2">
+                <div class="col-md-3">
+                    <label class="form-label form-label-sm mb-0">Date</label>
+                    <input type="date" name="DocumentDate"
+                           value="@Model.DocumentDate.ToString("yyyy-MM-dd")"
+                           class="form-control form-control-sm" required />
+                </div>
+                <div class="col-md-9">
+                    <label class="form-label form-label-sm mb-0">Description</label>
+                    <textarea name="DocumentDescription" rows="1"
+                              class="form-control form-control-sm">@Model.DocumentDescription</textarea>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-1 mt-2 pt-1 border-top">
+                <button type="button" class="btn btn-sm btn-secondary" onclick="closeDocInlineForm();">
+                    <i class="bi bi-x-lg me-1"></i>Cancel
+                </button>
+                <button type="submit" class="btn btn-sm btn-success">
+                    <i class="bi bi-check-lg me-1"></i>Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function closeDocInlineForm() {
+        var formContainer = document.getElementById('doc-form-container');
+        var gridContainer = document.getElementById('doc-grid-container');
+        if (formContainer) formContainer.innerHTML = '';
+        if (gridContainer) gridContainer.classList.remove('d-none');
+    }
+</script>

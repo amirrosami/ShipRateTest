@@ -1,0 +1,249 @@
+﻿@using ShipRate.Application.JobsViewModels
+@model CreateBLVm
+<div dir="ltr" class="container">
+    <div>
+        <h2 class="mb-1">Create Transport Document(BL-CMR,...)</h2>
+        <input type="hidden" value="@Model.JobId" name="JobId" />
+        <input type="hidden" value="@Model.BookingId" name="BookingId" />
+    </div>
+
+    <form hx-post="@Url.Action("SaveBL", "Jobs")"
+          hx-target="#modal-content"
+          hx-swap="innerHTML"
+          novalidate>
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+        <div class="mb-3">
+            <div class="card-header py-2 bg-primary-subtle text-primary-emphasis fw-semibold mb-1">General</div>
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <select asp-for="CompanyId" asp-items="Model.Companies" class="form-select form-select-sm">
+                        <option value="">Company...</option>
+                    </select>
+                    <span asp-validation-for="CompanyId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <input asp-for="BookingNo" class="form-control form-control-sm" placeholder="Booking Number" />
+                    <span asp-validation-for="BookingNo" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <input asp-for="LineBookingNo" class="form-control form-control-sm" placeholder="Line Booking No" />
+                    <span asp-validation-for="LineBookingNo" class="text-danger small"></span>
+                </div>
+
+
+                <div class="col-md-4">
+                    <select asp-for="TransportTypeId" asp-items="Model.TransportTypes" class="form-select form-select-sm"
+                            hx-get="@Url.Action("GetLoadTypes", "Jobs")"
+                            hx-trigger="change"
+                            hx-target="#load-type-wrapper"
+                            hx-swap="outerHTML"
+                            hx-include="[name='TransportTypeId']">
+                        <option value="">Transport Type...</option>
+                    </select>
+                    <span asp-validation-for="TransportTypeId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <select asp-for="TradeTypeId" asp-items="Model.TradeTypes" class="form-select form-select-sm">
+                        <option value="">Trade Type...</option>
+                    </select>
+                    <span asp-validation-for="TradeTypeId" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4" id="load-type-wrapper">
+                    <select asp-for="LoadTypeId" asp-items="Model.LoadTypes" class="form-select form-select-sm">
+                        <option value="">Load Type...</option>
+                    </select>
+                    <span asp-validation-for="LoadTypeId" class="text-danger small"></span>
+                </div>
+                @*                 <div class="col-md-4">
+                    <select asp-for="JobStatusId" asp-items="Model.JobStatuses" class="form-select form-select-sm">
+                        <option value="">Job Status...</option>
+                    </select>
+                    <span asp-validation-for="JobStatusId" class="text-danger small"></span>
+                </div>
+ *@
+                <div class="col-md-3">
+                    <label asp-for="CargoReadyDate" class="form-label small fw-semibold">Cargo Ready Date</label>
+                    <input asp-for="CargoReadyDate" type="date" class="form-control form-control-sm" />
+                    <span asp-validation-for="CargoReadyDate" class="text-danger small"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="card-header py-2 bg-primary-subtle text-primary-emphasis fw-semibold mb-1 d-flex justify-content-between align-items-center">
+                <span>Parties</span>
+                <button type="button"
+                        class="btn btn-sm btn-light py-0 px-2"
+                        hx-get="@Url.Action("AddPartyRow", "Jobs")"
+                        hx-target="#parties-wrapper"
+                        hx-swap="beforeend"
+                        hx-vals='js:{ index: window.partyIndex++ }'>
+                    + Add
+                </button>
+            </div>
+            @*         <div id="parties-wrapper" class="mb-3">
+            @for (int i = 0; i < Model.JobParties.Count; i++)
+            {
+                @await Html.PartialAsync("_JobPartyRow", Model.JobParties[i])
+            }
+        </div>
+ *@ 
+</div>
+
+
+        @*     <div class="mb-3">
+        <div class="card-header py-2 bg-primary-subtle text-primary-emphasis fw-semibold mb-1 d-flex justify-content-between align-items-center">
+            <span>Company Role Types</span>
+            <button type="button"
+                    class="btn btn-sm btn-light py-0 px-2"
+                    hx-get="@Url.Action("AddCompanyRoleTypeRow", "Jobs")"
+                    hx-target="#companyroles-wrapper"
+                    hx-swap="beforeend"
+                    hx-vals='js:{ index: window.companyroleIndex++ }'>
+                + Add
+            </button>
+        </div>
+        <div id="companyroles-wrapper" class="mb-3">
+            @for (int i = 0; i < Model.JobCompanyRoles.Count; i++)
+            {
+                @await Html.PartialAsync("_JobCompanyRoleRow", Model.JobCompanyRoles[i])
+            }
+        </div>
+    </div>
+ *@
+
+
+
+
+
+
+        <div class="mb-3">
+            <div class="card-header py-2 bg-primary-subtle text-primary-emphasis fw-semibold mb-1">Cargo  / Commercial</div>
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <select asp-for="CargoHandlingTypeId" asp-items="Model.CargoHandlingTypes" class="form-select form-select-sm">
+                        <option value="">Cargo Handling...</option>
+                    </select>
+                    <span asp-validation-for="CargoHandlingTypeId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <select asp-for="CargoNatureId" asp-items="Model.CargoNatures" class="form-select form-select-sm">
+                        <option value="">Cargo Nature...</option>
+                    </select>
+                    <span asp-validation-for="CargoNatureId" class="text-danger small"></span>
+                </div>
+                @*             <div class="col-md-4">
+                <select asp-for="IncotermId" asp-items="Model.Incoterms" class="form-select form-select-sm">
+                    <option value="">Incoterm...</option>
+                </select>
+                <span asp-validation-for="IncotermId" class="text-danger small"></span>
+            </div>
+ *@
+                @*             <div class="col-md-4">
+                <input asp-for="IncotermsLocationName" class="form-control form-control-sm" placeholder="Incoterm Location" />
+                <span asp-validation-for="IncotermsLocationName" class="text-danger small"></span>
+            </div>
+ *@
+                @*  <div class="col-md-4">
+                <select asp-for="FreightPaymentTypeId" asp-items="Model.PaymentTypes" class="form-select form-select-sm">
+                    <option value="">Freight Payment...</option>
+                </select>
+                <span asp-validation-for="FreightPaymentTypeId" class="text-danger small"></span>
+            </div>
+ *@
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="card-header py-2 bg-primary-subtle text-primary-emphasis fw-semibold mb-1">Routing</div>
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <select asp-for="OriginLocationId" asp-items="Model.Locations" class="form-select form-select-sm">
+                        <option value="">Origin...</option>
+                    </select>
+                    <span asp-validation-for="OriginLocationId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <select asp-for="DestinationLocationId" asp-items="Model.Locations" class="form-select form-select-sm">
+                        <option value="">Destination...</option>
+                    </select>
+                    <span asp-validation-for="DestinationLocationId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <select asp-for="MovementTypeId" asp-items="Model.MovementTypes" class="form-select form-select-sm">
+                        <option value="">Movement Type...</option>
+                    </select>
+                    <span asp-validation-for="MovementTypeId" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <input asp-for="ETD" type="datetime-local" class="form-control form-control-sm" />
+                    <span asp-validation-for="ETD" class="text-danger small"></span>
+                </div>
+                <div class="col-md-3">
+                    <input asp-for="ETA" type="datetime-local" class="form-control form-control-sm" />
+                    <span asp-validation-for="ETA" class="text-danger small"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="card-header py-2 bg-primary-subtle text-primary-emphasis fw-semibold mb-1 d-flex justify-content-between align-items-center">
+                <span>Containers</span>
+
+                <button type="button"
+                        class="btn btn-sm btn-light py-0 px-2"
+                        hx-get="@Url.Action("AddContainerRow", "Jobs")"
+                        hx-target="#containers-wrapper"
+                        hx-swap="beforeend"
+                        hx-vals='js:{ index: window.containerIndex++ }'>
+                    + Add
+                </button>
+            </div>
+            @*         <div id="containers-wrapper" class="mb-3">
+            @for (int i = 0; i < Model.Containers.Count; i++)
+            {
+                @await Html.PartialAsync("_JobContainerRow", Model.Containers[i])
+            }
+        </div>
+ *@
+        </div>
+
+        <div class="mb-3">
+            <div class="card-header py-2 bg-primary-subtle text-primary-emphasis fw-semibold mb-1 d-flex justify-content-between align-items-center">
+                <span>Packages</span>
+
+                <button type="button"
+                        class="btn btn-sm btn-light py-0 px-2"
+                        hx-get="@Url.Action("AddPackageRow", "Jobs")"
+                        hx-target="#packages-wrapper"
+                        hx-swap="beforeend"
+                        hx-vals='js:{ index: window.packageindex++ }'>
+                    + Add
+                </button>
+            </div>
+            @*         <div id="packages-wrapper" class="mb-3">
+            @for (int i = 0; i < Model.Packages.Count; i++)
+            {
+                @await Html.PartialAsync("_JobPackageRow", Model.Packages[i])
+            }
+        </div>
+ *@    </div>
+
+        <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+            <button type="submit" class="btn btn-success btn-sm">Save</button>
+            <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+        </div>
+    </form>
+</div>
+
+@* <script>
+    // window.containerIndex = @(Model.Containers?.Count ?? 0);
+    // window.packageIndex = @(Model.Packages?.Count ?? 0);
+    // window.companyroleIndex = @(Model.JobCompanyRoles?.Count ?? 0);
+    // window.partyIndex = @(Model.JobParties?.Count ?? 0);
+</script>
+ *@

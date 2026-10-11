@@ -1,0 +1,183 @@
+﻿@using ShipRate.Application.ViewModels
+@model BLManagePageVm
+
+<table class="table table-bordered table-striped table-sm align-middle">
+    <thead class="table-light">
+        <tr>
+            <th>Doc. Type</th>
+            <th>Mode</th>
+            <th>Shipment Type</th>
+            <th>Doc No</th>
+            <th>Issue Date</th>
+            <th>Carrier</th>
+            <th>POL</th>
+            <th>POD</th>
+            <th>Cntr(s)</th>
+            <th>Packages</th>
+            <th style="width: 180px;">Actions</th>
+            <th>More</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Items.Any())
+        {
+            foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@item.BLTypeName</td>
+                    <td>@item.TransportTypeName</td>
+                    <td>@item.TradeTypeName</td>
+                    <td>@item.BLNo</td>
+                    <td>@item.BLIssueDate.ToString("yyyy-MM-dd")</td>
+                    <td>@item.CarrierName</td>
+                    <td>@item.POLText</td>
+                    <td>@item.PODText</td>
+                    <td>@item.TotalContainers</td>
+                    <td>@item.TotalPackages</td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+
+         <a class="btn btn-warning"
+           href="@Url.Action("Edit", "TransportDocuments", new {
+               jobId = Model.Context.JobId ,id=item.Id})">Edit</a>
+
+                                 <button type="button" class="btn btn-sm btn-outline-primary btn-info"
+                                        hx-get="/DocumentManager/Index?objectId=@item.Id&objectTypeId=5"
+                                        hx-target="#document-manager-content"
+                                        hx-swap="innerHTML"
+                                        title="Attachments"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#documentManagerModal">
+                                    <i class="bi bi-folder2-open me-1"></i>
+                                </button>
+
+@*                             <button class="btn btn-warning"
+                                    hx-get="@Url.Action("EditModal", "BL", new { id = item.Id })"
+                                    hx-target="#modalBody"
+                                    hx-swap="innerHTML"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#mainModal">
+                                Edit
+                            </button>
+
+ *@
+                            <button class="btn btn-danger"
+                                    hx-get="@Url.Action("DeleteModal", "BL", new {
+                                        id = item.Id,
+                                        jobId = Model.Context.JobId,
+                                        bookingId = Model.Context.BookingId,
+                                        shipmentId = Model.Context.ShipmentId,
+                                        shipmentLegId = Model.Context.ShipmentLegId
+                                    })"
+                                    hx-target="#modalBody"
+                                    hx-swap="innerHTML"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#mainModal">
+                                Delete
+                            </button>
+                            <button class="btn btn-sm btn-outline-info"
+                                    hx-get="@Url.Action("GetDetentionStartBaseModal", "Detentions", new { blId = item.Id, companyId = 1 })"
+                                    hx-target="#modal-container"
+                                    title="Register Start Dates For Detention">
+                                    <i class="bi bi-stopwatch"></i> 
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary"
+                                    hx-get="@Url.Action("IndexModal", "ActivityLog", new { entityTypeId = 5, entityId = item.Id,externalReferenceNo=item.BLNo  })"
+                                    hx-target="#activityLogModalContainer"
+                                    hx-swap="innerHTML" 
+                                    title="View Event Logs">
+                                <i class="bi bi-clock-history"></i> 
+                            </button>
+
+
+
+
+
+
+
+                                    @*                             <a href="@Url.Action("Split", "TransportDocuments", new { id = item.Id, jobId = Model.Context.JobId })" 
+                                                                   class="btn btn-outline-primary" 
+                                                                   title="Split">
+                                                                    <i class="bi bi-scissors me-1"></i> Split
+                                                                </a>
+                                     *@
+                    </div>
+                    </td>
+
+
+
+<td class="text-center">
+    <div class="dropdown">
+        <button class="btn btn-link text-secondary p-0 border-0" 
+                type="button" 
+                data-bs-toggle="dropdown" 
+                data-bs-strategy="fixed"
+                aria-expanded="false">
+            <i class="bi bi-three-dots-vertical fs-5"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-2">
+            <li>
+                <a class="dropdown-item py-2" href="@Url.Action("MasterConsole", "BLManagement", new { id = item.Id })">
+                    <i class="bi bi-box-seam me-2"></i> BL Console
+                </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <a class="dropdown-item py-2" href="@Url.Action("ContainerPackingList", "Reports", new { id = item.Id })" target="_blank">
+                    <i class="bi bi-box-seam me-2"></i> Container Packing List
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item py-2" href="@Url.Action("BLSeaReport", "TransportDocuments", new { id = item.Id })" target="_blank">
+                    <i class="bi bi-box-seam me-2"></i> BL Report(Sea)
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item py-2" href="@Url.Action("ContainerManifest", "Reports", new { id = item.Id })" target="_blank">
+                    <i class="bi bi-file-earmark-text me-2"></i> Container Manifest
+                </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <a class="dropdown-item py-2" href="@Url.Action("BillOfLading", "Reports", new { id = item.Id, original = false })" target="_blank">
+                    <i class="bi bi-file-earmark me-2"></i> B/L Draft
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item py-2" href="@Url.Action("BillOfLading", "Reports", new { id = item.Id, original = true })" target="_blank">
+                    <i class="bi bi-file-earmark-check me-2"></i> B/L Original
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item py-2" href="@Url.Action("CargoAllocationByContainer", "Reports", new { id = item.Id })" target="_blank">
+                    <i class="bi bi-diagram-3 me-2"></i> Cargo Allocation by Container
+                </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <button type="button"
+                        class="dropdown-item py-2 text-danger"
+                        hx-delete="@Url.Action("Delete", "DeliveryOrders", new { id = item.Id })"
+                        hx-confirm="Are you sure you want to delete this draft DO?"
+                        hx-target="#gridContainer">
+                    <i class="bi bi-trash me-2"></i> Delete Draft
+                </button>
+            </li>
+        </ul>
+    </div>
+</td>
+
+
+
+
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="10" class="text-center">No data found.</td>
+            </tr>
+        }
+    </tbody>
+</table>

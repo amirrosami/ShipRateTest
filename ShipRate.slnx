@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+  </Folder>
+  <Project Path="Common/ShipRate.Common.csproj" />
+  <Project Path="ShipRate.Application/ShipRate.Application.csproj" Id="ba5cc5fe-0358-42c1-be7b-bd1083e5b45a" />
+  <Project Path="ShipRate.CustomersPortal/ShipRate.WebAppCustomers.csproj" />
+  <Project Path="ShipRate.Domain/ShipRate.Domain.csproj" Id="bb7c5cbb-c898-4ca0-922d-6e54b3c8ac05" />
+  <Project Path="ShipRate.Infrastructure/ShipRate.Infrastructure.csproj" />
+  <Project Path="ShipRate.WebApp/ShipRate.WebApp.csproj" Id="424f59d2-7777-4b47-a451-946a9f5f239f" />
+</Solution>

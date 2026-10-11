@@ -1,0 +1,69 @@
+﻿@model IEnumerable<ShipRate.Application.ViewModels.ChargeRowVm>
+
+<div class="card border-0 shadow-sm mt-3">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+        <h6 class="mb-0 text-primary fw-bold">
+            <i class="bi bi-cash-coin me-2"></i>Associated Charges
+        </h6>
+        <span class="badge bg-secondary">@Model.Count() Items</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 text-nowrap small text-start">
+            <thead class="table-light text-uppercase font-monospace">
+                <tr>
+                    <th class="ps-3">Charge Type</th>
+                    <th>Description</th>
+                    <th>Direction</th>
+                    <th>Qty</th>
+                    <th>Rate</th>
+                    <th>Net Amount</th>
+                    <th>Tax</th>
+                    <th>Gross Amount</th>
+                    <th>Party</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="10" class="text-center py-4 text-muted">
+                            <i class="bi bi-info-circle d-block mb-1"></i> No charges found for this BL.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-3 fw-semibold">@item.ChargeTypeName</td>
+                            <td class="text-truncate" style="max-width: 150px;">@item.ChargeDescription</td>
+                            <td>
+                                <span class="badge @(item.Direction == "Debit" || item.Direction == "Inbound" ? "bg-light-danger text-danger border border-danger-subtle" : "bg-light-success text-success border border-success-subtle")">
+                                    @item.Direction
+                                </span>
+                            </td>
+                            <td>@item.Quantity.ToString("N2")</td>
+                            <td>@item.UnitRate.ToString("N2") <span class="text-muted text-uppercase">@item.CurrencyCode</span></td>
+                            <td>@item.Amount.ToString("N2") <span class="text-muted text-uppercase">@item.CurrencyCode</span></td>
+                            <td class="text-muted">@(item.TaxAmount?.ToString("N2") ?? "0.00")</td>
+                            <td class="fw-bold">@item.GrossAmount.ToString("N2") <span class="text-dark text-uppercase">@item.CurrencyCode</span></td>
+                            <td>@item.PartyName</td>
+                            <td>
+                                @if (item.IsApproved)
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success"><i class="bi bi-check-circle-fill me-1"></i>Approved</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning-subtle text-warning border border-warning"><i class="bi bi-hourglass-split me-1"></i>Pending</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

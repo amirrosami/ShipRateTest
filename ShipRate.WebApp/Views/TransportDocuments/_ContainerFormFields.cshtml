@@ -1,0 +1,219 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@using ShipRate.Application.ViewModels
+
+@model BLContainerVm
+
+
+<style>
+    /* ۱. تثبیت نحوه چیدمان جدول کانتینرها جهت جلوگیری از محاسبه مجدد عرض‌ها */
+    #containersTable,
+    .container-row {
+        table-layout: fixed !important;
+    }
+
+        /* ۲. حذف هرگونه افکت جابجایی، تغییر سایز یا ترنزیشن در حالت hover روی اینپوت‌ها و ردیف */
+        .container-row,
+        .container-row td,
+        .container-row input,
+        .container-row select,
+        .container-row button {
+            transition: none !important;
+            transform: none !important;
+        }
+
+            /* ۳. تثبیت ضخامت کادرها در حالت فوکوس و هاور تا عرض ستون تغییر نکند */
+            .container-row .form-control,
+            .container-row .form-select {
+                box-sizing: border-box !important;
+            }
+
+                .container-row .form-control:hover,
+                .container-row .form-select:hover {
+                    border-color: #ced4da !important; /* تثبیت کادر در هاور */
+                }
+
+            /* ۴. جلوگیری از لرزش دکمه‌های انتهای سطر در هاور */
+            .container-row .btn:hover {
+                transform: none !important;
+            }
+
+</style>
+
+@{
+    var containerIndex = (int)(ViewData["ContainerIndex"] ?? 0);
+    var containerSizeTypes = ViewData["ContainerSizeTypes"] as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+    var fullmts = ViewData["FullMTs"] as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+    var loadtypes = ViewData["LoadTypes"] as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+    var owntypes = ViewData["CntOwnTypes"] as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+}
+
+<tr id="containerRow_@containerIndex" class="container-row">
+    <td>
+        <input type="text" name="Containers[@containerIndex].Seq"
+               value="@Model.Seq"
+               class="form-control form-control-sm text-center" style="width: 50px;" />
+    </td>
+    <td>
+        <input type="hidden" name="Containers[@containerIndex].Id" value="@Model.Id" />
+        <input type="hidden" name="Containers[@containerIndex].BLId" value="@Model.BLId" />
+        <input name="Containers[@containerIndex].ContainerNumber"
+               value="@Model.ContainerNumber"
+               class="form-control form-control-sm text-uppercase container-validator" maxlength="11" />
+
+        <span asp-validation-for="ContainerNumber" class="text-danger small"></span>
+    </td>
+    <td>
+        <select name="Containers[@containerIndex].ContainerSizeTypeId"
+                class="form-select form-select-sm">
+            <option value="">-- Select --</option>
+            @foreach (var item in containerSizeTypes)
+            {
+                if (item.Value == Model.ContainerSizeTypeId?.ToString())
+                {
+                    <option value="@item.Value" selected>@item.Text</option>
+                }
+                else
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            }
+        </select>
+        <span asp-validation-for="ContainerSizeTypeId" class="text-danger small"></span>
+    </td>
+
+
+    <td>
+        <select name="Containers[@containerIndex].FullMTId"
+                class="form-select form-select-sm">
+            <option value="">-- Select --</option>
+            @foreach (var item in fullmts)
+            {
+                if (item.Value == Model.FullMTId?.ToString())
+                {
+                    <option value="@item.Value" selected>@item.Text</option>
+                }
+                else
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            }
+        </select>
+        <span asp-validation-for="FullMTId" class="text-danger small"></span>
+    </td>
+
+    <td>
+        <select name="Containers[@containerIndex].CntOwnTypeId"
+                class="form-select form-select-sm">
+            <option value="">-- Select --</option>
+            @foreach (var item in owntypes)
+            {
+                if (item.Value == Model.CntOwnTypeId?.ToString())
+                {
+                    <option value="@item.Value" selected>@item.Text</option>
+                }
+                else
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            }
+        </select>
+        <span asp-validation-for="CntOwnTypeId" class="text-danger small"></span>
+    </td>
+
+
+
+
+    <td>
+        <input name="Containers[@containerIndex].SealNumber"
+               value="@Model.SealNumber"
+               class="form-control form-control-sm" />
+
+        <span asp-validation-for="SealNumber" class="text-danger small"></span>
+    </td>
+
+
+    <td>
+        <input name="Containers[@containerIndex].TotalPackageCount"
+               value="@Model.TotalPackageCount"
+               type="text"
+               class="form-control form-control-sm" />
+
+        <span asp-validation-for="TotalPackageCount" class="text-danger small"></span>
+    </td>
+
+    <td>
+        <input name="Containers[@containerIndex].TotalGrossWeight"
+               value="@Model.TotalGrossWeight"
+               type="text"
+               class="form-control form-control-sm" />
+
+        <span asp-validation-for="TotalGrossWeight" class="text-danger small"></span>
+    </td>
+
+    <td>
+        <input name="Containers[@containerIndex].TareWeight"
+               value="@Model.TareWeight"
+               type="text"
+               class="form-control form-control-sm" />
+
+        <span asp-validation-for="TareWeight" class="text-danger small"></span>
+    </td>
+
+
+    <td>
+        <input name="Containers[@containerIndex].TotalNetWeight"
+               value="@Model.TotalNetWeight"
+               type="text"
+               class="form-control form-control-sm" />
+
+        <span asp-validation-for="TotalNetWeight" class="text-danger small"></span>
+    </td>
+
+    <td>
+        <input name="Containers[@containerIndex].TotalVolumeCBM"
+               value="@Model.TotalVolumeCBM"
+               type="text"
+               class="form-control form-control-sm" />
+
+        <span asp-validation-for="TotalVolumeCBM" class="text-danger small"></span>
+    </td>
+    <td>
+        <select name="Containers[@containerIndex].LoadTypeId"
+                class="form-select form-select-sm">
+            <option value="">-- Select --</option>
+            @foreach (var item in loadtypes)
+            {
+                if (item.Value == Model.LoadTypeId?.ToString())
+                {
+                    <option value="@item.Value" selected>@item.Text</option>
+                }
+                else
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            }
+        </select>
+        <span asp-validation-for="LoadTypeId" class="text-danger small"></span>
+    </td>
+    <td>
+        <input name="Containers[@containerIndex].ExportPermission"
+               value="@Model.ExportPermission"
+               type="text"
+               class="form-control form-control-sm" />
+        <span asp-validation-for="ExportPermission" class="text-danger small"></span>
+    </td>
+    <td class="text-nowrap">
+        <button type="button"
+                class="btn btn-sm btn-outline-primary toggle-container-allocation-btn"
+                data-index="@containerIndex"
+                title="Allocation">
+            <i class="bi bi-distribute-vertical"></i>
+        </button>
+        <button type="button"
+                class="btn btn-sm btn-danger remove-container-row-btn"
+                data-index="@containerIndex"
+                title="Remove">
+            <i class="bi bi-trash"></i>
+        </button>
+    </td>
+</tr>

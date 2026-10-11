@@ -1,0 +1,124 @@
+﻿@using ShipRate.Application.ViewModels
+@model TelexReleaseCreateEditViewModel
+
+@{
+    var isEdit = Model.Id.HasValue;
+    var actionName = isEdit ? "Edit" : "Create";
+}
+<form hx-post="@Url.Action(actionName, "TelexRelease")"
+      hx-target="#modalBody"
+      hx-swap="innerHTML">
+    @Html.AntiForgeryToken()
+
+    @if (isEdit)
+    {
+        <input type="hidden" asp-for="Id" />
+    }
+    <input type="hidden" asp-for="BLId" id="BLId" />
+
+    <div class="row g-3">
+
+        <div class="col-md-6">
+            <label asp-for="CompanyId" class="form-label"></label>
+            <select asp-for="CompanyId" asp-items="Model.Companies" class="form-select">
+                <option value="">-- Select --</option>
+            </select>
+            <span asp-validation-for="CompanyId" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="LineForwarderTypeId" class="form-label">Request To:</label>
+            <select asp-for="LineForwarderTypeId" asp-items="Model.LineForwarderTypes" class="form-select">
+                <option value="">-- Select --</option>
+            </select>
+            <span asp-validation-for="LineForwarderTypeId" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="RequestNo" class="form-label">RequestNo</label>
+            <input asp-for="RequestNo" type="text" class="form-control" />
+            <span asp-validation-for="RequestNo" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="RequestDate" class="form-label"></label>
+            <input asp-for="RequestDate" type="datetime-local" class="form-control" />
+            <span asp-validation-for="RequestDate" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-8">
+            <label asp-for="CustomerId" class="form-label">Customer</label>
+
+            <input type="hidden"
+                   asp-for="CustomerId"
+                   id="CustomerId" />
+
+            <input type="text"
+                   id="CustomerSearchText"
+                   name="Customer"
+                   value="@Model.CustomerName"
+                   class="form-control"
+                   placeholder="Search Customer..."
+                   autocomplete="off"
+                   hx-get="@Url.Action("SearchParties", "JobParty")"
+                   hx-trigger="keyup changed delay:400ms"
+                   hx-target="#partySearchResults"
+                   hx-swap="innerHTML"
+                   hx-vals='js:{
+                            term: document.getElementById("CustomerSearchText").value,
+                            targetHiddenInputId: "CustomerId",
+                            targetTextInputId: "CustomerSearchText"
+                       }' />
+            <div id="partySearchResults"
+                 class="position-relative">
+            </div>
+            <span asp-validation-for="CustomerId" class="text-danger small"></span>
+        </div>
+        <div class="col-md-8">
+            <label asp-for="BLNo" class="form-label"></label>
+            <input asp-for="BLNo" id="BLNo" class="form-control" readonly />
+        </div>
+
+        @if (!(Model.BLId != null && Model.BLId.HasValue && Model.BLId != Guid.Empty))
+        {
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="button"
+                        class="btn btn-outline-primary w-100"
+                        hx-get="@Url.Action("BLLookup", "TelexRelease")"
+                        hx-target="#lookupModalBody"
+                        hx-swap="innerHTML"
+                        data-bs-toggle="modal"
+                        data-bs-target="#lookupModal"
+                        data-bs-dismiss="modal">
+                    <!-- این ویژگی اضافه شد -->
+                    <i class="bi bi-search"></i> Select BL
+                </button>
+            </div>
+        }
+
+        <div class="col-md-6">
+            <label asp-for="ShippingLineId" class="form-label">Carrier</label>
+            <select asp-for="ShippingLineId" asp-items="Model.Carriers" class="form-select">
+                <option value="">-- Select --</option>
+            </select>
+            <span asp-validation-for="ShippingLineId" class="text-danger"></span>
+        </div>
+
+        @*         <div class="col-md-6">
+            <label asp-for="BLSurrenderId" class="form-label"></label>
+            <input asp-for="BLSurrenderId" class="form-control" />
+            <span asp-validation-for="BLSurrenderId" class="text-danger"></span>
+        </div>
+ *@
+
+        <div class="col-md-12">
+            <label asp-for="Remarks" class="form-label"></label>
+            <textarea asp-for="Remarks" class="form-control"></textarea>
+            <span asp-validation-for="Remarks" class="text-danger"></span>
+        </div>
+
+    </div>
+
+    <div class="mt-4 text-end">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+</form>

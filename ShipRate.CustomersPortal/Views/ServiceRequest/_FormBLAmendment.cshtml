@@ -1,0 +1,69 @@
+﻿@model ShipRate.Application.ViewModels.CreateBLAmendmentVM
+
+<form hx-post="@Url.Action("FormBLAmendment", "ServiceRequest")"
+      hx-target="#modal-content"
+      hx-swap="innerHTML"
+      class="sr-form"
+      hx-on::config-request="
+          const srvReqId = document.getElementById('ServiceRequestId')?.value;
+          if (!srvReqId || srvReqId.trim() === '' || srvReqId === '00000000-0000-0000-0000-000000000000') {
+              event.preventDefault();
+              
+          }
+      ">
+       >
+    @Html.AntiForgeryToken()
+
+    <div class="form-field">
+        <label asp-for="BLNumber" class="form-label">B/L Number <span aria-hidden="true" class="form-required">*</span></label>
+        <select asp-for="BLNumber" class="form-select" required>
+            <option value="">— Select a B/L —</option>
+            @foreach (var opt in Model.AvailableBLs)
+            {
+                <option value="@opt.Value">@opt.Label</option>
+            }
+        </select>
+        <span asp-validation-for="BLNumber" class="form-error" role="alert"></span>
+    </div>
+
+    <div class="form-field">
+        <label asp-for="JobRef" class="form-label">Job Reference <span aria-hidden="true" class="form-required">*</span></label>
+        <input asp-for="JobRef" class="form-input" placeholder="e.g. JOB-2026-0041" required />
+        <span asp-validation-for="JobRef" class="form-error" role="alert"></span>
+    </div>
+
+    <div class="form-field">
+        <fieldset class="form-fieldset">
+            <legend class="form-label">Fields to Amend <span aria-hidden="true" class="form-required">*</span></legend>
+            <div class="form-checkgroup">
+                @foreach (var field in Model.AvailableAmendmentFields)
+                {
+                    <label class="form-check">
+                        <input type="checkbox"
+                               name="SelectedAmendmentFields"
+                               value="@field.Value"
+                               class="form-checkbox" />
+                        <span>@field.Label</span>
+                    </label>
+                }
+            </div>
+        </fieldset>
+        <span asp-validation-for="SelectedAmendmentFields" class="form-error" role="alert"></span>
+    </div>
+
+    <div class="form-field">
+        <label asp-for="Description" class="form-label">Description / Instructions <span aria-hidden="true" class="form-required">*</span></label>
+        <textarea asp-for="Description" class="form-textarea" rows="3"
+                  placeholder="Describe the changes required..." required></textarea>
+        <span asp-validation-for="Description" class="form-error" role="alert"></span>
+    </div>
+
+    <div class="form-actions">
+        <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>an asp-validation-for="Description" class="form-error" role="alert"></span>
+    </div>
+
+    <div class="form-actions">
+        <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn-primary">Submit Request</button>
+    </div>
+</form>

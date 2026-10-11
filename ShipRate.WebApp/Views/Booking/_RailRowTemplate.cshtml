@@ -1,0 +1,37 @@
+﻿@using ShipRate.Application.DTOs
+@model BookingRailDetailVm
+
+<tr class="rail-row">
+    <td>
+        <input type="hidden" name="RailDetails[__INDEX__].Id" value="@Model.Id" />
+        <select name="RailDetails[__INDEX__].OriginStationId" asp-items="ViewBag.Stations" class="form-select form-select-sm">
+            <option value="">-- Station --</option>
+        </select>
+    </td>
+    <td>
+        <select name="RailDetails[__INDEX__].DestinationStationId" asp-items="ViewBag.Stations" class="form-select form-select-sm">
+            <option value="">-- Station --</option>
+        </select>
+    </td>
+    <td>
+        <select name="RailDetails[__INDEX__].RailOperatorId" asp-items="ViewBag.RailOperators" class="form-select form-select-sm">
+            <option value="">-- Operator --</option>
+        </select>
+    </td>
+    <td>
+        <input type="text" name="RailDetails[__INDEX__].TrainNo" class="form-control form-control-sm mb-1" placeholder="Train No" />
+        <input type="text" name="RailDetails[__INDEX__].RailWaybillNo" class="form-control form-control-sm" placeholder="Waybill No" />
+    </td>
+    <td>
+        <input type="datetime-local" name="RailDetails[__INDEX__].DepartureDate" class="form-control form-control-sm mb-1" />
+        <input type="datetime-local" name="RailDetails[__INDEX__].ArrivalDate" class="form-control form-control-sm" />
+    </td>
+    <td>
+        <textarea name="RailDetails[__INDEX__].Remarks" class="form-control form-control-sm" rows="2"></textarea>
+    </td>
+    <td>
+        <button type="button" class="btn btn-outline-danger btn-sm border-0" onclick="removeRailRow(this)">
+            <i class="bi bi-trash-fill"></i>
+        </button>
+    </td>
+</tr>

@@ -1,0 +1,93 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model SettlementItemCreateDto
+
+<div class="modal-header d-flex justify-content-between align-items-center mb-2">
+    <h5 class="modal-title">Add Settlement Item</h5>
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <a href="@Url.Action("Index", "Invoices")"
+           class="btn btn-sm btn-outline-secondary"
+           target="_blank"
+           rel="noopener noreferrer">
+            <i class="bi bi-letter me-1"></i>
+            Invoices List
+        </a>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+</div>
+
+<form hx-post="@Url.Action("AddItem", "Settlements")"
+      hx-target="#itemsPanel"
+      hx-swap="innerHTML">
+
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="SettlementId" />
+
+    <div class="modal-body">
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label">Invoice</label>
+
+                <input type="hidden" asp-for="InvoiceId" id="AddItemInvoiceId" />
+
+                <input type="text"
+                       id="AddItemInvoiceText"
+                       name="invoicesearchtext"
+                       class="form-control"
+                       autocomplete="off"
+                       hx-get="@Url.Action("Invoices", "Lookup")"
+                       hx-trigger="keyup changed delay:400ms"
+                       hx-target="#addItemInvoiceResults"
+                       hx-vals='{"targetId":"AddItemInvoiceId","targetText":"AddItemInvoiceText"}' />
+
+                <div id="addItemInvoiceResults"></div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Charge</label>
+
+                <input type="hidden" asp-for="ChargeId" id="AddItemChargeId" />
+
+                <input type="text"
+                       id="AddItemChargeText"
+                       name="chargesearchtext"
+                       class="form-control"
+                       autocomplete="off"
+                       hx-get="@Url.Action("Charges", "Lookup")"
+                       hx-trigger="keyup changed delay:400ms"
+                       hx-target="#addItemChargeResults"
+                       hx-vals='{"targetId":"AddItemChargeId","targetText":"AddItemChargeText"}' />
+
+                <div id="addItemChargeResults"></div>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Amount</label>
+                <input asp-for="Amount" class="form-control text-end" />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Base Exchange Rate</label>
+                <input asp-for="BaseExchangeRate" class="form-control text-end" />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Amount In Base Currency</label>
+                <input asp-for="AmountInBaseCurrency" class="form-control text-end" />
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Remarks</label>
+                <textarea asp-for="Remarks" class="form-control" rows="2"></textarea>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Add Item</button>
+    </div>
+
+</form>

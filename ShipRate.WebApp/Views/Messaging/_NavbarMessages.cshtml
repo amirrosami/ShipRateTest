@@ -1,0 +1,67 @@
+﻿@using ShipRate.Application.DTOs.Messaging
+@model MessagingUnreadHeaderDto
+
+<button class="navbar-icon-btn position-relative"
+        type="button"
+        title="Messages"
+        data-bs-toggle="dropdown"
+        aria-expanded="false">
+    <i class="bi bi-chat-dots"></i>
+
+    @if (Model.TotalUnreadCount > 0)
+    {
+        <span class="badge-dot"></span>
+    }
+</button>
+
+<div class="dropdown-menu dropdown-menu-end navbar-dropdown-menu p-0">
+    <div class="px-3 py-2 border-bottom fw-semibold">
+        Messages
+    </div>
+
+    @if (!Model.Items.Any())
+    {
+        <div class="px-3 py-3 text-muted small">
+            No new messages
+        </div>
+    }
+    else
+    {
+        @foreach (var item in Model.Items)
+        {
+            <a class="dropdown-item py-2"
+               href="@Url.Action("Conversation", "Messaging", new { id = item.ConversationId })">
+                <div class="d-flex align-items-center justify-content-between gap-2">
+                    <strong class="text-truncate">@item.Subject</strong>
+
+                    @if (item.UnreadCount > 0)
+                    {
+                        <span class="badge bg-primary rounded-pill">@item.UnreadCount</span>
+                    }
+                </div>
+
+                <div class="small text-muted text-truncate">
+                    @item.SenderDisplayName
+                </div>
+
+                <div class="small text-truncate">
+                    @item.LastMessagePreview
+                </div>
+
+                @if (item.LastMessageAt.HasValue)
+                {
+                    <div class="small text-muted mt-1">
+                        @item.LastMessageAt.Value.ToString("yyyy-MM-dd HH:mm")
+                    </div>
+                }
+            </a>
+        }
+    }
+
+    <div class="border-top">
+        <a class="dropdown-item text-center small"
+           href="@Url.Action("Index", "Messaging")">
+            View all messages
+        </a>
+    </div>
+</div>

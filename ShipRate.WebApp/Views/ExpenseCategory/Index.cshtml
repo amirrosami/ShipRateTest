@@ -1,0 +1,142 @@
+﻿@{
+    ViewData["Title"] = "Expense Categories";
+}
+
+<!-- ======================== PAGE HEADER ======================== -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h4 class="mb-0">
+            <i class="bi bi-tags text-primary"></i> Expense Categories
+        </h4>
+        <small class="text-muted">Manage expense categories and their limits</small>
+    </div>
+</div>
+
+<!-- ======================== SEARCH + NEW BUTTON ======================== -->
+<div class="card shadow-sm">
+    <div class="card-header bg-white py-3">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+                    <input type="text"
+                           id="searchInput"
+                           class="form-control border-start-0"
+                           placeholder="Search by title, account code or company..."
+                           hx-get="@Url.Action("Grid")"
+                           hx-trigger="keyup changed delay:400ms"
+                           hx-target="#gridContainer"
+                           hx-swap="innerHTML"
+                           hx-include="this"
+                           name="search"
+                           autocomplete="off" />
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            id="btnClearSearch"
+                            title="Clear search"
+                            style="display:none;">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-6 text-end">
+                <button class="btn btn-primary"
+                        hx-get="@Url.Action("Create")"
+                        hx-target="#modalBody"
+                        hx-swap="innerHTML"
+                        data-bs-toggle="modal"
+                        data-bs-target="#crudModal">
+                    <i class="bi bi-plus-lg"></i> New Category
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================== GRID CONTAINER ======================== -->
+    <div class="card-body p-0"
+         id="gridContainer"
+         hx-get="@Url.Action("Grid")"
+         hx-trigger="load"
+         hx-swap="innerHTML">
+        <!-- Grid loads here via HTMX -->
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <div class="text-muted mt-2">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================== MODAL ======================== -->
+<div class="modal fade" id="crudModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">
+                    <i class="bi bi-tag"></i> Expense Category
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Form loads here via HTMX -->
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================== SCRIPTS ======================== -->
+@section Scripts {
+<script>
+    // ---- Close modal & refresh grid after successful save ----
+    document.body.addEventListener('closeModalAndRefresh', function () {
+        var modal = bootstrap.Modal.getInstance(document.getElementById('crudModal'));
+        if (modal) modal.hide();
+        refreshGrid();
+    });
+
+    // ---- Refresh grid keeping current search & page ----
+    function refreshGrid() {
+        var search = document.getElementById('searchInput').value;
+        var currentPage = document.getElementById('gridContainer').getAttribute('data-current-page') || '1';
+
+        htmx.ajax('GET', '@Url.Action("Grid")?search=' + encodeURIComponent(search) + '&page=' + currentPage, {
+            target: '#gridContainer',
+            swap: 'innerHTML'
+        });
+    }
+
+    // ---- Clear search button toggle ----
+    (function () {
+        var input = document.getElementById('searchInput');
+        var btnClear = document.getElementById('btnClearSearch');
+
+        input.addEventListener('input', function () {
+            btnClear.style.display = this.value.length > 0 ? '' : 'none';
+        });
+
+        btnClear.addEventListener('click', function () {
+            input.value = '';
+            btnClear.style.display = 'none';
+            // Trigger HTMX request to reload grid without search
+            htmx.trigger(input, 'keyup');
+        });
+    })();
+
+    // ---- After delete success, update page attribute ----
+    document.body.addEventListener('htmx:afterRequest', function (evt) {
+        var trigger = evt.detail.elt;
+        // After a delete, the grid is returned directly — update data attribute
+        if (trigger && trigger.hasAttribute('hx-delete')) {
+            var pageEl = document.querySelector('#gridContainer [data-page-info]');
+            if (pageEl) {
+                document.getElementById('gridContainer')
+                    .setAttribute('data-current-page', pageEl.getAttribute('data-page-info'));
+            }
+        }
+    });
+</script>
+}

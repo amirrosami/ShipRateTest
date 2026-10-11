@@ -1,0 +1,107 @@
+﻿@model PagedResult<PersonDto>
+@using ShipRate.Application.DTOs.Base_Info
+@using ShipRate.WebApp.ViewModels
+@using ShipRate.WebApp.ViewModels.Location
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0"><i class="bi bi-box-seam me-2"></i>Oragnizations & Persons</h2>
+        <small class="text-muted"></small>
+    </div>
+    <button class="btn btn-outline-primary"
+            hx-get="@Url.Action("PersonInfo", "ApiIr")"
+            hx-target="#apiIrModalBody"
+            hx-swap="innerHTML"
+            data-bs-toggle="modal"
+            data-bs-target="#apiIrModal">
+        استعلام شخص حقیقی
+    </button>
+    <button type="button"
+            class="btn btn-outline-primary"
+            hx-get="@Url.Action("CompanyInfo", "ApiIr")"
+            hx-target="#apiIrModalBody"
+            hx-swap="innerHTML"
+            data-bs-toggle="modal"
+            data-bs-target="#apiIrModal">
+        <i class="bi bi-building"></i>
+        استعلام شخص حقوقی
+    </button>
+
+    <button type="button"
+            class="btn btn-outline-danger"
+            hx-get="@Url.Action("ChequeInfo", "ApiIr")"
+            hx-target="#apiIrModalBody"
+            hx-swap="innerHTML"
+            data-bs-toggle="modal"
+            data-bs-target="#apiIrModal">
+        <i class="bi bi-bank"></i>
+        استعلام چک برگشتی
+    </button>
+
+
+
+
+    <button type="button"
+            class="btn btn-primary"
+            hx-get="@Url.Action("Create", "Persons")"
+            hx-target="#app-modal-content"
+            hx-swap="innerHTML">
+        <i class="bi bi-plus-lg me-1"></i>New
+    </button>
+</div>
+
+@await Html.PartialAsync(
+"_GridFilters",
+    new GridFilterViewModel
+    {
+        Page = Model.Page,
+        PageSize = Model.PageSize,
+        SearchTerm = Model.SearchTerm,
+        SortColumn = Model.SortColumn,
+        SortDirection = Model.SortDirection,
+        ListUrl = Url.Action("List", "Persons"),
+        CustomFilterPartial = "_CustomFilters",
+        CustomFilterValues = Model.CustomFilterValues,
+    }
+)
+
+
+
+
+<div id="table-container"
+     hx-post="@Url.Action("List", "Persons")"
+     hx-trigger="load, GridChanged from:body"
+     hx-swap="innerHTML"
+     hx-include="#grid-filters, #table-sort-info">
+</div>
+
+
+
+
+
+<div class="modal fade" id="apiIrModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content" id="apiIrModalBody">
+            <div class="modal-body text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <div class="mt-3">Loading...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .htmx-indicator {
+        display: none;
+    }
+
+    .htmx-request .htmx-indicator {
+        display: inline-block;
+    }
+
+    .htmx-request .btn {
+        pointer-events: none;
+        opacity: .8;
+    }
+
+</style>

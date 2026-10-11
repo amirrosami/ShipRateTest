@@ -1,0 +1,270 @@
+﻿@model PagedResult<TerritoryListViewModel>
+@using ShipRate.Application.DTOs.Base_Info
+@using ShipRate.WebApp.ViewModels
+@using ShipRate.WebApp.ViewModels.Location
+@using ShipRate.WebApp.ViewModels.TerritoryVms
+
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0"><i class="bi bi-box-seam me-2"></i>Territories</h2>
+        <small class="text-muted"></small>
+    </div>
+    <button type="button"
+            class="btn btn-primary"
+            hx-get="@Url.Action("CreateTerritory", "Territory")"
+            hx-target="#app-modal-content"
+            hx-swap="innerHTML">
+        <i class="bi bi-plus-lg me-1"></i>New
+    </button>
+</div>
+
+@await Html.PartialAsync(
+"_GridFilters",
+    new GridFilterViewModel
+    {
+        Page = Model.Page,
+        PageSize = Model.PageSize,
+        SearchTerm = Model.SearchTerm,
+        SortColumn = Model.SortColumn,
+        SortDirection = Model.SortDirection,
+        ListUrl = Url.Action("TerritoryGrid", "Territory"),
+        CustomFilterPartial = "",
+        CustomFilterValues = Model.CustomFilterValues,
+    }
+)
+
+
+
+
+<div id="table-container"
+     hx-post="@Url.Action("TerritoryGrid", "Territory")"
+     hx-trigger="load, GridChanged from:body"
+     hx-swap="innerHTML"
+     hx-include="#grid-filters, #table-sort-info">
+</div>
+
+
+
+<div id="detail-container" class="mt-5"
+     hx-get="@Url.Action("CitiesGrid", "Territory")"
+     hx-trigger="DetailChanged from:body"
+     hx-target="#detail-container"
+     hx-swap="innerHTML"
+     hx-include="#detail-container">
+</div>
+
+
+
+
+
+
+
+
+
+
+
+@* @using ShipRate.WebApp.ViewModels.TerritoryVms
+@model TerritorySearchViewModel
+@{
+    ViewData["Title"] = "Territory Management";
+}
+
+<div class="container-fluid py-3">
+
+    <!-- ═══════════ SEARCH PANEL ═══════════ -->
+    <div class="card mb-3 shadow-sm">
+       @*
+        <div class="card-header d-flex justify-content-between align-items-center">
+            
+            <button type="button" class="btn btn-sm btn-outline-secondary"
+                    onclick="clearSearch()">
+                <i class="bi bi-x-lg me-1"></i>Clear
+            </button>
+        </div>
+        
+        <div class="card-body">
+            <form id="searchForm"
+                  hx-get="@Url.Action("TerritoryGrid", "Territory")"
+                  hx-target="#territoryGridContainer"
+                  hx-swap="innerHTML"
+                  hx-trigger="submit">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Territory Name</label>
+                        <input type="text" name="TerritoryName"
+                               id="searchTerritoryName"
+                               class="form-control"
+                               placeholder="Search territory..." />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">City Name</label>
+                        <input type="text" name="CityName"
+                               id="searchCityName"
+                               class="form-control"
+                               placeholder="Search city..." />
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="bi bi-search me-1"></i>Search
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hidden fields for pagination -->
+                <input type="hidden" name="TerritoryPage" id="territoryPage" value="1" />
+                <input type="hidden" name="TerritoryPageSize" value="10" />
+            </form>
+        </div>
+    </div>
+
+    <!-- ═══════════ TERRITORIES GRID ═══════════ -->
+    <div class="card mb-3 shadow-sm">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-globe me-2"></i>Territories</span>
+            <button type="button" class="btn btn-sm btn-success"
+                    hx-get="@Url.Action("CreateTerritory", "Territory")"
+                    hx-target="#appModal .modal-content"
+                    hx-swap="innerHTML">
+                <i class="bi bi-plus-lg me-1"></i>Add Territory
+            </button>
+        </div>
+        <div class="card-body p-0"
+             id="territoryGridContainer"
+             hx-get="@Url.Action("TerritoryGrid", "Territory")"
+             hx-trigger="load, territoryChanged from:body"
+             hx-swap="innerHTML">
+            <!-- گرید مناطق اینجا لود می‌شود -->
+        </div>
+    </div>
+
+    <!-- ═══════════ CITIES GRID ═══════════ -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <span>
+                <i class="bi bi-building me-2"></i>
+                Cities — <strong id="selectedTerritoryLabel">Select a territory above</strong>
+            </span>
+            <button type="button" class="btn btn-sm btn-success"
+                    id="btnAddCity" style="display:none;"
+                    hx-target="#appModal .modal-content"
+                    hx-swap="innerHTML">
+                <i class="bi bi-plus-lg me-1"></i>Add City
+            </button>
+        </div>
+        <div class="card-body p-0"
+             id="citiesGridContainer"
+             hx-trigger="citiesChanged from:body"
+             hx-swap="innerHTML">
+            <div class="text-center text-muted py-4">
+                <i class="bi bi-arrow-up-circle me-1"></i>
+                Select a territory above to view cities.
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        // ═══════════ State ═══════════
+        let currentTerritoryId = null;
+        let currentTerritoryName = null;
+
+        // ═══════════ Select Territory ═══════════
+        function selectTerritory(id, name) {
+            currentTerritoryId = id;
+            currentTerritoryName = name;
+
+            // هایلایت ردیف انتخابی
+            document.querySelectorAll('#territoryGridContainer tr').forEach(tr => {
+                tr.classList.remove('table-primary');
+            });
+            const row = document.getElementById('territory-row-' + id);
+            if (row) row.classList.add('table-primary');
+
+            // به‌روزرسانی عنوان و دکمه Add City
+            document.getElementById('selectedTerritoryLabel').textContent = name;
+            const btnAdd = document.getElementById('btnAddCity');
+            btnAdd.style.display = '';
+            btnAdd.setAttribute('hx-get',
+                '@Url.Action("AddCity", "Territory")?territoryId=' + id + '&territoryName=' + encodeURIComponent(name));
+            htmx.process(btnAdd);
+
+            // بارگذاری شهرها
+            loadCities(1);
+        }
+
+        // ═══════════ Load Cities ═══════════
+        function loadCities(page) {
+            if (!currentTerritoryId) return;
+            const url = '@Url.Action("CitiesGrid", "Territory")'
+                + '?territoryId=' + currentTerritoryId
+                + '&cityPage=' + page
+                + '&cityPageSize=10';
+
+            htmx.ajax('GET', url, { target: '#citiesGridContainer', swap: 'innerHTML' });
+        }
+
+        // ═══════════ Territory Pagination ═══════════
+        function goToTerritoryPage(page) {
+            document.getElementById('territoryPage').value = page;
+            htmx.trigger('#searchForm', 'submit');
+        }
+
+        // ═══════════ City Pagination ═══════════
+        function goToCityPage(page) {
+            loadCities(page);
+        }
+
+        // ═══════════ Clear Search ═══════════
+        function clearSearch() {
+            document.getElementById('searchTerritoryName').value = '';
+            document.getElementById('searchCityName').value = '';
+            document.getElementById('territoryPage').value = '1';
+            htmx.trigger('#searchForm', 'submit');
+        }
+
+        // ═══════════ HTMX Events ═══════════
+
+        // باز کردن Modal وقتی محتوا لود شد
+        document.body.addEventListener('htmx:afterSwap', function (e) {
+            if (e.detail.target.closest('#appModal')) {
+                var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('appModal'));
+                modal.show();
+            }
+        });
+
+        // بستن Modal از سرور
+        document.body.addEventListener('closeModal', function () {
+            var modal = bootstrap.Modal.getInstance(document.getElementById('appModal'));
+            if (modal) modal.hide();
+        });
+
+        // Toast موفقیت
+        document.body.addEventListener('showToast', function () {
+            showAppToast('Operation completed successfully.', 'success');
+        });
+
+        // Toast خطا
+        document.body.addEventListener('showToastError', function (e) {
+            showAppToast(e.detail.value || 'An error occurred.', 'danger');
+        });
+
+        // وقتی شهرها تغییر کرد، دوباره لود کن
+        document.body.addEventListener('citiesChanged', function () {
+            if (currentTerritoryId) {
+                loadCities(1);
+            }
+        });
+
+        // ═══════════ Toast Function ═══════════
+        function showAppToast(message, type) {
+            const toast = document.getElementById('appToast');
+            toast.className = 'toast align-items-center text-bg-' + type + ' border-0';
+            toast.querySelector('.toast-body').textContent = message;
+            var bsToast = bootstrap.Toast.getOrCreateInstance(toast, { delay: 3000 });
+            bsToast.show();
+        }
+    </script>
+} *@

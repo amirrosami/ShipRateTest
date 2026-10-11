@@ -1,0 +1,354 @@
+﻿@using ShipRate.WebApp.ViewModels.ShippingRouteVms
+@model ShippingRoutePageViewModel
+@{
+    ViewData["Title"] = "Shipping Route Management";
+}
+
+<!-- HTMX -->
+@* <script src="https://unpkg.com/htmx.org@1.9.12"></script> *@
+
+
+<style>
+    .grid-section {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 20px;
+        background: #fff;
+    }
+    .grid-section .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #0d6efd;
+    }
+    .grid-section .section-header h5 {
+        margin: 0;
+        color: #0d6efd;
+        font-weight: 600;
+    }
+    .table-hover tbody tr { cursor: pointer; }
+    .selected-row { background-color: #cfe2ff !important; }
+    .badge-active { background-color: #198754; }
+    .badge-inactive { background-color: #dc3545; }
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+    }
+    .empty-state i { font-size: 2rem; margin-bottom: 10px; }
+    .htmx-indicator { display: none; }
+    .htmx-request .htmx-indicator { display: inline-block; }
+    .htmx-request.htmx-indicator { display: inline-block; }
+</style>
+
+<div class="container-fluid" dir="ltr">
+    <h3 class="mb-4">
+        <i class="bi bi-ship"></i> Shipping Route Management
+    </h3>
+
+    <!-- ==================== GRID 1: SHIPPING LINES ==================== -->
+    <div class="grid-section">
+        <div class="section-header">
+            <h5><i class="bi bi-building"></i> Shipping Lines</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover table-bordered mb-0">
+                <thead class="table-primary">
+                    <tr>
+                        <th style="width:60px">#</th>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th style="width:100px" class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Carriers.Any())
+                    {
+                        var idx = 0;
+                        @foreach (var c in Model.Carriers)
+                        {
+                            idx++;
+                            <tr id="carrier-row-@c.CarrierId">
+                                <td>@idx</td>
+                                <td>@c.Code</td>
+                                <td>@c.FullName</td>
+                                <td class="text-center">
+
+                                    <button class="btn btn-outline-primary btn-sm"
+                                            data-id="@c.CarrierId"
+                                            data-name="@c.FullName"
+                                            onclick="selectCarrier(this.dataset.id, this.dataset.name)">
+                                        <i class="bi bi-check2-circle"></i> Select
+                                    </button>
+
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="4" class="empty-state">No shipping lines found.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ==================== GRID 2: SERVICES ==================== -->
+    <div class="grid-section">
+        <div class="section-header">
+            <h5>
+                <i class="bi bi-diagram-3"></i>
+                Shipping Line Services
+                <span id="selectedCarrierName" class="text-muted"></span>
+            </h5>
+
+            <button id="btnAddService"
+                    class="btn btn-sm btn-success"
+                    disabled
+                    hx-get=""
+                    hx-target="#modalBody"
+                    hx-trigger="click">
+                <i class="bi bi-plus-lg"></i> Add Service
+            </button>
+
+
+@*             <button id="btnAddService"
+                    class="btn btn-success btn-sm"
+                    disabled
+                    onclick="openAddService()">
+                <i class="bi bi-plus-circle"></i> Add Service
+            </button>
+ *@
+
+        </div>
+
+        <div id="serviceGrid">
+            <div class="empty-state">
+                Select a Shipping Line to view services.
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== GRID 3: LOOPS ==================== -->
+    <div class="grid-section">
+        <div class="section-header">
+            <h5>
+                <i class="bi bi-arrow-repeat"></i>
+                Loops
+                <span id="selectedServiceName" class="text-muted"></span>
+            </h5>
+
+            <button id="btnAddLoop"
+                    class="btn btn-sm btn-success"
+                    disabled
+                    hx-get=""
+                    hx-target="#modalBody">
+                <i class="bi bi-plus-lg"></i> Add Loop
+            </button>
+        </div>
+
+        <div id="loopGrid">
+            <div class="empty-state">
+                Select a Service to view loops.
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== GRID 4: LOOP PORTS ==================== -->
+    <div class="grid-section">
+        <div class="section-header">
+            <h5>
+                <i class="bi bi-geo"></i>
+                Loop Ports
+                <span id="selectedLoopName" class="text-muted"></span>
+            </h5>
+        </div>
+
+        <div id="loopPortGrid">
+            <div class="empty-state">
+                Select a Loop to view ports.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL ==================== -->
+<div class="modal fade" id="mainModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div id="modalBody"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedCarrierId = null
+    let selectedServiceId = null
+    let selectedLoopId = null
+
+    function selectCarrier(id, name)
+    {
+        selectedCarrierId = id
+        selectedServiceId = null
+        selectedLoopId = null
+
+        document.getElementById("selectedCarrierName").innerText = " - " + name
+        document.getElementById("btnAddService").disabled = false
+
+        document.getElementById("btnAddService")
+            .setAttribute("hx-get","/ShippingRoute/ServiceCreate?carrierId=" + id)
+
+        htmx.ajax("GET","/ShippingRoute/ServiceGrid?carrierId=" + id,"#serviceGrid")
+
+        document.getElementById("loopGrid").innerHTML =
+            '<div class="empty-state">Select a Service to view loops.</div>'
+
+        document.getElementById("loopPortGrid").innerHTML =
+            '<div class="empty-state">Select a Loop to view ports.</div>'
+    }
+
+    function selectService(id,name)
+    {
+        selectedServiceId = id
+        selectedLoopId = null
+
+        document.getElementById("selectedServiceName").innerText = " - " + name
+
+        document.getElementById("btnAddLoop").disabled = false
+        document.getElementById("btnAddLoop")
+            .setAttribute("hx-get","/ShippingRoute/LoopCreate?serviceId=" + id)
+
+        htmx.ajax("GET","/ShippingRoute/LoopGrid?serviceId=" + id,"#loopGrid")
+
+        document.getElementById("loopPortGrid").innerHTML =
+            '<div class="empty-state">Select a Loop to view ports.</div>'
+    }
+
+
+    // function openAddService() {
+    //     if (!selectedCarrierId) {
+    //         alert('Please select a Carrier first.');
+    //         return;
+    //     }
+
+    //     // اول فرم رو لود کن، بعد Modal رو باز کن
+    //     fetch('/ShippingRoute/CreateService?carrierId=' + selectedCarrierId)
+    //         .then(response => response.text())
+    //         .then(html => {
+    //             document.getElementById('modalBody').innerHTML = html;
+    //             new bootstrap.Modal(document.getElementById('mainModal')).show();
+    //         });
+    // }
+
+
+
+
+    function selectLoop(id,name)
+    {
+        selectedLoopId = id
+        document.getElementById("selectedLoopName").innerText = " - " + name
+        htmx.ajax("GET","/ShippingRoute/LoopPortGrid?loopId=" + id,"#loopPortGrid")
+    }
+
+    /* =================== EVENTS =================== */
+
+    document.body.addEventListener("serviceChanged", function() {
+        if(selectedCarrierId)
+            htmx.ajax("GET","/ShippingRoute/ServiceGrid?carrierId="+selectedCarrierId,"#serviceGrid")
+    })
+
+    document.body.addEventListener("loopChanged", function() {
+        if(selectedServiceId)
+            htmx.ajax("GET","/ShippingRoute/LoopGrid?serviceId="+selectedServiceId,"#loopGrid")
+    })
+
+    document.body.addEventListener("loopPortChanged", function() {
+        if(selectedLoopId)
+            htmx.ajax("GET","/ShippingRoute/LoopPortGrid?loopId="+selectedLoopId,"#loopPortGrid")
+    })
+
+    /* =================== MODAL =================== */
+
+    document.body.addEventListener("htmx:afterSwap", function(evt) {
+        if(evt.detail.target.id === "modalBody") {
+            var modal = new bootstrap.Modal(document.getElementById("mainModal"))
+            modal.show()
+        }
+    })
+
+    document.body.addEventListener("htmx:beforeSwap", function(evt) {
+        if(evt.detail.xhr.status === 200 && evt.detail.target.id === "modalBody") {
+            if(evt.detail.xhr.response === "") {
+                bootstrap.Modal.getInstance(document.getElementById("mainModal")).hide()
+                evt.detail.shouldSwap = false
+            }
+        }
+    })
+
+    /* =================== ERROR HANDLING =================== */
+    document.body.addEventListener("htmx:responseError", function(evt) {
+        var xhr = evt.detail.xhr;
+        if (xhr.status === 422) {
+            showAlert(xhr.responseText, "warning");
+        } else if (xhr.status === 404) {
+            showAlert("Record not found. It may have been deleted.", "danger");
+        } else if (xhr.status >= 500) {
+            showAlert("A server error occurred. Please try again.", "danger");
+        }
+    });
+
+    function showAlert(message, type) {
+        var alertDiv = document.createElement("div");
+        alertDiv.className = "alert alert-" + type + " alert-dismissible fade show position-fixed";
+        alertDiv.style.cssText = "top:20px;right:20px;z-index:9999;min-width:350px;max-width:500px;box-shadow:0 4px 12px rgba(0,0,0,0.15)";
+        alertDiv.innerHTML =
+            '<i class="bi bi-exclamation-triangle-fill me-2"></i>' +
+            message +
+            '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        document.body.appendChild(alertDiv);
+
+        setTimeout(function() {
+            if (alertDiv.parentNode) {
+                alertDiv.classList.remove("show");
+                setTimeout(function() { alertDiv.remove(); }, 300);
+            }
+        }, 5000);
+    }
+
+    /* =================== HIGHLIGHT SELECTED ROWS =================== */
+    function highlightRow(tablePrefix, rowId) {
+        document.querySelectorAll("[id^='" + tablePrefix + "-row-']").forEach(function(r) {
+            r.classList.remove("selected-row");
+        });
+        var row = document.getElementById(tablePrefix + "-row-" + rowId);
+        if (row) row.classList.add("selected-row");
+    }
+
+    // Override select functions to add highlighting
+    var _origSelectCarrier = selectCarrier;
+    selectCarrier = function(id, name) {
+        _origSelectCarrier(id, name);
+        highlightRow("carrier", id);
+    };
+
+    var _origSelectService = selectService;
+    selectService = function(id, name) {
+        _origSelectService(id, name);
+        highlightRow("service", id);
+    };
+
+    var _origSelectLoop = selectLoop;
+    selectLoop = function(id, name) {
+        _origSelectLoop(id, name);
+        highlightRow("loop", id);
+    };
+</script>

@@ -1,0 +1,35 @@
+﻿@using ShipRate.Application.DTOs.RouteDTOs
+@model RouteDto
+
+<div class="modal fade show d-block">
+
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Route</h5>
+            </div>
+
+            <div class="modal-body">
+                Delete route <strong>@Model.RouteName</strong> ?
+            </div>
+
+            <div class="modal-footer">
+
+                <button class="btn btn-secondary"
+                        onclick="document.getElementById('modal-container').innerHTML=''">
+                    Cancel
+                </button>
+
+                <button class="btn btn-danger"
+                        hx-post="/Routes/DeleteConfirmed/@Model.RouteId"
+                        hx-target="#modal-container">
+                    Delete
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>

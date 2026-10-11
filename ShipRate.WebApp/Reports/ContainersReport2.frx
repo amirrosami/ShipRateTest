@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="06/12/2026 15:03:47" ReportInfo.Modified="06/12/2026 15:05:03" ReportInfo.CreatorVersion="2026.1.0.0">
+  <Styles Name="Blue">
+    <Style Name="Title" Font="Arial, 12pt, style=Bold"/>
+    <Style Name="Header" Fill.Color="LightSkyBlue" Font="Arial, 10pt, style=Bold"/>
+    <Style Name="Group" Font="Arial, 10pt, style=Bold"/>
+    <Style Name="Data" Font="Arial, 10pt"/>
+    <Style Name="Footer" Fill.Color="LightSkyBlue" Font="Arial, 10pt"/>
+    <Style Name="EvenRows" Fill.Color="AliceBlue" Font="Arial, 10pt"/>
+  </Styles>
+  <Dictionary>
+      <BusinessObjectDataSource Name="vwContainers" DataType="System.Int32" Enabled="true" ReferenceName="vwContainers">
+        <Column Name="Id" DataType="System.Guid"/>
+        <Column Name="ContainerNumber" DataType="System.String"/>
+        <Column Name="ShortName" DataType="System.String"/>
+        <Column Name="ContainerSizeName" DataType="System.String"/>
+        <Column Name="ContainerType" DataType="System.String"/>
+        <Column Name="TareWeight" DataType="System.Int32"/>
+        <Column Name="IsActive" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="Remarks" DataType="System.String"/>
+      </BusinessObjectDataSource>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="1047.06" Height="37.8">
+      <TextObject Name="Text1" Width="1047.06" Height="37.8" Dock="Fill" Text="vwContainers" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold" Style="Title"/>
+    </ReportTitleBand>
+    <GroupHeaderBand Name="GroupHeader1" Top="41.8" Width="1047.06" Height="18.9" Condition="[vwContainers.ShortName]">
+      <TextObject Name="Text16" Width="1047.06" Height="18.9" Dock="Fill" Text="[vwContainers.ShortName]" Font="Arial, 10pt, style=Bold" Style="Group"/>
+      <DataBand Name="Data1" Top="64.7" Width="1047.06" Height="141.75" DataSource="vwContainers">
+        <TextObject Name="Text2" Width="151.2" Height="18.9" Fill.Color="LightSkyBlue" Text="ContainerNumber" Font="Arial, 10pt, style=Bold" Style="Header"/>
+        <TextObject Name="Text3" Left="151.2" Width="897.75" Height="18.9" Text="[vwContainers.ContainerNumber]" Font="Arial, 10pt" Style="Data"/>
+        <TextObject Name="Text4" Top="18.9" Width="151.2" Height="18.9" Fill.Color="LightSkyBlue" Text="ShortName" Font="Arial, 10pt, style=Bold" Style="Header"/>
+        <TextObject Name="Text5" Left="151.2" Top="18.9" Width="897.75" Height="18.9" Text="[vwContainers.ShortName]" Font="Arial, 10pt" Style="Data"/>
+        <TextObject Name="Text6" Top="37.8" Width="151.2" Height="18.9" Fill.Color="LightSkyBlue" Text="ContainerSizeName" Font="Arial, 10pt, style=Bold" Style="Header"/>
+        <TextObject Name="Text7" Left="151.2" Top="37.8" Width="897.75" Height="18.9" Text="[vwContainers.ContainerSizeName]" Font="Arial, 10pt" Style="Data"/>
+        <TextObject Name="Text8" Top="56.7" Width="151.2" Height="18.9" Fill.Color="LightSkyBlue" Text="ContainerType" Font="Arial, 10pt, style=Bold" Style="Header"/>
+        <TextObject Name="Text9" Left="151.2" Top="56.7" Width="897.75" Height="18.9" Text="[vwContainers.ContainerType]" Font="Arial, 10pt" Style="Data"/>
+        <TextObject Name="Text10" Top="75.6" Width="151.2" Height="18.9" Fill.Color="LightSkyBlue" Text="TareWeight" Font="Arial, 10pt, style=Bold" Style="Header"/>
+        <TextObject Name="Text11" Left="151.2" Top="75.6" Width="897.75" Height="18.9" Text="[vwContainers.TareWeight]" Font="Arial, 10pt" Style="Data"/>
+        <TextObject Name="Text12" Top="94.5" Width="151.2" Height="18.9" Fill.Color="LightSkyBlue" Text="IsActive" Font="Arial, 10pt, style=Bold" Style="Header"/>
+        <TextObject Name="Text13" Left="151.2" Top="94.5" Width="897.75" Height="18.9" Text="[vwContainers.IsActive]" Font="Arial, 10pt" Style="Data"/>
+        <TextObject Name="Text14" Top="113.4" Width="151.2" Height="18.9" Fill.Color="LightSkyBlue" Text="Remarks" Font="Arial, 10pt, style=Bold" Style="Header"/>
+        <TextObject Name="Text15" Left="151.2" Top="113.4" Width="897.75" Height="18.9" Text="[vwContainers.Remarks]" Font="Arial, 10pt" Style="Data"/>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="210.45" Width="1047.06" Height="18.9"/>
+    </GroupHeaderBand>
+    <PageFooterBand Name="PageFooter1" Top="233.35" Width="1047.06" Height="18.9">
+      <TextObject Name="Text17" Width="1047.06" Height="18.9" Dock="Fill" Fill.Color="LightSkyBlue" Text="[PageN]" HorzAlign="Right" Font="Arial, 10pt" Style="Footer"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

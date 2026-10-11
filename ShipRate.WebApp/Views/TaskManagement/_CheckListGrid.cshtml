@@ -1,0 +1,87 @@
+﻿@using ShipRate.WebApp.ViewModels.TaskVms
+<!-- Views/TaskManagement/_ChecklistGrid.cshtml -->
+@model List<TaskCheckListTemplateViewModel>
+
+<div class="card-body">
+
+    <div class="d-flex justify-content-between mb-2">
+        <h6>Checklist Templates</h6>
+
+        <button class="btn btn-success btn-sm"
+                hx-get="/TaskManagement/CreateChecklist?taskId=@ViewBag.TaskId"
+                hx-target="#appModal .modal-content"
+                hx-swap="innerHTML"
+                data-bs-toggle="modal"
+                data-bs-target="#appModal">
+            <i class="bi bi-plus-circle"></i> Add
+        </button>
+    </div>
+
+    <table class="table table-sm table-hover">
+
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Mandatory</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @foreach (var c in Model)
+            {
+                <tr>
+
+                    <td>@c.CheckListTitle</td>
+
+                    <td>
+                        @if (c.IsMandatory)
+                        {
+                            <span class="badge bg-danger">Yes</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">No</span>
+                        }
+                    </td>
+
+                    <td>
+
+@*                         <button class="btn btn-sm btn-warning"
+                                hx-get="/TaskManagement/EditChecklist?id=@c.Id"
+                                hx-target="#modalContainer"
+                                hx-swap="innerHTML"
+                                data-bs-toggle="modal"
+                                data-bs-target="#crudModal">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+ *@
+
+
+                        <button class="btn btn-warning btn-sm"
+                                hx-get="/TaskManagement/EditChecklist?checklistId=@c.Id"
+                                hx-target="#appModal .modal-content"
+                                hx-swap="innerHTML"
+                                data-bs-toggle="modal"
+                                data-bs-target="#appModal">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+
+
+                        <button class="btn btn-sm btn-danger"
+                                hx-delete="/TaskManagement/DeleteChecklist?id=@c.Id"
+                                hx-target="#checklistGridContainer"
+                                hx-confirm="Delete item?">
+                            <i class="bi bi-trash"></i>
+                        </button>
+
+                    </td>
+
+                </tr>
+            }
+
+        </tbody>
+    </table>
+
+</div>

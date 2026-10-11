@@ -1,0 +1,23 @@
+﻿@model ShipRate.Application.ViewModels.JobPartyFilterVm
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Job Parties</span>
+
+        <button class="btn btn-sm btn-primary"
+                hx-get="@Url.Action("Create", "JobParty", new { jobId = Model.JobId })"
+                hx-target="#modalContainer"
+                hx-swap="innerHTML">
+            <i class="bi bi-plus-lg"></i>
+            Add New Party
+        </button>
+    </div>
+
+    <div class="card-body p-2"
+         id="jobPartyListWrapper"
+         hx-get="@Url.Action("List", "JobParty", new { jobId = Model.JobId })"
+         hx-trigger="load, jobPartyChanged from:body"
+         hx-target="this"
+         hx-swap="innerHTML">
+    </div>
+</div>

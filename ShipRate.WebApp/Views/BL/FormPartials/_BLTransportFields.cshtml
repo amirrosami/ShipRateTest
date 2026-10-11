@@ -1,0 +1,108 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@using ShipRate.Application.DTOs.BillOfLadings
+@model BLUpsertDto
+
+@{
+    var lookups = ViewBag.Lookups as BLLookupDto;
+}
+
+<h6>Sea Voyages</h6>
+
+<div class="table-responsive mb-3">
+    <table class="table table-sm table-bordered align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Voyage Type</th>
+                <th>Voyage</th>
+                <th>POL</th>
+                <th>POD</th>
+                <th>ETD</th>
+                <th>ETA</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (var i = 0; i < Model.Voyages.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <input type="hidden" asp-for="Voyages[i].Id" />
+
+                        <select asp-for="Voyages[i].VoyageTypeId"
+                                class="form-select form-select-sm"
+                                asp-items="@(new SelectList(lookups?.VoyageTypes ?? Enumerable.Empty<object>(), "Id", "Name", Model.Voyages[i].VoyageTypeId))">
+                            <option value="">Select Type</option>
+                        </select>
+                    </td>
+
+                    <td>
+                        <select asp-for="Voyages[i].VoyageId"
+                                class="form-select form-select-sm"
+                                asp-items="@(new SelectList(lookups?.Voyages ?? Enumerable.Empty<object>(), "Id", "Name", Model.Voyages[i].VoyageId))">
+                            <option value="">Select Voyage</option>
+                        </select>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<h6>Road Trips</h6>
+
+<div class="table-responsive">
+    <table class="table table-sm table-bordered align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Trip</th>
+                <th>From</th>
+                <th>To</th>
+                <th>ETD</th>
+                <th>ETA</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (var i = 0; i < Model.Trips.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <input type="hidden" asp-for="Trips[i].Id" />
+
+                        <select asp-for="Trips[i].TripId"
+                                class="form-select form-select-sm"
+                                asp-items="@(new SelectList(lookups?.Trips ?? Enumerable.Empty<object>(), "Id", "Name", Model.Trips[i].TripId))">
+                            <option value="">Select Trip</option>
+                        </select>
+                    </td>
+
+@*                     <td>
+                        <select asp-for="Trips[i]."
+                                class="form-select form-select-sm"
+                                asp-items="@(new SelectList(lookups?.Locations ?? Enumerable.Empty<object>(), "Id", "Name", Model.Trips[i].FromLocationId))">
+                            <option value="">Select From</option>
+                        </select>
+                    </td>
+
+                    <td>
+                        <select asp-for="Trips[i].ToLocationId"
+                                class="form-select form-select-sm"
+                                asp-items="@(new SelectList(lookups?.Locations ?? Enumerable.Empty<object>(), "Id", "Name", Model.Trips[i].ToLocationId))">
+                            <option value="">Select To</option>
+                        </select>
+                    </td>
+
+                    <td>
+                        <input asp-for="Trips[i].ETD"
+                               type="date"
+                               class="form-control form-control-sm" />
+                    </td>
+
+                    <td>
+                        <input asp-for="Trips[i].ETA"
+                               type="date"
+                               class="form-control form-control-sm" />
+                    </td>
+ *@                </tr>
+            }
+        </tbody>
+    </table>
+</div>

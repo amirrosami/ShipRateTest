@@ -1,0 +1,464 @@
+﻿@using ShipRate.WebApp.ViewModels.Location
+@model LocationCreateEditViewModel
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+}
+
+<style>
+    .location-form-wrapper {
+        direction: ltr;
+        background-color: #f5f7fb;
+        font-family: inherit;
+    }
+
+    .bl-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: #ffffff;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 12px 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 6px 6px 0 0;
+    }
+
+    .bl-topbar-title h1 {
+        font-size: 17px;
+        margin: 0;
+        font-weight: 700;
+        color: #111827;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .bl-card {
+        background: #ffffff;
+        border: 1px solid #d1d9e0;
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
+        margin-bottom: 14px;
+    }
+
+    .bl-card-header {
+        padding: 9px 15px;
+        border-bottom: 1px solid #d1d9e0;
+        background: #fbfdff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+        .bl-card-header h2 {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 0;
+            color: #1f2937;
+            letter-spacing: .2px;
+        }
+
+    .excel-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0;
+        border: 1px solid #d1d9e0;
+        background-color: #d1d9e0;
+    }
+
+    .excel-field {
+        display: flex;
+        align-items: stretch;
+        background-color: #ffffff;
+        border: 0.5px solid #d1d9e0;
+        min-height: 40px;
+    }
+
+    .span-2 {
+        grid-column: span 2;
+    }
+
+    .span-3 {
+        grid-column: span 3;
+    }
+
+    .excel-field label {
+        background-color: #eef6ff;
+        color: #374151;
+        padding: 7px 12px;
+        font-size: 13.5px;
+        font-weight: 600;
+        min-width: 155px;
+        max-width: 155px;
+        border-right: 1px solid #d1d9e0;
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        margin: 0;
+        user-select: none;
+    }
+
+    .excel-field input,
+    .excel-field select,
+    .excel-field textarea {
+        flex: 1;
+        border: none !important;
+        border-radius: 0 !important;
+        background-color: #ffffff;
+        padding: 6px 10px;
+        font-size: 14px;
+        color: #111827;
+        outline: none !important;
+        box-shadow: none !important;
+        width: 100%;
+        min-height: 38px;
+    }
+
+        .excel-field input:focus,
+        .excel-field select:focus,
+        .excel-field textarea:focus {
+            background-color: #fff9c4 !important;
+        }
+
+        .excel-field input.is-invalid,
+        .excel-field select.is-invalid {
+            background-color: #fff1f2 !important;
+            border-bottom: 2px solid #dc3545 !important;
+        }
+
+    /* استایل اختصاصی نتایج اتوکامپلیت والد */
+    .parent-results-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+        max-height: 220px;
+        overflow-y: auto;
+        z-index: 1050;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+        display: none;
+    }
+
+        .parent-results-dropdown .list-group-item {
+            border: none;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
+            padding: 8px 12px;
+            cursor: pointer;
+            color: #334155;
+        }
+
+            .parent-results-dropdown .list-group-item:hover {
+                background-color: #eef6ff;
+                color: #0d6efd;
+            }
+
+    @@media (max-width: 992px) {
+        .excel-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .span-2, .span-3 {
+            grid-column: span 1;
+        }
+    }
+</style>
+
+<div class="location-form-wrapper p-3">
+    <!-- هدر چسبان -->
+    <div class="bl-topbar mb-3">
+        <div class="bl-topbar-title">
+            <h1>
+                <i class="bi @(isCreateMode ? "bi-geo-alt" : "bi-pencil-square") text-primary"></i>
+                <span>@(isCreateMode ? "Add Location" : "Edit Location")</span>
+            </h1>
+        </div>
+        <button type="button" class="btn-close" onclick="AppModal.close()" aria-label="Close"></button>
+    </div>
+
+    <form hx-post="@Url.Action(isCreateMode ? "Create" : "Edit", "Locations")"
+          hx-target="#app-modal-content"
+          hx-swap="innerHTML">
+
+        @if (!isCreateMode)
+        {
+            <input type="hidden" asp-for="Id" />
+        }
+
+        @await Html.PartialAsync("_ModelStateError")
+
+        <!-- ۱. مشخصات عمومی و سلسله‌مراتب (General & Hierarchy) -->
+        <div class="bl-card">
+            <div class="bl-card-header">
+                <h2><i class="bi bi-diagram-3 text-primary me-2"></i>Hierarchy & Classification</h2>
+            </div>
+            <div class="excel-grid">
+                <!-- Location Type -->
+                <div class="excel-field">
+                    <label asp-for="LocationTypeId">Location Type <span class="text-danger ms-1">*</span></label>
+                    <select asp-for="LocationTypeId"
+                            id="LocationTypeId"
+                            asp-items="@Model.LocationTypes"
+                            class="@(ViewData.ModelState.ContainsKey("LocationTypeId") && ViewData.ModelState["LocationTypeId"]!.Errors.Any() ? "is-invalid" : "")">
+                    </select>
+                </div>
+
+                <!-- Country -->
+                <div class="excel-field">
+                    <label asp-for="CountryId">Country <span class="text-danger ms-1">*</span></label>
+                    <select asp-for="CountryId"
+                            id="CountryId"
+                            asp-items="@Model.Countries"
+                            class="@(ViewData.ModelState.ContainsKey("CountryId") && ViewData.ModelState["CountryId"]!.Errors.Any() ? "is-invalid" : "")">
+                    </select>
+                </div>
+
+                <!-- Parent Location Autocomplete -->
+                <div class="excel-field position-relative">
+                    <label>Parent Location</label>
+                    <input type="text"
+                           id="parentLocationSearch"
+                           name="ParentLocationName"
+                           value="@Model.ParentLocationName"
+                           placeholder="Type to search…"
+                           autocomplete="off" />
+                    <input type="hidden" name="ParentLocationId" id="ParentLocationId" value="@Model.ParentLocationId" />
+                    <div id="parentLocationResults" class="parent-results-dropdown"></div>
+                </div>
+
+                <!-- Location Code -->
+                <div class="excel-field">
+                    <label>Location Code <span class="text-danger ms-1">*</span></label>
+                    <input type="text"
+                           name="LocationCode"
+                           value="@Model.LocationCode"
+                           class="@(ViewData.ModelState.ContainsKey("LocationCode") && ViewData.ModelState["LocationCode"]!.Errors.Any() ? "is-invalid" : "")"
+                           placeholder="Code" />
+                </div>
+
+                <!-- Location Name -->
+                <div class="excel-field">
+                    <label>Location Name</label>
+                    <input type="text"
+                           name="LocationName"
+                           value="@Model.LocationName"
+                           class="@(ViewData.ModelState.ContainsKey("LocationName") && ViewData.ModelState["LocationName"]!.Errors.Any() ? "is-invalid" : "")"
+                           placeholder="Standard Name" />
+                </div>
+
+                <!-- Local Name -->
+                <div class="excel-field">
+                    <label>Local Name</label>
+                    <input type="text"
+                           name="LocationLocalName"
+                           value="@Model.LocationLocalName"
+                           class="@(ViewData.ModelState.ContainsKey("LocationLocalName") && ViewData.ModelState["LocationLocalName"]!.Errors.Any() ? "is-invalid" : "")"
+                           placeholder="نام بومی / محلی" />
+                </div>
+            </div>
+        </div>
+
+        <!-- ۲. جزئیات جغرافیایی و اطلاعات تماس (Geographic & Contact Details) -->
+        <div class="bl-card">
+            <div class="bl-card-header">
+                <h2><i class="bi bi-geo text-primary me-2"></i>Address & Geographic Coordinates</h2>
+            </div>
+            <div class="excel-grid">
+                <!-- Address -->
+                <div class="excel-field span-3">
+                    <label>Address</label>
+                    <input type="text"
+                           name="Address"
+                           value="@Model.Address"
+                           class="@(ViewData.ModelState.ContainsKey("Address") && ViewData.ModelState["Address"]!.Errors.Any() ? "is-invalid" : "")"
+                           placeholder="Location full address..." />
+                </div>
+
+                <!-- Email -->
+                <div class="excel-field span-2">
+                    <label asp-for="Email">Email</label>
+                    <input type="email"
+                           asp-for="Email"
+                           class="@(ViewData.ModelState.ContainsKey("Email") && ViewData.ModelState["Email"]!.Errors.Any() ? "is-invalid" : "")"
+                           placeholder="contact@terminal.com" />
+                </div>
+
+                <!-- Phone -->
+                <div class="excel-field">
+                    <label asp-for="Phone">Phone</label>
+                    <input type="text"
+                           asp-for="Phone"
+                           class="@(ViewData.ModelState.ContainsKey("Phone") && ViewData.ModelState["Phone"]!.Errors.Any() ? "is-invalid" : "")"
+                           placeholder="+98..." />
+                </div>
+
+                <!-- Latitude -->
+                <div class="excel-field">
+                    <label asp-for="Latitude">Latitude</label>
+                    <input type="text"
+                           asp-for="Latitude"
+                           class="@(ViewData.ModelState.ContainsKey("Latitude") && ViewData.ModelState["Latitude"]!.Errors.Any() ? "is-invalid" : "")"
+                           placeholder="e.g. 35.6892" />
+                </div>
+
+                <!-- Longitude -->
+                <div class="excel-field span-2">
+                    <label asp-for="Longitude">Longitude</label>
+                    <input type="text"
+                           asp-for="Longitude"
+                           class="@(ViewData.ModelState.ContainsKey("Longitude") && ViewData.ModelState["Longitude"]!.Errors.Any() ? "is-invalid" : "")"
+                           placeholder="e.g. 51.3890" />
+                </div>
+            </div>
+        </div>
+
+        <!-- ۳. تنظیمات ویژه نوع لوکیشن (Type-Specific Details - Conditional) -->
+        <div class="bl-card">
+            <div class="bl-card-header">
+                <h2><i class="bi bi-sliders text-primary me-2"></i>Type Specific Specifications</h2>
+            </div>
+            <div class="excel-grid">
+                <!-- City Type (data-show-if="LocationTypeId = 2") -->
+                <div class="excel-field" data-show-if="LocationTypeId = 2">
+                    <label asp-for="CityTypeId">City Type <span class="text-danger ms-1">*</span></label>
+                    <select asp-for="CityTypeId"
+                            id="CityTypeId"
+                            asp-items="@Model.CityTypes"
+                            class="@(ViewData.ModelState.ContainsKey("CityTypeId") && ViewData.ModelState["CityTypeId"]!.Errors.Any() ? "is-invalid" : "")">
+                    </select>
+                </div>
+
+                <!-- Airport: IATA Code (data-show-if="LocationTypeId = 3") -->
+                <div class="excel-field" data-show-if="LocationTypeId = 3">
+                    <label asp-for="IATACode">IATA Code</label>
+                    <input type="text"
+                           asp-for="IATACode"
+                           class="@(ViewData.ModelState.ContainsKey("IATACode") && ViewData.ModelState["IATACode"]!.Errors.Any() ? "is-invalid" : "")"
+                           placeholder="e.g. IKA" />
+                </div>
+
+                <!-- Airport: ICAO Code (data-show-if="LocationTypeId = 3") -->
+                <div class="excel-field" data-show-if="LocationTypeId = 3">
+                    <label asp-for="ICAOCode">ICAO Code</label>
+                    <input type="text"
+                           asp-for="ICAOCode"
+                           class="@(ViewData.ModelState.ContainsKey("ICAOCode") && ViewData.ModelState["ICAOCode"]!.Errors.Any() ? "is-invalid" : "")"
+                           placeholder="e.g. OIIE" />
+                </div>
+
+                <!-- Border / Country 2 (data-show-if="LocationTypeId = 4") -->
+                <div class="excel-field" data-show-if="LocationTypeId = 4">
+                    <label asp-for="CountryId2">Country 2 <span class="text-danger ms-1">*</span></label>
+                    <select asp-for="CountryId2"
+                            asp-items="@Model.Countries"
+                            class="@(ViewData.ModelState.ContainsKey("CountryId2") && ViewData.ModelState["CountryId2"]!.Errors.Any() ? "is-invalid" : "")">
+                    </select>
+                </div>
+
+                <!-- Terminal Type (data-show-if="LocationTypeId = 6") -->
+                <div class="excel-field" data-show-if="LocationTypeId = 6">
+                    <label asp-for="TerminalTypeId">Terminal Type <span class="text-danger ms-1">*</span></label>
+                    <select asp-for="TerminalTypeId"
+                            asp-items="@Model.TerminalTypes"
+                            class="@(ViewData.ModelState.ContainsKey("TerminalTypeId") && ViewData.ModelState["TerminalTypeId"]!.Errors.Any() ? "is-invalid" : "")">
+                    </select>
+                </div>
+
+                <!-- Depot Type (data-show-if="LocationTypeId = 7") -->
+                <div class="excel-field" data-show-if="LocationTypeId = 7">
+                    <label asp-for="DepotTypeId">Depot Type <span class="text-danger ms-1">*</span></label>
+                    <select asp-for="DepotTypeId"
+                            asp-items="@Model.DepotTypes"
+                            class="@(ViewData.ModelState.ContainsKey("DepotTypeId") && ViewData.ModelState["DepotTypeId"]!.Errors.Any() ? "is-invalid" : "")">
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- فوتر دکمه‌ها -->
+        <div class="d-flex justify-content-end gap-2 pt-3 border-top mt-3">
+            <button type="button" class="btn btn-light border px-3 py-1 fw-semibold" style="font-size: .88rem;" onclick="AppModal.close()">Cancel</button>
+            <button type="submit" class="btn btn-primary px-3 py-1 fw-semibold shadow-sm" style="font-size: .88rem;">
+                <i class="bi bi-check-lg me-1"></i> @(isCreateMode ? "Save Location" : "Update Location")
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    (function () {
+        const input = document.getElementById('parentLocationSearch');
+        const hidden = document.getElementById('ParentLocationId');
+        const cityTypeId = document.getElementById('CityTypeId');
+        const countryId = document.getElementById('CountryId');
+        const locationTypeId = document.getElementById('LocationTypeId');
+        const results = document.getElementById('parentLocationResults');
+        let debounce;
+
+        function resetParent() {
+            if (hidden) hidden.value = '';
+            if (input) input.value = '';
+        }
+
+        if (locationTypeId) locationTypeId.addEventListener('change', resetParent);
+        if (cityTypeId) cityTypeId.addEventListener('change', resetParent);
+        if (countryId) countryId.addEventListener('change', resetParent);
+
+        if (input) {
+            input.addEventListener('input', function () {
+                clearTimeout(debounce);
+                const term = this.value.trim();
+                if (term.length < 2) {
+                    results.style.display = 'none';
+                    return;
+                }
+                debounce = setTimeout(() => {
+                    const lType = locationTypeId ? encodeURIComponent(locationTypeId.value) : '';
+                    const cId = countryId ? encodeURIComponent(countryId.value) : '';
+                    const cType = cityTypeId ? encodeURIComponent(cityTypeId.value) : '';
+
+                    fetch(`/Locations/SearchParentLocations?term=${encodeURIComponent(term)}&locationTypeId=${lType}&country=${cId}&cityType=${cType}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            results.innerHTML = '';
+                            if (!data || data.length === 0) {
+                                results.style.display = 'none';
+                                return;
+                            }
+                            data.forEach(p => {
+                                const a = document.createElement('a');
+                                a.href = '#';
+                                a.className = 'list-group-item list-group-item-action';
+                                a.textContent = p.locationName;
+                                a.addEventListener('click', function (e) {
+                                    e.preventDefault();
+                                    input.value = p.locationName;
+                                    hidden.value = p.id;
+                                    results.style.display = 'none';
+                                });
+                                results.appendChild(a);
+                            });
+                            results.style.display = 'block';
+                        })
+                        .catch(() => {
+                            results.style.display = 'none';
+                        });
+                }, 300);
+            });
+        }
+
+        document.addEventListener('click', function (e) {
+            if (results && !results.contains(e.target) && e.target !== input) {
+                results.style.display = 'none';
+            }
+        });
+    })();
+</script>

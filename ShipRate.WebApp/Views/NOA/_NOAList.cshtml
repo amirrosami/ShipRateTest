@@ -1,0 +1,155 @@
+﻿@using ShipRate.Application.DTOs
+@model PagedResultDto<NOAListDto>
+
+@{
+    // محاسبه شماره ردیف شروع بر اساس صفحه فعلی
+    int rowIndex = ((Model.PageNumber - 1) * Model.PageSize) + 1;
+}
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between">
+        <span class="fw-bold">List Of NOA</span>
+        <span class="text-muted">Total: @Model.TotalCount</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle mb-0 table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 50px;" class="text-center">#</th>
+                    <th>Company</th>
+                    <th>Type</th>
+                    <th>NOA Number</th>
+                    <th>BL</th>
+                    <th>Master BL</th>
+                    <th>Vessel / Voyage</th>
+                    <th>Issue Date</th>
+                    <th>Pickup</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.Items)
+                {
+                    <tr>
+                        <td class="text-center text-muted fw-semibold">@(rowIndex++)</td>
+                        <td>@row.CompanyName</td>
+                        <td>@row.InOutName</td>
+                        <td class="fw-semibold">@row.NOANumber</td>
+                        <td>@row.BLNumber</td>
+                        <td>@row.MasterBLNumber</td>
+                        <td>@row.VesselName / @row.VoyageNo</td>
+                        <td>@row.IssuedDate?.ToString("yyyy-MM-dd")</td>
+                        <td>@row.AvailableForPickupDate?.ToString("yyyy-MM-dd")</td>
+                        <td class="text-nowrap text-center">
+                            <a class="btn btn-sm btn-outline-primary @(row.InOutId == 2 ? "" : "disabled")"
+                               target="_blank"
+                               href="@Url.Action("Print", new { id = row.Id })" title="Print">
+                                <i class="bi bi-printer"></i>
+                            </a>
+                            <button class="btn btn-sm btn-outline-secondary" title="Edit"
+                                    hx-get="@Url.Action("Form", new { id = row.Id })"
+                                    hx-target="#noaModalBody"
+                                    hx-swap="innerHTML"
+                                    hx-on::after-request="showNoaModal()">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" title="Delete"
+                                    hx-post="@Url.Action("Delete", new { id = row.Id })"
+                                    hx-include="closest form"
+                                    hx-target="#noa-grid"
+                                    hx-confirm="Delete this NOA?">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-info" title="Send/History"
+                                    hx-get="@Url.Action("SendHistory", new { id = row.Id })"
+                                    hx-target="#sendModalBody"
+                                    hx-on::after-request="showSendModal()">
+                                <i class="bi bi-envelope-check"></i>
+                            </button>
+@*                             <a class="btn btn-sm btn-outline-dark" title="History"
+                               hx-get="@Url.Action("SendHistory", new { id = row.Id })"
+                               hx-target="#sendModalBody"
+                               hx-on::after-request="showSendModal()">
+                                <i class="bi bi-clock-history"></i>
+                            </a>
+ *@                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    int maxPagesToShow = 5;
+    int startPage = Math.Max(1, Model.PageNumber - (maxPagesToShow / 2));
+    int endPage = Math.Min(Model.TotalPages, startPage + maxPagesToShow - 1);
+
+    if (endPage - startPage + 1 < maxPagesToShow)
+    {
+        startPage = Math.Max(1, endPage - maxPagesToShow + 1);
+    }
+
+    <ul class="pagination pagination-sm mt-2 justify-content-center mb-0">
+        <!-- دکمه رفتن به اولین صفحه -->
+        <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+            <button class="page-link" type="button"
+                    hx-get="@Url.Action("Grid", new { page = 1, pageSize = Model.PageSize })"
+                    hx-target="#noa-grid" hx-swap="innerHTML">
+                &laquo;&laquo;
+            </button>
+        </li>
+
+        <!-- دکمه صفحه قبلی -->
+        <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+            <button class="page-link" type="button"
+                    hx-get="@Url.Action("Grid", new { page = Model.PageNumber - 1, pageSize = Model.PageSize })"
+                    hx-target="#noa-grid" hx-swap="innerHTML">
+                &laquo;
+            </button>
+        </li>
+
+        <!-- نمایش سه‌نقطه قبل از بازه صفحات -->
+        @if (startPage > 1)
+        {
+            <li class="page-item disabled"><span class="page-link">...</span></li>
+        }
+
+        <!-- لیست محدود صفحات -->
+        @for (int i = startPage; i <= endPage; i++)
+        {
+            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                <button class="page-link" type="button"
+                        hx-get="@Url.Action("Grid", new { page = i, pageSize = Model.PageSize })"
+                        hx-target="#noa-grid" hx-swap="innerHTML">
+                    @i
+                </button>
+            </li>
+        }
+
+        <!-- نمایش سه‌نقطه بعد از بازه صفحات -->
+        @if (endPage < Model.TotalPages)
+        {
+            <li class="page-item disabled"><span class="page-link">...</span></li>
+        }
+
+        <!-- دکمه صفحه بعدی -->
+        <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+            <button class="page-link" type="button"
+                    hx-get="@Url.Action("Grid", new { page = Model.PageNumber + 1, pageSize = Model.PageSize })"
+                    hx-target="#noa-grid" hx-swap="innerHTML">
+                &raquo;
+            </button>
+        </li>
+
+        <!-- دکمه رفتن به آخرین صفحه -->
+        <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+            <button class="page-link" type="button"
+                    hx-get="@Url.Action("Grid", new { page = Model.TotalPages, pageSize = Model.PageSize })"
+                    hx-target="#noa-grid" hx-swap="innerHTML">
+                &raquo;&raquo;
+            </button>
+        </li>
+    </ul>
+}

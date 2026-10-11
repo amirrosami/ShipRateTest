@@ -1,0 +1,74 @@
+﻿@using ShipRate.WebApp.ViewModels.CustomersVms
+@model LostReasonListViewModel
+
+@if (Model.Reasons != null && Model.Reasons.Any())
+{
+    <table class="lr-table"
+           hx-trigger="reasonChanged from:body"
+           hx-get="/LostReasons/ReasonGrid?categoryId=@Model.CategoryId"
+           hx-target="#reason-grid"
+           hx-swap="innerHTML">
+        <thead>
+            <tr>
+                <th style="width:40px">#</th>
+                <th>Reason Name</th>
+                <th>Local Name</th>
+                <th style="width:70px">Status</th>
+                <th style="width:100px" class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var idx = 0;
+            }
+            @foreach (var reason in Model.Reasons)
+            {
+                idx++;
+                <tr>
+                    <td class="row-num">@idx</td>
+                    <td class="fw-600">@reason.LostReasonName</td>
+                    <td>@reason.LostReasonLocalName</td>
+                    <td>
+                        @if (reason.IsActive)
+                        {
+                            <span class="lr-badge lr-badge-active">Active</span>
+                        }
+                        else
+                        {
+                            <span class="lr-badge lr-badge-inactive">Inactive</span>
+                        }
+                    </td>
+                    <td class="text-center actions-cell">
+                        <button class="lr-action-btn edit"
+                                hx-get="/LostReasons/EditReason/@reason.Id"
+                                hx-target="#modal-body"
+                                hx-swap="innerHTML"
+                                onclick="document.getElementById('lr-modal').classList.add('active')">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button class="lr-action-btn delete"
+                                hx-delete="/LostReasons/DeleteReason/@reason.Id"
+                                hx-confirm="Delete this reason?"
+                                hx-swap="none">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (Model.CategoryId > 0)
+{
+    <div class="lr-empty-state">
+        <i class="fas fa-clipboard-list"></i>
+        <p>No reasons in this category. Click "New" to add one.</p>
+    </div>
+}
+else
+{
+    <div class="lr-empty-state">
+        <i class="fas fa-arrow-left"></i>
+        <p>Select a category to view its reasons</p>
+    </div>
+}

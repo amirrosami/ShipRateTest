@@ -1,0 +1,65 @@
+﻿@using ShipRate.Application.DTOs
+@model PagedResultDto<VoyagePortLookupDto>
+
+@{
+    var targetPrefix = ViewBag.TargetPrefix?.ToString() ?? "tip-voyageport";
+}
+
+<div class="modal fade"
+     tabindex="-1"
+     role="dialog"
+     id="voyagePortLookupModal"
+     aria-hidden="true"
+     data-bs-backdrop="false">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Lookup Voyage / Vessel / Port</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <form class="row g-2 mb-3"
+                      hx-get="@Url.Action("LookupVoyagePortResults", "TIP")"
+                      hx-target="#voyage-port-lookup-results"
+                      hx-swap="innerHTML"
+                      hx-trigger="submit">
+
+                    <input type="hidden" name="targetPrefix" value="@targetPrefix" />
+
+                    <div class="col-md-3">
+                        <label class="form-label">Voyage No</label>
+                        <input type="text" name="VoyageNo" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Vessel Name</label>
+                        <input type="text" name="VesselName" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Port</label>
+                        <input type="text" name="Port" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            Search
+                        </button>
+                    </div>
+                </form>
+
+                <div id="voyage-port-lookup-results">
+                    @await Html.PartialAsync("_VoyagePortLookupResults", Model)
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

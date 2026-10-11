@@ -1,0 +1,168 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.Finance
+@model PagedResultDto<SettlementListItemDto>
+
+<style>
+    /* تنظیمات اختصاصی گرید */
+    .settlements-grid {
+        font-size: 0.875rem;
+    }
+
+        .settlements-grid .table > :not(caption) > * > * {
+            padding-top: 0.35rem;
+            padding-bottom: 0.35rem;
+        }
+
+        .settlements-grid .badge {
+            font-size: 0.75em;
+            padding: 0.35em 0.55em;
+        }
+
+        .settlements-grid .btn.btn-sm {
+            --bs-btn-padding-y: 0.2rem;
+            --bs-btn-padding-x: 0.4rem;
+            --bs-btn-font-size: 0.8rem;
+        }
+
+        /* فعال‌سازی همیشگی اسکرول افقی (در تمام صفحات) */
+        .settlements-grid .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .settlements-grid table {
+            min-width: 1400px; /* می‌توانید این عدد را بر اساس نیاز کمتر یا بیشتر کنید */
+            width: 100%;
+        }
+
+        .settlements-grid th,
+        .settlements-grid td {
+            white-space: nowrap; /* جلوگیری از شکست خطوط */
+        }
+</style>
+
+<div class="card shadow-sm settlements-grid">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped table-sm mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 50px;" class="text-center">#</th>
+                        <th>Settlement No</th>
+                        <th>Date</th>
+                        <th>Company</th>
+                        <th>Party</th>
+                        <th>Currency</th>
+                        <th class="text-end">Settlement Amount</th>
+                        <th class="text-end">Allocated Amount</th>
+                        <th>Status</th>
+                        <th>Create Date</th>
+                        <th>Create User</th>
+                        <th>Remarks</th>
+                        <th style="width: 140px;" class="text-center">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (!Model.Items.Any())
+                    {
+                        <tr>
+                            <td colspan="13" class="text-center text-muted py-4">
+                                No records found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        var rowNumber = ((Model.PageNumber - 1) * Model.PageSize) + 1;
+
+                        foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td class="text-center text-muted fw-semibold">@rowNumber</td>
+                                <td>
+                                    <span class="fw-semibold">@item.SettlementNo</span>
+                                </td>
+                                <td>@item.SettlementDate.ToString("yyyy-MM-dd")</td>
+                                <td>@item.CompanyName</td>
+                                <td>@item.PartyName</td>
+                                <td>@item.CurrencyName</td>
+                                <td class="text-end fw-semibold">@item.TotalSettlementAmount.ToString("N2")</td>
+                                <td class="text-end fw-semibold text-success">@item.TotalAllocatedAmount.ToString("N2")</td>
+                                <td>
+                                    @if (item.StatusId == 2)
+                                    {
+                                        <span class="badge bg-success">Approved</span>
+                                    }
+                                    else if (item.StatusId == 10)
+                                    {
+                                        <span class="badge bg-danger">Canceled</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">@item.StatusName</span>
+                                    }
+                                </td>
+                                <td>@item.CreateDate.ToString("yyyy-MM-dd")</td>
+                                <td>@item.CreateUserName</td>
+                                <td>@item.Remarks</td>
+                                <td class="text-center">
+                                    <div class="d-inline-flex gap-1 align-items-center">
+                                        <a class="btn btn-sm btn-outline-dark"
+                                           title="Print Settlement Receipt"
+                                           href="@Url.Action("PrintReceipt", "Settlements", new { id = item.Id })"
+                                           target="_blank">
+                                            <i class="bi bi-printer"></i>
+                                        </a>
+
+                                        <a asp-action="PrintView"
+                                           asp-route-id="@item.Id"
+                                           target="_blank"
+                                           class="btn btn-sm btn-outline-secondary"
+                                           title="مشاهده رسید">
+                                            <i class="bi bi-file-earmark-text"></i>
+                                        </a>
+                                        @if (item.StatusId == 1)
+                                        {
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-primary"
+                                                    title="Edit"
+                                                    hx-get="@Url.Action("Edit", "Settlements", new { id = item.Id })"
+                                                    hx-target="#mainModalBody"
+                                                    hx-swap="innerHTML"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#mainModal">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    title="Delete"
+                                                    hx-confirm="Are you sure you want to delete this settlement?"
+                                                    hx-get="@Url.Action("Delete", "Settlements", new { id = item.Id })">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-success"
+                                                    title="Approve"
+                                                    hx-post="@Url.Action("Approve", "Settlements", new { id = item.Id })"
+                                                    hx-confirm="Are you sure you want to approve this settlement?"
+                                                    hx-target="closest tr"
+                                                    hx-swap="outerHTML">
+                                                <i class="bi bi-check2-circle"></i>
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                            rowNumber++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card-footer">
+        @await Html.PartialAsync("_Pager", Model)
+    </div>
+</div>

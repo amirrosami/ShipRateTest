@@ -1,0 +1,125 @@
+﻿@using Microsoft.Extensions.Localization
+@using ShipRate.Application.ViewModels
+@using System.Globalization
+@using ShipRate.WebAppCustomers
+@model PaymentDocumentSearchVm
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isFa = culture == "fa";
+    var lang = isFa ? "fa" : "en";
+    var dir = isFa ? "rtl" : "ltr";
+}
+<form id="paymentDocumentSearchForm" class="row g-3" dir="@dir">
+    <input type="hidden" asp-for="Page" />
+    <input type="hidden" asp-for="PageSize" />
+
+    <div class="col-md-2">
+        <label asp-for="CompanyId" class="form-label">@(isFa ? "شرکت" : "Company")</label>
+        <select asp-for="CompanyId"
+                asp-items="Model.Companies"
+                class="form-select"
+                hx-get="@Url.Action("List", "PaymentDocuments")"
+                hx-trigger="change"
+                hx-target="#payment-document-list"
+                hx-include="#paymentDocumentSearchForm"
+                hx-swap="innerHTML">
+            <option value="">@(isFa ? "انتخاب" : "Select")</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <label asp-for="CurrencyId" class="form-label">@(isFa ? "ارز" : "Currency")</label>
+        <select asp-for="CurrencyId"
+                asp-items="Model.Currencies"
+                class="form-select"
+                hx-get="@Url.Action("List", "PaymentDocuments")"
+                hx-trigger="change"
+                hx-target="#payment-document-list"
+                hx-include="#paymentDocumentSearchForm"
+                hx-swap="innerHTML">
+            <option value="">@(isFa ? "انتخاب" : "Select")</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <label asp-for="DocumentNumber" class="form-label">@(isFa ? "شماره سند" : "Document No")</label>
+        <input asp-for="DocumentNumber"
+               class="form-control"
+               hx-get="@Url.Action("List", "PaymentDocuments")"
+               hx-trigger="keyup changed delay:500ms"
+               hx-target="#payment-document-list"
+               hx-include="#paymentDocumentSearchForm"
+               hx-swap="innerHTML" />
+    </div>
+
+    <div class="col-md-2">
+        <label asp-for="PaymentMethodId" class="form-label">@(isFa ? "روش پرداخت" : "Payment Method")</label>
+        <select asp-for="PaymentMethodId"
+                asp-items="Model.PaymentMethods"
+                class="form-select"
+                hx-get="@Url.Action("List", "PaymentDocuments")"
+                hx-trigger="change"
+                hx-target="#payment-document-list"
+                hx-include="#paymentDocumentSearchForm"
+                hx-swap="innerHTML">
+            <option value="">@(isFa ? "انتخاب روش" : "Select Method")</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <label asp-for="ChequePurposeId" class="form-label">@(isFa ? "بابت" : "Cheque Purpose")</label>
+        <select asp-for="ChequePurposeId"
+                asp-items="Model.ChequePurposes"
+                class="form-select"
+                hx-get="@Url.Action("List", "PaymentDocuments")"
+                hx-trigger="change"
+                hx-target="#payment-document-list"
+                hx-include="#paymentDocumentSearchForm"
+                hx-swap="innerHTML">
+            <option value="">@(isFa ? "انتخاب بابت" : "Select Purpose")</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <label asp-for="FromDateShamsi" class="form-label">@(isFa ? "از تاریخ" : "From Date")</label>
+        <input asp-for="FromDateShamsi"
+               class="form-control"
+               placeholder="yyyy/MM/dd"
+               hx-get="@Url.Action("List", "PaymentDocuments")"
+               hx-trigger="change"
+               hx-target="#payment-document-list"
+               hx-include="#paymentDocumentSearchForm"
+               hx-swap="innerHTML" />
+    </div>
+
+    <div class="col-md-2">
+        <label asp-for="ToDateShamsi" class="form-label">@(isFa ? "تا تاریخ" : "To Date")</label>
+        <input asp-for="ToDateShamsi"
+               class="form-control"
+               placeholder="yyyy/MM/dd"
+               hx-get="@Url.Action("List", "PaymentDocuments")"
+               hx-trigger="change"
+               hx-target="#payment-document-list"
+               hx-include="#paymentDocumentSearchForm"
+               hx-swap="innerHTML" />
+    </div>
+
+    <div class="col-1 d-flex gap-2 align-items-end">
+        <button type="button"
+                class="btn btn-primary"
+                hx-get="@Url.Action("List", "PaymentDocuments")"
+                hx-target="#payment-document-list"
+                hx-include="#paymentDocumentSearchForm"
+                hx-swap="innerHTML">
+            @(isFa ? "جستجو" : "Search")
+        </button>
+
+        <button type="button"
+                class="btn btn-outline-secondary"
+                onclick="document.getElementById('paymentDocumentSearchForm').reset(); htmx.ajax('GET', '@Url.Action("List", "PaymentDocuments")', { target:'#payment-document-list', swap:'innerHTML', values:{ page:1, pageSize:@Model.PageSize } });">
+            @(isFa ? "بازنشانی" : "Reset")
+        </button>
+    </div>
+</form>

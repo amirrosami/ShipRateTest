@@ -1,0 +1,125 @@
+﻿@using ShipRate.Application.DTOs
+@model VoyageMonitoringRowDto
+<div class="offcanvas-header">
+    <h5 class="offcanvas-title">
+        Voyage Actions
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+</div>
+
+<div class="offcanvas-body">
+    <div class="mb-3">
+        <div><strong>Vessel:</strong> @Model.VesselName</div>
+        <div><strong>Voyage In:</strong> @Model.VoyageNoIn</div>
+        <div><strong>Voyage Out:</strong> @Model.VoyageNoOut</div>
+        <div><strong>Port:</strong> @Model.PortName</div>
+        <div><strong>Terminal:</strong> @Model.TerminalName</div>
+        <div><strong>Stage:</strong> @Model.CurrentStage</div>
+    </div>
+    <div class="list-group">
+        <a class="list-group-item list-group-item-action"
+           href="#"
+           hx-post="@Url.Action("ExecuteAction", "VoyageManagement")"
+           hx-vals='{"VoyagePortId":"@Model.VoyagePortId","ActionCode":"GENERATE_COPARN"}'
+           hx-swap="none"
+           hx-on::after-request="
+                htmx.trigger('#voyage-search-form', 'submit');
+                bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('voyageActionOffcanvas')).hide();
+           ">
+            Generate Import Coparn
+        </a>
+        <a class="list-group-item list-group-item-action"
+           href="#"
+           hx-post="@Url.Action("ExecuteAction", "VoyageManagement")"
+           hx-vals='{"VoyagePortId":"@Model.VoyagePortId","ActionCode":"GENERATE_EPL"}'
+           hx-swap="none"
+           hx-on::after-request="
+                htmx.trigger('#voyage-search-form', 'submit');
+                bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('voyageActionOffcanvas')).hide();
+           ">
+            Generate Import EPL
+        </a>
+        <a class="list-group-item list-group-item-action"
+           href="#"
+           hx-post="@Url.Action("ExecuteAction", "VoyageManagement")"
+           hx-vals='{"VoyagePortId":"@Model.VoyagePortId","ActionCode":"GENERATE_TCTS"}'
+           hx-swap="none"
+           hx-on::after-request="
+                htmx.trigger('#voyage-search-form', 'submit');
+                bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('voyageActionOffcanvas')).hide();
+           ">
+            Generate Export TCTS File
+        </a>
+    </div>
+    <div class="list-group">
+        <a class="list-group-item list-group-item-action"
+           href="javascript:void(0)"
+           hx-get="@Url.Action("Timeline", "VoyageManagement", new { voyagePortId = Model.VoyagePortId })"
+           hx-target="#voyage-modal-container"
+           hx-swap="innerHTML"
+           hx-on:click="bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('voyageActionOffcanvas')).hide();"
+           hx-on::after-request="setTimeout(function(){ bootstrap.Modal.getOrCreateInstance(document.getElementById('voyageTimelineModal')).show(); }, 150);">
+            View Timeline
+        </a>
+
+@*         <a class="list-group-item list-group-item-action"
+           href="#"
+           hx-post="@Url.Action("ExecuteAction", "VoyageManagement")"
+           hx-vals='{"VoyagePortId":"@Model.VoyagePortId","ActionCode":"REGISTER_ARRIVAL"}'
+           hx-swap="none"
+           hx-on::after-request="
+                htmx.trigger('#voyage-search-form', 'submit');
+                bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('voyageActionOffcanvas')).hide();
+           ">
+            Register Arrival
+        </a>
+
+        <a class="list-group-item list-group-item-action"
+           href="#"
+           hx-post="@Url.Action("ExecuteAction", "VoyageManagement")"
+           hx-vals='{"VoyagePortId":"@Model.VoyagePortId","ActionCode":"REGISTER_BERTHING"}'
+           hx-swap="none"
+           hx-on::after-request="
+                htmx.trigger('#voyage-search-form', 'submit');
+                bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('voyageActionOffcanvas')).hide();
+           ">
+            Register Berthing
+        </a>
+
+        <a class="list-group-item list-group-item-action"
+           href="#"
+           hx-post="@Url.Action("ExecuteAction", "VoyageManagement")"
+           hx-vals='{"VoyagePortId":"@Model.VoyagePortId","ActionCode":"REGISTER_OPS_COMMENCED"}'
+           hx-swap="none"
+           hx-on::after-request="
+                htmx.trigger('#voyage-search-form', 'submit');
+                bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('voyageActionOffcanvas')).hide();
+           ">
+            Operations Commenced
+        </a>
+
+        <a class="list-group-item list-group-item-action"
+           href="#"
+           hx-post="@Url.Action("ExecuteAction", "VoyageManagement")"
+           hx-vals='{"VoyagePortId":"@Model.VoyagePortId","ActionCode":"REGISTER_OPS_COMPLETED"}'
+           hx-swap="none"
+           hx-on::after-request="
+                htmx.trigger('#voyage-search-form', 'submit');
+                bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('voyageActionOffcanvas')).hide();
+           ">
+            Operations Completed
+        </a>
+
+        <a class="list-group-item list-group-item-action"
+           href="#"
+           hx-post="@Url.Action("ExecuteAction", "VoyageManagement")"
+           hx-vals='{"VoyagePortId":"@Model.VoyagePortId","ActionCode":"MARK_COMPLETED"}'
+           hx-swap="none"
+           hx-on::after-request="
+                htmx.trigger('#voyage-search-form', 'submit');
+                bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('voyageActionOffcanvas')).hide();
+           ">
+            Mark Voyage Completed
+        </a>
+ *@    </div>
+</div>

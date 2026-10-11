@@ -1,0 +1,33 @@
+﻿@using ShipRate.Application.ViewModels
+@model IReadOnlyList<FlightLookupItemVm>
+
+@if (Model.Count == 0)
+{
+    <div class="text-muted small">
+        No flights found.
+    </div>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var flight in Model)
+        {
+            <button type="button"
+                    class="list-group-item list-group-item-action btn-choose-flight"
+                    data-flight-id="@flight.Id"
+                    data-airline-id="@flight.AirlineId"
+                    data-airline-name="@flight.AirlineName"
+                    data-flight-no="@flight.FlightNo"
+                    data-display-text="@flight.DisplayText">
+
+                <div class="fw-semibold">
+                    @flight.AirlineName — @flight.FlightNo
+                </div>
+
+                <div class="small text-muted">
+                    @flight.OriginAirportName → @flight.DestinationAirportName
+                </div>
+            </button>
+        }
+    </div>
+}

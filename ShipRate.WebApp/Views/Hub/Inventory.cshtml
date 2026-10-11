@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["Title"] = "Inventory Hub";
+}
+
+<div class="container-fluid py-3">
+    <div class="hub-page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="fw-bold mb-1"><i class="bi bi-boxes text-primary me-2"></i>Inventory & Stock Control</h5>
+            <span class="text-muted small">Warehouse items, product classifications, material requisitions, and stock transactions</span>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <auth-policy policy="Inventory.Inventories.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Inventory" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-building"></i></div>
+                    <div>
+                        <div class="hub-title">Inventories</div>
+                        <p class="hub-desc">Manage warehouse locations, physical bins, and storekeeper assignments.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Inventory.Products.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Products" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-box"></i></div>
+                    <div>
+                        <div class="hub-title">Products</div>
+                        <p class="hub-desc">Item master records, serial numbers, barcodes, and minimum stock alerts.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Inventory.ProductCategories.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="ProductCategory" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-folder2-open"></i></div>
+                    <div>
+                        <div class="hub-title">Product Category</div>
+                        <p class="hub-desc">Hierarchical structure for spare parts, office supplies, and equipment.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Inventory.ProductStockTransactions.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="ProductStockTransactions" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-arrow-left-right"></i></div>
+                    <div>
+                        <div class="hub-title">Inventory Transactions</div>
+                        <p class="hub-desc">Issue goods receipts, outbound delivery notes, and inventory adjustments.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Inventory.ProductRequests.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="ProductRequests" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-cart-check"></i></div>
+                    <div>
+                        <div class="hub-title">Requests Management</div>
+                        <p class="hub-desc">Internal requisitions, approvals, and stock fulfillment vouchers.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+    </div>
+</div>

@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="2026-09-26" ReportInfo.Modified="09/26/2026 16:25:55" ReportInfo.CreatorVersion="2026.1.0.0">
+  <Dictionary>
+    <TableDataSource Name="TipUsage" ReferenceName="TipUsage" DataType="System.Int32" Enabled="true">
+      <Column Name="BLNo" DataType="System.String"/>
+      <Column Name="CustomerName" DataType="System.String"/>
+      <Column Name="TIPNo" DataType="System.String"/>
+      <Column Name="LetterNo" DataType="System.String"/>
+      <Column Name="LetterLocalDate" DataType="System.String"/>
+      <Column Name="VesselName" DataType="System.String"/>
+      <Column Name="VoyageNo" DataType="System.String"/>
+      <Column Name="CustomsOfficeName" DataType="System.String"/>
+      <Column Name="F20PlusF40" DataType="System.Int32"/>
+    </TableDataSource>
+    <TableDataSource Name="Containers" ReferenceName="Containers" DataType="System.Int32" Enabled="true">
+      <Column Name="RowNo" DataType="System.Int32"/>
+      <Column Name="ContainerNumber" DataType="System.String"/>
+      <Column Name="SizeTypeShortName" DataType="System.String"/>
+    </TableDataSource>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="304.5">
+      <TextObject Name="txtCustoms" Left="534.08" Top="101.94" Width="160.14" Height="32.56" Text="درب خروج گمرک محترم " HorzAlign="Right" Font="Tahoma, 10pt, style=Bold"/>
+      <TextObject Name="txtDate" Left="174.92" Top="120.84" Width="56.36" Height="21.22" Text=":تاریخ" HorzAlign="Right" Font="Tahoma, 10pt"/>
+      <TextObject Name="txtSalam" Left="630" Top="143.16" Width="70" Height="20" Text="با سلام" HorzAlign="Right" Font="Tahoma, 10pt"/>
+      <TextObject Name="txtBody" Left="326.18" Top="173.16" Width="373.82" Height="24.4" Text="احتراما خواهشمند است دستور فرمایید از محل پروانه ورود موقت " HorzAlign="Right" Font="Tahoma, 10pt">
+        <Formats>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
+      <TextObject Name="Text1" Left="298.62" Top="102.06" Width="230.58" Height="18.9" Text="[TipUsage.CustomsOfficeName]" HorzAlign="Right" Font="Arial, 10pt" TextFill.Color="0, 0, 192"/>
+      <TextObject Name="Text2" Left="71.82" Top="120.96" Width="94.5" Height="18.9" Text="[TipUsage.LetterLocalDate]" HorzAlign="Right" Font="Arial, 10pt" TextFill.Color="0, 0, 192"/>
+      <TextObject Name="Text3" Left="174.92" Top="98.16" Width="56.36" Height="21.22" Text=":شماره" HorzAlign="Right" Font="Tahoma, 10pt"/>
+      <TextObject Name="Text4" Left="75.6" Top="98.28" Width="94.5" Height="18.9" Text="[TipUsage.LetterNo]" HorzAlign="Right" Font="Arial, 10pt" TextFill.Color="0, 0, 192"/>
+      <TextObject Name="Text5" Left="226.8" Top="173.88" Width="94.5" Height="18.9" Text="[TipUsage.TIPNo]" HorzAlign="Right" Font="Arial, 9pt" TextFill.Color="0, 0, 192"/>
+      <TextObject Name="Text6" Left="178.76" Top="173.16" Width="44.96" Height="24.4" Text="تعداد" HorzAlign="Right" Font="Tahoma, 10pt">
+        <Formats>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
+      <TextObject Name="Text7" Left="102.06" Top="173.88" Width="75.6" Height="18.9" Text="[TipUsage.F20PlusF40]" HorzAlign="Right" Font="Arial, 9pt" TextFill.Color="0, 0, 192"/>
+      <TextObject Name="Text8" Left="42.68" Top="173.16" Width="52.52" Height="24.4" Text="دستگاه " HorzAlign="Right" Font="Tahoma, 10pt">
+        <Formats>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
+      <TextObject Name="Text9" Left="439.58" Top="207.18" Width="260.42" Height="24.4" Text="کانتینر خالی از محل قبض انبار بارنامه دریایی" HorzAlign="Right" Font="Tahoma, 10pt">
+        <Formats>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
+      <TextObject Name="Text10" Left="275.94" Top="207.9" Width="162.54" Height="18.9" Text="[TipUsage.BLNo]" HorzAlign="Center" Font="Arial, 9pt" TextFill.Color="0, 0, 192"/>
+      <TextObject Name="Text11" Left="227.9" Top="207.18" Width="48.74" Height="24.4" Text="کشتی" HorzAlign="Right" Font="Tahoma, 10pt">
+        <Formats>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
+      <TextObject Name="Text12" Left="91.82" Top="210.96" Width="48.74" Height="24.4" Text="سفر" HorzAlign="Right" Font="Tahoma, 10pt">
+        <Formats>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
+      <TextObject Name="Text13" Left="139.86" Top="211.68" Width="94.5" Height="18.9" Text="[TipUsage.VesselName]" HorzAlign="Center" Font="Arial, 9pt" TextFill.Color="0, 0, 192"/>
+      <TextObject Name="Text14" Left="7.56" Top="211.68" Width="79.38" Height="18.9" Text="[TipUsage.VoyageNo]" HorzAlign="Center" Font="Arial, 9pt" TextFill.Color="0, 0, 192"/>
+      <TextObject Name="Text15" Left="655.04" Top="237.42" Width="44.96" Height="24.4" Text="تحویل" HorzAlign="Right" Font="Tahoma, 10pt">
+        <Formats>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
+      <TextObject Name="Text16" Left="381.78" Top="238.14" Width="260.82" Height="18.9" Text="[TipUsage.CustomerName]" HorzAlign="Center" Font="Arial, 9pt" TextFill.Color="0, 0, 192"/>
+      <TextObject Name="Text17" Left="299.72" Top="237.42" Width="75.2" Height="24.4" Text=".نمایند" HorzAlign="Right" Font="Tahoma, 10pt">
+        <Formats>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
+      <TextObject Name="Text18" Left="309.96" Top="272.16" Width="389.34" Height="18.9" Text=".قبلا از همکاری آن اداره محترم کمال تشکر را دارد " HorzAlign="Right" Font="Tahoma, 10pt" TextFill.Color="0, 0, 0"/>
+    </ReportTitleBand>
+    <ColumnHeaderBand Name="ColumnHeader1" Top="306.72" Width="718.2" Height="30">
+      <TableObject Name="tblHeader" Left="19" Width="680" Height="30">
+        <TableColumn Name="ColH1" Width="50"/>
+        <TableColumn Name="ColH2" Width="180"/>
+        <TableColumn Name="ColH3" Width="110"/>
+        <TableColumn Name="ColH4" Width="50"/>
+        <TableColumn Name="ColH5" Width="180"/>
+        <TableColumn Name="ColH6" Width="110"/>
+        <TableRow Name="RowHeader" Height="30">
+          <TableCell Name="CellH1" Border.Lines="All" Fill.Color="LightGray" Text="ردیف" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 9pt, style=Bold"/>
+          <TableCell Name="CellH2" Border.Lines="All" Fill.Color="LightGray" Text="شماره کانتینر" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 9pt, style=Bold"/>
+          <TableCell Name="CellH3" Border.Lines="All" Fill.Color="LightGray" Text="سایز" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 9pt, style=Bold"/>
+          <TableCell Name="CellH4" Border.Lines="All" Fill.Color="LightGray" Text="ردیف" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 9pt, style=Bold"/>
+          <TableCell Name="CellH5" Border.Lines="All" Fill.Color="LightGray" Text="شماره کانتینر" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 9pt, style=Bold"/>
+          <TableCell Name="CellH6" Border.Lines="All" Fill.Color="LightGray" Text="سایز" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 9pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </ColumnHeaderBand>
+    <DataBand Name="DataContainers" Top="338.94" Width="718.2" Height="28" DataSource="Containers">
+      <TableObject Name="tblData" Left="19" Width="340" Height="28">
+        <TableColumn Name="ColD1" Width="50"/>
+        <TableColumn Name="ColD2" Width="180"/>
+        <TableColumn Name="ColD3" Width="110"/>
+        <TableRow Name="RowData" Height="28">
+          <TableCell Name="CellD1" Border.Lines="All" Text="[Containers.RowNo]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 9pt"/>
+          <TableCell Name="CellD2" Border.Lines="All" Text="[Containers.ContainerNumber]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 9pt"/>
+          <TableCell Name="CellD3" Border.Lines="All" Text="[Containers.SizeTypeShortName]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 9pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="369.17" Width="718.2" Height="80"/>
+  </ReportPage>
+</Report>

@@ -1,0 +1,784 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Chat" xml:space="preserve">
+    <value>چت با کارشناسان</value>
+  </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>داشبورد</value>
+  </data>
+  <data name="DownloadForms" xml:space="preserve">
+    <value>دانلود فرمها و تعهدنامه ها</value>
+  </data>
+  <data name="Invoices" xml:space="preserve">
+    <value>فاکتورها</value>
+  </data>
+  <data name="NewRequest" xml:space="preserve">
+    <value>درخواست جدید</value>
+  </data>
+  <data name="Orders" xml:space="preserve">
+    <value>سفارشات</value>
+  </data>
+  <data name="PaymentDocuments" xml:space="preserve">
+    <value>پرداختی ها</value>
+  </data>
+  <data name="RateRequests" xml:space="preserve">
+    <value>سفارشات</value>
+  </data>
+  <data name="Tracking" xml:space="preserve">
+    <value>پیگیری محموله</value>
+  </data>
+  <data name="CustomerPortal" xml:space="preserve">
+    <value>پورتال مشتریان</value>
+  </data>
+  <data name="HomePageTitle" xml:space="preserve">
+    <value>صفحه اصلی - ShipRate</value>
+  </data>
+  <data name="WelcomeTo" xml:space="preserve">
+    <value>خوش آمدید به</value>
+  </data>
+  <data name="WelcomeSubtitle" xml:space="preserve">
+    <value>سریع‌ترین و امن‌ترین راه برای لجستیک</value>
+  </data>
+  <data name="GetStarted" xml:space="preserve">
+    <value>شروع کنید</value>
+  </data>
+  <data name="TrackShipment" xml:space="preserve">
+    <value>رهگیری مرسوله</value>
+  </data>
+  <data name="OurServices" xml:space="preserve">
+    <value>خدمات ما</value>
+  </data>
+  <data name="InstantRateTitle" xml:space="preserve">
+    <value>استعلام نرخ آنی</value>
+  </data>
+  <data name="InstantRateDesc" xml:space="preserve">
+    <value>نرخ‌های لحظه‌ای را مشاهده کنید</value>
+  </data>
+  <data name="OrderPlacementTitle" xml:space="preserve">
+    <value>ثبت سفارش آسان</value>
+  </data>
+  <data name="OrderPlacementDesc" xml:space="preserve">
+    <value>بدون پیچیدگی اداری سفارش ثبت کنید</value>
+  </data>
+  <data name="InvoiceMgmtTitle" xml:space="preserve">
+    <value>مدیریت فاکتورها</value>
+  </data>
+  <data name="WhyShipRateTitle" xml:space="preserve">
+    <value>چرا ShipRate؟</value>
+  </data>
+  <data name="Feature1" xml:space="preserve">
+    <value>تضمین امنیت محموله‌ها</value>
+  </data>
+  <data name="WhyShipRateDesc" xml:space="preserve">
+    <value>ما تجربه حمل‌ونقل شما را متحول می‌کنیم.</value>
+  </data>
+  <data name="Feature2" xml:space="preserve">
+    <value>پوشش گسترده مقاصد جهانی</value>
+  </data>
+  <data name="Feature3" xml:space="preserve">
+    <value>داشبورد اختصاصی مشتری</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>جستجو</value>
+  </data>
+  <data name="GeneralInformation" xml:space="preserve">
+    <value>اطلاعات عمومی</value>
+  </data>
+  <data name="CargoDetails" xml:space="preserve">
+    <value>جزئیات بار</value>
+  </data>
+  <data name="Select" xml:space="preserve">
+    <value>انتخاب کنید</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>افزودن</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>انصراف</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>بستن</value>
+  </data>
+  <data name="UpdateInformation" xml:space="preserve">
+    <value>بروزرسانی اطلاعات</value>
+  </data>
+  <data name="LoadingCargoDetails" xml:space="preserve">
+    <value>در حال بارگذاری جزئیات بار...</value>
+  </data>
+  <data name="RequestInfo" xml:space="preserve">
+    <value>اطلاعات درخواست</value>
+  </data>
+  <data name="Company" xml:space="preserve">
+    <value>شرکت</value>
+  </data>
+  <data name="SelectCompany" xml:space="preserve">
+    <value>انتخاب شرکت</value>
+  </data>
+  <data name="RequestSource" xml:space="preserve">
+    <value>منبع درخواست</value>
+  </data>
+  <data name="SelectSource" xml:space="preserve">
+    <value>انتخاب منبع</value>
+  </data>
+  <data name="RequestDate" xml:space="preserve">
+    <value>تاریخ درخواست</value>
+  </data>
+  <data name="Customer" xml:space="preserve">
+    <value>مشتری</value>
+  </data>
+  <data name="CustomerName" xml:space="preserve">
+    <value>نام مشتری</value>
+  </data>
+  <data name="MobileNo" xml:space="preserve">
+    <value>شماره موبایل</value>
+  </data>
+  <data name="EmailAddress" xml:space="preserve">
+    <value>آدرس ایمیل</value>
+  </data>
+  <data name="ContactName" xml:space="preserve">
+    <value>نام شخص رابط</value>
+  </data>
+  <data name="Cargo" xml:space="preserve">
+    <value>محموله</value>
+  </data>
+  <data name="Origin" xml:space="preserve">
+    <value>مبدأ</value>
+  </data>
+  <data name="Destination" xml:space="preserve">
+    <value>مقصد</value>
+  </data>
+  <data name="TradeType" xml:space="preserve">
+    <value>نوع تجارت</value>
+  </data>
+  <data name="MovementType" xml:space="preserve">
+    <value>نوع جابجایی</value>
+  </data>
+  <data name="PaymentType" xml:space="preserve">
+    <value>نوع پرداخت</value>
+  </data>
+  <data name="CargoCommodity" xml:space="preserve">
+    <value>نوع کالا</value>
+  </data>
+  <data name="CommodityDescription" xml:space="preserve">
+    <value>شرح کالا</value>
+  </data>
+  <data name="CargoHandlingType" xml:space="preserve">
+    <value>نوع هندلینگ بار</value>
+  </data>
+  <data name="CargoNature" xml:space="preserve">
+    <value>ماهیت بار</value>
+  </data>
+  <data name="LoadType" xml:space="preserve">
+    <value>نوع بارگیری</value>
+  </data>
+  <data name="CargoReadinessDate" xml:space="preserve">
+    <value>تاریخ آمادگی بار</value>
+  </data>
+  <data name="RequiredServicesAndRelatedAddresses" xml:space="preserve">
+    <value>خدمات مورد نیاز و آدرس‌های مرتبط</value>
+  </data>
+  <data name="PickupRequired" xml:space="preserve">
+    <value>نیاز به بارگیری</value>
+  </data>
+  <data name="PickupAddress" xml:space="preserve">
+    <value>آدرس محل بارگیری</value>
+  </data>
+  <data name="ZipCode" xml:space="preserve">
+    <value>کد پستی</value>
+  </data>
+  <data name="DeliveryRequired" xml:space="preserve">
+    <value>نیاز به تحویل (Delivery)</value>
+  </data>
+  <data name="DeliveryAddress" xml:space="preserve">
+    <value>آدرس تحویل</value>
+  </data>
+  <data name="CustomsClearance" xml:space="preserve">
+    <value>ترخیص گمرکی</value>
+  </data>
+  <data name="Insurance" xml:space="preserve">
+    <value>بیمه</value>
+  </data>
+  <data name="Stuffing" xml:space="preserve">
+    <value>استافینگ (بارگیری کانتینر)</value>
+  </data>
+  <data name="Warehousing" xml:space="preserve">
+    <value>انبارداری</value>
+  </data>
+  <data name="Remarks" xml:space="preserve">
+    <value>ملاحظات</value>
+  </data>
+  <data name="TransportMode" xml:space="preserve">
+    <value>شیوه حمل‌ونقل</value>
+  </data>
+  <data name="ContainerType" xml:space="preserve">
+    <value>کانتینر / نوع</value>
+  </data>
+  <data name="Qty" xml:space="preserve">
+    <value>تعداد</value>
+  </data>
+  <data name="SaveFirst" xml:space="preserve">
+    <value>ابتدا ذخیره</value>
+  </data>
+  <data name="SaveAndContinue" xml:space="preserve">
+    <value>ذخیره و ادامه</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>مجموع</value>
+  </data>
+  <data name="First" xml:space="preserve">
+    <value>ابتدا</value>
+  </data>
+  <data name="Previous" xml:space="preserve">
+    <value>قبلی</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>بعدی</value>
+  </data>
+  <data name="Last" xml:space="preserve">
+    <value>آخر</value>
+  </data>
+  <data name="Seq" xml:space="preserve">
+    <value>ردیف</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>شرح</value>
+  </data>
+  <data name="HSCode" xml:space="preserve">
+    <value>کد تعرفه</value>
+  </data>
+  <data name="PackageType" xml:space="preserve">
+    <value>نوع بسته‌بندی</value>
+  </data>
+  <data name="PkgCount" xml:space="preserve">
+    <value>تعداد بسته</value>
+  </data>
+  <data name="GrossWeightShort" xml:space="preserve">
+    <value>وزن ناخالص</value>
+  </data>
+  <data name="NetWeightShort" xml:space="preserve">
+    <value>وزن خالص</value>
+  </data>
+  <data name="Volume" xml:space="preserve">
+    <value>حجم</value>
+  </data>
+  <data name="Flags" xml:space="preserve">
+    <value>ویژگی‌ها</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>عملیات</value>
+  </data>
+  <data name="NoCargoDetailsFound" xml:space="preserve">
+    <value>هیچ جزئیاتی برای کالا یافت نشد.</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>جزئیات</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>ویرایش</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>حذف</value>
+  </data>
+  <data name="DG" xml:space="preserve">
+    <value>DG</value>
+  </data>
+  <data name="DangerousGoods" xml:space="preserve">
+    <value>کالای خطرناک</value>
+  </data>
+  <data name="Temp" xml:space="preserve">
+    <value>Temp</value>
+  </data>
+  <data name="TemperatureControlled" xml:space="preserve">
+    <value>کنترل دمایی</value>
+  </data>
+  <data name="Fragile" xml:space="preserve">
+    <value>شکستنی</value>
+  </data>
+  <data name="Perishable" xml:space="preserve">
+    <value>فاسدشدنی</value>
+  </data>
+  <data name="AddNewCargo" xml:space="preserve">
+    <value>محموله جدید</value>
+  </data>
+  <data name="CargoDetail" xml:space="preserve">
+    <value>جزئیات کالا</value>
+  </data>
+  <data name="InnerPackage" xml:space="preserve">
+    <value>بسته‌بندی داخلی</value>
+  </data>
+  <data name="InnerCount" xml:space="preserve">
+    <value>تعداد داخلی</value>
+  </data>
+  <data name="ChargeableWeight" xml:space="preserve">
+    <value>وزن مشمول کرایه</value>
+  </data>
+  <data name="WeightUnitShort" xml:space="preserve">
+    <value>واحد وزن</value>
+  </data>
+  <data name="VolumeUnit" xml:space="preserve">
+    <value>واحد حجم</value>
+  </data>
+  <data name="CountryHSCode" xml:space="preserve">
+    <value>کد تعرفه کشوری</value>
+  </data>
+  <data name="CargoDescription" xml:space="preserve">
+    <value>شرح کالا</value>
+  </data>
+  <data name="MarksAndNumbers" xml:space="preserve">
+    <value>علائم و شماره‌ها</value>
+  </data>
+  <data name="Dimensions" xml:space="preserve">
+    <value>ابعاد</value>
+  </data>
+  <data name="Length" xml:space="preserve">
+    <value>طول</value>
+  </data>
+  <data name="Width" xml:space="preserve">
+    <value>عرض</value>
+  </data>
+  <data name="Height" xml:space="preserve">
+    <value>ارتفاع</value>
+  </data>
+  <data name="DimensionUnit" xml:space="preserve">
+    <value>واحد ابعاد</value>
+  </data>
+  <data name="OverSized" xml:space="preserve">
+    <value>خارج از ابعاد استاندارد</value>
+  </data>
+  <data name="IsDG" xml:space="preserve">
+    <value>خطرناک است</value>
+  </data>
+  <data name="DGClass" xml:space="preserve">
+    <value>کلاس خطر</value>
+  </data>
+  <data name="UNNumber" xml:space="preserve">
+    <value>شماره UN</value>
+  </data>
+  <data name="FlashPoint" xml:space="preserve">
+    <value>نقطه اشتعال</value>
+  </data>
+  <data name="PackingGroup" xml:space="preserve">
+    <value>گروه بسته‌بندی</value>
+  </data>
+  <data name="Temperature" xml:space="preserve">
+    <value>دما</value>
+  </data>
+  <data name="Min" xml:space="preserve">
+    <value>حداقل</value>
+  </data>
+  <data name="Normal" xml:space="preserve">
+    <value>نرمال</value>
+  </data>
+  <data name="Max" xml:space="preserve">
+    <value>حداکثر</value>
+  </data>
+  <data name="TempUnit" xml:space="preserve">
+    <value>واحد دما</value>
+  </data>
+  <data name="Rotateable" xml:space="preserve">
+    <value>قابل چرخش</value>
+  </data>
+  <data name="Stackable" xml:space="preserve">
+    <value>قابل روی‌هم‌چینی</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>بله</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>خیر</value>
+  </data>
+  <data name="SellQuoteDetails" xml:space="preserve">
+    <value>جزئیات نرخ فروش</value>
+  </data>
+  <data name="SellQuotation" xml:space="preserve">
+    <value>پیشنهاد فروش</value>
+  </data>
+  <data name="BackToList" xml:space="preserve">
+    <value>بازگشت به لیست</value>
+  </data>
+  <data name="Ref" xml:space="preserve">
+    <value>مرجع</value>
+  </data>
+  <data name="CarrierVendor" xml:space="preserve">
+    <value>کریر / فروشنده</value>
+  </data>
+  <data name="ServiceVehicle" xml:space="preserve">
+    <value>سرویس / وسیله</value>
+  </data>
+  <data name="TransitTime" xml:space="preserve">
+    <value>زمان ترانزیت</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>روز</value>
+  </data>
+  <data name="RouteType" xml:space="preserve">
+    <value>نوع مسیر</value>
+  </data>
+  <data name="Direct" xml:space="preserve">
+    <value>مستقیم</value>
+  </data>
+  <data name="Indirect" xml:space="preserve">
+    <value>غیرمستقیم</value>
+  </data>
+  <data name="Validity" xml:space="preserve">
+    <value>اعتبار</value>
+  </data>
+  <data name="ETD" xml:space="preserve">
+    <value>تاریخ حرکت</value>
+  </data>
+  <data name="ETA" xml:space="preserve">
+    <value>تاریخ رسیدن</value>
+  </data>
+  <data name="QuoteDate" xml:space="preserve">
+    <value>تاریخ پیشنهاد</value>
+  </data>
+  <data name="GrandTotal" xml:space="preserve">
+    <value>مجموع کل</value>
+  </data>
+  <data name="ChargeDescription" xml:space="preserve">
+    <value>شرح هزینه</value>
+  </data>
+  <data name="UnitRate" xml:space="preserve">
+    <value>نرخ واحد</value>
+  </data>
+  <data name="Currency" xml:space="preserve">
+    <value>ارز</value>
+  </data>
+  <data name="TotalAmount" xml:space="preserve">
+    <value>مبلغ کل</value>
+  </data>
+  <data name="NoItemsAvailable" xml:space="preserve">
+    <value>هیچ آیتمی برای این پیشنهاد ثبت نشده است</value>
+  </data>
+  <data name="SummarySubTotal" xml:space="preserve">
+    <value>جمع جزء</value>
+  </data>
+  <data name="AgentRemarks" xml:space="preserve">
+    <value>ملاحظات و توضیحات کارشناس</value>
+  </data>
+  <data name="NoRemarksProvided" xml:space="preserve">
+    <value>توضیح اضافه‌ای توسط کارشناس ثبت نشده است</value>
+  </data>
+  <data name="CreatedBy" xml:space="preserve">
+    <value>ایجادشده توسط</value>
+  </data>
+  <data name="LastUpdated" xml:space="preserve">
+    <value>آخرین به‌روزرسانی</value>
+  </data>
+  <data name="QuotationsSentToCustomer" xml:space="preserve">
+    <value>استعلام‌های ارسال‌شده برای مشتری</value>
+  </data>
+  <data name="QuotationNo" xml:space="preserve">
+    <value>شماره استعلام</value>
+  </data>
+  <data name="QuotationDate" xml:space="preserve">
+    <value>تاریخ استعلام</value>
+  </data>
+  <data name="TransportationBy" xml:space="preserve">
+    <value>حمل توسط</value>
+  </data>
+  <data name="ValidUntil" xml:space="preserve">
+    <value>معتبر تا</value>
+  </data>
+  <data name="CreateUser" xml:space="preserve">
+    <value>ایجادکننده</value>
+  </data>
+  <data name="LastEditUser" xml:space="preserve">
+    <value>آخرین ویرایش توسط</value>
+  </data>
+  <data name="ChargesList" xml:space="preserve">
+    <value>لیست هزینه‌ها</value>
+  </data>
+  <data name="Accept" xml:space="preserve">
+    <value>تأیید</value>
+  </data>
+  <data name="Reject" xml:space="preserve">
+    <value>رد</value>
+  </data>
+  <data name="NoResponsesFoundForCustomerQuote" xml:space="preserve">
+    <value>هیچ پاسخی برای این درخواست نرخِ ارسال‌شده به مشتری یافت نشد.</value>
+  </data>
+  <data name="DeleteConfirmation" xml:space="preserve">
+    <value>تأیید حذف</value>
+  </data>
+  <data name="DeleteConfirmationMessage" xml:space="preserve">
+    <value>آیا از حذف این مورد اطمینان دارید؟</value>
+  </data>
+  <data name="YesDelete" xml:space="preserve">
+    <value>بله، حذف شود</value>
+  </data>
+  <data name="AcceptQuotationResponse" xml:space="preserve">
+    <value>پذیرش پیشنهاد استعلام</value>
+  </data>
+  <data name="AcceptQuotationConfirmMessage" xml:space="preserve">
+    <value>آیا از پذیرش و تأیید این پیشنهاد استعلام اطمینان دارید؟</value>
+  </data>
+  <data name="Comments" xml:space="preserve">
+    <value>توضیحات / یادداشت‌ها</value>
+  </data>
+  <data name="EnterCommentsPlaceholder" xml:space="preserve">
+    <value>یادداشت یا توضیحات خود را اینجا وارد کنید...</value>
+  </data>
+  <data name="AcceptResponse" xml:space="preserve">
+    <value>تأیید و پذیرش پیشنهاد</value>
+  </data>
+  <data name="RejectQuotationResponse" xml:space="preserve">
+    <value>رد پیشنهاد استعلام</value>
+  </data>
+  <data name="RejectQuotationConfirmMessage" xml:space="preserve">
+    <value>آیا از رد این پیشنهاد استعلام اطمینان دارید؟</value>
+  </data>
+  <data name="RejectResponse" xml:space="preserve">
+    <value>رد پیشنهاد</value>
+  </data>
+  <data name="SellQuotationDetails" xml:space="preserve">
+    <value>جزئیات پیش‌فاکتور فروش</value>
+  </data>
+  <data name="ChargeCode" xml:space="preserve">
+    <value>کد هزینه</value>
+  </data>
+  <data name="ChargeName" xml:space="preserve">
+    <value>عنوان هزینه</value>
+  </data>
+  <data name="SizeType" xml:space="preserve">
+    <value>نوع/سایز</value>
+  </data>
+  <data name="Quantity" xml:space="preserve">
+    <value>تعداد</value>
+  </data>
+  <data name="NoQuotationDetailsFound" xml:space="preserve">
+    <value>هیچ جزئیاتی برای این پیش‌فاکتور یافت نشد.</value>
+  </data>
+  <data name="CommitmentLetters" xml:space="preserve">
+    <value>تعهدنامه‌ها</value>
+  </data>
+  <data name="Row" xml:space="preserve">
+    <value>ردیف</value>
+  </data>
+  <data name="FileTitle" xml:space="preserve">
+    <value>عنوان فایل</value>
+  </data>
+  <data name="FileName" xml:space="preserve">
+    <value>نام فایل</value>
+  </data>
+  <data name="UploadDate" xml:space="preserve">
+    <value>تاریخ بارگذاری</value>
+  </data>
+  <data name="Download" xml:space="preserve">
+    <value>دانلود</value>
+  </data>
+  <data name="NoCommitmentLettersFound" xml:space="preserve">
+    <value>هیچ تعهدنامه‌ای یافت نشد.</value>
+  </data>
+  <data name="InvoiceNo" xml:space="preserve">
+    <value>شماره فاکتور</value>
+  </data>
+  <data name="InvoicePNo" xml:space="preserve">
+    <value>شماره پیگیری</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>تاریخ</value>
+  </data>
+  <data name="DueDate" xml:space="preserve">
+    <value>تاریخ سررسید</value>
+  </data>
+  <data name="Party" xml:space="preserve">
+    <value>طرف حساب</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>نوع</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>وضعیت</value>
+  </data>
+  <data name="Direction" xml:space="preserve">
+    <value>جهت</value>
+  </data>
+  <data name="CreateDate" xml:space="preserve">
+    <value>تاریخ ایجاد</value>
+  </data>
+  <data name="Items" xml:space="preserve">
+    <value>اقلام</value>
+  </data>
+  <data name="NoDataFound" xml:space="preserve">
+    <value>داده‌ای یافت نشد.</value>
+  </data>
+  <data name="DateFrom" xml:space="preserve">
+    <value>از تاریخ</value>
+  </data>
+  <data name="DateTo" xml:space="preserve">
+    <value>تا تاریخ</value>
+  </data>
+  <data name="ItemsForInvoice" xml:space="preserve">
+    <value>اقلام برای فاکتور شماره</value>
+  </data>
+  <data name="ChargeType" xml:space="preserve">
+    <value>نوع هزینه</value>
+  </data>
+  <data name="Charge" xml:space="preserve">
+    <value>هزینه</value>
+  </data>
+  <data name="UnitPrice" xml:space="preserve">
+    <value>قیمت واحد</value>
+  </data>
+  <data name="Discount" xml:space="preserve">
+    <value>تخفیف</value>
+  </data>
+  <data name="TaxPercent" xml:space="preserve">
+    <value>درصد مالیات</value>
+  </data>
+  <data name="BeforeDiscount" xml:space="preserve">
+    <value>قبل تخفیف</value>
+  </data>
+  <data name="AfterDiscount" xml:space="preserve">
+    <value>بعد تخفیف</value>
+  </data>
+  <data name="Tax" xml:space="preserve">
+    <value>مالیات</value>
+  </data>
+  <data name="UpdateDate" xml:space="preserve">
+    <value>تاریخ ویرایش</value>
+  </data>
+  <data name="AreYouSureDelete" xml:space="preserve">
+    <value>آیا از حذف این آیتم اطمینان دارید؟</value>
+  </data>
+  <data name="NoItemsFound" xml:space="preserve">
+    <value>هیچ اقلامی یافت نشد.</value>
+  </data>
+  <data name="Receipts" xml:space="preserve">
+    <value>دریافتی ها</value>
+  </data>
+  <data name="TotalPayment" xml:space="preserve">
+    <value>مبلغ</value>
+    <comment>مبلغ</comment>
+  </data>
+  <data name="OnlinePayments" xml:space="preserve">
+    <value>پرداخت های آنلاین</value>
+  </data>
+  <data name="RequestNo" xml:space="preserve">
+    <value>شماره درخواست</value>
+  </data>
+  <data name="TraceNo" xml:space="preserve">
+    <value>شماره پیگیری</value>
+  </data>
+  <data name="BankReferenceNo" xml:space="preserve">
+    <value>شماره رفرنس</value>
+  </data>
+</root>

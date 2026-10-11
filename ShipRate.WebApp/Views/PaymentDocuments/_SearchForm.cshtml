@@ -1,0 +1,163 @@
+﻿@using ShipRate.Application.ViewModels
+@model PaymentDocumentSearchVm
+
+<form id="paymentDocumentSearchForm"
+      class="row g-2 align-items-end"
+      dir="ltr"
+      hx-get="@Url.Action("List", "PaymentDocuments")"
+      hx-target="#payment-document-list"
+      hx-swap="innerHTML"
+      hx-include="#paymentDocumentSearchForm">
+
+    <!-- ریست شدن شماره صفحه با هر جستجو -->
+    <input type="hidden" asp-for="Page" id="searchFormPage" value="1" />
+    <input type="hidden" asp-for="PageSize" />
+
+    <!-- Company -->
+    <div class="col-md-2 col-sm-6">
+        <label asp-for="CompanyId" class="form-label small mb-1">Company</label>
+        <select asp-for="CompanyId"
+                asp-items="Model.Companies"
+                class="form-select form-select-sm"
+                hx-trigger="change">
+            <option value="">Select Company</option>
+        </select>
+    </div>
+
+    <!-- Currency -->
+    <div class="col-md-2 col-sm-6">
+        <label asp-for="CurrencyId" class="form-label small mb-1">Currency</label>
+        <select asp-for="CurrencyId"
+                asp-items="Model.Currencies"
+                class="form-select form-select-sm"
+                hx-trigger="change">
+            <option value="">Select Currency</option>
+        </select>
+    </div>
+
+    <!-- Direction -->
+    <div class="col-md-2 col-sm-6">
+        <label asp-for="FinanceDirectionId" class="form-label small mb-1">Direction</label>
+        <select asp-for="FinanceDirectionId"
+                asp-items="Model.FinanceDirections"
+                class="form-select form-select-sm"
+                hx-trigger="change">
+            <option value="">Select Direction</option>
+        </select>
+    </div>
+
+    <!-- Document No -->
+    <div class="col-md-2 col-sm-6">
+        <label asp-for="DocumentNumber" class="form-label small mb-1">Doc No</label>
+        <input asp-for="DocumentNumber"
+               class="form-control form-control-sm"
+               placeholder="Search Doc No..."
+               hx-trigger="keyup changed delay:400ms" />
+    </div>
+
+    <!-- Person -->
+    <div class="col-md-2 col-sm-6">
+        <label asp-for="PersonName" class="form-label small mb-1">Person</label>
+        <input asp-for="PersonName"
+               class="form-control form-control-sm"
+               placeholder="Search Person..."
+               hx-trigger="keyup changed delay:400ms" />
+    </div>
+
+    <!-- Payment Method -->
+    <div class="col-md-2 col-sm-6">
+        <label asp-for="PaymentMethodId" class="form-label small mb-1">Method</label>
+        <select asp-for="PaymentMethodId"
+                asp-items="Model.PaymentMethods"
+                class="form-select form-select-sm"
+                hx-trigger="change">
+            <option value="">Select Method</option>
+        </select>
+    </div>
+
+    <!-- Cheque Purpose -->
+    <div class="col-md-2 col-sm-6">
+        <label asp-for="ChequePurposeId" class="form-label small mb-1">Cheque Purpose</label>
+        <select asp-for="ChequePurposeId"
+                asp-items="Model.ChequePurposes"
+                class="form-select form-select-sm"
+                hx-trigger="change">
+            <option value="">Select Purpose</option>
+        </select>
+    </div>
+
+    <!-- From Date -->
+    <div class="col-md-2 col-sm-6">
+        <label asp-for="FromDateShamsi" class="form-label small mb-1">From Date</label>
+        <input asp-for="FromDateShamsi"
+               class="form-control form-control-sm"
+               placeholder="1405/01/01"
+               hx-trigger="change" />
+    </div>
+
+    <!-- To Date -->
+    <div class="col-md-2 col-sm-6">
+        <label asp-for="ToDateShamsi" class="form-label small mb-1">To Date</label>
+        <input asp-for="ToDateShamsi"
+               class="form-control form-control-sm"
+               placeholder="1405/12/29"
+               hx-trigger="change" />
+    </div>
+
+    <!-- فیلتر فقط مانده‌دارها (Switch Checkbox) -->
+    <div class="col-md-2 col-sm-6 d-flex align-items-center mb-1">
+        <div class="form-check form-switch m-0">
+            <input class="form-check-input"
+                   type="checkbox"
+                   role="switch"
+                   asp-for="OnlyHasRemaining"
+                   id="onlyHasRemainingSwitch"
+                   hx-trigger="change" />
+            <label class="form-check-label small fw-semibold text-danger ms-1" for="onlyHasRemainingSwitch">
+                Remaining Only
+            </label>
+        </div>
+    </div>
+
+
+
+    <!-- Action Buttons -->
+    <div class="col-md-3 col-sm-12">
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
+                <i class="bi bi-search me-1"></i> Search
+            </button>
+
+            <button type="button"
+                    class="btn btn-outline-secondary btn-sm flex-grow-1"
+                    onclick="resetPaymentSearchForm()">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+            </button>
+        </div>
+    </div>
+</form>
+
+<script>
+    function resetPaymentSearchForm() {
+        const form = document.getElementById('paymentDocumentSearchForm');
+        if (!form) return;
+
+        // فرم را کامل ریست کن
+        form.reset();
+
+        // مقدار پیج حتماً به 1 برگردد
+        const pageInput = document.getElementById('searchFormPage');
+        if (pageInput) pageInput.value = '1';
+
+        // اگر پنل جزئیات (Usage) پایین باز است، آن را ببند
+        const usagePanel = document.getElementById('payment-document-usage-panel');
+        if (usagePanel) usagePanel.innerHTML = '';
+
+        // ارسال مجدد درخواست خالی به کنترلر
+        htmx.ajax('GET', '@Url.Action("List", "PaymentDocuments")', {
+            target: '#payment-document-list',
+            swap: 'innerHTML',
+            values: { page: 1, pageSize: @Model.PageSize }
+        });
+    }
+</script>

@@ -1,0 +1,88 @@
+﻿@using ShipRate.WebApp.ViewModels.TaskVms
+@model TaskManagementIndexViewModel
+@{
+    ViewData["Title"] = "Task Management";
+}
+
+<div class="container-fluid mt-4">
+    <h4 class="mb-4">Task Management</h4>
+
+    <!-- Categories Grid (Always Visible) -->
+    <div class="card mb-3">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Task Categories</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Category Name</th>
+                            <th>Local Name</th>
+                            <th>Status</th>
+                            <th style="width: 100px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var c in Model.Categories)
+                        {
+                            <tr>
+                                <td>@c.CategoryName</td>
+                                <td>@c.LocalCategoryName</td>
+                                <td>
+                                    @if (c.IsActive)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary"
+                                            hx-get="/TaskManagement/LoadTasks?categoryId=@c.Id"
+                                            hx-target="#tasksGridContainer"
+                                            hx-swap="innerHTML"
+                                            onclick="document.getElementById('tasksCard').style.display='block';document.getElementById('selectedCategoryName').innerText='@c.CategoryName';document.getElementById('checklistCard').style.display='none';">
+                                        <i class="bi bi-check-circle"></i> Select
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tasks Grid (Hidden by default) -->
+    <div class="card mb-3" id="tasksCard" style="display:none;">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Tasks - <span id="selectedCategoryName"></span></h5>
+        </div>
+        <div id="tasksGridContainer">
+            <!-- Tasks will be loaded here via HTMX -->
+        </div>
+    </div>
+
+    <!-- Checklist Grid (Hidden by default) -->
+    <div class="card mb-3" id="checklistCard" style="display:none;">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Checklist Templates - <span id="selectedTaskName"></span></h5>
+        </div>
+        <div id="checklistGridContainer">
+            <!-- Checklist items will be loaded here via HTMX -->
+        </div>
+    </div>
+
+</div>
+
+@* <!-- Modal Container for CRUD Forms -->
+<div id="modalContainer"></div>
+
+<!-- Bootstrap Modal Structure -->
+<div class="modal fade" id="crudModal" tabindex="-1" aria-hidden="true">
+    <!-- Modal content will be loaded here via HTMX -->
+</div>
+ *@

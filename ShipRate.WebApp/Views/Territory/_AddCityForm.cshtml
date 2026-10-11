@@ -1,0 +1,152 @@
+﻿@using ShipRate.WebApp.ViewModels.Location
+@using ShipRate.WebApp.ViewModels.TerritoryVms
+@model TerritoryCityCreateEditDto
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+}
+
+<form hx-post="@Url.Action(isCreateMode?"AddCity":"EditCity", "Territory")"
+      hx-target="#app-modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header form-caption-bg  text-white">
+        <input type="hidden" asp-for="TerritoryId" />
+
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add City for Territory Name : @ViewBag.TerritoryName</h5>
+            
+        }
+        else
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Edit City</h5>
+            <input type="hidden" asp-for="Id" />
+        }
+
+
+        <button type="button"
+                class="btn-close"
+                onclick="AppModal.close()">
+        </button>
+    </div>
+
+
+    <div class="modal-body row">
+
+        @await Html.PartialAsync("_ModelStateError")
+
+
+        <!-- Example: City Search -->
+        <autocomplete-search label="City"
+                             name="CityName"
+                             hidden-name="CityId"
+                             value="@Model.CityName"
+                             hidden-value="@Model.CityId"
+                             api-url="/Territory/SearchLocations">
+        </autocomplete-search>
+
+        <!-- Example: Customer Search (Same page, works automatically!) -->
+        @*
+        <autocomplete-search label="Customer"
+                             name="CustomerName"
+                             hidden-name="CustomerId"
+                             value="@Model.CustomerName"
+                             hidden-value="@Model.CustomerId"
+                             api-url="/Customers/SearchCustomers">
+        </autocomplete-search>
+        *@
+
+        @*
+        <div class="mb-1 col-md-6">
+            <label class="form-label">
+                City  <span class="text-danger">*</span>
+            </label>
+            <div class="position-relative">
+                <input type="text"
+                       id="clientSearch"
+                       name="CityName"
+                       class="form-control"
+                       placeholder="Type to search…"
+                       value="@Model.CityName"
+                       autocomplete="off" />
+                <input type="hidden" name="CityId" id="clientId" value="@Model.CityId" />
+                <div id="clientResults"
+                     class="list-group position-absolute w-100 shadow"
+                     style="z-index:9999; max-height:200px; overflow-y:auto; display:none;">
+                </div>
+            </div>
+        </div>
+        *@
+
+    </div>
+
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="AppModal.close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>
+
+@*
+<script>
+    (function () {
+            const input = document.getElementById('clientSearch');
+            const hidden = document.getElementById('clientId');
+            const results = document.getElementById('clientResults');
+            let debounce;
+
+            input.addEventListener('input', function () {
+                clearTimeout(debounce);
+                const term = this.value.trim();
+                if (term.length < 2) {
+                    results.style.display = 'none';
+                    return;
+                }
+                debounce = setTimeout(() => {
+                    fetch('/Territory/SearchLocations?term=' + encodeURIComponent(term))
+                        .then(r => r.json())
+                        .then(data => {
+                            results.innerHTML = '';
+                            if (data.length === 0) {
+                                results.style.display = 'none';
+                                return;
+                            }
+                            data.forEach(p => {
+                                const a = document.createElement('a');
+                                a.href = '#';
+                                a.className = 'list-group-item list-group-item-action';
+                                a.textContent = p.locationName;
+                                a.addEventListener('click', function (e) {
+                                    e.preventDefault();
+                                    input.value = p.locationName;
+                                    hidden.value = p.id;
+                                    results.style.display = 'none';
+                                });
+                                results.appendChild(a);
+                            });
+                            results.style.display = 'block';
+                        });
+                }, 300);
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!results.contains(e.target) && e.target !== input) {
+                    results.style.display = 'none';
+                }
+            });
+        })();
+</script>
+*@

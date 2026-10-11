@@ -1,0 +1,40 @@
+﻿@using ShipRate.Application.DTOs
+@model List<TipUsageListDto>
+
+<table class="table table-bordered table-hover table-sm">
+    <thead class="table-light">
+        <tr>
+            <th>BL No</th>
+            <th>Customer</th>
+            <th>Letter No</th>
+            <th>Letter Date</th>
+            <th>F20</th>
+            <th>F40</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr hx-get="@Url.Action("ListTipUsageContainers", "TIP", new { tipUsageId = item.Id })"
+                    hx-target="#tip-usage-containers-grid"
+                    hx-trigger="click"
+                    style="cursor:pointer">
+                    <td>@item.BLNo</td>
+                    <td>@item.CustomerName</td>
+                    <td>@item.LetterNo</td>
+                    <td>@item.LetterDate.ToString("yyyy-MM-dd")</td>
+                    <td>@item.F20</td>
+                    <td>@item.F40</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" class="text-center">No TIP usages found for selected TIP.</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,66 @@
+﻿@{
+    ViewData["Title"] = "Import Specific Operations";
+}
+
+<div class="container-fluid py-3">
+    <div class="hub-page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="fw-bold mb-1"><i class="bi bi-box-arrow-in-down text-primary me-2"></i>Import Specific Operations</h5>
+            <span class="text-muted small">Issuance of Delivery Orders (DO), TIP customs letters, NOA, and guarantee cheques</span>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <auth-policy policy="ImportSpecific.DeliveryOrders.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="DeliveryOrders" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-file-earmark-check"></i></div>
+                    <div>
+                        <div class="hub-title">Delivery Orders (DO)</div>
+                        <p class="hub-desc">Issue, approve, register customer delivery handover, and void DO records.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="ImportSpecific.TIPs.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="TIP" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-file-earmark-ruled"></i></div>
+                    <div>
+                        <div class="hub-title">TIP Management</div>
+                        <p class="hub-desc">Issue and print official FastReport Temporary Import Permits for customs.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="ImportSpecific.NOAs.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="NOA" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-bell"></i></div>
+                    <div>
+                        <div class="hub-title">Notice of Arrival (NOA)</div>
+                        <p class="hub-desc">Vessel arrival alerts, cargo discharge notices, and consignee follow-ups.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="ImportSpecific.GuaranteePlans.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="GuaranteePlans" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-shield-check"></i></div>
+                    <div>
+                        <div class="hub-title">Guarantee Plans</div>
+                        <p class="hub-desc">Track container deposits, security cheques, and deposit release workflows.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+    </div>
+</div>

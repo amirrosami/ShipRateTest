@@ -1,0 +1,16 @@
+﻿@using ShipRate.Domain.Entities.BaseInfo.Finance
+@using ShipRate.Domain.Entities.Lines
+@model IEnumerable<Currency>
+
+
+@foreach (var item in Model)
+{
+<div class="list-group-item list-group-item-action"
+     hx-get="/FACContracts/SelectCurrency/@item.Id"
+     hx-target="#currencyBox"
+     hx-swap="outerHTML">
+
+@item.CurrencyCode - @item.CurrencyName
+
+</div>
+}

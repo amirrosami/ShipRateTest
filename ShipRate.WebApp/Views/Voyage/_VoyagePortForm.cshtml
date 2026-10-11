@@ -1,0 +1,178 @@
+﻿@using ShipRate.WebApp.ViewModels
+@using ShipRate.WebApp.ViewModels.Location
+@using ShipRate.WebApp.ViewModels.TerritoryVms
+@using ShipRate.WebApp.ViewModels.VoyageVms
+@model VoyagePortFormViewModel
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+}
+
+<form hx-post="@Url.Action(isCreateMode?"CreateVoyagePort":"EditVoyagePort", "Voyage")"
+      hx-target="#app-modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header form-caption-bg  text-white">
+        <input type="hidden" asp-for="InboundVoyageId" />
+
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add Voyage Port</h5>
+
+        }
+        else
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Edit Voyage Port</h5>
+            <input type="hidden" asp-for="Id" />
+        }
+
+
+        <button type="button"
+                class="btn-close"
+                onclick="AppModal.close()">
+        </button>
+    </div>
+
+
+    <div class="modal-body row">
+
+        @Html.AntiForgeryToken()
+        @if (!ViewData.ModelState.IsValid)
+        {
+            var allErrors = ViewData.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            if (allErrors.Any())
+            {
+                <div class="alert alert-danger py-2 mb-1">
+                    <ul class="mb-0 small">
+                        @foreach (var err in allErrors)
+                        {
+                            <li>@err</li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+
+        
+
+            <div class="col-md-4">
+                <label asp-for="VoyagePortSequence" class="form-label fw-semibold">
+                    <i class="bi bi-sort-numeric-up me-1"></i>Sequence
+                </label>
+                <input asp-for="VoyagePortSequence" class="form-control" type="number" min="1" />
+                <span asp-validation-for="VoyagePortSequence" class="text-danger small"></span>
+            </div>
+
+        <div class="col-md-8">
+            <label>Port</label>
+            <input type="hidden" asp-for="PortId" id="PortId" />
+            <input type="text"
+                   id="PortSearchText"
+                   name="Port"
+                   value="@Model.PortName"
+                   class="form-control"
+                   placeholder="Search Port..."
+                   autocomplete="off"
+                   hx-get="@Url.Action("SearchLocations", "Locations")"
+                   hx-trigger="keyup changed delay:400ms"
+                   hx-target="#portSearchResults"
+                   hx-swap="innerHTML"
+                   hx-vals='js:{
+                            term: document.getElementById("PortSearchText").value,
+                            targetHiddenInputId: "PortId",
+                            targetTextInputId: "PortSearchText"
+                       }' />
+
+            <div id="portSearchResults"
+                 class="position-relative">
+            </div>
+            <span asp-validation-for="PortId" class="text-danger small"></span>
+        </div>
+
+
+            <div class="col-md-6">
+                <label asp-for="TerminalId" class="form-label fw-semibold">
+                    <i class="bi bi-building me-1"></i>Terminal
+                </label>
+                <select asp-for="TerminalId" asp-items="Model.Terminals" class="form-select">
+                    <option value="">-- Select Terminal --</option>
+                </select>
+                <span asp-validation-for="TerminalId" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="ShippingLineAgentId" class="form-label fw-semibold">
+                    <i class="bi bi-person-badge me-1"></i>Shipping Line Agent
+                </label>
+                <select asp-for="ShippingLineAgentId" asp-items="Model.ShippingLineAgents" class="form-select">
+                    <option value="">-- Select Agent --</option>
+                </select>
+                <span asp-validation-for="ShippingLineAgentId" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="ETA" class="form-label fw-semibold">
+                    <i class="bi bi-box-arrow-in-right me-1 text-success"></i>ETA
+                </label>
+                <input asp-for="ETA" class="form-control" type="datetime-local" />
+                <span asp-validation-for="ETA" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="ETD" class="form-label fw-semibold">
+                    <i class="bi bi-box-arrow-right me-1 text-warning"></i>ETD
+                </label>
+                <input asp-for="ETD" class="form-control" type="datetime-local" />
+                <span asp-validation-for="ETD" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="ATA" class="form-label fw-semibold">
+                    <i class="bi bi-check-circle me-1 text-success"></i>ATA
+                </label>
+                <input asp-for="ATA" class="form-control" type="datetime-local" />
+                <span asp-validation-for="ATA" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="ATD" class="form-label fw-semibold">
+                    <i class="bi bi-check-circle-fill me-1 text-warning"></i>ATD
+                </label>
+                <input asp-for="ATD" class="form-control" type="datetime-local" />
+                <span asp-validation-for="ATD" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-8">
+                <label asp-for="OutboundVoyageId" class="form-label fw-semibold">
+                    <i class="bi bi-arrow-right-circle me-1"></i>Outbound Voyage
+                </label>
+                <select asp-for="OutboundVoyageId" asp-items="Model.OutboundVoyages" class="form-select">
+                    <option value="">-- None --</option>
+                </select>
+                <span asp-validation-for="OutboundVoyageId" class="text-danger small"></span>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <div class="form-check form-switch mb-2">
+                    <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" />
+                    <label asp-for="IsActive" class="form-check-label fw-semibold">Active</label>
+                </div>
+            </div>
+
+
+    </div>
+
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="AppModal.close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>

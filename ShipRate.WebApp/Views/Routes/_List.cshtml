@@ -1,0 +1,75 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.RouteDTOs
+@model PagedResultDto<RouteDto>
+
+<div class="card">
+
+    <div class="table-responsive">
+
+        <table class="table">
+
+            <thead>
+                <tr>
+                    <th>Route</th>
+                    <th>Origin</th>
+                    <th>Destination</th>
+                    <th>Mode</th>
+                    <th>Distance</th>
+@*                     <th>Status</th>
+ *@                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var r in Model.Items)
+                {
+                    <tr>
+
+                        <td>@r.RouteName</td>
+                        <td>@r.OriginName</td>
+                        <td>@r.DestinationName</td>
+                        <td>@r.RouteModeName</td>
+
+                        <td>
+                            @if (r.DistanceKms != null)
+                            {
+                                <span>@r.DistanceKms km</span>
+                            }
+                        </td>
+
+@*                         <td>
+                            @if (r.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </td>
+ *@
+                        <td>
+
+                            <button class="btn btn-sm btn-outline-primary"
+                                    hx-get="/Routes/Edit/@r.RouteId"
+                                    hx-target="#modal-container">
+                                Edit
+                            </button>
+
+                            <button class="btn btn-sm btn-outline-danger"
+                                    hx-get="/Routes/Delete/@r.RouteId"
+                                    hx-target="#modal-container">
+                                Delete
+                            </button>
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+
+    </div>
+</div>

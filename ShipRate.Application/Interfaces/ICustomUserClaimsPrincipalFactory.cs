@@ -1,0 +1,10 @@
+﻿using Microsoft.AspNetCore.Identity;
+using ShipRate.Domain.Entities.Security;
+
+namespace ShipRate.Application.Interfaces
+{
+    public interface ICustomUserClaimsPrincipalFactory : IUserClaimsPrincipalFactory<ApplicationUser>
+    {
+
+    }
+}

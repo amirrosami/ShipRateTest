@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "Report Designer";
+}
+
+<link href="https://cdn.stimulsoft.com/reports-js/CSS/stimulsoft.viewer.office2013.css" rel="stylesheet" />
+<link href="https://cdn.stimulsoft.com/reports-js/CSS/stimulsoft.designer.office2013.css" rel="stylesheet" />
+
+<script src="https://cdn.stimulsoft.com/reports-js/Scripts/stimulsoft.reports.js"></script>
+<script src="https://cdn.stimulsoft.com/reports-js/Scripts/stimulsoft.viewer.js"></script>
+<script src="https://cdn.stimulsoft.com/reports-js/Scripts/stimulsoft.designer.js"></script>
+
+<div id="designer" style="height:100vh;"></div>
+
+<script>
+
+
+    var report = new Stimulsoft.Report.StiReport();
+    var designer = new Stimulsoft.Designer.StiDesigner(null, "Designer", false);
+
+    designer.renderHtml("designer");
+    designer.report = report;
+</script>

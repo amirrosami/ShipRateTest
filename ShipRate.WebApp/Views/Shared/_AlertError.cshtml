@@ -1,0 +1,50 @@
+﻿@model dynamic
+
+@{
+    var messages = new List<string>();
+
+    if (Model is string strMsg && !string.IsNullOrWhiteSpace(strMsg))
+    {
+        messages.Add(strMsg);
+    }
+    else if (Model is IEnumerable<string> strList)
+    {
+        messages.AddRange(strList.Where(s => !string.IsNullOrWhiteSpace(s)));
+    }
+    else if (Model is Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState)
+    {
+        messages.AddRange(modelState.Values
+            .SelectMany(v => v.Errors)
+            .Select(e => e.ErrorMessage)
+            .Where(msg => !string.IsNullOrWhiteSpace(msg)));
+    }
+    else if (ViewBag.ErrorMessage != null)
+    {
+        messages.Add(ViewBag.ErrorMessage.ToString());
+    }
+}
+
+@if (messages.Any())
+{
+    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-start gap-2 shadow-sm my-2 py-2 px-3 border-danger-subtle" role="alert">
+        <i class="bi bi-exclamation-triangle-fill flex-shrink-0 text-danger fs-5 mt-1"></i>
+
+        <div class="flex-grow-1 small">
+            @if (messages.Count == 1)
+            {
+                <span>@messages.First()</span>
+            }
+            else
+            {
+                <ul class="mb-0 ps-3">
+                    @foreach (var err in messages)
+                    {
+                        <li>@err</li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}

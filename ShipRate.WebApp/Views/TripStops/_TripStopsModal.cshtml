@@ -1,0 +1,147 @@
+﻿@using ShipRate.WebApp.ViewModels.TransitViewModels
+@model TripStopsListViewModel
+
+<style>
+    .stops-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #e8ecff;
+    }
+
+        .stops-header h3 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+    .stops-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+    }
+
+        .stops-table th {
+            background: #f8f9fa;
+            padding: 12px 8px;
+            text-align: left;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .stops-table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 0.85rem;
+        }
+
+        .stops-table tr:hover {
+            background: #f8f9ff;
+        }
+
+    .stop-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        background: var(--primary);
+        color: white;
+        border-radius: 50%;
+        font-weight: 700;
+        font-size: 0.75rem;
+    }
+
+    .time-cell {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+
+    .time-actual {
+        color: #28a745;
+        font-weight: 600;
+    }
+
+    .empty-stops {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+    }
+</style>
+
+<div id="stops-content">
+    <div class="stops-header">
+        <h3>🗺️ Trip Stops — @Model.TripNumber</h3>
+        <button class="btn btn-primary btn-sm"
+                hx-get="/TripStops/Create?tripId=@Model.TripId"
+                hx-target="#stop-form-container"
+                hx-swap="innerHTML"
+                onclick="document.getElementById('stop-form-modal').classList.add('active')">
+            <i class="bi bi-plus-circle"></i> Add Stop
+        </button>
+    </div>
+
+    @if (Model.Stops.Any())
+    {
+        <table class="stops-table">
+            <thead>
+                <tr>
+                    <th style="width: 60px;">#</th>
+                    <th>Location</th>
+                    <th>Scheduled Arrival</th>
+                    <th>Scheduled Departure</th>
+                    <th>Actual Arrival</th>
+                    <th>Actual Departure</th>
+                    <th>Remarks</th>
+                    <th style="width: 100px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var stop in Model.Stops)
+                {
+                    <tr>
+                        <td><span class="stop-number">@stop.StopNumber</span></td>
+                        <td><strong>@stop.LocationName</strong></td>
+                        <td class="time-cell">@stop.ScheduledArrival?.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="time-cell">@stop.ScheduledDeparture?.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="time-cell time-actual">
+                            @(stop.ActualArrival.HasValue? stop.ActualArrival.Value.ToString("yyyy-MM-dd HH:mm") : "—")
+                        </td>
+                        <td class="time-cell time-actual">
+                            @(stop.ActualDeparture.HasValue? stop.ActualDeparture.Value.ToString("yyyy-MM-dd HH:mm") : "—")
+                        </td>
+                        <td>@(string.IsNullOrEmpty(stop.Remarks) ? "—" : stop.Remarks)</td>
+                        <td class="actions-cell">
+                            <button class="action-btn edit"
+                                    hx-get="/TripStops/Edit/@stop.Id"
+                                    hx-target="#stop-form-container"
+                                    hx-swap="innerHTML"
+                                    onclick="document.getElementById('stop-form-modal').classList.add('active')"
+                                    title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="action-btn delete"
+                                    hx-delete="/TripStops/Delete/@stop.Id"
+                                    hx-confirm="Delete this stop?"
+                                    hx-trigger="stopChanged from:body"
+                                    title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="empty-stops">
+            <i class="bi bi-geo" style="font-size: 3rem; color: #dee2e6;"></i>
+            <p>No stops defined for this trip yet.</p>
+        </div>
+    }
+</div>

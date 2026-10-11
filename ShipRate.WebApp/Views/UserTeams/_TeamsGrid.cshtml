@@ -1,0 +1,78 @@
+﻿@using ShipRate.Application.DTOs.UserTeams
+@model TeamListViewModel
+
+<table class="table table-bordered table-hover table-sm align-middle">
+
+    <thead>
+        <tr>
+            <th>Company</th>
+            <th>Team</th>
+            <th>Team Local Name</th>
+            <th>Type</th>
+            <th>Manager</th>
+            <th width="150"></th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @if (Model.Result.Items == null || !Model.Result.Items.Any())
+        {
+            <tr>
+                <td colspan="5" class="text-center text-muted">
+                    No teams found.
+                </td>
+            </tr>
+        }
+        else
+        {
+            foreach (var team in Model.Result.Items)
+            {
+                <tr>
+
+                    <td>@team.CompanyName</td>
+
+                    <td>
+                        <button type="button"
+                                class="btn btn-link p-0"
+                                hx-get="/UserTeams/MembersGrid?teamId=@team.Id"
+                                hx-target="#membersGrid"
+                                hx-swap="outerHTML">
+                            @team.TeamName
+                        </button>
+                    </td>
+                    <td>@team.TeamLocalName</td>
+                    <td>@team.TeamTypeName</td>
+
+                    <td>@team.ManagerName</td>
+
+                    <td>
+
+                        <button type="button"
+                                class="btn btn-sm btn-warning"
+                                hx-get="/UserTeams/EditTeam/@team.Id"
+                                hx-target="#app-modal-content"
+                                hx-swap="innerHTML">
+                            Edit
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-sm btn-danger"
+                                hx-post="/UserTeams/DeleteTeam/@team.Id"
+                                hx-confirm="Delete this team?"
+                                hx-target="#teamsGrid"
+                                hx-swap="innerHTML">
+                            Delete
+                        </button>
+
+                    </td>
+
+                </tr>
+            }
+        }
+
+    </tbody>
+
+</table>
+
+<partial name="_Paging" model="Model.Result" />

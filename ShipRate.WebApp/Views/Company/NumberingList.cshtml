@@ -1,0 +1,101 @@
+﻿@using ShipRate.WebApp.ViewModels.CompaniesViewModels
+@model CompanyNumberingListViewModel
+
+@{
+    ViewData["Title"] = "Numbering Configurations - " + Model.CompanyName;
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="mb-0">Numbering Configurations</h4>
+            <small class="text-muted">Company: <strong>@Model.CompanyName</strong></small>
+        </div>
+        <a asp-action="Index" class="btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back to Companies
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Entity Type</th>
+                    <th>Prefix</th>
+                    <th>Suffix</th>
+                    <th>Pad Length</th>
+                    <th>Current Seq</th>
+                    <th>Current Year</th>
+                    <th>Reset Yearly</th>
+                    <th>Status</th>
+                    <th>Next Generated Number</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Items.Any())
+                {
+                    <tr>
+                        <td colspan="11" class="text-center text-muted py-4">
+                            No Numbering Configuration Defined for this Company.
+                        </td>
+                    </tr>
+                }
+                @{
+                    var row = 1;
+                }
+                @foreach (var item in Model.Items)
+                {
+                    var nextNumber = $"{item.Prefix}{(item.CurrentSeq + 1).ToString().PadLeft(item.PadLength, '0')}{item.Suffix}";
+                    <tr>
+                        <td>@(row++)</td>
+                        <td><strong class="text-primary">@item.EntityType</strong></td>
+                        <td>@item.Prefix</td>
+                        <td>@item.Suffix</td>
+                        <td>@item.PadLength</td>
+                        <td>@item.CurrentSeq</td>
+                        <td>@item.CurrentYear</td>
+                        <td>
+                            @if (item.ResetYearly)
+                            {
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-x-circle text-muted"></i>
+                            }
+                        </td>
+                        <td>
+                            @if (item.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="badge bg-dark font-monospace">@nextNumber</span>
+                        </td>
+                        <td>
+                            <a asp-action="EditNumbering" asp-route-id="@item.Id"
+                               class="btn btn-outline-primary btn-sm" title="Edit Numbering">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

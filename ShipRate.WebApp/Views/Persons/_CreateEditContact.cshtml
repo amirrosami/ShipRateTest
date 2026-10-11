@@ -1,0 +1,123 @@
+﻿@using ShipRate.Application.DTOs.Base_Info
+@model PersonContactCreateUpdateDto
+@{
+    string CreateEditContact = ViewBag.CreateEditContact;
+    bool isCreateMode = false;
+    if (CreateEditContact == "Create") isCreateMode = true;
+}
+
+<form hx-post="@Url.Action(isCreateMode?"CreateContact":"EditContact", "Persons")"
+      hx-target="#app-modal-content-second"
+      hx-swap="innerHTML">
+
+    <div class="modal-header bg-primary text-white">
+        <input type="hidden" asp-for="PersonId" />
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add Contact</h5>
+        }
+        else
+        {
+            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Edit Contact</h5>
+            <input type="hidden" asp-for="Id" />
+        }
+
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    </div>
+
+
+
+
+    <div class="modal-body row">
+        @Html.AntiForgeryToken()
+        @if (!ViewData.ModelState.IsValid)
+        {
+            var allErrors = ViewData.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            if (allErrors.Any())
+            {
+                <div class="alert alert-danger py-2 mb-3">
+                    <ul class="mb-0 small">
+                        @foreach (var err in allErrors)
+                        {
+                            <li>@err</li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+        <!-- Full Name -->
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                Name <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="FullName"
+                   value="@Model.FullName"
+                   class="form-control @(ViewData.ModelState.ContainsKey("FullName") && ViewData.ModelState["FullName"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="50" required />
+        </div>
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                Role <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="Role"
+                   value="@Model.Role"
+                   class="form-control @(ViewData.ModelState.ContainsKey("Role") && ViewData.ModelState["Role"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="100" required />
+        </div>
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                Phone <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="Phone"
+                   value="@Model.Phone"
+                   class="form-control @(ViewData.ModelState.ContainsKey("Phone") && ViewData.ModelState["Phone"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="20" required />
+        </div>
+
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                Email <span class="text-danger">*</span>
+            </label>
+            <input type="text"
+                   name="Email"
+                   value="@Model.Email"
+                   class="form-control @(ViewData.ModelState.ContainsKey("Email") && ViewData.ModelState["Email"]!.Errors.Any() ? "is-invalid" : "")"
+                   placeholder=""
+                   maxlength="50" required />
+        </div>
+
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-medium">
+                Is Main<span class="text-danger">*</span>
+            </label>
+            <input type="checkbox"
+                   name="IsMain"
+                   value="true"
+                   checked="@(Model.IsMain ? "checked" : null)"
+                   class="form-check-input" />
+            <input type="hidden" name="IsMain" value="false" />
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>

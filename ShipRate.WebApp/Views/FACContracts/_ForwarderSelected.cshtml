@@ -1,0 +1,13 @@
+﻿@using ShipRate.Domain.Entities.Customers
+@model Customer
+
+<div id="forwarderBox">
+
+    <input type="hidden" name="ForwarderId" value="@Model.Id" />
+
+    <input type="text"
+           class="form-control"
+           value="@Model.Person.PersonName"
+           readonly />
+
+</div>

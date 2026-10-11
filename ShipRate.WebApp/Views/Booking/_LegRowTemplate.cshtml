@@ -1,0 +1,112 @@
+﻿@using ShipRate.Application.DTOs
+@model BookingLegVm
+
+@{
+    var rowIndex = (int)(ViewData["LegIndex"] ?? 0);
+}
+
+<tr class="leg-row" data-leg-index="@rowIndex">
+
+    <td>
+        <!-- برای Model Binding لیست، مخصوصاً بعد از حذف ردیف -->
+        <input type="hidden"
+               name="BookingLegs.Index"
+               value="@rowIndex" />
+
+        <input type="hidden"
+               name="BookingLegs[@rowIndex].Id"
+               value="@Model.Id" />
+
+        <input type="number"
+               name="BookingLegs[@rowIndex].SequenceNo"
+               value="@Model.SequenceNo"
+               class="form-control form-control-sm text-center"
+               readonly />
+    </td>
+
+    <td>
+        <select name="BookingLegs[@rowIndex].TransportTypeId"
+                class="form-select form-select-sm"
+                asp-items="ViewBag.TransportTypes">
+            <option value="">-- Select --</option>
+        </select>
+    </td>
+
+    <td>
+        <input type="hidden"
+               id="port-from-id-@rowIndex"
+               name="BookingLegs[@rowIndex].FromLocationId"
+               value="@Model.FromLocationId" />
+
+        <input type="text"
+               id="port-from-text-@rowIndex"
+               name="search"
+               class="form-control form-control-sm port-search-input"
+               placeholder="Type to search from location..."
+               value="@Model.FromLocationName"
+               autocomplete="off"
+               data-index="@rowIndex"
+               data-port-type="from"
+               hx-get="@Url.Action("SearchPorts", "Locations")"
+               hx-trigger="keyup changed delay:300ms"
+               hx-vals='{"index":"@rowIndex","portType":"from"}'
+               hx-target="#global-port-search-popup"
+               hx-swap="innerHTML" />
+    </td>
+
+    <td>
+        <input type="hidden"
+               id="port-to-id-@rowIndex"
+               name="BookingLegs[@rowIndex].ToLocationId"
+               value="@Model.ToLocationId" />
+
+        <input type="text"
+               id="port-to-text-@rowIndex"
+               name="search"
+               class="form-control form-control-sm port-search-input"
+               placeholder="Type to search to location..."
+               value="@Model.ToLocationName"
+               autocomplete="off"
+               data-index="@rowIndex"
+               data-port-type="to"
+               hx-get="@Url.Action("SearchPorts", "Locations")"
+               hx-trigger="keyup changed delay:300ms"
+               hx-vals='{"index":"@rowIndex","portType":"to"}'
+               hx-target="#global-port-search-popup"
+               hx-swap="innerHTML" />
+    </td>
+
+    <td>
+        <input type="datetime-local"
+               name="BookingLegs[@rowIndex].PlannedETD"
+               value="@(Model.PlannedETD?.ToString("yyyy-MM-ddTHH:mm"))"
+               class="form-control form-control-sm" />
+    </td>
+
+    <td>
+        <input type="datetime-local"
+               name="BookingLegs[@rowIndex].PlannedETA"
+               value="@(Model.PlannedETA?.ToString("yyyy-MM-ddTHH:mm"))"
+               class="form-control form-control-sm" />
+    </td>
+
+    <td class="text-center">
+        <button type="button"
+                class="btn btn-sm btn-outline-danger"
+                onclick="this.closest('tr').remove();">
+            <i class="bi bi-trash"></i>
+        </button>
+    </td>
+
+</tr>
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,149 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@using ShipRate.Application.DTOs.BillOfLadings
+@model BLUpsertDto
+
+@{
+    var lookups = ViewBag.Lookups as BLLookupDto;
+}
+
+<div class="row g-3">
+
+    <div class="col-md-4">
+        <label asp-for="BLNo" class="form-label">BL No</label>
+        <input asp-for="BLNo" class="form-control" />
+        <span asp-validation-for="BLNo" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="BLIssueDate" class="form-label">BL Issuee Date</label>
+        <input asp-for="BLIssueDate" class="form-control" />
+        <span asp-validation-for="BLIssueDate" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="IssuePlace" class="form-label">Place Of Issue</label>
+        <input asp-for="IssuePlace" class="form-control" />
+        <span asp-validation-for="IssuePlace" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="CompanyId" class="form-label">Company</label>
+        <select asp-for="CompanyId"
+                class="form-select"
+                asp-items="@(new SelectList(lookups?.Companies ?? Enumerable.Empty<object>(), "Id", "Name", Model.CompanyId))">
+            <option value="">Select Company</option>
+        </select>
+        <span asp-validation-for="CompanyId" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="BLTypeId" class="form-label">BL Type</label>
+        <select asp-for="BLTypeId"
+                class="form-select"
+                asp-items="@(new SelectList(lookups?.BLTypes ?? Enumerable.Empty<object>(), "Id", "Name", Model.BLTypeId))">
+            <option value="">Select BL Type</option>
+        </select>
+        <span asp-validation-for="BLTypeId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="BLLevelId" class="form-label">BL Level</label>
+        <select asp-for="BLLevelId"
+                class="form-select"
+                asp-items="@(new SelectList(lookups?.BLLevels ?? Enumerable.Empty<object>(), "Id", "Name", Model.BLLevelId))">
+            <option value="">Select BL Level</option>
+        </select>
+        <span asp-validation-for="BLLevelId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="TransportTypeId" class="form-label">Transport Type</label>
+        <select asp-for="TransportTypeId"
+                class="form-select"
+                asp-items="@(new SelectList(lookups?.TransportTypes ?? Enumerable.Empty<object>(), "Id", "Name", Model.TransportTypeId))">
+            <option value="">Select Transport Type</option>
+        </select>
+        <span asp-validation-for="TransportTypeId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="LoadTypeId" class="form-label">Load Type</label>
+        <select asp-for="LoadTypeId"
+                class="form-select"
+                asp-items="@(new SelectList(lookups?.LoadTypes ?? Enumerable.Empty<object>(), "Id", "Name", Model.LoadTypeId))">
+            <option value="">Select Load Type</option>
+        </select>
+        <span asp-validation-for="LoadTypeId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="MovementTypeId" class="form-label">Movement Type</label>
+        <select asp-for="MovementTypeId"
+                class="form-select"
+                asp-items="@(new SelectList(lookups?.MovementTypes ?? Enumerable.Empty<object>(), "Id", "Name", Model.MovementTypeId))">
+            <option value="">Select Movement Type</option>
+        </select>
+        <span asp-validation-for="MovementTypeId" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="PaymentTypeId" class="form-label">Payment Type</label>
+        <select asp-for="PaymentTypeId"
+                class="form-select"
+                asp-items="@(new SelectList(lookups?.PaymentTypes ?? Enumerable.Empty<object>(), "Id", "Name", Model.PaymentTypeId))">
+            <option value="">Select Payment Type</option>
+        </select>
+        <span asp-validation-for="PaymentTypeId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="CarrierId" class="form-label">Carrier</label>
+        <select asp-for="CarrierId"
+                class="form-select"
+                asp-items="@(new SelectList(lookups?.Carriers ?? Enumerable.Empty<object>(), "Id", "Name", Model.CarrierId))">
+            <option value="">Select Carrier</option>
+        </select>
+        <span asp-validation-for="CarrierId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="IssuerPartyId" class="form-label">Issuer Party</label>
+        <select asp-for="IssuerPartyId"
+                class="form-select"
+                asp-items="@(new SelectList(lookups?.IssueParties ?? Enumerable.Empty<object>(), "Id", "Name", Model.IssuerPartyId))">
+            <option value="">Select Issuer Party</option>
+        </select>
+        <span asp-validation-for="IssuerPartyId" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <div class="form-check mt-4">
+            <input asp-for="IsContainerized" class="form-check-input" />
+            <label asp-for="IsContainerized" class="form-check-label">
+                Containerized
+            </label>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <label asp-for="GoodsDescription" class="form-label">Description Of Goods</label>
+        <textarea asp-for="GoodsDescription" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="GoodsDescription" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="MarksAndNumbers" class="form-label">Marks and Numbers</label>
+        <input asp-for="MarksAndNumbers" class="form-control" />
+        <span asp-validation-for="MarksAndNumbers" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="TotalContainers" class="form-label">Total Containers</label>
+        <input asp-for="TotalContainers" class="form-control" />
+        <span asp-validation-for="TotalContainers" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="TotalPackages" class="form-label">Total Packages</label>
+        <input asp-for="TotalPackages" class="form-control" />
+        <span asp-validation-for="TotalPackages" class="text-danger"></span>
+    </div>
+
+
+</div>

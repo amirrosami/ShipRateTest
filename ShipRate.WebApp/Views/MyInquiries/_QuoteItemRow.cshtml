@@ -1,0 +1,107 @@
+﻿@using ShipRate.Application.ViewModels
+@model QuoteItemRowVm
+
+@{
+    var i = Model.Index;
+    var item = Model.Parent.Items[i];
+    var total = (item.Quantity ?? 0) * (item.UnitRate ?? 0);
+}
+
+<tr>
+    <td>
+        <select name="Items[@i].ChargeTypeId" class="form-select form-select-sm">
+            <option value="">Select...</option>
+            @foreach (var option in Model.Parent.ChargeTypeOptions)
+            {
+                if (option.Value == item.ChargeTypeId?.ToString())
+                {
+                    <option value="@option.Value" selected>@option.Text</option>
+                }
+                else
+                {
+                    <option value="@option.Value">@option.Text</option>
+                }
+            }
+        </select>
+        <span class="text-danger field-validation-valid small" data-valmsg-for="Items[@i].ChargeTypeId"></span>
+    </td>
+
+    <td>
+        <select name="Items[@i].ContainerSizeTypeId" class="form-select form-select-sm">
+            <option value="">Select...</option>
+            @foreach (var option in Model.Parent.ContainerSizeTypeOptions)
+            {
+                if (option.Value == item.ContainerSizeTypeId?.ToString())
+                {
+                    <option value="@option.Value" selected>@option.Text</option>
+                }
+                else
+                {
+                    <option value="@option.Value">@option.Text</option>
+                }
+            }
+        </select>
+    </td>
+
+    <td>
+        <input name="Items[@i].Quantity"
+               value="@item.Quantity"
+               type="number"
+               step="0.01"
+               min="0"
+               class="form-control form-control-sm quote-qty" />
+        <span class="text-danger field-validation-valid small" data-valmsg-for="Items[@i].Quantity"></span>
+    </td>
+
+    <td>
+        <input name="Items[@i].UnitRate"
+               value="@item.UnitRate"
+               type="number"
+               step="0.01"
+               min="0"
+               class="form-control form-control-sm quote-rate" />
+        <span class="text-danger field-validation-valid small" data-valmsg-for="Items[@i].UnitRate"></span>
+    </td>
+
+    <td>
+        <select name="Items[@i].CurrencyId" class="form-select form-select-sm">
+            <option value="">Select...</option>
+            @foreach (var option in Model.Parent.CurrencyOptions)
+            {
+                if (option.Value == item.CurrencyId?.ToString())
+                {
+                    <option value="@option.Value" selected>@option.Text</option>
+                }
+                else
+                {
+                    <option value="@option.Value">@option.Text</option>
+                }
+            }
+        </select>
+        <span class="text-danger field-validation-valid small" data-valmsg-for="Items[@i].CurrencyId"></span>
+    </td>
+
+    <td>
+        <input name="Items[@i].Remarks" value="@item.Remarks" class="form-control form-control-sm" />
+    </td>
+
+    <td>
+        <input type="text"
+               class="form-control form-control-sm quote-total"
+               value="@total"
+               readonly />
+    </td>
+
+
+
+    <td class="text-center">
+        <button type="button"
+                class="btn btn-sm btn-outline-danger"
+                hx-post="@Url.Action("RemoveQuoteItem", "MyInquiries", new { index = i })"
+                hx-include="closest form"
+                hx-target="#quote-items-editor"
+                hx-swap="outerHTML">
+            <i class="bi bi-trash"></i>
+        </button>
+    </td>
+</tr>

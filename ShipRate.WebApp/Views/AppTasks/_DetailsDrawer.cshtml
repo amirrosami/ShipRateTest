@@ -1,0 +1,139 @@
+﻿@using ShipRate.Application.DTOs.AppTasks
+@model AppTaskDetailsDto
+
+<div class="border-bottom p-3 d-flex justify-content-between align-items-start">
+    <div>
+        <h5 class="mb-1">@Model.Title</h5>
+        <div class="text-muted small">
+            Status: @Model.TaskStatusName
+            @if (Model.DueDate.HasValue)
+            {
+                <span> | Due: @Model.DueDate.Value.ToString("yyyy/MM/dd")</span>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.PriorityName))
+            {
+                <span> | Priority: @Model.PriorityName</span>
+            }
+        </div>
+    </div>
+
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+</div>
+
+<div class="p-3">
+
+    <div class="mb-3">
+        <label class="form-label fw-semibold">Description</label>
+        <div class="border rounded p-2 bg-light">
+            @(string.IsNullOrWhiteSpace(Model.TaskDesciption) ? "-" : Model.TaskDesciption)
+        </div>
+
+        @if (Model.TaskStatusId == 1)
+        {
+            <button class="btn btn-sm btn-primary"
+                    hx-post="@Url.Action("Start", "AppTasks", new { id = Model.Id })"
+                    hx-target="#appTaskDrawer"
+                    hx-swap="innerHTML">
+                Start
+            </button>
+        }
+
+    </div>
+
+    <div class="row g-2 mb-3">
+        <div class="col-md-6">
+            <div class="small text-muted">Owner</div>
+            <div>@(Model.OwnerUserName ?? "-")</div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="small text-muted">Current Assignee</div>
+            <div>@(Model.CurrentAssignedToUserName ?? "-")</div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="small text-muted">Entity</div>
+            <div>@(Model.EntityTypeName ?? "-")</div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="small text-muted">Related Id</div>
+            <div>@(Model.RelatedEntityId?.ToString() ?? "-")</div>
+        </div>
+    </div>
+
+    @if (Model.HasOpenMandatoryChecklist && !Model.CompletedDate.HasValue)
+    {
+        <div class="alert alert-warning">
+            Mandatory checklist items are still open.
+        </div>
+    }
+
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#taskChecklist" type="button">
+                Checklist
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#taskComments" type="button">
+                Comments
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#taskAssignments" type="button">
+                Assignments
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#taskTimeline" type="button">
+                Timeline
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content border border-top-0 p-3 mb-3">
+        <div class="tab-pane fade show active" id="taskChecklist">
+            @await Html.PartialAsync("_Checklist", Model)
+        </div>
+
+        <div class="tab-pane fade" id="taskComments">
+            @await Html.PartialAsync("_CommentForm", Model)
+        </div>
+
+        <div class="tab-pane fade" id="taskAssignments">
+            @await Html.PartialAsync("_AssignmentPanel", Model)
+        </div>
+
+        <div class="tab-pane fade" id="taskTimeline">
+            @await Html.PartialAsync("_Timeline", Model.Timeline)
+        </div>
+    </div>
+
+    @if (Model.CanComplete)
+    {
+        <form hx-post="@Url.Action("Complete", "AppTasks")"
+              hx-target="#appTaskDrawerContent"
+              hx-swap="innerHTML">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" name="AppTaskId" value="@Model.Id" />
+
+            <div class="mb-2">
+                <label class="form-label">Result Notes</label>
+                <textarea name="ResultNotes" class="form-control" rows="3"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">
+                Complete Task
+            </button>
+        </form>
+    }
+    else if (Model.CompletedDate.HasValue)
+    {
+        <div class="alert alert-success mb-0">
+            Completed at @Model.CompletedDate.Value.ToString("yyyy/MM/dd HH:mm")
+        </div>
+    }
+</div>

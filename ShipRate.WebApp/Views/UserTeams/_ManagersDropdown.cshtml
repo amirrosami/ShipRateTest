@@ -1,0 +1,12 @@
+﻿@model List<SelectListItem>
+
+<select name="ManagerId" class="form-select">
+
+    <option value="">Select manager...</option>
+
+    @foreach (var m in Model)
+    {
+        <option value="@m.Value">@m.Text</option>
+    }
+
+</select>

@@ -1,0 +1,112 @@
+﻿@using ShipRate.Application.JobsViewModels
+@model CreateBookingVm
+
+<div dir="ltr" class="container">
+    <div>
+        <h2 class="mb-3 fw-bold text-primary">Create / Edit Booking</h2>
+    </div>
+
+    <!-- فرم اصلی با کنترل و ارسال سراسری به متد SaveBooking -->
+    <form hx-post="@Url.Action("SaveBooking", "Jobs")"
+          hx-target="#modal-content"
+          hx-swap="innerHTML"
+          novalidate>
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+        <input type="hidden" asp-for="JobId" id="JobId" />
+        <input type="hidden" asp-for="BookingId" id="BookingId" />
+
+        <!-- 1. GENERAL SECTION (فیلدهای ثابت و بالا دستی) -->
+        <div class="card mb-3 border-light shadow-sm">
+            <div class="card-header py-2 bg-primary-subtle text-primary-emphasis fw-semibold">General Context</div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Company</label>
+                        <select asp-for="CompanyId" asp-items="Model.Companies" class="form-select form-select-sm">
+                            <option value="">Select Company...</option>
+                        </select>
+                        <span asp-validation-for="CompanyId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Company Role Type</label>
+                        <!-- تریگر HTMX برای آپدیت فیلدهای پویا با تغییر نقش -->
+                        <select asp-for="CompanyRoleTypeId" asp-items="Model.CompanyRoleTypes" class="form-select form-select-sm" id="CompanyRoleTypeId"
+                                hx-get="@Url.Action("GetDynamicBookingFields", "Jobs")"
+                                hx-trigger="change"
+                                hx-target="#dynamic-booking-content"
+                                hx-include="#JobId, #BookingId, #TransportTypeId, #CompanyRoleTypeId">
+                            <option value="">Select Role...</option>
+                        </select>
+                        <span asp-validation-for="CompanyRoleTypeId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Transport Type</label>
+                        <!-- تریگر HTMX برای آپدیت کل فرم با تغییر نوع حمل -->
+                        <select asp-for="TransportTypeId" asp-items="Model.TransportTypes" class="form-select form-select-sm" id="TransportTypeId"
+                                hx-get="@Url.Action("GetDynamicBookingFields", "Jobs")"
+                                hx-trigger="change"
+                                hx-target="#dynamic-booking-content"
+                                hx-include="#JobId, #BookingId, #TransportTypeId, #CompanyRoleTypeId">
+                            <option value="">Select Transport...</option>
+                        </select>
+                        <span asp-validation-for="TransportTypeId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Shipment Leg</label>
+                        <select asp-for="ShipmentLegId" asp-items="Model.Legs" class="form-select form-select-sm">
+                            <option value="">Select Leg...</option>
+                        </select>
+                        <span asp-validation-for="ShipmentLegId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Booking Number</label>
+                        <input asp-for="BookingNo" class="form-control form-control-sm" placeholder="Booking No..." />
+                        <span asp-validation-for="BookingNo" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Line Booking No (Carrier)</label>
+                        <input asp-for="LineBookingNo" class="form-control form-control-sm" placeholder="Line Booking No..." />
+                        <span asp-validation-for="LineBookingNo" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. DYNAMIC WORKFLOW SECTION (اینجا با HTMX لود می‌شود) -->
+        <div id="dynamic-booking-content">
+            @await Html.PartialAsync("_DynamicBookingFields", Model)
+        </div>
+
+        <!-- 3. REMARKS & ACTIONS (بخش پایینی و عمومی) -->
+        <div class="card mb-3 border-light shadow-sm">
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">
+                        <i class="bi bi-chat-left-text text-primary me-1"></i> Booking Remarks
+                    </label>
+                    <textarea name="Remarks" class="form-control form-control-sm" rows="3"
+                              placeholder="Add special instructions for this booking here...">@Model.Remarks</textarea>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+                    <button type="submit" class="btn btn-success btn-sm px-4">Save Booking</button>
+                    <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    // ایندکس‌ها برای افزودن داینامیک ردیف‌ها در صورت لزوم
+    window.containerIndex = @(Model.Containers?.Count ?? 0);
+    window.packageIndex = @(Model.Packages?.Count ?? 0);
+    window.partyIndex = @(Model.Parties?.Count ?? 0);
+</script>

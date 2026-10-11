@@ -1,0 +1,151 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.ViewModels
+@model PagedResultDto<TelexReleaseListItemViewModel>
+
+@{
+    var search = ViewBag.Search as TelexReleaseSearchViewModel
+                 ?? new TelexReleaseSearchViewModel();
+
+    var totalPages = (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize);
+    var currentPage = Model.PageNumber;
+
+    var startPage = Math.Max(1, currentPage - 2);
+    var endPage = Math.Min(totalPages, currentPage + 2);
+}
+
+<div class="card">
+    <div class="card-body table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Request No</th>
+                    <th>Request Date</th>
+                    <th>BL No</th>
+                    <th>Approval Date</th>
+                    <th>Status</th>
+                    <th>Remarks</th>
+                    <th>Create Date</th>
+                    <th>Create User</th>
+                    <th>Approve Date</th>
+                    <th>Approve User</th>
+                    <th style="width:160px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Items != null && Model.Items.Any())
+                {
+                    foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>@item.RequestNo</td>
+                            <td>@item.RequestDate.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@item.BLNo</td>
+                            <td>@(item.ApprovalDate?.ToString("yyyy-MM-dd HH:mm"))</td>
+                            <td>@item.StatusName</td>
+                            <td>@item.Remarks</td>
+                            <td>@item.CreateDate?.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@item.CreatedByUserName</td>
+                            <td>@item.ApprovalDate?.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@item.ApproveByUserName</td>
+                            <td>
+                                <button class="btn btn-sm btn-info"
+                                        title="Details"
+                                        hx-get="@Url.Action("Details", "TelexRelease", new { id = item.Id })"
+                                        hx-target="#modalBody"
+                                        hx-swap="innerHTML"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#mainModal">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+
+                                <button class="btn btn-sm btn-warning"
+                                        title="Edit"
+                                        hx-get="@Url.Action("Edit", "TelexRelease", new { id = item.Id })"
+                                        hx-target="#modalBody"
+                                        hx-swap="innerHTML"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#mainModal">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+
+                                <button class="btn btn-sm btn-danger"
+                                        title="Approve"
+                                        hx-get="@Url.Action("Approve", "TelexRelease", new { id = item.Id })"
+                                        hx-target="#modalBody"
+                                        hx-swap="innerHTML"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#mainModal">
+                                    <i class="bi bi-check"></i>
+                                </button>
+
+
+                                <button class="btn btn-sm btn-danger"
+                                        title="Delete"
+                                        hx-get="@Url.Action("Delete", "TelexRelease", new { id = item.Id })"
+                                        hx-target="#modalBody"
+                                        hx-swap="innerHTML"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#mainModal">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-secondary"
+                                        hx-get="/DocumentManager/Index?objectId=@item.Id&objectTypeId=9"
+                                        hx-target="#document-manager-content"
+                                        hx-swap="innerHTML"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#documentManagerModal">
+                                    <i class="bi bi-folder2-open me-1"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="text-center">No data found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        @if (totalPages > 1)
+        {
+            <nav>
+                <ul class="pagination justify-content-center">
+
+                    @if (currentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link"
+                               hx-get="@Url.Action("Search", "TelexRelease", new { BLNo = search.BLNo, TelexReleaseStatusId = search.TelexReleaseStatusId, pageNumber = currentPage - 1, pageSize = search.PageSize })"
+                               hx-target="#gridContainer"
+                               hx-swap="innerHTML">Previous</a>
+                        </li>
+                    }
+
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(i == currentPage ? "active" : "")">
+                            <a class="page-link"
+                               hx-get="@Url.Action("Search", "TelexRelease", new { BLNo = search.BLNo, TelexReleaseStatusId = search.TelexReleaseStatusId, pageNumber = i, pageSize = search.PageSize })"
+                               hx-target="#gridContainer"
+                               hx-swap="innerHTML">@i</a>
+                        </li>
+                    }
+
+                    @if (currentPage < totalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link"
+                               hx-get="@Url.Action("Search", "TelexRelease", new { BLNo = search.BLNo, TelexReleaseStatusId = search.TelexReleaseStatusId, pageNumber = currentPage + 1, pageSize = search.PageSize })"
+                               hx-target="#gridContainer"
+                               hx-swap="innerHTML">Next</a>
+                        </li>
+                    }
+
+                </ul>
+            </nav>
+        }
+    </div>
+</div>

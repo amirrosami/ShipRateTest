@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="2025-01-01T00:00:00" ReportInfo.Modified="2025-01-01T00:00:00" ReportInfo.CreatorVersion="2024.1.0">
+  <Dictionary>
+    <BusinessObjectDataSource Name="BL" ReferenceName="BL" Enabled="true">
+      <Column Name="BLNo" DataType="System.String"/>
+      <Column Name="DocumentCaption" DataType="System.String"/>
+      <Column Name="IssuerName" DataType="System.String"/>
+      <Column Name="CarrierName" DataType="System.String"/>
+      <Column Name="ShipperName" DataType="System.String"/>
+      <Column Name="ShipperAddress" DataType="System.String"/>
+      <Column Name="ConsigneeName" DataType="System.String"/>
+      <Column Name="ConsigneeAddress" DataType="System.String"/>
+      <Column Name="NotifyPartyName" DataType="System.String"/>
+      <Column Name="NotifyPartyAddress" DataType="System.String"/>
+      <Column Name="LoadingPlace" DataType="System.String"/>
+      <Column Name="UnloadingPlace" DataType="System.String"/>
+      <Column Name="GoodsDescription" DataType="System.String"/>
+      <Column Name="PackageCount" DataType="System.String"/>
+      <Column Name="GrossWeight" DataType="System.String"/>
+      <Column Name="TruckNo" DataType="System.String"/>
+      <Column Name="TrailerNo" DataType="System.String"/>
+      <Column Name="DriverName" DataType="System.String"/>
+      <Column Name="IssuePlace" DataType="System.String"/>
+      <Column Name="IssueDate" DataType="System.String"/>
+      <Column Name="SignatureName" DataType="System.String"/>
+    </BusinessObjectDataSource>
+    <BusinessObjectDataSource Name="Trips" ReferenceName="Trips" Enabled="true">
+      <Column Name="TripNo" DataType="System.String"/>
+      <Column Name="Origin" DataType="System.String"/>
+      <Column Name="Destination" DataType="System.String"/>
+      <Column Name="TruckNo" DataType="System.String"/>
+      <Column Name="TrailerNo" DataType="System.String"/>
+      <Column Name="DriverName" DataType="System.String"/>
+    </BusinessObjectDataSource>
+    <ReportTitleBand Name="ReportTitle1" Top="0" Width="718.2" Height="54">
+        <TextObject Name="RoadTitle" Left="0" Top="0" Width="718" Height="12" Text="[BL.DocumentCaption]" HorzAlign="Center" Font="Arial, 14, Bold"/>
+        <TextObject Name="RoadNo" Left="0" Top="16" Width="718" Height="8" Text="CMR No: [BL.BLNo]" HorzAlign="Center" Font="Arial, 9"/>
+        <TextObject Name="RoadIssuer" Left="0" Top="28" Width="718" Height="8" Text="Issuer: [BL.IssuerName] | Carrier: [BL.CarrierName]" HorzAlign="Center" Font="Arial, 9"/>
+        <LineObject Name="RoadLine1" Left="0" Top="42" Width="718" Height="0.5"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="58" Width="718.2" Height="18">
+        <TextObject Name="RoadHdr1" Left="0" Top="0" Width="80" Height="8" Text="Parties" HorzAlign="Left" Font="Arial, 10, Bold"/>
+        <TextObject Name="RoadHdr2" Left="220" Top="0" Width="80" Height="8" Text="Routing" HorzAlign="Left" Font="Arial, 10, Bold"/>
+        <TextObject Name="RoadHdr3" Left="430" Top="0" Width="120" Height="8" Text="Truck / Cargo" HorzAlign="Left" Font="Arial, 10, Bold"/>
+    </PageHeaderBand>
+    <DataBand Name="DataBandBL" Top="78" Width="718.2" Height="62" DataSource="BL">
+        <TextObject Name="RoadShipper" Left="0" Top="0" Width="210" Height="20" Text="Shipper: [BL.ShipperName]
+[BL.ShipperAddress]" HorzAlign="Left" Font="Arial, 9"/>
+        <TextObject Name="RoadConsignee" Left="0" Top="24" Width="210" Height="20" Text="Consignee: [BL.ConsigneeName]
+[BL.ConsigneeAddress]" HorzAlign="Left" Font="Arial, 9"/>
+        <TextObject Name="RoadNotify" Left="220" Top="0" Width="210" Height="20" Text="Notify: [BL.NotifyPartyName]
+[BL.NotifyPartyAddress]" HorzAlign="Left" Font="Arial, 9"/>
+        <TextObject Name="RoadRoute" Left="220" Top="24" Width="210" Height="20" Text="Loading: [BL.LoadingPlace]
+Unloading: [BL.UnloadingPlace]" HorzAlign="Left" Font="Arial, 9"/>
+        <TextObject Name="RoadTruck" Left="430" Top="0" Width="288" Height="44" Text="Truck: [BL.TruckNo]
+Trailer: [BL.TrailerNo]
+Driver: [BL.DriverName]" HorzAlign="Left" Font="Arial, 9"/>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="148" Width="718.2" Height="24">
+        <TextObject Name="RoadCargo" Left="0" Top="0" Width="718" Height="8" Text="Cargo: [BL.GoodsDescription]  Packages: [BL.PackageCount]  Gross Weight: [BL.GrossWeight]" HorzAlign="Left" Font="Arial, 9"/>
+    </ReportSummaryBand>
+    <DataBand Name="DataBandTrips" Top="178" Width="718.2" Height="40" DataSource="Trips">
+        <TextObject Name="RoadTripRow" Left="0" Top="0" Width="160" Height="8" Text="Trip: [Trips.TripNo]" HorzAlign="Left" Font="Arial, 9, Bold"/>
+        <TextObject Name="RoadTripRoute" Left="0" Top="12" Width="260" Height="8" Text="[Trips.Origin] -> [Trips.Destination]" HorzAlign="Left" Font="Arial, 9"/>
+        <TextObject Name="RoadTripTruck" Left="0" Top="24" Width="400" Height="8" Text="Truck: [Trips.TruckNo]  Trailer: [Trips.TrailerNo]  Driver: [Trips.DriverName]" HorzAlign="Left" Font="Arial, 9"/>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary2" Top="228" Width="718.2" Height="28">
+        <TextObject Name="RoadDeclaration" Left="0" Top="0" Width="718" Height="8" Text="The carrier confirms acceptance subject to the CMR conditions." HorzAlign="Left" Font="Arial, 9"/>
+        <TextObject Name="RoadSignature" Left="0" Top="14" Width="260" Height="8" Text="Authorized Signature: [BL.SignatureName]" HorzAlign="Left" Font="Arial, 9"/>
+    </ReportSummaryBand>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="210" PaperHeight="297" LeftMargin="10" RightMargin="10" TopMargin="10" BottomMargin="10">
+  </ReportPage>
+</Report>

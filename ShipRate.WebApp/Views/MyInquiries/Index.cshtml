@@ -1,0 +1,158 @@
+﻿@using ShipRate.Application.ViewModels
+@model VendorInquiryDashboardVm
+@{
+    ViewData["Title"] = "My Inquiries";
+}
+<div class="container-fluid mt-4" dir="ltr">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="mb-0">My Inquiries</h3>
+            <small class="text-muted">
+                Manage your received inquiries and submitted quote options.
+            </small>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-body">
+            <form hx-get="@Url.Action("InquiryList", "MyInquiries")"
+                  hx-target="#vendorInquiryGrid"
+                  hx-swap="innerHTML"
+                  class="row g-3">
+
+                <div class="col-md-2">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" asp-for="@Model.Search.StatusId" asp-items="Model.Statuses"  >
+                        <option value="">All</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Inquiry No</label>
+                    <input name="InquiryNo" class="form-control" />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">From</label>
+                    <input type="date" name="From" class="form-control" />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">To</label>
+                    <input type="date" name="To" class="form-control" />
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end">
+                    <button class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i>
+                        Search
+                    </button>
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end">
+                    <a href="@Url.Action("Index", "MyInquiries")"
+                       class="btn btn-outline-secondary w-100">
+                        Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-3">
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <strong>
+                        <i class="bi bi-inboxes"></i>
+                        Received Price Inquiries
+                    </strong>
+                    <span class="text-muted small">
+                        Select an inquiry to view your submitted responses.
+                    </span>
+                </div>
+
+                <div class="card-body p-0" id="vendorInquiryGrid">
+                    <partial name="_VendorInquiryGrid" model="Model.Inquiries" />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <strong>
+                        <i class="bi bi-chat-square-text"></i>
+                        My Quote Responses
+                    </strong>
+
+                    <span id="selectedInquiryLabel" class="text-muted small">
+                        @(Model.SelectedInquiryId.HasValue ? "Responses for selected inquiry" : "No inquiry selected")
+                    </span>
+                </div>
+
+                <div class="card-body p-0" id="vendorQuoteResponseGrid">
+                    <partial name="_VendorQuoteResponseGrid" model="Model.Responses" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal fade" id="quoteModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="quoteModalContent">
+        </div>
+    </div>
+</div>
+
+
+<div id="emailPreviewContainer"></div>
+
+<div class="modal fade" id="emailPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Rate Inquiry Email Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body p-0">
+                <iframe id="emailPreviewFrame"
+                        style="width:100%; height:750px; border:0;">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.body.addEventListener('quoteSaved', function () {
+        const selectedRow = document.querySelector('[data-selected-inquiry="true"]');
+        if (!selectedRow) {
+            location.reload();
+            return;
+        }
+        const inquiryId = selectedRow.dataset.inquiryId;
+        htmx.ajax('GET', '/MyInquiries/QuoteResponses?inquiryId=' + inquiryId, {
+            target: '#vendorQuoteResponseGrid',
+            swap: 'innerHTML'
+        });
+        htmx.ajax('GET', '/MyInquiries/InquiryList', {
+            target: '#vendorInquiryGrid',
+            swap: 'innerHTML'
+        });
+        const modalEl = document.getElementById('quoteModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) {
+            modal.hide();
+        }
+    });
+</script>
+<script>
+    function openReject(id) {
+        document.getElementById('InquiryId').value = id;
+        new bootstrap.Modal(document.getElementById('rejectModal')).show();
+    }
+</script>

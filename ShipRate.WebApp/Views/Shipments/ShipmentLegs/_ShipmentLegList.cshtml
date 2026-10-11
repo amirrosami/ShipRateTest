@@ -1,0 +1,83 @@
+﻿@using ShipRate.Application.DTOs
+@model PagedResultDto<ShipRate.Application.ViewModels.ShipmentLegListItemVm>
+
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-hover align-middle text-start mb-0" dir="ltr">
+        <thead class="table-light">
+            <tr>
+                <th style="width:70px;">Seq</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Leg Type</th>
+                <th>Transport</th>
+                <th>Carrier</th>
+                <th>Planned Dep.</th>
+                <th>Planned Arr.</th>
+                <th>Status</th>
+                <th style="width:90px;">Active</th>
+                <th style="width:130px;" class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Items != null && Model.Items.Any())
+            {
+                foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.SequenceNo</td>
+                        <td>@item.FromLocationName</td>
+                        <td>@item.ToLocationName</td>
+                        <td>@item.LegTypeName</td>
+                        <td>@item.TransportTypeName</td>
+                        <td>@item.CarrierName</td>
+                        <td>@item.PlannedDepartureDate?.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@item.PlannedArrivalDate?.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@item.LegStatusName</td>
+                        <td>@(item.IsActive ? "Yes" : "No")</td>
+                        <td class="text-center">
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-secondary"
+                                    title="Details"
+                                    hx-get="@Url.Action("ShipmentLegDetails", "Shipments", new { id = item.Id })"
+                                    hx-target="#modalContainer"
+                                    hx-swap="innerHTML">
+                                <i class="bi bi-eye"></i>
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-primary"
+                                    title="Edit"
+                                    hx-get="@Url.Action("EditShipmentLeg", "Shipments", new { id = item.Id })"
+                                    hx-target="#modalContainer"
+                                    hx-swap="innerHTML">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    title="Delete"
+                                    hx-get="@Url.Action("DeleteShipmentLeg", "Shipments", new { id = item.Id })"
+                                    hx-target="#modalContainer"
+                                    hx-swap="innerHTML">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary"
+                                    hx-get="@Url.Action("IndexModal", "ActivityLog", new { entityTypeId = 4, entityId = item.Id ,externalReferenceNo=item.LegTypeName + item.SequenceNo.ToString() })"
+                                    hx-target="#activityLogModalContainer"
+                                    hx-swap="innerHTML" 
+                                    title="View Event Logs">
+                                <i class="bi bi-clock-history"></i> 
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="11" class="text-center text-muted">No records found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

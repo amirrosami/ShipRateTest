@@ -1,0 +1,106 @@
+﻿@using ShipRate.WebApp.ViewModels.CompaniesViewModels
+@model NumberingSystemItemViewModel
+
+@{
+    ViewData["Title"] = "Edit Numbering - " + Model.EntityType;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="mb-0">Edit Numbering System</h4>
+            <small class="text-muted">Company: <strong>@Model.CompanyName</strong></small>
+        </div>
+        <a asp-action="NumberingList" asp-route-id="@Model.CompanyId" class="btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back to Numbering List
+        </a>
+    </div>
+
+    <form asp-action="EditNumbering" method="post">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="CompanyId" />
+        <input type="hidden" asp-for="CompanyName" />
+        <input type="hidden" asp-for="EntityType" />
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <strong>Configuration Details</strong>
+                <span class="badge bg-primary fs-6">Entity: @Model.EntityType</span>
+            </div>
+            <div class="card-body">
+
+                @* Row 1: EntityType (Readonly) + Prefix + Suffix *@
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Entity Type</label>
+                        <input type="text" class="form-control bg-light" value="@Model.EntityType" disabled readonly />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Prefix" class="form-label">Prefix</label>
+                        <input asp-for="Prefix" class="form-control" placeholder="e.g., INV-" />
+                        <span asp-validation-for="Prefix" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Suffix" class="form-label">Suffix</label>
+                        <input asp-for="Suffix" class="form-control" placeholder="e.g., -26" />
+                        <span asp-validation-for="Suffix" class="text-danger"></span>
+                    </div>
+                </div>
+
+                @* Row 2: PadLength + CurrentSeq + CurrentYear *@
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label asp-for="PadLength" class="form-label">Pad Length</label>
+                        <input asp-for="PadLength" type="number" class="form-control" min="1" max="20" />
+                        <span asp-validation-for="PadLength" class="text-danger"></span>
+                        <small class="text-muted">Total digits padding (e.g., 4 → 0001)</small>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="CurrentSeq" class="form-label">Current Sequence</label>
+                        <input asp-for="CurrentSeq" type="number" class="form-control" min="0" />
+                        <span asp-validation-for="CurrentSeq" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="CurrentYear" class="form-label">Current Year</label>
+                        <input asp-for="CurrentYear" type="number" class="form-control" />
+                        <span asp-validation-for="CurrentYear" class="text-danger"></span>
+                    </div>
+                </div>
+
+                @* Row 3: ResetYearly + IsActive *@
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="form-check form-switch mt-4">
+                            <input asp-for="ResetYearly" class="form-check-input" type="checkbox" />
+                            <label asp-for="ResetYearly" class="form-check-label">Reset Sequence Yearly</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check form-switch mt-4">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                            <label asp-for="IsActive" class="form-check-label">Active</label>
+                        </div>
+                    </div>
+                </div>
+
+                @* Preview *@
+                <div class="alert alert-light border mt-3">
+                    <i class="bi bi-eye"></i>
+                    <strong>Next Generated Code Preview:</strong>
+                    <span class="font-monospace ms-2 text-primary fs-5">
+                        @Model.Prefix@((Model.CurrentSeq + 1).ToString().PadLeft(Model.PadLength, '0'))@Model.Suffix
+                    </span>
+                </div>
+
+            </div>
+            <div class="card-footer text-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg"></i> Save Changes
+                </button>
+                <a asp-action="NumberingList" asp-route-id="@Model.CompanyId" class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>

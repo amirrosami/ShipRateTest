@@ -1,0 +1,37 @@
+﻿@using ShipRate.Application.ViewModels
+@model IReadOnlyList<FlightDateLookupItemVm>
+
+@if (Model.Count == 0)
+{
+    <div class="text-muted small">
+        No flight dates found for this flight.
+    </div>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var flightDate in Model)
+        {
+            <button type="button"
+                    class="list-group-item list-group-item-action btn-choose-flight-date"
+                    data-flight-date-id="@flightDate.Id"
+                    data-etd="@flightDate.ETD?.ToString("yyyy-MM-ddTHH:mm:ss")"
+                    data-local-date="@flightDate.ETD?.ToString("yyyy-MM-dd HH:mm")"
+                    data-display-text="@flightDate.DisplayText">
+
+                <div class="fw-semibold">
+                    ETD: @flightDate.ETD?.ToString("yyyy-MM-dd HH:mm")
+                </div>
+
+                <div class="small text-muted">
+                    ETA: @flightDate.ETA?.ToString("yyyy-MM-dd HH:mm")
+
+                    @if (flightDate.DelayHours > 0)
+                    {
+                        <span> — Delay: @flightDate.DelayHours hours</span>
+                    }
+                </div>
+            </button>
+        }
+    </div>
+}

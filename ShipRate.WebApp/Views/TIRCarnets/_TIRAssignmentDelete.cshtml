@@ -1,0 +1,38 @@
+﻿@using ShipRate.Application.ViewModels
+@model TIRAssignmentDeleteVm
+
+
+<div class="modal-header">
+    <h5 class="modal-title">Delete Assignment</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<form hx-post="@Url.Action("DeleteAssignmentConfirmed", "TIRCarnets")"
+      hx-target="#mainModalContent"
+      hx-swap="innerHTML">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="id" value="@Model.Id" />
+    <input type="hidden" name="tirCarnetId" value="@Model.TIRCarnetId" />
+
+    <div class="modal-body">
+        <div class="alert alert-warning mb-3">
+            Are you sure you want to delete this assignment?
+        </div>
+
+        <dl class="row mb-0">
+            <dt class="col-sm-4">TIR Carnet</dt>
+            <dd class="col-sm-8">@Model.TruckDisplay</dd>
+
+        </dl>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            Cancel
+        </button>
+        <button type="submit" class="btn btn-danger">
+            Confirm Delete
+        </button>
+    </div>
+</form>

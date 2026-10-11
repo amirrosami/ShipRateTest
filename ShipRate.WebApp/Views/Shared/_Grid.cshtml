@@ -1,0 +1,166 @@
+﻿@using ShipRate.WebApp.Controllers
+@using ShipRate.WebApp.ViewModels
+@model GridViewModel 
+
+@{
+    string[] sortDirectionOrder = new[]{"asc" ,"desc" ,""};
+}
+
+
+<div id="table-sort-info">
+    <input type="hidden" name="SortColumn" value="@Model.Data.SortColumn" />
+    <input type="hidden" name="SortDirection" value="@Model.Data.SortDirection" />
+    @* <input type="hidden" name="page" value="@Model.Data.Page" /> *@
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+            <thead class="form-caption-bg shadow-sm">
+                <tr class="form-caption-bg pt-4 h-25">
+                    <td class="form-caption-bg shadow-sm text-white">#</td>
+    @foreach (var col in Model.columns)
+        {
+
+            var nextDirection = "asc";
+            var icon = "";
+
+            if (Model.Data.SortColumn == col.Name)
+            {
+                if (Model.Data.SortDirection == "asc")
+                {
+                    nextDirection = "desc";
+                    icon = " ▲";
+                }
+                if (Model.Data.SortDirection == "desc")
+                {
+                    nextDirection = "";
+                    icon = " ▼";
+                }
+                
+            }
+            
+                <th class="form-caption-bg shadow-sm">
+                <a class="text-white" href="#"
+                   hx-post="@Model.ListUrl"
+                   hx-target="#table-container"
+                   hx-swap="innerHTML"
+                   hx-include="#grid-filters"
+                   hx-vals='js:{ sortDirection: "@nextDirection" , sortColumn: "@col.Name"}'>
+                  
+
+                    @col.DisplayName @icon
+                   </a>
+            </th>
+        }
+
+                    <th class=" form-caption-bg shadow-sm text-center text-white" style="width:160px;">Actions</th>
+            </tr>
+    </thead>
+
+    <tbody>
+        @await Html.PartialAsync(Model.GridPartialName ,Model)
+    </tbody>
+</table>
+
+    </div>
+
+
+    @* ── Pagination Footer ── *@
+
+    @if (Model.Data.TotalPages > 1)
+    {
+        int maxVisible = 5;
+        int half = maxVisible / 2;
+        int startPage = Math.Max(1, Model.Data.Page - half);
+        int endPage = Math.Min(Model.Data.TotalPages, startPage + maxVisible - 1);
+
+        if (endPage - startPage + 1 < maxVisible)
+        {
+            startPage = Math.Max(1, endPage - maxVisible + 1);
+        }
+
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+                Showing @((Model.Data.Page - 1) * Model.Data.PageSize + 1)–@Math.Min(Model.Data.Page * Model.Data.PageSize, Model.Data.TotalCount) of @Model.Data.TotalCount
+            </small>
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+
+                    @* دکمه قبلی *@
+                    <li class="page-item @(Model.Data.Page > 1 ? "" : "disabled")">
+                        <a class="page-link"
+                           hx-post="@Model.ListUrl"
+                           hx-target="#table-container"
+                           hx-swap="innerHTML"
+                           hx-include="#grid-filters, #table-sort-info"
+                           href="#"
+                           hx-vals='js:{ page: @(Model.Data.Page - 1)}'
+                        > &laquo;</a>
+                    </li>
+                    @* صفحه اول + ... *@
+                    @if (startPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link"
+                               hx-post="@Model.ListUrl"
+                               hx-target="#table-container"
+                               hx-swap="innerHTML"
+                               hx-include="#grid-filters, #table-sort-info"
+                               hx-vals='js:{ page: 1 }'
+                               href="#">1</a>
+                        </li>
+                        if (startPage > 2)
+                        {
+                            <li class="page-item disabled"><span class="page-link">…</span></li>
+                        }
+                    }
+
+                    @* صفحات وسط *@
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(i == Model.Data.Page ? "active" : "")">
+                            <a class="page-link"
+                               hx-post="@Model.ListUrl"
+                               hx-target="#table-container"
+                               hx-swap="innerHTML"
+                               hx-include="#grid-filters, #table-sort-info"
+                               hx-vals='js:{ page: @i }'
+                               href="#">@i</a>
+                        </li>
+                    }
+
+                    @* ... + صفحه آخر *@
+                    @if (endPage < Model.Data.TotalPages)
+                    {
+                        if (endPage < Model.Data.TotalPages - 1)
+                        {
+                            <li class="page-item disabled"><span class="page-link">…</span></li>
+                        }
+                        <li class="page-item">
+                            <a class="page-link"
+                               hx-post="@Model.ListUrl"
+                               hx-target="#table-container"
+                               hx-swap="innerHTML"
+                               hx-include="#grid-filters, #table-sort-info"
+                               hx-vals='js:{ page: @Model.Data.TotalPages }'
+                               href="#">@Model.Data.TotalPages</a>
+                        </li>
+                    }
+
+                    @* دکمه بعدی *@
+                    <li class="page-item @(Model.Data.Page < Model.Data.TotalPages ? "" : "disabled")">
+                        <a class="page-link"
+                           hx-post="@Model.ListUrl"
+                           hx-target="#table-container"
+                           hx-swap="innerHTML"
+                           hx-include="#grid-filters, #table-sort-info"
+                           hx-vals='js:{ page: @(Model.Data.Page + 1) }'
+                           href="#">&raquo;</a>
+                    </li>
+
+                </ul>
+            </nav>
+        </div>
+    }
+</div>

@@ -1,0 +1,21 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model List<LookupDto>
+
+@{
+    var targetId = ViewBag.TargetId as string;
+    var targetText = ViewBag.TargetText as string;
+}
+
+@if (Model.Any())
+{
+    <div class="list-group position-absolute shadow-sm mt-1" style="z-index: 2000; min-width: 300px;">
+        @foreach (var item in Model)
+        {
+            <button type="button"
+                    class="list-group-item list-group-item-action"
+                    onclick="document.getElementById('@targetId').value='@item.Id';document.getElementById('@targetText').value='@item.Text';this.parentElement.remove();">
+                @item.Text
+            </button>
+        }
+    </div>
+}

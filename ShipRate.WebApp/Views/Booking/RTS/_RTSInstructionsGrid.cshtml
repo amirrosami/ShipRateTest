@@ -1,0 +1,156 @@
+﻿@using ShipRate.Application.JobsViewModels
+@model RTSInstructionsGridVm
+
+<!-- افزودن w-100 و min-width: 0 برای مهار کانتینرهای flex والد -->
+<div class="card mt-3 w-100" style="min-width: 0;">
+    <div class="card-header d-flex justify-content-between align-items-center bg-light">
+        <strong><i class="bi bi-box-seam me-1"></i> RTS Instructions For Booking No: @ViewBag.BookingNo</strong>
+        <button type="button"
+                class="btn btn-sm btn-light py-0 px-2"
+                hx-get="@Url.Action("AddRTSInstruction", "Jobs", new { bookingId = Model.BookingId })"
+                hx-target="#rtsModalContainer"
+                hx-swap="innerHTML">
+            <i class="bi bi-plus-lg me-1"></i> Add RTS Instruction
+        </button>
+    </div>
+
+    <div class="card-body p-0" style="min-width: 0; overflow: hidden;">
+        <!-- اعمال مستقیم اسکرول افقی روی کانتینر جدول -->
+        <div class="table-responsive w-100" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+            <!-- تعیین حداقل عرض (min-width) تا ستون‌ها فشرده نشوند و اسکرول فعال شود -->
+            <table class="table table-sm table-bordered table-striped mb-0 align-middle text-nowrap" style="min-width: 1100px;">
+                <thead class="table-secondary">
+                    <tr>
+                        <th style="width: 110px;">RTS No</th>
+                        <th style="width: 100px;">Date</th>
+                        <th>Shipper</th>
+                        <th>Carrier</th>
+                        <th>Depot</th>
+                        <th>Containers</th>
+                        <th style="width: 100px;">Status</th>
+                        <th style="width: 100px;">Valid From</th>
+                        <th style="width: 100px;">Valid To</th>
+                        <th style="width: 100px;">Create User</th>
+                        <th style="width: 100px;">Update User</th>
+                        <th style="min-width: 160px;">Remarks</th>
+                        <th style="width: 180px;" class="text-center">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model.Items != null && Model.Items.Any())
+                    {
+                        foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td><code>@item.RTSInstructionNo</code></td>
+                                <td>@item.RTSInstructionDate?.ToString("yyyy-MM-dd")</td>
+                                <td>@item.ShipperName</td>
+                                <td>@item.CarrierName</td>
+                                <td>@item.DepotName</td>
+                                <td class="align-middle">
+                                    @if (item.ContainerTypes != null && item.ContainerTypes.Any(c => c.ContainerCounts > 0))
+                                    {
+                                        <div class="d-flex flex-nowrap gap-1">
+                                            @foreach (var con in item.ContainerTypes.Where(c => c.ContainerCounts.HasValue && c.ContainerCounts > 0))
+                                            {
+                                                <span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle"
+                                                      title="@con.Remarks">
+                                                    <i class="bi bi-box-seam me-1"></i>
+                                                    @con.ContainerCounts<span>X</span>@con.ContainerSizeTypeName?.ToUpper()
+                                                </span>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td><span class="badge bg-light text-dark border">@item.StatusName</span></td>
+                                <td>@item.ValidDateFrom?.ToString("yyyy-MM-dd")</td>
+                                <td>@item.ValidDateTo?.ToString("yyyy-MM-dd")</td>
+                                <td><span title="@item.CreatedAt">@item.CreateUserName</span>  </td>
+                                <td><span title="@item.UpdatedAt">@item.UpdateUserName</span>  </td>
+                                <td class="text-truncate" style="max-width: 200px;" title="@item.Remarks">@item.Remarks</td>
+                                <td class="text-center" onclick="event.stopPropagation();">
+                                    <div class="d-inline-flex flex-nowrap align-items-center justify-content-center gap-1">
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary py-0 px-2"
+                                                hx-get="@Url.Action("SearchRtsByInstructionId", "RTSDelivery", new { rtsInstructionId = item.Id })"
+                                                hx-target="#rts-summary-container"
+                                                hx-swap="innerHTML show:#rts-summary-container:top"
+                                                title="View Summary Details">
+                                            <i class="bi bi-card-checklist"></i>
+                                        </button>
+
+
+                                        <!-- Details -->
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-info py-0 px-2"
+                                                hx-get="@Url.Action("RTSInstructionDetails", "Jobs", new { id = item.Id })"
+                                                hx-target="#rtsModalContainer"
+                                                hx-swap="innerHTML"
+                                                title="Details">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+
+                                        <!-- Edit -->
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary py-0 px-2"
+                                                hx-get="@Url.Action("EditRTSInstruction", "Jobs", new { id = item.Id, bookingId = item.BookingId })"
+                                                hx-target="#rtsModalContainer"
+                                                hx-swap="innerHTML"
+                                                title="Edit">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+
+                                        <!-- Delete -->
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-danger py-0 px-2"
+                                                hx-delete="@Url.Action("DeleteRTSInstruction", "Jobs", new { id = item.Id })"
+                                                hx-confirm="Are you sure you want to delete this RTS Instruction?"
+                                                hx-target="closest tr"
+                                                hx-swap="outerHTML swap:1s"
+                                                title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+
+                                        <!-- Issue & Confirm -->
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-success py-0 px-2"
+                                                hx-get="@Url.Action("ConfirmAndIssueRTSInstruction", "Jobs", new { id = item.Id })"
+                                                hx-confirm="Are you sure you want to Issue and Confirm this RTS Instruction?"
+                                                hx-swap="none"
+                                                title="Issue and Confirm">
+                                            <i class="bi bi-patch-check"></i>
+                                        </button>
+
+                                        <!-- Print Letter -->
+                                        <a asp-controller="Booking"
+                                           asp-action="PrintRTSInstructionLetter"
+                                           asp-route-id="@item.Id"
+                                           target="_blank"
+                                           title="Print RTS Instruction Letter"
+                                           class="btn btn-sm btn-outline-secondary py-0 px-2">
+                                            <i class="bi bi-printer"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="11" class="text-center text-muted py-3">
+                                No RTS Instructions found for selected booking.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

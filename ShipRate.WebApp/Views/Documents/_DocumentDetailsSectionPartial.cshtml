@@ -1,0 +1,160 @@
+﻿@using ShipRate.Application.DTOs.Documents
+@model DocumentDetailsSectionDto
+
+<div class="card" dir="ltr">
+    <div class="card-header">
+        <h6 class="mb-0">Document Details</h6>
+    </div>
+    <div class="card-body">
+        <div class="row g-2 mb-3 small">
+            <div class="col-lg-3 col-md-4">
+                <span class="fw-bold">Title:</span> @Model.DocumentTitle
+            </div>
+
+            <div class="col-lg-3 col-md-4">
+                <span class="fw-bold">Document No:</span> @Model.DocumentNo
+            </div>
+
+            <div class="col-lg-3 col-md-4">
+                <span class="fw-bold">Company:</span> @Model.CompanyName
+            </div>
+
+            <div class="col-lg-3 col-md-4">
+                <span class="fw-bold">Document Type:</span> @Model.DocumentTypeName
+            </div>
+
+            <div class="col-lg-3 col-md-4">
+                <span class="fw-bold">Object Type:</span> @Model.ObjectTypeName
+            </div>
+
+            <div class="col-lg-3 col-md-4">
+                <span class="fw-bold">Object:</span> @Model.ObjectDisplayText
+            </div>
+
+            <div class="col-lg-3 col-md-4">
+                <span class="fw-bold">Document Date:</span> @Model.DocumentDate.ToString("yyyy-MM-dd")
+            </div>
+
+            <div class="col-lg-3 col-md-4">
+                <span class="fw-bold">Expiry Date:</span> @(Model.ExpiryDate?.ToString("yyyy-MM-dd") ?? "-")
+            </div>
+
+            <div class="col-12">
+                <span class="fw-bold">Description:</span> @Model.DocumentDescription
+            </div>
+        </div>
+
+        <h5 class="mb-3">Attachments</h5>
+        <div class="table-responsive mb-4">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>File Name</th>
+                        <th>Type</th>
+                        <th>Extension</th>
+                        <th>Size</th>
+                        <th>Created At</th>
+                        <th>Status</th>
+                        <th style="width:100px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Attachments != null && Model.Attachments.Any())
+                    {
+                        foreach (var item in Model.Attachments)
+                        {
+                            <tr>
+                                <td>@item.DocumentAttachmentFileName</td>
+                                <td>@item.DocumentAttachmentFileType</td>
+                                <td>@item.DocumentAttachmentFileExtension</td>
+                                <td>@item.DocumentAttachmentFileSize</td>
+                                <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a class="btn btn-sm btn-primary"
+                                       target="_blank"
+                                       href="@Url.Action("ViewAttachment", "Documents", new { attachmentId = item.Id })">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-3">No attachments found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <h5 class="mb-3">Emails</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Subject</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Direction</th>
+                        <th>Send Date</th>
+                        <th>Status</th>
+                        <th style="width:100px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Emails != null && Model.Emails.Any())
+                    {
+                        foreach (var item in Model.Emails)
+                        {
+                            <tr>
+                                <td>@item.DocumentEmailSubject</td>
+                                <td>@item.DocumentEmailFrom</td>
+                                <td>@item.DocumentEmailTo</td>
+                                <td>@item.EmailDirectionName</td>
+                                <td>@item.DocumentEmailSendDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    <button type="button"
+                                            class="btn btn-sm btn-primary"
+                                            hx-get="@Url.Action("EmailDetails", "Documents", new { emailId = item.Id })"
+                                            hx-target="#emailDetailsModalContent"
+                                            hx-swap="innerHTML"
+                                            hx-on::after-request="document.body.dispatchEvent(new CustomEvent('showEmailModal'))">
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-3">No emails found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

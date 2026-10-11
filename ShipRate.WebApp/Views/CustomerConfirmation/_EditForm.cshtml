@@ -1,0 +1,59 @@
+﻿@using ShipRate.WebApp.ViewModels.CustomersVms
+@model CustomerConfirmationEditViewModel
+
+<div class="modal-header bg-primary text-white">
+    <h5 class="modal-title">
+        <i class="bi bi-pencil-square"></i> Edit Request
+    </h5>
+    <button type="button" class="btn-close btn-close-white" onclick="closeModal()"></button>
+</div>
+
+<form hx-post="/CustomerConfirmation/Edit"
+      hx-target="#listContainer"
+      hx-swap="innerHTML">
+
+    @Html.AntiForgeryToken()
+
+    <div class="modal-body">
+
+        <input type="hidden" name="Id" value="@Model.Id" />
+        <input type="hidden" name="PersonId" value="@Model.PersonId" />
+
+        <!-- Person -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Person</label>
+            <input type="text" class="form-control form-control-sm"
+                   value="@Model.PersonName"
+                   disabled />
+        </div>
+
+        <!-- Remarks -->
+        <div class="mb-2">
+            <label class="form-label fw-semibold">
+                Remarks
+            </label>
+            <textarea class="form-control form-control-sm"
+                      name="Remarks"
+                      rows="3"
+                      maxlength="200">@Model.Remarks</textarea>
+        </div>
+
+        <!-- Status -->
+        <div class="mb-2">
+            <label class="form-label fw-semibold">Status</label>
+            <input type="text" class="form-control form-control-sm"
+                   value="@Model.Status"
+                   disabled />
+        </div>
+
+    </div>
+
+    <div class="modal-footer py-2">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal()">
+            Cancel
+        </button>
+        <button type="submit" class="btn btn-primary btn-sm">
+            <i class="bi bi-save"></i> Save Changes
+        </button>
+    </div>
+</form>

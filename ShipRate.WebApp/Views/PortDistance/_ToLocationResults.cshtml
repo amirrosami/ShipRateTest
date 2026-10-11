@@ -1,0 +1,17 @@
+﻿@using ShipRate.WebApp.ViewModels
+@model List<LocatonViewModel>
+@foreach (var item in Model)
+{
+    <div class="lookup-item"
+         onclick="selectPort('@item.LocationId', '@item.LocationName')">
+        @item.LocationName
+    </div>
+}
+
+<script>
+    function selectPort(id, name) {
+        document.getElementById('toport-id').value = id;
+        event.target.closest('.lookup-container').querySelector('input[type="text"]').value = name;
+        document.getElementById('toport-results').innerHTML = '';
+    }
+</script>

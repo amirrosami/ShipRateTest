@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="06/12/2026 14:01:07" ReportInfo.Modified="06/12/2026 15:02:42" ReportInfo.CreatorVersion="2026.1.0.0">
+  <Dictionary>
+    <BusinessObjectDataSource Name="vwContainers" ReferenceName="vwContainers" DataType="System.Int32" Enabled="true">
+      <Column Name="ContainerNumber" DataType="System.String"/>
+      <Column Name="ShortName" DataType="System.String"/>
+      <Column Name="ContainerSizeName" DataType="System.String"/>
+      <Column Name="ContainerType" DataType="System.String"/>
+      <Column Name="TareWeight" DataType="System.String"/>
+      <Column Name="IsActive" DataType="System.Boolean"/>
+    </BusinessObjectDataSource>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="141.75">
+      <TextObject Name="Text13" Left="160.65" Top="28.35" Width="406.35" Height="37.8" Text="Containers Report" HorzAlign="Center" Font="Arial, 24pt, style=Bold" TextFill.Color="DarkBlue"/>
+      <LineObject Name="Line1" Left="9.45" Top="113.4" Width="680.4"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="145.75" Width="718.2" Height="18.9">
+      <TextObject Name="Text2" Left="37.8" Width="122.85" Height="18.9" Text="ContainerNumber" Font="Arial, 10pt"/>
+      <TextObject Name="Text4" Left="170.1" Width="94.5" Height="18.9" Text="ShortName" Font="Arial, 10pt"/>
+      <TextObject Name="Text6" Left="274.05" Width="94.5" Height="18.9" Text="ContainerSizeName" Font="Arial, 10pt"/>
+      <TextObject Name="Text8" Left="387.45" Width="94.5" Height="18.9" Text="ContainerType" Font="Arial, 10pt"/>
+      <TextObject Name="Text10" Left="491.4" Width="94.5" Height="18.9" Text="TareWeight" Font="Arial, 10pt"/>
+      <TextObject Name="Text11" Left="595.35" Width="85.05" Height="18.9" Text="IsActive" Font="Arial, 10pt"/>
+      <TextObject Name="Text15" Width="37.8" Height="18.9" Text="Row" Font="Arial, 10pt"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="168.65" Width="718.2" Height="37.8" DataSource="vwContainers">
+      <TextObject Name="Text1" Left="37.8" Top="9.45" Width="94.5" Height="18.9" Text="[vwContainers.ContainerNumber]" Font="Arial, 10pt"/>
+      <TextObject Name="Text3" Left="170.1" Top="9.45" Width="94.5" Height="18.9" Text="[vwContainers.ShortName]" Font="Arial, 10pt"/>
+      <TextObject Name="Text5" Left="274.05" Top="9.45" Width="94.5" Height="18.9" Text="[vwContainers.ContainerSizeName]" Font="Arial, 10pt"/>
+      <TextObject Name="Text7" Left="387.45" Top="9.45" Width="94.5" Height="18.9" Text="[vwContainers.ContainerType]" Font="Arial, 10pt"/>
+      <TextObject Name="Text9" Left="491.4" Top="9.45" Width="94.5" Height="18.9" Text="[vwContainers.TareWeight]" Font="Arial, 10pt"/>
+      <CheckBoxObject Name="CheckBox1" Left="652.05" Top="9.45" Width="18.9" Height="18.9" DataColumn="vwContainers.IsActive"/>
+      <LineObject Name="Line2" Left="9.45" Top="37.8" Width="680.4"/>
+      <TextObject Name="Text14" Top="9.45" Width="94.5" Height="18.9" Text="[Row#]" Font="Arial, 10pt"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="210.45" Width="718.2" Height="37.8">
+      <TextObject Name="Text12" Left="302.4" Top="18.9" Width="94.5" Height="18.9" Text="[TotalPages]" Font="Arial, 10pt"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

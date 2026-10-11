@@ -1,0 +1,159 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.ViewModels
+@model PagedResultDto<AccountCodeListItemVm>
+
+@{
+    var searchVm = ViewBag.SearchVm as AccountCodeSearchVm ?? new AccountCodeSearchVm();
+}
+
+<style>
+    .accountcode-table {
+        font-size: 0.875rem;
+    }
+
+    .accountcode-table th,
+    .accountcode-table td {
+        padding: 0.35rem 0.5rem;
+        vertical-align: middle;
+        line-height: 1.2;
+    }
+
+    .accountcode-table .btn-icon-sm {
+        padding: 0.2rem 0.4rem;
+        line-height: 1;
+    }
+
+    .accountcode-table .btn-icon-sm i {
+        font-size: 0.85rem;
+    }
+
+    .accountcode-pagination .page-link {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.875rem;
+    }
+</style>
+
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-hover align-middle text-nowrap mb-2 accountcode-table">
+        <thead class="table-light">
+            <tr>
+                <th style="width: 55px;">#</th>
+                <th>Company</th>
+                <th>Person</th>
+                <th>Account Code</th>
+                <th>Charge Type</th>
+                <th>Buy Account Code</th>
+                <th>Sell Account Code</th>
+                <th class="text-center" style="width:90px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Items.Any())
+            {
+                var rowNo = ((Model.PageNumber - 1) * Model.PageSize) + 1;
+                foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@rowNo</td>
+                        <td>@item.CompanyName</td>
+                        <td>@item.PersonName</td>
+                        <td>@item.AccCode</td>
+                        <td>@item.ChargeTypeTitle</td>
+                        <td>@item.BuyAccCode</td>
+                        <td>@item.SellAccCode</td>
+                        <td class="text-center">
+                            <div class="d-inline-flex gap-1">
+                                <button type="button"
+                                        class="btn btn-warning btn-sm btn-icon-sm"
+                                        hx-get="@Url.Action("Edit", "AccountCode", new { id = item.Id })"
+                                        hx-target="#accountCodeModalBody"
+                                        hx-swap="innerHTML"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#accountCodeModal"
+                                        title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-danger btn-sm btn-icon-sm"
+                                        hx-get="@Url.Action("Delete", "AccountCode", new { id = item.Id })"
+                                        hx-target="#accountCodeModalBody"
+                                        hx-swap="innerHTML"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#accountCodeModal"
+                                        title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    rowNo++;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-2">
+                        No data found.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination pagination-sm justify-content-center mb-0 accountcode-pagination">
+
+            <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
+                <a class="page-link"
+                   hx-get="@Url.Action("List", "AccountCode", new {
+                        Search = searchVm.Search,
+                        CompanyId = searchVm.CompanyId,
+                        ChargeTypeId = searchVm.ChargeTypeId,
+                        page = Model.PageNumber - 1,
+                        pageSize = Model.PageSize
+                   })"
+                   hx-target="#accountCodeListContainer"
+                   hx-swap="innerHTML">
+                    Previous
+                </a>
+            </li>
+
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                    <a class="page-link"
+                       hx-get="@Url.Action("List", "AccountCode", new {
+                            Search = searchVm.Search,
+                            CompanyId = searchVm.CompanyId,
+                            ChargeTypeId = searchVm.ChargeTypeId,
+                            page = i,
+                            pageSize = Model.PageSize
+                       })"
+                       hx-target="#accountCodeListContainer"
+                       hx-swap="innerHTML">
+                        @i
+                    </a>
+                </li>
+            }
+
+            <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")">
+                <a class="page-link"
+                   hx-get="@Url.Action("List", "AccountCode", new {
+                        Search = searchVm.Search,
+                        CompanyId = searchVm.CompanyId,
+                        ChargeTypeId = searchVm.ChargeTypeId,
+                        page = Model.PageNumber + 1,
+                        pageSize = Model.PageSize
+                   })"
+                   hx-target="#accountCodeListContainer"
+                   hx-swap="innerHTML">
+                    Next
+                </a>
+            </li>
+        </ul>
+    </nav>
+}

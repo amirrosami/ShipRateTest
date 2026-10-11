@@ -1,0 +1,136 @@
+﻿@using ShipRate.Application.ViewModels
+@model DoPricePreviewViewModel
+
+<style>
+    /* هدر مدرن و ملایم با کنتراست بالا */
+    .do-modal-header {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        border-bottom: 1px solid #475569;
+    }
+
+    /* هدر جدول: پس‌زمینه روشن با فونت تیره و کاملاً خوانا */
+    .do-table-header {
+        background-color: #f1f5f9 !important;
+        border-bottom: 2px solid #cbd5e1 !important;
+    }
+
+        .do-table-header th {
+            color: #1e293b !important; /* رنگ تیره و کاملاً مشخص */
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            padding-top: 12px;
+            padding-bottom: 12px;
+            vertical-align: middle;
+        }
+
+    .summary-card {
+        background: #f8fafc;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .currency-tag {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #64748b;
+        margin-left: 3px;
+    }
+</style>
+
+<!-- Modal Definition -->
+<div class="modal fade" id="doPricePreviewModal" tabindex="-1" aria-labelledby="doPriceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
+
+            <!-- Modal Header -->
+            <div class="modal-header do-modal-header text-white py-3 px-4">
+                <div class="d-flex align-items-center">
+                    <div class="bg-white bg-opacity-15 rounded-3 p-2 me-3 text-info shadow-sm">
+                        <i class="bi bi-receipt-cutoff fs-4 text-cyan-300"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-white mb-0 fs-6" id="doPriceModalLabel">
+                            Delivery Order (D/O) Price Simulation
+                        </h5>
+                        <small class="text-slate-300" style="font-size: 0.75rem;">
+                            Calculate charges, brokerage fees, VAT, and container deposits (Amounts in IRR)
+                        </small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Parameters Filter Form Bar -->
+            <div class="bg-light border-bottom px-4 py-3">
+                <form id="doPriceFilterForm"
+                      hx-get="@Url.Action("PreviewDoPrices", "BLManagement")"
+                      hx-target="#do-price-grid-area"
+                      hx-swap="innerHTML"
+                      hx-trigger="change delay:200ms, submit"
+                      class="row g-3 align-items-end">
+
+                    <input type="hidden" name="blId" value="@Model.BLId" />
+
+                    <div class="col-md-4">
+                        <label class="form-label fs-8 fw-bold text-secondary text-uppercase mb-1">
+                            <i class="bi bi-diagram-3 me-1"></i> Clearance Type
+                        </label>
+                        <select name="clearanceTypeId" class="form-select form-select-sm border-secondary-subtle fw-medium">
+                            <option value="1" selected="@(Model.ClearanceTypeId == 1)">TIP(ورود موقت)</option>
+                            <option value="2" selected="@(Model.ClearanceTypeId == 2)">Strip(تخلیه در محوطه)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fs-8 fw-bold text-secondary text-uppercase mb-1">
+                            <i class="bi bi-percent me-1"></i> Tax Rate
+                        </label>
+                        <div class="input-group input-group-sm">
+                            <input type="number" step="0.01" min="0" max="100" name="taxRate" value="@Model.TaxRate" class="form-control border-secondary-subtle fw-semibold" />
+                            <span class="input-group-text bg-white text-muted fw-bold">%</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-sm btn-primary px-3 shadow-sm">
+                            <i class="bi bi-arrow-repeat me-1"></i> Recalculate
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal Body (Dynamic Grid Area) -->
+            <div class="modal-body p-4 bg-white" id="do-price-grid-area">
+                @await Html.PartialAsync("_PreviewDoPricesGrid", Model)
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer bg-light border-top py-2 px-4 d-flex justify-content-between align-items-center">
+                <div class="text-muted fs-8">
+                    <i class="bi bi-info-circle text-primary me-1"></i>
+                    <span>Toggle checkboxes to recalculate total payable amount in <strong>IRR</strong>.</span>
+                </div>
+                <button type="button" class="btn btn-sm btn-secondary px-4 rounded-pill" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- اسکریپت باز کردن خودکار مودال -->
+<script>
+    (function () {
+        var modalEl = document.getElementById('doPricePreviewModal');
+        if (modalEl) {
+            var modalInstance = new bootstrap.Modal(modalEl);
+            modalInstance.show();
+
+            modalEl.addEventListener('hidden.bs.modal', function () {
+                modalEl.remove();
+            });
+        }
+    })();
+</script>

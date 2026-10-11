@@ -1,0 +1,436 @@
+﻿@using ShipRate.WebApp.ViewModels.FlightVms
+@using ShipRate.WebApp.ViewModels.TransitViewModels
+@model TruckFormVM
+
+@{
+    string CreateEdit = ViewBag.CreateEdit;
+    bool isCreateMode = false;
+    if (CreateEdit == "Create") isCreateMode = true;
+}
+
+<form hx-post="@Url.Action(isCreateMode ? "Create" : "Edit", "Truck")"
+      hx-target="#app-modal-content"
+      hx-swap="innerHTML">
+
+    <div class="modal-header form-caption-bg text-white">
+        @if (isCreateMode)
+        {
+            <h5 class="modal-title">
+                <i class="bi bi-plus-circle me-2"></i>Add Flight
+            </h5>
+        }
+        else
+        {
+            <h5 class="modal-title">
+                <i class="bi bi-pencil-square me-2"></i>Edit Flight
+            </h5>
+            <input type="hidden" asp-for="Id" />
+        }
+
+        <button type="button"
+                class="btn-close"
+                onclick="AppModal.close()">
+        </button>
+    </div>
+
+    <div class="modal-body row">
+        @Html.AntiForgeryToken()
+
+        @await Html.PartialAsync("_ModelStateError")
+
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Company <span class="text-danger">*</span></label>
+            <select class="form-select" asp-for="CompanyId">
+                <option value="">-- Select --</option>
+                @foreach (var c in ViewBag.Companies)
+                {
+                    @:<option value="@c.Value" @(c.Value == Model.CompanyId.ToString() ? "selected" : "")>@c.Text</option>
+                }
+            </select>
+            <span asp-validation-for="CompanyId" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Truck Type <span class="text-danger">*</span></label>
+            <select class="form-select" asp-for="TruckTypeId">
+                <option value="">-- Select --</option>
+                @foreach (var t in ViewBag.TruckTypes)
+                {
+                    @:<option value="@t.Value" @(t.Value == Model.TruckTypeId.ToString() ? "selected" : "")>@t.Text</option>
+                }
+            </select>
+            <span asp-validation-for="TruckTypeId" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Country <span class="text-danger">*</span></label>
+            <select class="form-select" asp-for="CountryId">
+                <option value="">-- Select --</option>
+                @foreach (var c in ViewBag.Countries)
+                {
+                    @:<option value="@c.Value" @(c.Value == Model.CountryId.ToString() ? "selected" : "")>@c.Text</option>
+                }
+            </select>
+            <span asp-validation-for="CountryId" class="text-danger small"></span>
+        </div>
+
+        <!-- ========== Row 2: Reference Title / Brand / Model ========== -->
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">Truck Reference Title <span class="text-danger">*</span></label>
+            <input class="form-control" asp-for="TruckReferenceTitle" maxlength="50" />
+            <span asp-validation-for="TruckReferenceTitle" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Brand <span class="text-danger">*</span></label>
+            <input class="form-control" asp-for="Brand" />
+            <span asp-validation-for="Brand" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Model <span class="text-danger">*</span></label>
+            <input class="form-control" asp-for="Model" />
+            <span asp-validation-for="Model" class="text-danger small"></span>
+        </div>
+
+        <!-- ========== Row 3: Year / Axles / Truck Plate / Trailer Plate ========== -->
+        <div class="col-md-3">
+            <label class="form-label">Year Manufactured</label>
+            <input type="number" class="form-control" asp-for="YearManufactured" min="1950" max="2030" />
+            <span asp-validation-for="YearManufactured" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Axle Count</label>
+            <input type="number" class="form-control" asp-for="AxleCount" min="1" max="20" />
+            <span asp-validation-for="AxleCount" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Truck Plate <span class="text-danger">*</span></label>
+            <input class="form-control" asp-for="TruckPlateNumber" maxlength="30" />
+            <span asp-validation-for="TruckPlateNumber" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Trailer Plate <span class="text-danger">*</span></label>
+            <input class="form-control" asp-for="TrailerPlateNumber" maxlength="30" />
+            <span asp-validation-for="TrailerPlateNumber" class="text-danger small"></span>
+        </div>
+
+        <!-- ========== Row 4: Payload / Volume / Owner / Carrier ========== -->
+        <div class="col-md-3">
+            <label class="form-label">Max Payload (Kg)</label>
+            <input type="number" step="0.01" class="form-control" asp-for="MaxPayloadKg" min="0" />
+            <span asp-validation-for="MaxPayloadKg" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Max Volume (CBM)</label>
+            <input type="number" step="0.01" class="form-control" asp-for="MaxVolumeCBM" min="0" />
+            <span asp-validation-for="MaxVolumeCBM" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Owner</label>
+            <select class="form-select" asp-for="OwnerId">
+                <option value="">-- Select --</option>
+                @foreach (var p in ViewBag.Persons)
+                {
+                    var ownerVal = Model.OwnerId?.ToString() ?? "";
+                    @:<option value="@p.Value" @(p.Value == ownerVal ? "selected" : "")>@p.Text</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Carrier</label>
+            <select class="form-select" asp-for="CarrierId">
+                <option value="">-- Select --</option>
+                @foreach (var cr in ViewBag.Carriers)
+                {
+                    var carrierVal = Model.CarrierId?.ToString() ?? "";
+                    @:<option value="@cr.Value" @(cr.Value == carrierVal ? "selected" : "")>@cr.Text</option>
+                }
+            </select>
+        </div>
+
+        <!-- ========== Row 5: Last Driver / Smart Card / Insurance ========== -->
+        <div class="col-md-4">
+            <label class="form-label">Last Driver</label>
+            <select class="form-select" asp-for="LastDriverId">
+                <option value="">-- Select --</option>
+                @foreach (var p in ViewBag.Persons)
+                {
+                    var driverVal = Model.LastDriverId?.ToString() ?? "";
+                    @:<option value="@p.Value" @(p.Value == driverVal ? "selected" : "")>@p.Text</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Fleet Smart Card No. <span class="text-danger">*</span></label>
+            <input class="form-control" asp-for="FleetSmartCardNo" maxlength="30" />
+            <span asp-validation-for="FleetSmartCardNo" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">TP Insurance No. <span class="text-danger">*</span></label>
+            <input class="form-control" asp-for="TPInsuranceNo" maxlength="30" />
+            <span asp-validation-for="TPInsuranceNo" class="text-danger small"></span>
+        </div>
+
+        <!-- ========== Row 6: Insurance Expiry / IsActive ========== -->
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Insurance Expiry Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" asp-for="TPInsuranceExpiryDate" />
+            <span asp-validation-for="TPInsuranceExpiryDate" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-4 d-flex align-items-end">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" asp-for="IsActive" />
+                <label class="form-check-label" asp-for="IsActive">
+                    Active
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button"
+                class="btn btn-secondary"
+                onclick="AppModal.close()">
+            Cancel
+        </button>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+
+            @if (isCreateMode)
+            {
+                <span>Save</span>
+            }
+            else
+            {
+                <span>Update</span>
+            }
+        </button>
+    </div>
+</form>
+
+
+
+
+
+@* @using ShipRate.WebApp.ViewModels.TransitViewModels
+@model TruckFormVM
+@{
+    var isEdit = Model.Id != null;
+    var companies = (List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.Companies;
+    var truckTypes = (List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.TruckTypes;
+    var countries = (List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.Countries;
+    var carriers = (List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.Carriers;
+    var persons = (List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.Persons;
+}
+
+<!-- Validation Summary -->
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger py-2 mb-3">
+        <ul class="mb-0 small">
+            @foreach (var state in ViewData.ModelState.Values)
+            {
+                @foreach (var err in state.Errors)
+                {
+                    <li>@err.ErrorMessage</li>
+                }
+            }
+        </ul>
+    </div>
+}
+
+<form hx-post="/Truck/Save"
+      hx-target="#modalBody"
+      hx-swap="innerHTML"
+      autocomplete="off">
+
+    <input type="hidden" asp-for="Id" />
+
+    <div class="row g-3" dir="ltr">
+
+        <!-- ========== Row 1: Company / Truck Type / Country ========== -->
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Company <span class="text-danger">*</span></label>
+            <select class="form-select" asp-for="CompanyId">
+                <option value="">-- Select --</option>
+                @foreach (var c in companies)
+                {
+                    @:<option value="@c.Value" @(c.Value == Model.CompanyId.ToString() ? "selected" : "")>@c.Text</option>
+                }
+            </select>
+            <span asp-validation-for="CompanyId" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Truck Type <span class="text-danger">*</span></label>
+            <select class="form-select" asp-for="TruckTypeId">
+                <option value="">-- Select --</option>
+                @foreach (var t in truckTypes)
+                {
+                    @:<option value="@t.Value" @(t.Value == Model.TruckTypeId.ToString() ? "selected" : "")>@t.Text</option>
+                }
+            </select>
+            <span asp-validation-for="TruckTypeId" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Country <span class="text-danger">*</span></label>
+            <select class="form-select" asp-for="CountryId">
+                <option value="">-- Select --</option>
+                @foreach (var c in countries)
+                {
+                    @:<option value="@c.Value" @(c.Value == Model.CountryId.ToString() ? "selected" : "")>@c.Text</option>
+                }
+            </select>
+            <span asp-validation-for="CountryId" class="text-danger small"></span>
+        </div>
+
+        <!-- ========== Row 2: Reference Title / Brand / Model ========== -->
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">Truck Reference Title <span class="text-danger">*</span></label>
+            <input class="form-control" asp-for="TruckReferenceTitle" maxlength="50" />
+            <span asp-validation-for="TruckReferenceTitle" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Brand <span class="text-danger">*</span></label>
+            <input class="form-control" asp-for="Brand" />
+            <span asp-validation-for="Brand" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Model <span class="text-danger">*</span></label>
+            <input class="form-control" asp-for="Model" />
+            <span asp-validation-for="Model" class="text-danger small"></span>
+        </div>
+
+        <!-- ========== Row 3: Year / Axles / Truck Plate / Trailer Plate ========== -->
+        <div class="col-md-3">
+            <label class="form-label">Year Manufactured</label>
+            <input type="number" class="form-control" asp-for="YearManufactured" min="1950" max="2030" />
+            <span asp-validation-for="YearManufactured" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Axle Count</label>
+            <input type="number" class="form-control" asp-for="AxleCount" min="1" max="20" />
+            <span asp-validation-for="AxleCount" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Truck Plate <span class="text-danger">*</span></label>
+            <input class="form-control" asp-for="TruckPlateNumber" maxlength="30" />
+            <span asp-validation-for="TruckPlateNumber" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Trailer Plate <span class="text-danger">*</span></label>
+            <input class="form-control" asp-for="TrailerPlateNumber" maxlength="30" />
+            <span asp-validation-for="TrailerPlateNumber" class="text-danger small"></span>
+        </div>
+
+        <!-- ========== Row 4: Payload / Volume / Owner / Carrier ========== -->
+        <div class="col-md-3">
+            <label class="form-label">Max Payload (Kg)</label>
+            <input type="number" step="0.01" class="form-control" asp-for="MaxPayloadKg" min="0" />
+            <span asp-validation-for="MaxPayloadKg" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Max Volume (CBM)</label>
+            <input type="number" step="0.01" class="form-control" asp-for="MaxVolumeCBM" min="0" />
+            <span asp-validation-for="MaxVolumeCBM" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Owner</label>
+            <select class="form-select" asp-for="OwnerId">
+                <option value="">-- Select --</option>
+                @foreach (var p in persons)
+                {
+                    var ownerVal = Model.OwnerId?.ToString() ?? "";
+                    @:<option value="@p.Value" @(p.Value == ownerVal ? "selected" : "")>@p.Text</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Carrier</label>
+            <select class="form-select" asp-for="CarrierId">
+                <option value="">-- Select --</option>
+                @foreach (var cr in carriers)
+                {
+                    var carrierVal = Model.CarrierId?.ToString() ?? "";
+                    @:<option value="@cr.Value" @(cr.Value == carrierVal ? "selected" : "")>@cr.Text</option>
+                }
+            </select>
+        </div>
+
+        <!-- ========== Row 5: Last Driver / Smart Card / Insurance ========== -->
+        <div class="col-md-4">
+            <label class="form-label">Last Driver</label>
+            <select class="form-select" asp-for="LastDriverId">
+                <option value="">-- Select --</option>
+                @foreach (var p in persons)
+                {
+                    var driverVal = Model.LastDriverId?.ToString() ?? "";
+                    @:<option value="@p.Value" @(p.Value == driverVal ? "selected" : "")>@p.Text</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Fleet Smart Card No. <span class="text-danger">*</span></label>
+            <input class="form-control" asp-for="FleetSmartCardNo" maxlength="30" />
+            <span asp-validation-for="FleetSmartCardNo" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">TP Insurance No. <span class="text-danger">*</span></label>
+            <input class="form-control" asp-for="TPInsuranceNo" maxlength="30" />
+            <span asp-validation-for="TPInsuranceNo" class="text-danger small"></span>
+        </div>
+
+        <!-- ========== Row 6: Insurance Expiry / IsActive ========== -->
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Insurance Expiry Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" asp-for="TPInsuranceExpiryDate" />
+            <span asp-validation-for="TPInsuranceExpiryDate" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-4 d-flex align-items-end">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" asp-for="IsActive" />
+                <label class="form-check-label" asp-for="IsActive">
+                    Active
+                </label>
+            </div>
+        </div>
+
+    </div>
+
+    <hr class="my-3" />
+
+    <!-- ========== Buttons ========== -->
+    <div class="d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-lg me-1"></i> Cancel
+        </button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check2-circle me-1"></i>
+            @(isEdit ? "Save Changes" : "Create Truck")
+        </button>
+    </div>
+
+</form> *@

@@ -1,0 +1,36 @@
+﻿@using ShipRate.Application.DTOs
+@model BLAmendmentFullRequestFormDto
+
+<div class="row g-3">
+
+    <div class="col-md-12">
+        <label asp-for="Amendment.BLId" class="form-label">B/L</label>
+        <select asp-for="Amendment.BLId"
+                asp-items="Model.Amendment.BLs"
+                class="form-select">
+            <option value="">-- Select B/L --</option>
+        </select>
+        <span asp-validation-for="Amendment.BLId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-12">
+        <label asp-for="Amendment.Reason" class="form-label">Reason</label>
+        <textarea asp-for="Amendment.Reason" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Amendment.Reason" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-check mt-2">
+            <input asp-for="Amendment.RequiresCarrierApproval" class="form-check-input" />
+            <label asp-for="Amendment.RequiresCarrierApproval" class="form-check-label"></label>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-check mt-2">
+            <input asp-for="Amendment.RequiresCustomerApproval" class="form-check-input" />
+            <label asp-for="Amendment.RequiresCustomerApproval" class="form-check-label"></label>
+        </div>
+    </div>
+
+</div>

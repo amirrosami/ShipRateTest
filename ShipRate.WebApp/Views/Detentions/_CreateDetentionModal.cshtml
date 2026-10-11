@@ -1,0 +1,308 @@
+﻿@using ShipRate.Application.ViewModels
+@model CreateDetentionVm
+
+@{
+    var companies = ViewBag.Companies as List<SelectListItem> ?? [];
+    var parties = ViewBag.Parties as List<SelectListItem> ?? [];
+    var financeDirections = ViewBag.FinanceDirections as List<SelectListItem> ?? [];
+    var billsOfLading = ViewBag.BillsOfLading as List<SelectListItem> ?? [];
+    var bookings = ViewBag.Bookings as List<SelectListItem> ?? [];
+    var tariffBooks = ViewBag.TariffBooks as List<SelectListItem> ?? [];
+    var tradeTypes = ViewBag.TradeTypes as List<SelectListItem> ?? [];
+    var currencies = ViewBag.Currencies as List<SelectListItem> ?? [];
+    var exchangeRates = ViewBag.ExchangeRates as List<SelectListItem> ?? [];
+}
+
+<style>
+    .input-validation-error {
+        border-color: #dc3545 !important;
+    }
+
+    .field-validation-error {
+        color: #dc3545;
+        font-size: 0.72rem;
+        display: block;
+        margin-top: 0.2rem;
+    }
+</style>
+
+<div class="modal fade"
+     id="createDetentionModal"
+     tabindex="-1"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content shadow-lg border-0">
+
+            <form hx-post="@Url.Action("Calculate", "Detentions")"
+                  hx-target="#detention-calculation-result"
+                  hx-swap="innerHTML"
+                  hx-indicator="#calc-loading">
+
+                @Html.AntiForgeryToken()
+
+                <!-- Modal Header -->
+                <div class="modal-header bg-light py-2 px-3 border-bottom">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle p-2">
+                            <i class="bi bi-calculator fs-6"></i>
+                        </span>
+                        <div>
+                            <h6 class="modal-title fw-bold text-dark mb-0">New Detention Calculation</h6>
+                        </div>
+                    </div>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body p-3 bg-body-tertiary">
+
+                    <!-- Validation Summary -->
+                    @if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show shadow-sm py-2 px-3 mb-3 border-danger-subtle" role="alert">
+                            <div class="d-flex align-items-center mb-1 text-danger fw-semibold">
+                                <i class="bi bi-exclamation-circle-fill me-2 fs-6"></i>
+                                <span class="small">Please fix the following issue(s):</span>
+                            </div>
+                            <ul class="mb-0 ps-3 small text-danger">
+                                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                {
+                                    if (!string.IsNullOrWhiteSpace(error.ErrorMessage))
+                                    {
+                                        <li>@error.ErrorMessage</li>
+                                    }
+                                }
+                            </ul>
+                            <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    <!-- Section 1: Shipment & Parties Card -->
+                    <div class="card border mb-2 shadow-none">
+                        <div class="card-header bg-white py-1 px-3 border-bottom d-flex align-items-center">
+                            <span class="text-uppercase fw-bold text-secondary" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                                <i class="bi bi-box-seam me-1 text-primary"></i> 1. Shipment & Parties Information
+                            </span>
+                        </div>
+                        <div class="card-body p-2 bg-white">
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <label asp-for="CompanyId" class="form-label small text-muted mb-1">Company <span class="text-danger">*</span></label>
+                                    <select asp-for="CompanyId" asp-items="companies" class="form-select form-select-sm">
+                                        <option value="">-- Select Company --</option>
+                                    </select>
+                                    <span asp-validation-for="CompanyId"></span>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label asp-for="BLId" class="form-label small text-muted mb-1">B/L No <span class="text-danger">*</span></label>
+                                    <select asp-for="BLId" asp-items="billsOfLading" class="form-select form-select-sm">
+                                        <option value="">-- Select B/L --</option>
+                                    </select>
+                                    <span asp-validation-for="BLId"></span>
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="BookingId" class="form-label small text-muted mb-1">Booking No <span class="text-danger">*</span></label>
+                                    <select asp-for="BookingId" asp-items="bookings" class="form-select form-select-sm">
+                                        <option value="">-- Select Booking --</option>
+                                    </select>
+                                    <span asp-validation-for="BookingId"></span>
+                                </div>
+
+
+                                <div class="col-md-4">
+                                    <label asp-for="FinanceDirectionId" class="form-label small text-muted mb-1">Buy/Sell <span class="text-danger">*</span></label>
+                                    <select asp-for="FinanceDirectionId" asp-items="financeDirections" class="form-select form-select-sm">
+                                        <option value="">-- Select Buy/Sell --</option>
+                                    </select>
+                                    <span asp-validation-for="FinanceDirectionId"></span>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label asp-for="TariffBookId" class="form-label small text-muted mb-1">Tariff Book <span class="text-danger">*</span></label>
+                                    <select asp-for="TariffBookId" asp-items="tariffBooks" class="form-select form-select-sm">
+                                        <option value="">-- Select Tariff Book --</option>
+                                    </select>
+                                    <span asp-validation-for="TariffBookId"></span>
+                                </div>
+
+@*                                 <div class="col-md-3">
+                                    <label asp-for="IssuedByUs" class="form-label small text-muted mb-1">Issued By</label>
+                                    <select asp-for="IssuedByUs" class="form-select form-select-sm">
+                                        <option value="true">Us</option>
+                                        <option value="false">Other Party</option>
+                                    </select>
+                                </div>
+ *@
+                                <div class="col-md-3">
+                                    <label asp-for="PartyId" class="form-label small text-muted mb-1">Party</label>
+                                    <select asp-for="PartyId" asp-items="parties" class="form-select form-select-sm">
+                                        <option value="">-- Select Party --</option>
+                                    </select>
+                                </div>
+
+
+                                <div class="col-md-3">
+                                    <label asp-for="TradeTypeId" class="form-label small text-muted mb-1">Trade Type</label>
+                                    <select asp-for="TradeTypeId" asp-items="tradeTypes" class="form-select form-select-sm">
+                                        <option value="">-- Select Trade Type --</option>
+                                    </select>
+                                    <span asp-validation-for="TradeTypeId"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Calculation & Financial Info -->
+                    <div class="card border mb-3 shadow-none">
+                        <div class="card-header bg-white py-1 px-3 border-bottom d-flex align-items-center">
+                            <span class="text-uppercase fw-bold text-secondary" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                                <i class="bi bi-cash-stack me-1 text-success"></i> 2. Period & Currency Settings
+                            </span>
+                        </div>
+                        <div class="card-body p-2 bg-white">
+                            <div class="row g-2">
+                                <div class="col-md-3">
+                                    <label asp-for="DetentionToDate" class="form-label small text-muted mb-1">
+                                        Detention To Date <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group input-group-sm">
+                                        <!-- فیلد میلادی -->
+                                        <input asp-for="DetentionToDate"
+                                               type="text"
+                                               id="detentionToDateMiladi"
+                                               class="form-control form-control-sm text-center"
+                                               placeholder="YYYY-MM-DD" />
+
+                                        <span class="input-group-text bg-light text-muted">
+                                            <i class="bi bi-arrow-left-right"></i>
+                                        </span>
+
+                                        <!-- فیلد شمسی -->
+                                        <input type="text"
+                                               id="detentionToDateShamsi"
+                                               class="form-control form-control-sm text-center"
+                                               placeholder="1403/01/01" />
+                                    </div>
+                                    <span asp-validation-for="DetentionToDate"></span>
+                                </div>
+                                <div class="col-md-2">
+                                    <label asp-for="MainCurrencyId" class="form-label small text-muted mb-1">Tariff Currency <span class="text-danger">*</span></label>
+                                    <select asp-for="MainCurrencyId" asp-items="currencies" class="form-select form-select-sm">
+                                        <option value="">-- Select --</option>
+                                    </select>
+                                    <span asp-validation-for="MainCurrencyId"></span>
+                                </div>
+                                <div class="col-md-2">
+                                    <label asp-for="FinalCurrencyId" class="form-label small text-muted mb-1">Payment Currency <span class="text-danger">*</span></label>
+                                    <select asp-for="FinalCurrencyId" asp-items="currencies" class="form-select form-select-sm">
+                                        <option value="">-- Select --</option>
+                                    </select>
+                                    <span asp-validation-for="FinalCurrencyId"></span>
+                                </div>
+                                <div class="col-md-2">
+                                    <label asp-for="ExchangeRateValue" class="form-label small text-muted mb-1">Rate Value</label>
+                                    <input asp-for="ExchangeRateValue" placeholder="1" class="form-control form-control-sm text-end money-input" />
+                                </div>
+                                <div class="col-12">
+                                    <label asp-for="Remarks" class="form-label small text-muted mb-1">Remarks</label>
+                                    <textarea asp-for="Remarks" rows="2" placeholder="Optional notes or calculation remarks..." class="form-control form-control-sm"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calculation Results Target Container -->
+                    <div id="detention-calculation-result" class="position-relative">
+                        <!-- Loading Indicator Overlay -->
+                        <div id="calc-loading" class="htmx-indicator position-absolute top-50 start-50 translate-middle text-center bg-white p-3 rounded shadow border" style="z-index: 10;">
+                            <div class="spinner-border text-primary spinner-border-sm me-2" role="status"></div>
+                            <span class="small fw-semibold text-secondary">Calculating detention tiers & containers...</span>
+                        </div>
+
+                        <!-- Initial Placeholder State -->
+                        <div class="alert alert-light border border-dashed text-center py-4 mb-0">
+                            <i class="bi bi-info-circle text-muted fs-4 d-block mb-1"></i>
+                            <div class="fw-semibold text-secondary small">Ready to Calculate</div>
+                            <div class="text-muted" style="font-size: 0.75rem;">Fill out the mandatory parameters above and click <strong>Calculate Detention</strong> to view container tier results.</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer bg-light py-2 px-3 border-top d-flex justify-content-between align-items-center">
+                    <button type="button"
+                            class="btn btn-sm btn-outline-secondary px-3"
+                            data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-1"></i> Close
+                    </button>
+
+                    <button type="submit" class="btn btn-sm btn-primary px-4 fw-semibold shadow-sm">
+                        <i class="bi bi-calculator me-1"></i> Calculate Detention
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    bootstrap.Modal
+        .getOrCreateInstance(document.getElementById('createDetentionModal'))
+        .show();
+</script>
+
+<script>
+    function miladiToShamsi(miladiStr) {
+        if (!miladiStr) return '';
+        const d = new Date(miladiStr);
+        if (isNaN(d.getTime())) return '';
+        const formatter = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
+            year: 'numeric', month: '2-digit', day: '2-digit', numberingSystem: 'latn'
+        });
+        const parts = formatter.formatToParts(d);
+        return `${parts.find(p => p.type === 'year').value}/${parts.find(p => p.type === 'month').value.padStart(2, '0')}/${parts.find(p => p.type === 'day').value.padStart(2, '0')}`;
+    }
+
+    function shamsiToMiladi(shamsiStr) {
+        if (!shamsiStr || !shamsiStr.includes('/')) return '';
+        const [jy, jm, jd] = shamsiStr.split('/').map(Number);
+        if (!jy || !jm || !jd) return '';
+        let gy = (jy <= 979) ? 621 : 1600;
+        let jyAdj = (jy <= 979) ? jy : jy - 979;
+        let days = (365 * jyAdj) + (Math.floor(jyAdj / 33) * 8) + Math.floor(((jyAdj % 33) + 3) / 4) + 78 + jd + ((jm < 7) ? (jm - 1) * 31 : ((jm - 7) * 30) + 186);
+        gy += 400 * Math.floor(days / 146097);
+        days %= 146097;
+        if (days > 36524) { gy += 100 * Math.floor(--days / 36524); days %= 36524; if (days >= 365) days++; }
+        gy += 4 * Math.floor(days / 1461);
+        days %= 1461;
+        if (days > 365) { gy += Math.floor((days - 1) / 365); days = (days - 1) % 365; }
+        let gd = days + 1;
+        const sal_a = [0, 31, ((gy % 4 === 0 && gy % 100 !== 0) || (gy % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        let gm;
+        for (gm = 1; gm <= 12; gm++) { if (gd <= sal_a[gm]) break; gd -= sal_a[gm]; }
+        return `${gy}-${String(gm).padStart(2, '0')}-${String(gd).padStart(2, '0')}`;
+    }
+
+    function syncDatePickers() {
+        const miladi = document.getElementById('detentionToDateMiladi');
+        const shamsi = document.getElementById('detentionToDateShamsi');
+        if (!miladi || !shamsi) return;
+
+        if (miladi.value) shamsi.value = miladiToShamsi(miladi.value);
+
+        miladi.addEventListener('input', function() { shamsi.value = miladiToShamsi(this.value); });
+        shamsi.addEventListener('input', function() { miladi.value = shamsiToMiladi(this.value); });
+    }
+
+    document.addEventListener('DOMContentLoaded', syncDatePickers);
+    document.body.addEventListener('htmx:afterSwap', syncDatePickers);
+</script>

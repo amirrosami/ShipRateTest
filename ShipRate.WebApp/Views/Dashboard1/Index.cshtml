@@ -1,0 +1,810 @@
+﻿@{
+    ViewData["Title"] = "Mission Control";
+    ViewData["PageHeader"] = "Mission Control";
+    ViewData["PageDescription"] = "Real-Time Logistics Command Center";
+}
+
+
+
+<style>
+    /* ============ MISSION CONTROL STYLES ============ */
+    .mc-glow-card {
+        border: 1px solid rgba(78,115,223,0.2);
+        border-radius: 16px;
+        backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .mc-glow-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--mc-accent, #4e73df), transparent);
+        }
+
+        .mc-glow-card.green::before {
+            --mc-accent: #1cc88a;
+        }
+
+        .mc-glow-card.orange::before {
+            --mc-accent: #f6c23e;
+        }
+
+        .mc-glow-card.red::before {
+            --mc-accent: #e74a3b;
+        }
+
+        .mc-glow-card.cyan::before {
+            --mc-accent: #36b9cc;
+        }
+
+        .mc-glow-card.purple::before {
+            --mc-accent: #8b5cf6;
+        }
+
+    /* Pulsing dot */
+    .pulse-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        animation: pulseDot 1.5s ease-in-out infinite;
+    }
+
+        .pulse-dot.green {
+            background: #1cc88a;
+            box-shadow: 0 0 8px #1cc88a;
+        }
+
+        .pulse-dot.red {
+            background: #e74a3b;
+            box-shadow: 0 0 8px #e74a3b;
+        }
+
+        .pulse-dot.yellow {
+            background: #f6c23e;
+            box-shadow: 0 0 8px #f6c23e;
+        }
+
+        .pulse-dot.blue {
+            background: #4e73df;
+            box-shadow: 0 0 8px #4e73df;
+        }
+
+    @@keyframes pulseDot {
+        0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.5;
+            transform: scale(1.3);
+        }
+    }
+
+    /* Ticker */
+    .mc-ticker {
+        overflow: hidden;
+        white-space: nowrap;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.8rem;
+        background: rgba(78,115,223,0.08);
+        border: 1px solid rgba(78,115,223,0.15);
+    }
+
+    .mc-ticker-content {
+        display: inline-block;
+        animation: tickerScroll 30s linear infinite;
+    }
+
+    @@keyframes tickerScroll {
+        0% {
+            transform: translateX(100%);
+        }
+
+        100% {
+            transform: translateX(-100%);
+        }
+    }
+
+    /* Big number counter */
+    .mc-big-num {
+        font-family: 'Inter', monospace;
+        font-size: 2.2rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+        line-height: 1;
+        background: linear-gradient(135deg, var(--mc-accent, #4e73df), #36b9cc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+        .mc-big-num.green {
+            background: linear-gradient(135deg, #1cc88a, #17a673);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .mc-big-num.orange {
+            background: linear-gradient(135deg, #f6c23e, #dda520);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .mc-big-num.red {
+            background: linear-gradient(135deg, #e74a3b, #c0392b);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .mc-big-num.purple {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+    /* Radar ring background */
+    .radar-ring {
+        position: relative;
+    }
+
+        .radar-ring::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 180px;
+            height: 180px;
+            transform: translate(-50%, -50%);
+            border: 1px dashed rgba(78,115,223,0.2);
+            border-radius: 50%;
+            animation: radarSpin 8s linear infinite;
+            pointer-events: none;
+        }
+
+    @@keyframes radarSpin {
+        0% {
+            transform: translate(-50%, -50%) rotate(0deg);
+        }
+
+        100% {
+            transform: translate(-50%, -50%) rotate(360deg);
+        }
+    }
+
+    /* Ship tracker line */
+    .route-line {
+        height: 4px;
+        border-radius: 2px;
+        background: linear-gradient(90deg, #1cc88a var(--progress), rgba(128,128,128,0.2) var(--progress));
+        position: relative;
+    }
+
+        .route-line .ship-icon {
+            position: absolute;
+            top: 50%;
+            left: var(--progress);
+            transform: translate(-50%, -50%);
+            font-size: 1rem;
+            transition: left 1s ease;
+        }
+
+    /* Hexagon badge */
+    .hex-badge {
+        width: 56px;
+        height: 56px;
+        clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: #fff;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    /* Status bar */
+    .status-segment {
+        height: 8px;
+        border-radius: 4px;
+        flex: 1;
+        transition: all 0.3s;
+    }
+
+        .status-segment:hover {
+            transform: scaleY(2);
+        }
+
+    /* Matrix grid animation for section bg */
+    .mc-grid-bg {
+        background-image: linear-gradient(rgba(78,115,223,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(78,115,223,0.03) 1px, transparent 1px);
+        background-size: 40px 40px;
+    }
+
+    /* Flip counter */
+    .flip-unit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 48px;
+        border-radius: 8px;
+        font-size: 1.4rem;
+        font-weight: 800;
+        font-family: 'Inter', monospace;
+        margin: 0 1px;
+    }
+
+    .flip-separator {
+        font-size: 1.4rem;
+        font-weight: 800;
+        opacity: 0.4;
+        animation: blinkSep 1s step-end infinite;
+    }
+
+    @@keyframes blinkSep {
+        0%, 100% {
+            opacity: 0.4;
+        }
+
+        50% {
+            opacity: 0;
+        }
+    }
+
+    /* Wave bars (mini equalizer) */
+    .wave-bar {
+        width: 3px;
+        border-radius: 2px;
+        background: #1cc88a;
+        display: inline-block;
+        animation: waveBar 0.8s ease-in-out infinite alternate;
+    }
+
+        .wave-bar:nth-child(2) {
+            animation-delay: 0.1s;
+            height: 16px;
+        }
+
+        .wave-bar:nth-child(3) {
+            animation-delay: 0.2s;
+            height: 22px;
+        }
+
+        .wave-bar:nth-child(4) {
+            animation-delay: 0.3s;
+            height: 12px;
+        }
+
+        .wave-bar:nth-child(5) {
+            animation-delay: 0.4s;
+            height: 18px;
+        }
+
+    @@keyframes waveBar {
+        0% {
+            height: 6px;
+        }
+
+        100% {
+            height: 24px;
+        }
+    }
+</style>
+
+<!-- ==================== LIVE TICKER ==================== -->
+<div class="mc-ticker mb-4">
+    <div class="mc-ticker-content">
+        <span class="me-4">🟢 <strong>SYS ONLINE</strong> — All 14 nodes operational</span>
+        <span class="me-4">📦 Container MSKU-4829 cleared customs at Rotterdam 12:04 UTC</span>
+        <span class="me-4">🚢 MV Orion ETA Singapore: 16:30 UTC</span>
+        <span class="me-4">⚠️ Weather advisory: Typhoon Chan-hom affecting East China Sea routes</span>
+        <span class="me-4">✅ Revenue target 94.2% achieved for Q4</span>
+        <span class="me-4">🔄 Fleet utilization at 87.3% — above target</span>
+    </div>
+</div>
+
+<!-- ==================== COMMAND METRICS ==================== -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+        <div class="card mc-glow-card border-0 shadow-sm h-100">
+            <div class="card-body text-center py-4">
+                <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                    <span class="pulse-dot green"></span>
+                    <small class="text-muted text-uppercase fw-semibold" style="font-size:0.7rem;letter-spacing:1px;">Active Fleet</small>
+                </div>
+                <div class="mc-big-num" id="counterFleet">247</div>
+                <div class="mt-2 d-flex justify-content-center gap-1">
+                    <span class="status-segment" style="background:#1cc88a;" title="Operational"></span>
+                    <span class="status-segment" style="background:#1cc88a;"></span>
+                    <span class="status-segment" style="background:#1cc88a;"></span>
+                    <span class="status-segment" style="background:#f6c23e;" title="Maintenance"></span>
+                    <span class="status-segment" style="background:rgba(128,128,128,0.2);" title="Offline"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="card mc-glow-card green border-0 shadow-sm h-100">
+            <div class="card-body text-center py-4">
+                <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                    <span class="pulse-dot blue"></span>
+                    <small class="text-muted text-uppercase fw-semibold" style="font-size:0.7rem;letter-spacing:1px;">Containers / hr</small>
+                </div>
+                <div class="mc-big-num green" id="counterContainers">1,842</div>
+                <small class="text-success"><i class="bi bi-caret-up-fill"></i> 14% vs last hour</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="card mc-glow-card orange border-0 shadow-sm h-100">
+            <div class="card-body text-center py-4">
+                <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                    <span class="pulse-dot yellow"></span>
+                    <small class="text-muted text-uppercase fw-semibold" style="font-size:0.7rem;letter-spacing:1px;">Revenue Today</small>
+                </div>
+                <div class="mc-big-num orange">$2.4M</div>
+                <small class="text-muted">Target: $2.6M</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="card mc-glow-card red border-0 shadow-sm h-100">
+            <div class="card-body text-center py-4">
+                <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                    <span class="pulse-dot red"></span>
+                    <small class="text-muted text-uppercase fw-semibold" style="font-size:0.7rem;letter-spacing:1px;">Alerts</small>
+                </div>
+                <div class="mc-big-num red" id="counterAlerts">7</div>
+                <small class="text-danger">3 critical — 4 warning</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== UPTIME CLOCK + SYS STATUS ==================== -->
+<div class="row g-3 mb-4">
+    <div class="col-lg-4">
+        <div class="card mc-glow-card purple border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 text-center">
+                <small class="text-uppercase fw-semibold" style="font-size:0.7rem;letter-spacing:1px;color:var(--app-text,#666);">System Uptime</small>
+            </div>
+            <div class="card-body text-center py-3">
+                <div id="uptimeClock" class="d-flex justify-content-center align-items-center gap-1">
+                    <span class="flip-unit bg-primary text-white">1</span>
+                    <span class="flip-unit bg-primary text-white">2</span>
+                    <span class="flip-separator">:</span>
+                    <span class="flip-unit bg-primary text-white">4</span>
+                    <span class="flip-unit bg-primary text-white">7</span>
+                    <span class="flip-separator">:</span>
+                    <span class="flip-unit bg-primary text-white">3</span>
+                    <span class="flip-unit bg-primary text-white" id="uptimeSec">3</span>
+                </div>
+                <small class="text-muted d-block mt-2">Last restart: 12 days ago</small>
+                <div class="mt-3 d-flex justify-content-center align-items-end gap-1" style="height:28px;">
+                    <span class="wave-bar" style="height:10px;"></span>
+                    <span class="wave-bar" style="height:16px;"></span>
+                    <span class="wave-bar" style="height:22px;"></span>
+                    <span class="wave-bar" style="height:12px;"></span>
+                    <span class="wave-bar" style="height:18px;"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card mc-glow-card cyan border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0">
+                <h6 class="mb-0 fw-semibold">System Health Monitor</h6>
+            </div>
+            <div class="card-body pt-0">
+                <div style="position:relative;height:200px;">
+                    <canvas id="chartHeartbeat"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MAIN CHARTS ==================== -->
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="card mc-glow-card border-0 shadow-sm h-100 mc-grid-bg">
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-activity me-2 text-primary"></i>Global Throughput</h6>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="pulse-dot green"></span>
+                    <small class="text-muted">LIVE</small>
+                </div>
+            </div>
+            <div class="card-body pt-0">
+                <div style="position:relative;height:300px;">
+                    <canvas id="chartThroughput"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card mc-glow-card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-bullseye me-2 text-info"></i>Capability Radar</h6>
+            </div>
+            <div class="card-body pt-0 radar-ring">
+                <div style="position:relative;height:300px;">
+                    <canvas id="chartRadar"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== LIVE SHIP TRACKER ==================== -->
+<div class="row g-3 mb-4">
+    <div class="col-12">
+        <div class="card mc-glow-card green border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-geo-alt-fill me-2 text-success"></i>Live Vessel Tracker</h6>
+                <small class="text-muted">Updated 30s ago</small>
+            </div>
+            <div class="card-body">
+                <!-- Route 1 -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div>
+                            <span class="fw-semibold">MV Pacific Star</span>
+                            <span class="badge bg-success-subtle text-success ms-2">On Schedule</span>
+                        </div>
+                        <small class="text-muted">Shanghai → Rotterdam | ETA 14 days</small>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-muted" style="width:70px;">Shanghai</small>
+                        <div class="flex-grow-1 route-line" style="--progress:62%;">
+                            <span class="ship-icon">🚢</span>
+                        </div>
+                        <small class="text-muted" style="width:70px;text-align:right;">Rotterdam</small>
+                    </div>
+                </div>
+                <!-- Route 2 -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div>
+                            <span class="fw-semibold">MV Ocean Breeze</span>
+                            <span class="badge bg-warning-subtle text-warning ms-2">Slight Delay</span>
+                        </div>
+                        <small class="text-muted">Dubai → Hamburg | ETA 8 days</small>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-muted" style="width:70px;">Dubai</small>
+                        <div class="flex-grow-1 route-line" style="--progress:41%;">
+                            <span class="ship-icon">🚢</span>
+                        </div>
+                        <small class="text-muted" style="width:70px;text-align:right;">Hamburg</small>
+                    </div>
+                </div>
+                <!-- Route 3 -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div>
+                            <span class="fw-semibold">MV Titan Cargo</span>
+                            <span class="badge bg-success-subtle text-success ms-2">On Schedule</span>
+                        </div>
+                        <small class="text-muted">Singapore → Sydney | ETA 3 days</small>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-muted" style="width:70px;">Singapore</small>
+                        <div class="flex-grow-1 route-line" style="--progress:85%;">
+                            <span class="ship-icon">🚢</span>
+                        </div>
+                        <small class="text-muted" style="width:70px;text-align:right;">Sydney</small>
+                    </div>
+                </div>
+                <!-- Route 4 -->
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div>
+                            <span class="fw-semibold">MV Red Phoenix</span>
+                            <span class="badge bg-danger-subtle text-danger ms-2">Delayed</span>
+                        </div>
+                        <small class="text-muted">Mumbai → Durban | ETA 11 days</small>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-muted" style="width:70px;">Mumbai</small>
+                        <div class="flex-grow-1 route-line" style="--progress:23%;">
+                            <span class="ship-icon">🚢</span>
+                        </div>
+                        <small class="text-muted" style="width:70px;text-align:right;">Durban</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== BOTTOM ROW ==================== -->
+<div class="row g-3 mb-4">
+    <!-- Port Congestion -->
+    <div class="col-lg-5">
+        <div class="card mc-glow-card orange border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-bar-chart-steps me-2 text-warning"></i>Port Congestion Index</h6>
+            </div>
+            <div class="card-body pt-0">
+                <div style="position:relative;height:260px;">
+                    <canvas id="chartCongestion"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Crew & Resource -->
+    <div class="col-lg-3">
+        <div class="card mc-glow-card purple border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-people-fill me-2" style="color:#8b5cf6"></i>Crew Status</h6>
+            </div>
+            <div class="card-body pt-0">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="hex-badge" style="background:#1cc88a;">
+                        <i class="bi bi-person-check"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold fs-5">312</div>
+                        <small class="text-muted">On Duty</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="hex-badge" style="background:#f6c23e;">
+                        <i class="bi bi-moon"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold fs-5">87</div>
+                        <small class="text-muted">On Leave</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="hex-badge" style="background:#36b9cc;">
+                        <i class="bi bi-mortarboard"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold fs-5">24</div>
+                        <small class="text-muted">Training</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="hex-badge" style="background:#e74a3b;">
+                        <i class="bi bi-bandaid"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold fs-5">5</div>
+                        <small class="text-muted">Medical</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Command Log -->
+    <div class="col-lg-4">
+        <div class="card mc-glow-card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-terminal me-2 text-primary"></i>Command Log</h6>
+                <span class="badge bg-primary-subtle text-primary font-monospace" style="font-size:0.65rem;">TERMINAL</span>
+            </div>
+            <div class="card-body pt-0">
+                <div class="font-monospace small p-3 rounded-3"
+                     style="background:rgba(0,0,0,0.05);max-height:280px;overflow-y:auto;font-size:0.75rem;line-height:1.8;">
+                    <div><span class="text-success">12:04:33</span> <span class="text-muted">|</span> Container MSKU-4829 <span class="text-success">CLEARED</span> Rotterdam</div>
+                    <div><span class="text-success">12:03:58</span> <span class="text-muted">|</span> Vessel MV-Star <span class="text-primary">DEPARTED</span> berth A7</div>
+                    <div><span class="text-success">12:02:11</span> <span class="text-muted">|</span> Alert <span class="text-warning">WEATHER</span> advisory CH-Sea</div>
+                    <div><span class="text-success">12:01:44</span> <span class="text-muted">|</span> Invoice #INV-9921 <span class="text-info">GENERATED</span> $48,200</div>
+                    <div><span class="text-success">12:00:02</span> <span class="text-muted">|</span> System health check <span class="text-success">PASSED</span></div>
+                    <div><span class="text-success">11:58:39</span> <span class="text-muted">|</span> GPS sync <span class="text-danger">FAILED</span> MV-Orion</div>
+                    <div><span class="text-success">11:57:15</span> <span class="text-muted">|</span> Batch #B-9912 customs <span class="text-success">APPROVED</span></div>
+                    <div><span class="text-success">11:55:08</span> <span class="text-muted">|</span> New carrier <span class="text-primary">REGISTERED</span> PacificEx</div>
+                    <div><span class="text-success">11:54:22</span> <span class="text-muted">|</span> Route SG-SYD delay <span class="text-warning">+4hrs</span></div>
+                    <div><span class="text-success">11:52:01</span> <span class="text-muted">|</span> Fuel level MV-Breeze <span class="text-success">82%</span></div>
+                    <div class="mt-1"><span class="text-muted">▌</span><span class="text-muted" style="animation:blinkSep 1s step-end infinite;">_</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const C = {
+                primary: '#4e73df', success: '#1cc88a', info: '#36b9cc',
+                warning: '#f6c23e', danger: '#e74a3b', purple: '#8b5cf6', secondary: '#858796'
+            };
+            function txtClr() { return getComputedStyle(document.documentElement).getPropertyValue('--bs-body-color').trim() || '#555'; }
+            function grdClr() { return 'rgba(128,128,128,0.12)'; }
+
+            // ===== 1. System Heartbeat (Streaming Line) =====
+            const heartbeatData = [];
+            const heartbeatLabels = [];
+            for (let i = 60; i >= 0; i--) {
+                heartbeatLabels.push(i + 's');
+                heartbeatData.push(95 + Math.random() * 5);
+            }
+            const heartbeatChart = new Chart(document.getElementById('chartHeartbeat'), {
+                type: 'line',
+                data: {
+                    labels: heartbeatLabels,
+                    datasets: [{
+                        label: 'System Load %',
+                        data: heartbeatData,
+                        borderColor: C.success,
+                        backgroundColor: 'rgba(28,200,138,0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 0,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    animation: { duration: 0 },
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { min: 80, max: 100, grid: { color: grdClr() }, ticks: { color: txtClr(), callback: v => v + '%' } }
+                    }
+                }
+            });
+            // Live update heartbeat
+            setInterval(() => {
+                heartbeatChart.data.datasets[0].data.shift();
+                heartbeatChart.data.datasets[0].data.push(94 + Math.random() * 6);
+                heartbeatChart.data.labels.shift();
+                heartbeatChart.data.labels.push('0s');
+                heartbeatChart.update('none');
+            }, 1000);
+
+            // ===== 2. Global Throughput (Multi-dataset area) =====
+            new Chart(document.getElementById('chartThroughput'), {
+                type: 'line',
+                data: {
+                    labels: ['00:00','02:00','04:00','06:00','08:00','10:00','12:00','14:00','16:00','18:00','20:00','22:00'],
+                    datasets: [
+                        {
+                            label: 'Inbound TEU',
+                            data: [320,280,240,310,520,680,750,820,790,680,540,420],
+                            borderColor: C.primary,
+                            backgroundColor: 'rgba(78,115,223,0.1)',
+                            fill: true, tension: 0.4, pointRadius: 3, pointBackgroundColor: '#fff', pointBorderWidth: 2, borderWidth: 2
+                        },
+                        {
+                            label: 'Outbound TEU',
+                            data: [280,240,200,260,460,610,690,760,730,620,490,380],
+                            borderColor: C.success,
+                            backgroundColor: 'rgba(28,200,138,0.08)',
+                            fill: true, tension: 0.4, pointRadius: 3, pointBackgroundColor: '#fff', pointBorderWidth: 2, borderWidth: 2
+                        },
+                        {
+                            label: 'Transit TEU',
+                            data: [150,120,100,140,250,320,350,390,370,310,260,200],
+                            borderColor: C.warning,
+                            backgroundColor: 'transparent',
+                            fill: false, tension: 0.4, pointRadius: 2, borderDash: [5,5], borderWidth: 1.5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { usePointStyle: true, padding: 16, color: txtClr(), font: { size: 11 } } } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: txtClr() } },
+                        y: { grid: { color: grdClr() }, ticks: { color: txtClr() }, beginAtZero: true }
+                    }
+                }
+            });
+
+            // ===== 3. Capability Radar =====
+            new Chart(document.getElementById('chartRadar'), {
+                type: 'radar',
+                data: {
+                    labels: ['Speed','Capacity','Safety','Cost Efficiency','Reliability','Coverage'],
+                    datasets: [
+                        {
+                            label: 'Current',
+                            data: [88,75,92,70,85,78],
+                            borderColor: C.primary,
+                            backgroundColor: 'rgba(78,115,223,0.15)',
+                            pointBackgroundColor: C.primary,
+                            pointRadius: 4, borderWidth: 2
+                        },
+                        {
+                            label: 'Target',
+                            data: [90,85,95,80,90,85],
+                            borderColor: C.danger,
+                            backgroundColor: 'rgba(231,74,59,0.08)',
+                            pointBackgroundColor: C.danger,
+                            pointRadius: 3, borderWidth: 1.5, borderDash: [4,4]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12, color: txtClr(), font: { size: 11 } } } },
+                    scales: {
+                        r: {
+                            beginAtZero: true, max: 100,
+                            grid: { color: grdClr() },
+                            angleLines: { color: grdClr() },
+                            pointLabels: { color: txtClr(), font: { size: 11 } },
+                            ticks: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // ===== 4. Port Congestion (Horizontal grouped bar) =====
+            new Chart(document.getElementById('chartCongestion'), {
+                type: 'bar',
+                data: {
+                    labels: ['Shanghai','Rotterdam','Singapore','Dubai','Hamburg','LA/LB'],
+                    datasets: [
+                        {
+                            label: 'Waiting (hrs)',
+                            data: [18,12,8,14,10,22],
+                            backgroundColor: C.danger,
+                            borderRadius: 4, barPercentage: 0.5
+                        },
+                        {
+                            label: 'Processing (hrs)',
+                            data: [6,4,3,5,4,8],
+                            backgroundColor: C.warning,
+                            borderRadius: 4, barPercentage: 0.5
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 14, color: txtClr(), font: { size: 11 } } }
+                    },
+                    scales: {
+                        x: { stacked: true, grid: { color: grdClr() }, ticks: { color: txtClr(), callback: v => v + 'h' } },
+                        y: { stacked: true, grid: { display: false }, ticks: { color: txtClr() } }
+                    }
+                }
+            });
+
+            // ===== LIVE COUNTER ANIMATION =====
+            function animateValue(el, start, end, dur) {
+                let startTime = null;
+                const step = (ts) => {
+                    if (!startTime) startTime = ts;
+                    const progress = Math.min((ts - startTime) / dur, 1);
+                    const val = Math.floor(progress * (end - start) + start);
+                    el.textContent = val.toLocaleString();
+                    if (progress < 1) requestAnimationFrame(step);
+                };
+                requestAnimationFrame(step);
+            }
+            animateValue(document.getElementById('counterFleet'), 0, 247, 1500);
+            animateValue(document.getElementById('counterContainers'), 0, 1842, 2000);
+            animateValue(document.getElementById('counterAlerts'), 0, 7, 800);
+
+            // ===== UPTIME CLOCK =====
+            let sec = 33;
+            setInterval(() => {
+                sec = (sec + 1) % 60;
+                const el = document.getElementById('uptimeSec');
+                if (el) el.textContent = sec < 10 ? '0'.charAt(1) : String(sec).charAt(1);
+                // update full display would need more logic, keeping simple
+                if (el) el.textContent = sec % 10;
+            }, 1000);
+
+        });
+    </script>
+}

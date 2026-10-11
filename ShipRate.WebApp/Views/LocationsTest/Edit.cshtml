@@ -1,0 +1,340 @@
+﻿@using ShipRate.WebApp.ViewModels.Location
+@model LocationEditViewModel
+@{
+    ViewData["Title"] = $"Edit — {Model.LocationName}";
+}
+
+@await Html.PartialAsync("_LocationStyles")
+
+<div class="loc-page">
+
+    <!-- ═══ Header ═══ -->
+    <div class="loc-header">
+        <div class="loc-header-left">
+            <div class="loc-header-icon">✏️</div>
+            <div>
+                <h1>Edit Location</h1>
+                <p>
+                    Modifying <strong>@Model.LocationCode</strong> — @Model.LocationName
+                </p>
+            </div>
+        </div>
+        <div class="loc-header-actions">
+            <a asp-action="Detail" asp-route-id="@Model.LocationId"
+               class="loc-btn loc-btn-outline">
+                👁 View Details
+            </a>
+            <a asp-action="Index" class="loc-btn loc-btn-outline">
+                ← Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- ═══ Validation Summary ═══ -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="loc-alert loc-alert-danger">
+            ❌ Please correct the errors below and try again.
+        </div>
+    }
+
+    <!-- ═══ Meta Info ═══ -->
+    <div class="loc-card" style="margin-bottom: 20px;">
+        <div class="loc-card-body" style="padding: 12px 24px;">
+            <div style="display: flex; gap: 32px; flex-wrap: wrap; font-size: .8125rem; color: var(--loc-gray-500);">
+                <span>
+                    <strong>ID:</strong> @Model.LocationId
+                </span>
+                <span>
+                    <strong>Created:</strong> @Model.CreatedDate.ToString("yyyy-MM-dd HH:mm")
+                </span>
+                @if (Model.ModifiedDate.HasValue)
+                {
+                    <span>
+                        <strong>Last Modified:</strong> @Model.ModifiedDate.Value.ToString("yyyy-MM-dd HH:mm")
+                    </span>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Form ═══ -->
+    <form asp-action="Edit" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="LocationId" />
+        <input type="hidden" asp-for="CreatedDate" />
+
+        <div class="loc-card">
+            <div class="loc-card-header">
+                <h2>📝 Location Information</h2>
+            </div>
+            <div class="loc-card-body">
+
+
+                <!-- ── Basic Info ── -->
+                <div class="loc-section-title">🏷 Basic Information</div>
+                <div class="loc-grid loc-grid-3">
+                    <div class="loc-form-group">
+                        <label asp-for="LocationTypeId">
+                            Location Type <span class="required">*</span>
+                        </label>
+                        <select asp-for="LocationTypeId" class="loc-form-control"
+                                id="ddlLocationType">
+                            <option value="">— Select Type —</option>
+                            @foreach (var t in Model.LocationTypes)
+                            {
+                                <option value="@t.Value">@t.Text</option>
+                            }
+                        </select>
+                        <span asp-validation-for="LocationTypeId"></span>
+                    </div>
+
+                    <div class="loc-form-group">
+                        <label asp-for="CountryId">Country</label>
+                        <select asp-for="CountryId" class="loc-form-control">
+                            <option value="">— Select Country —</option>
+                            @foreach (var c in Model.Countries)
+                            {
+                                <option value="@c.Value">@c.Text</option>
+                            }
+                        </select>
+                        <span asp-validation-for="CountryId"></span>
+                    </div>
+
+                    <div class="loc-form-group">
+                        <label asp-for="ParentLocationId">Parent Location</label>
+                        <select asp-for="ParentLocationId" class="loc-form-control">
+                            <option value="">— None —</option>
+                            @foreach (var p in Model.ParentLocations)
+                            {
+                                <option value="@p.Value">@p.Text</option>
+                            }
+                        </select>
+                        <span asp-validation-for="ParentLocationId"></span>
+                    </div>
+                </div>
+
+
+                <div class="loc-grid loc-grid-3">
+                    <div class="loc-form-group">
+                        <label asp-for="LocationCode">
+                            Location Code <span class="required">*</span>
+                        </label>
+                        <input asp-for="LocationCode" class="loc-form-control"
+                               placeholder="" maxlength="20" />
+                        <span asp-validation-for="LocationCode"></span>
+                    </div>
+
+                    <div class="loc-form-group">
+                        <label asp-for="LocationName">
+                            Location Name <span class="required">*</span>
+                        </label>
+                        <input asp-for="LocationName" class="loc-form-control"
+                               placeholder="" maxlength="200" />
+                        <span asp-validation-for="LocationName"></span>
+                    </div>
+
+                    <div class="loc-form-group">
+                        <label asp-for="@Model.LocationLocalName">
+                            Location Local Name
+                        </label>
+                        <input asp-for="LocationLocalName" class="loc-form-control"
+                               placeholder="" maxlength="200" />
+                        <span asp-validation-for="LocationLocalName"></span>
+                    </div>
+                </div>
+
+                <div class="loc-grid loc-grid-3">
+                    <div class="loc-form-group">
+                        <label asp-for="Address">
+                            Address
+                        </label>
+                        <input asp-for="Address" class="loc-form-control"
+                               placeholder="" maxlength="20" />
+                        <span asp-validation-for="Address"></span>
+                    </div>
+
+                    <div class="loc-form-group">
+                        <label asp-for="Phone">
+                            Phone
+                        </label>
+                        <input asp-for="Phone" class="loc-form-control"
+                               placeholder="" maxlength="50" />
+                        <span asp-validation-for="Phone"></span>
+                    </div>
+
+                    <div class="loc-form-group">
+                        <label asp-for="Email">
+                            Email
+                        </label>
+                        <input asp-for="Email" class="loc-form-control"
+                               placeholder="" maxlength="200" />
+                        <span asp-validation-for="Email"></span>
+                    </div>
+                </div>
+
+                <!-- ── Geo & Codes ── -->
+                <div class="loc-section-title">🌐 Geographic & Coding</div>
+                <div class="loc-grid loc-grid-3">
+                    <div class="loc-form-group">
+                        <label asp-for="Latitude">Latitude</label>
+                        <input asp-for="Latitude" class="loc-form-control" type="number"
+                               step="0.000001" placeholder="" />
+                        <span asp-validation-for="Latitude"></span>
+                    </div>
+                    <div class="loc-form-group">
+                        <label asp-for="Longitude">Longitude</label>
+                        <input asp-for="Longitude" class="loc-form-control" type="number"
+                               step="0.000001" placeholder="" />
+                        <span asp-validation-for="Longitude"></span>
+                    </div>
+                </div>
+
+
+
+
+                <!-- ── Conditional: City Type ── -->
+                <div class="loc-conditional" id="sectionCity">
+                    <div class="loc-grid loc-grid-3">
+                        <div class="loc-form-group">
+                            <label asp-for="CityTypeId">City Type</label>
+                            <select asp-for="CityTypeId" class="loc-form-control">
+                                <option value="">— Select City Type —</option>
+                                @foreach (var c in Model.CityTypes)
+                                {
+                                    <option value="@c.Value">@c.Text</option>
+                                }
+                            </select>
+                            <span asp-validation-for="CityTypeId"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Conditional: Airport Fields ── -->
+                <div class="loc-conditional" id="sectionAirport">
+                    <div class="loc-section-title">✈️ Airport Details</div>
+                    <div class="loc-grid loc-grid-3">
+                        <div class="loc-form-group">
+                            <label asp-for="IATACode">IATA Code</label>
+                            <input asp-for="IATACode" class="loc-form-control"
+                                   placeholder="" maxlength="10"
+                                   style="text-transform: uppercase;" />
+                            <span asp-validation-for="IATACode"></span>
+                        </div>
+                        <div class="loc-form-group">
+                            <label asp-for="ICAOCode">ICAO Code</label>
+                            <input asp-for="ICAOCode" class="loc-form-control"
+                                   placeholder="" maxlength="10"
+                                   style="text-transform: uppercase;" />
+                            <span asp-validation-for="ICAOCode"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Conditional: Border Fields ── -->
+                <div class="loc-conditional" id="sectionBorder">
+                    <div class="loc-section-title">🚧 Border Details</div>
+                    <div class="loc-grid loc-grid-3">
+                        <div class="loc-form-group">
+                            <label asp-for="CountryId2">Second Country</label>
+                            <select asp-for="CountryId2" class="loc-form-control">
+                                <option value="">— Select Second Country —</option>
+                                @foreach (var c in Model.Countries)
+                                {
+                                    <option value="@c.Value">@c.Text</option>
+                                }
+                            </select>
+                            <span asp-validation-for="CountryId2"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Conditional: Depot Fields ── -->
+                <div class="loc-conditional" id="sectionDepot">
+                    <div class="loc-section-title">🏭 Depot Details</div>
+                    <div class="loc-grid loc-grid-3">
+                        <div class="loc-form-group">
+                            <label asp-for="DepotTypeId">Depot Type</label>
+                            <select asp-for="DepotTypeId" class="loc-form-control">
+                                <option value="">— Select Depot Type —</option>
+                                @foreach (var d in Model.DepotTypes)
+                                {
+                                    <option value="@d.Value">@d.Text</option>
+                                }
+                            </select>
+                            <span asp-validation-for="DepotTypeId"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Conditional: Terminal Fields ── -->
+                <div class="loc-conditional" id="sectionTerminal">
+                    <div class="loc-section-title">🚢 Terminal Details</div>
+                    <div class="loc-grid loc-grid-3">
+                        <div class="loc-form-group">
+                            <label asp-for="TerminalTypeId">Terminal Type</label>
+                            <select asp-for="TerminalTypeId" class="loc-form-control">
+                                <option value="">— Select Terminal Type —</option>
+                                @foreach (var tt in Model.TerminalTypes)
+                                {
+                                    <option value="@tt.Value">@tt.Text</option>
+                                }
+                            </select>
+                            <span asp-validation-for="TerminalTypeId"></span>
+                        </div>
+                    </div>
+                </div>
+                <!-- ── Submit ── -->
+                <div class="loc-form-actions">
+                    <a asp-action="Index" class="loc-btn loc-btn-outline">Cancel</a>
+                    <a asp-action="Delete" asp-route-id="@Model.LocationId"
+                       class="loc-btn loc-btn-danger">
+                        🗑 Delete
+                    </a>
+                    <button type="submit" class="loc-btn loc-btn-primary loc-btn-lg">
+                        💾 Save Changes
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        const typeFieldMap = {
+            '1': ['sectionProvince'],                 // Province
+            '2': ['sectionCity'],                     // City
+            '3': ['sectionAirport'],                  // Airport
+            '4': ['sectionBorder'],                   // Border
+            '5': ['sectionCustomsOffice'],            // Customs Office
+            '6': ['sectionTerminal'],                 // Terminal
+            '7': ['sectionDepot'],                    // Depot
+            '8': ['sectionFreezone'],                 // Free zone
+            };
+
+        const ddl = document.getElementById('ddlLocationType');
+
+        function toggleSections() {
+            document.querySelectorAll('.loc-conditional').forEach(el => {
+                el.classList.remove('show');
+            });
+            const val = ddl.value;
+            if (val && typeFieldMap[val]) {
+                typeFieldMap[val].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('show');
+                });
+            }
+        }
+
+        ddl.addEventListener('change', toggleSections);
+        toggleSections();
+    </script>
+}

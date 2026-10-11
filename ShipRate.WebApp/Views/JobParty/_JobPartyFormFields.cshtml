@@ -1,0 +1,110 @@
+﻿@model ShipRate.Application.ViewModels.JobPartyFormVm
+
+<div class="modal-body text-start" dir="ltr">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="JobId" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+    <div class="row g-2">
+        <div class="col-md-3">
+            <label asp-for="SequenceNo" class="form-label"></label>
+            <input asp-for="SequenceNo" class="form-control form-control-sm" />
+            <span asp-validation-for="SequenceNo" class="text-danger small"></span>
+        </div>
+        <br />
+
+@*         <div class="col-md-6">
+            <label asp-for="PartyId" class="form-label"></label>
+            <select asp-for="PartyId" asp-items="Model.Parties" class="form-select form-select-sm">
+                <option value="">-- Select Party --</option>
+            </select>
+            <span asp-validation-for="PartyId" class="text-danger small"></span>
+        </div>
+ *@
+        <div class="col-md-9">
+        </div>
+
+
+        <div class="col-md-4">
+            <label asp-for="RoleTypeId" class="form-label"></label>
+            <select asp-for="RoleTypeId" asp-items="Model.RoleTypes" class="form-select form-select-sm">
+                <option value="">-- Select Role Type --</option>
+            </select>
+            <span asp-validation-for="RoleTypeId" class="text-danger small"></span>
+        </div>
+
+
+
+        <div class="col-md-8">
+            <label asp-for="PartyId" class="form-label">Party</label>
+
+            <input type="hidden"
+                   asp-for="PartyId"
+                   id="CPartyId" />
+
+            <input type="text"
+                   id="CPartySearchText"
+                   name="CParty"
+                   value="@Model.PartyName"
+                   class="form-control"
+                   placeholder="Search Party..."
+                   autocomplete="off"
+                   hx-get="@Url.Action("SearchParties", "JobParty")"
+                   hx-trigger="keyup changed delay:400ms"
+                   hx-target="#partySearchResults"
+                   hx-swap="innerHTML"
+                   hx-vals='js:{
+                            term: document.getElementById("CPartySearchText").value,
+                            targetHiddenInputId: "CPartyId",
+                            targetTextInputId: "CPartySearchText"
+                       }' />
+
+            <div id="partySearchResults"
+                 class="position-relative">
+            </div>
+
+            <span asp-validation-for="PartyId" class="text-danger small"></span>
+        </div>
+
+
+
+
+
+
+        <div class="col-md-6">
+            <label asp-for="ContactName" class="form-label"></label>
+            <input asp-for="ContactName" class="form-control form-control-sm" />
+            <span asp-validation-for="ContactName" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="ContactEmail" class="form-label"></label>
+            <input asp-for="ContactEmail" class="form-control form-control-sm" />
+            <span asp-validation-for="ContactEmail" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="ContactPhone" class="form-label"></label>
+            <input asp-for="ContactPhone" class="form-control form-control-sm" />
+            <span asp-validation-for="ContactPhone" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-check mt-4 pt-2">
+                <input asp-for="IsPrimaryRole" class="form-check-input" />
+                <label asp-for="IsPrimaryRole" class="form-check-label"></label>
+            </div>
+        </div>
+
+        @*         <div class="col-md-3">
+            <div class="form-check mt-4 pt-2">
+                <input asp-for="IsActive" class="form-check-input" />
+                <label asp-for="IsActive" class="form-check-label"></label>
+            </div>
+        </div>
+         *@
+
+
+    </div>
+</div>

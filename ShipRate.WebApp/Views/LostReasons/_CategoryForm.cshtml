@@ -1,0 +1,46 @@
+﻿@using ShipRate.WebApp.ViewModels.CustomersVms
+@model LostReasonCategoryViewModel
+
+<form hx-post="/LostReasons/SaveCategory"
+      hx-target="#modal-body"
+      hx-swap="innerHTML"
+      hx-on::after-request="if(event.detail.successful && event.detail.xhr.status===200 && event.detail.xhr.responseText==='') document.getElementById('lr-modal').classList.remove('active')">
+
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <div class="lr-form-grid">
+        <div class="lr-form-group">
+            <label>Category Name</label>
+            <input type="text" name="LostReasonCategoryName"
+                   value="@Model.LostReasonCategoryName"
+                   class="lr-input" required maxlength="50"
+                   placeholder="" />
+        </div>
+
+        <div class="lr-form-group">
+            <label>Local Name</label>
+            <input type="text" name="LostReasonCategoryLocalName"
+                   value="@Model.LostReasonCategoryLocalName"
+                   class="lr-input" required maxlength="50"
+                   placeholder="" />
+        </div>
+
+        <div class="lr-form-group lr-checkbox-group">
+            <label class="lr-checkbox-label">
+                <input type="checkbox" name="IsActive" value="true"
+                       @(Model.IsActive ? "checked" : "") />
+                <span>Active</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="lr-form-actions">
+        <button type="button" class="lr-btn lr-btn-cancel"
+                onclick="document.getElementById('lr-modal').classList.remove('active')">
+            <i class="fas fa-times"></i> Cancel
+        </button>
+        <button type="submit" class="lr-btn lr-btn-save">
+            <i class="fas fa-check"></i> @(Model.Id == 0 ? "Create" : "Update")
+        </button>
+    </div>
+</form>

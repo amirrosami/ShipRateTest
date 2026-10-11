@@ -1,0 +1,24 @@
+@using ShipRate.Application.JobsViewModels
+@using ShipRate.Application.ViewModels
+@using ShippingTrackingMvc.Models
+@model List<RateRequestContainerListItemVm>  
+<table class="data">
+    <thead>
+        <tr>
+            <th>Container no.</th>
+            <th>Size / type</th>
+            <th>Seal no.</th>
+            <th>Packages</th>
+            <th>Gross weight</th>
+            <th>Volume</th>
+        </tr>
+        </thead>
+        <tbody>
+            @foreach(var c in Model)
+            {
+                <tr>
+                    <td class="strong">@c.ShortName</td>
+                </tr>
+            }
+        </tbody>
+</table>

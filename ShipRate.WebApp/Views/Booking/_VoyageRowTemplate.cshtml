@@ -1,0 +1,101 @@
+﻿@using ShipRate.Application.DTOs
+@model BookingSeaVoyageVm
+@{
+    var rowIndex = (int)(ViewData["VoyageIndex"] ?? 0);
+}
+
+<tr class="voyage-row">
+    <td class="seq-no">@rowIndex</td>
+
+    <td>
+        <input type="hidden" name="SeaDetail.Voyages[@rowIndex].Id" value="@Model.Id" />
+        <select name="SeaDetail.Voyages[@rowIndex].VesselId" asp-items="ViewBag.Vessels" class="form-select form-select-sm">
+            <option value="">-- Select Vessel --</option>
+        </select>
+    </td>
+
+    <td>
+        <select name="SeaDetail.Voyages[@rowIndex].VoyageId" asp-items="ViewBag.Voyages" class="form-select form-select-sm">
+            <option value="">-- Select Voyage --</option>
+        </select>
+    </td>
+
+    <td>
+        <input type="hidden"
+               id="port-from-id-@rowIndex"
+               name="SeaDetail.Voyages[@rowIndex].FromPortId"
+               value="@Model.FromPortId" />
+
+        <input type="text"
+               id="port-from-text-@rowIndex"
+               name="search"
+               class="form-control form-control-sm port-search-input"
+               placeholder="Type to search origin..."
+               value="@Model.FromPortName"
+               autocomplete="off"
+               data-index="@rowIndex"
+               data-port-type="from"
+               hx-get="/Locations/SearchPorts"
+               hx-trigger="keyup changed delay:300ms"
+               hx-vals='{"index":"@rowIndex","portType":"from"}'
+               hx-target="#global-port-search-popup"
+               hx-swap="innerHTML" />
+    </td>
+
+    <td>
+        <input type="hidden"
+               id="port-to-id-@rowIndex"
+               name="SeaDetail.Voyages[@rowIndex].ToPortId"
+               value="@Model.ToPortId" />
+
+        <input type="text"
+               id="port-to-text-@rowIndex"
+               name="search"
+               class="form-control form-control-sm port-search-input"
+               placeholder="Type to search destination..."
+               value="@Model.ToPortName"
+               autocomplete="off"
+               data-index="@rowIndex"
+               data-port-type="to"
+               hx-get="/Locations/SearchPorts"
+               hx-trigger="keyup changed delay:300ms"
+               hx-vals='{"index":"@rowIndex","portType":"to"}'
+               hx-target="#global-port-search-popup"
+               hx-swap="innerHTML" />
+    </td>
+
+    <td>
+        <input type="datetime-local"
+               name="SeaDetail.Voyages[@rowIndex].ETD"
+               value="@(Model.ETD?.ToString("yyyy-MM-ddTHH:mm"))"
+               class="form-control form-control-sm" />
+    </td>
+
+    <td>
+        <input type="datetime-local"
+               name="SeaDetail.Voyages[@rowIndex].ETA"
+               value="@(Model.ETA?.ToString("yyyy-MM-ddTHH:mm"))"
+               class="form-control form-control-sm" />
+    </td>
+
+    <td>
+        <div class="form-check d-flex justify-content-center">
+            <input type="checkbox"
+                   name="SeaDetail.Voyages[@rowIndex].IsTransshipment"
+                   value="true"
+                   class="form-check-input"
+                   @(Model.IsTransshipment ? "checked" : "") />
+            <input type="hidden" name="SeaDetail.Voyages[@rowIndex].IsTransshipment" value="false" />
+        </div>
+    </td>
+
+    <td>
+        <button type="button" class="btn btn-outline-danger btn-sm border-0" onclick="removeVoyageRow(this)">
+            <i class="bi bi-trash-fill"></i>
+        </button>
+    </td>
+</tr>
+
+
+
+

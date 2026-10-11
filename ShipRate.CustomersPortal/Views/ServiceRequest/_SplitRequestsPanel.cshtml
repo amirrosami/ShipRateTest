@@ -1,0 +1,157 @@
+﻿@using ShipRate.Application.DTOs
+@model SplitRequestPanelDto
+
+<div class="card border-info shadow-sm mt-3">
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+        <div>
+            <i class="bi bi-diagram-3 me-2"></i>
+            <strong>Split Request - @Model.RequestNo</strong>
+        </div>
+
+        <button type="button"
+                class="btn-close btn-close-white"
+                aria-label="Close"
+                onclick="document.getElementById('split-requests-panel').innerHTML = '';">
+        </button>
+    </div>
+
+    <div class="card-body">
+        <div class="row g-2 mb-3">
+            <div class="col-md-3">
+                <strong>Status:</strong> @(Model.IsFinalized ? "Finalized" : "Draft")
+            </div>
+            <div class="col-md-3">
+                <strong>Source BL:</strong> @(string.IsNullOrWhiteSpace(Model.SourceBLNo) ? "-" : Model.SourceBLNo)
+            </div>
+            <div class="col-md-3">
+                <strong>Targets:</strong> @Model.Targets.Count
+            </div>
+            <div class="col-md-3">
+                <strong>Type:</strong> @Model.RequestTypeId
+            </div>
+        </div>
+
+        <div class="mb-2">
+            <strong>Reason:</strong> @(string.IsNullOrWhiteSpace(Model.Reason) ? "-" : Model.Reason)
+        </div>
+
+        <div class="mb-3">
+            <strong>Notes:</strong> @(string.IsNullOrWhiteSpace(Model.Notes) ? "-" : Model.Notes)
+        </div>
+
+        <div class="mb-3">
+
+
+            @if (!Model.SplitRequestId.HasValue)
+            {
+                <form asp-action="CreateSplitRequest"
+                      asp-controller="ServiceRequests"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="ServiceRequestId"
+                           value="@Model.ServiceRequestId" />
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Source Bill of Lading</label>
+
+                            <select name="SourceBLId"
+                                    class="form-select"
+                                    required>
+                                <option value="">Select bill of lading...</option>
+
+                                @foreach (var bl in Model.AvailableBillsOfLading)
+                                {
+                                    <option value="@bl.Id">
+                                        @bl.BLNo
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Reason</label>
+                            <input name="Reason"
+                                   class="form-control" />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            <textarea name="Notes"
+                                  class="form-control"
+                                  rows="2"></textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                <i class="bi bi-check-lg me-1"></i>
+                                Create Split Request
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div>
+@*                     <div><strong>Source BL:</strong> @Model.SourceBLNo</div>
+                    <div><strong>Reason:</strong> @Model.Reason</div>
+                    <div><strong>Status:</strong> @(Model.IsFinalized ? "Finalized" : "Draft")</div> *@
+                    <a asp-action="AdvancedSplitEditor"
+                       asp-route-splitRequestId="@Model.SplitRequestId"
+                       class="btn btn-primary mt-2">
+                        Open Split Editor
+                    </a>
+                </div>
+            }
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered table-striped align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Target</th>
+                        <th>Title</th>
+                        <th>BL No</th>
+                        <th>Allocations</th>
+                        <th>Packages</th>
+                        <th>Weight</th>
+                        <th>Volume</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Targets.Any())
+                    {
+                        foreach (var target in Model.Targets.OrderBy(x => x.SortOrder))
+                        {
+                            var totalPackages = target.Allocations.Sum(x => x.Packages);
+                            var totalWeight = target.Allocations.Sum(x => x.Weight);
+                            var totalVolume = target.Allocations.Sum(x => x.Volume);
+
+                            <tr>
+                                <td>@target.TargetKey</td>
+                                <td>@(string.IsNullOrWhiteSpace(target.Title) ? "-" : target.Title)</td>
+                                <td>@(string.IsNullOrWhiteSpace(target.TargetBLNo) ? "-" : target.TargetBLNo)</td>
+                                <td>@target.Allocations.Count</td>
+                                <td>@totalPackages</td>
+                                <td>@totalWeight</td>
+                                <td>@totalVolume</td>
+                                <td>@(string.IsNullOrWhiteSpace(target.Remarks) ? "-" : target.Remarks)</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-3">No split targets found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

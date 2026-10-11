@@ -1,0 +1,189 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.Base_Info
+@using ShipRate.Domain.Entities.BaseInfo.Cargos
+@model PagedResultDto<IndustryDto>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Row</th>
+                    <th class="sortable"
+                        hx-get="@Url.Action("List", "Industry")"
+                        hx-target="#table-container"
+                        hx-swap="innerHTML"
+                        hx-vals='{"sortColumn":"IndustryName","sortDirection":"@(Model.SortColumn == "IndustryName" && Model.SortDirection == "asc" ? "desc" : "asc")","searchterm":"@Model.SearchTerm","pageNumber":"1","pageSize":"@Model.PageSize"}'>
+                        Title
+                        @if (Model.SortColumn == "IndustryName")
+                        {
+                            <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "up" : "down") ms-1"></i>
+                        }
+                    </th>
+                    <th class="text-center sortable"
+                        hx-get="@Url.Action("List", "Industry")"
+                        hx-target="#table-container"
+                        hx-swap="innerHTML"
+                        hx-vals='{"sortColumn":"IsActive","sortDirection":"@(Model.SortColumn == "IsActive" && Model.SortDirection == "asc" ? "desc" : "asc")","searchterm":"@Model.SearchTerm","pageNumber":"1","pageSize":"@Model.PageSize"}'>
+                        Status
+                        @if (Model.SortColumn == "IsActive")
+                        {
+                            <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "up" : "down") ms-1"></i>
+                        }
+                    </th>
+                    <th class="text-center" style="width:160px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Items.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                            No Industries found.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    int counter = 0;
+                    counter = (Model.PageNumber - 1) * Model.PageSize;
+                    @foreach (var item in Model.Items)
+                    {
+                        counter++;
+                        <tr>
+                            <td>@counter</td>
+                            <td class="fw-medium">@item.IndustryName</td>
+                            <td class="text-center">
+                                <div class="form-check form-switch d-inline-block"
+                                     hx-post="@Url.Action("ToggleActive", "Industry", new { id = item.Id })"
+                                     hx-swap="none"
+                                     style="cursor:pointer;"
+                                     title="Click to toggle">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           @(item.IsActive ? "checked" : "")
+                                           style="pointer-events:none;" />
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button"
+                                            class="btn btn-outline-primary"
+                                            title="Edit"
+                                            hx-get="@Url.Action("Edit", "Industry", new { id = item.Id })"
+                                            hx-target="#modal-content"
+                                            hx-swap="innerHTML"
+                                            onclick="showModal()">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button type="button"
+                                            class="btn btn-outline-danger"
+                                            title="Delete"
+                                            hx-get="@Url.Action("Delete", "Industry", new { id = item.Id })"
+                                            hx-target="#modal-content"
+                                            hx-swap="innerHTML"
+                                            onclick="showModal()">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @* ── Pagination Footer ── *@
+
+    @if (Model.TotalPages > 1)
+    {
+        int maxVisible = 5;
+        int half = maxVisible / 2;
+        int startPage = Math.Max(1, Model.PageNumber - half);
+        int endPage = Math.Min(Model.TotalPages, startPage + maxVisible - 1);
+
+        if (endPage - startPage + 1 < maxVisible)
+        {
+            startPage = Math.Max(1, endPage - maxVisible + 1);
+        }
+
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+                Showing @((Model.PageNumber - 1) * Model.PageSize + 1)–@Math.Min(Model.PageNumber * Model.PageSize, Model.TotalCount) of @Model.TotalCount
+            </small>
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+
+                    @* دکمه قبلی *@
+                    <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                        <a class="page-link"
+                           hx-get="@Url.Action("List", "Industry")"
+                           hx-target="#table-container"
+                           hx-swap="innerHTML"
+                           hx-vals='{"pagenumber":"@(Model.PageNumber - 1)","pageSize":"@Model.PageSize","searchterm":"@Model.SearchTerm","sortColumn":"@Model.SortColumn","sortDirection":"@Model.SortDirection"}'
+                           href="#">&laquo;</a>
+                    </li>
+
+                    @* صفحه اول + ... *@
+                    @if (startPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link"
+                               hx-get="@Url.Action("List", "Industry")"
+                               hx-target="#table-container"
+                               hx-swap="innerHTML"
+                               hx-vals='{"pagenumber":"1","pageSize":"@Model.PageSize","searchterm":"@Model.SearchTerm","sortColumn":"@Model.SortColumn","sortDirection":"@Model.SortDirection"}'
+                               href="#">1</a>
+                        </li>
+                        if (startPage > 2)
+                        {
+                            <li class="page-item disabled"><span class="page-link">…</span></li>
+                        }
+                    }
+
+                    @* صفحات وسط *@
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                            <a class="page-link"
+                               hx-get="@Url.Action("List", "Industry")"
+                               hx-target="#table-container"
+                               hx-swap="innerHTML"
+                               hx-vals='{"pagenumber":"@i","pageSize":"@Model.PageSize","searchterm":"@Model.SearchTerm","sortColumn":"@Model.SortColumn","sortDirection":"@Model.SortDirection"}'
+                               href="#">@i</a>
+                        </li>
+                    }
+
+                    @* ... + صفحه آخر *@
+                    @if (endPage < Model.TotalPages)
+                    {
+                        if (endPage < Model.TotalPages - 1)
+                        {
+                            <li class="page-item disabled"><span class="page-link">…</span></li>
+                        }
+                        <li class="page-item">
+                            <a class="page-link"
+                               hx-get="@Url.Action("List", "Industry")"
+                               hx-target="#table-container"
+                               hx-swap="innerHTML"
+                               hx-vals='{"pagenumber":"@Model.TotalPages","pageSize":"@Model.PageSize","searchterm":"@Model.SearchTerm","sortColumn":"@Model.SortColumn","sortDirection":"@Model.SortDirection"}'
+                               href="#">@Model.TotalPages</a>
+                        </li>
+                    }
+
+                    @* دکمه بعدی *@
+                    <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                        <a class="page-link"
+                           hx-get="@Url.Action("List", "Industry")"
+                           hx-target="#table-container"
+                           hx-swap="innerHTML"
+                           hx-vals='{"pagenumber":"@(Model.PageNumber + 1)","pageSize":"@Model.PageSize","searchterm":"@Model.SearchTerm","sortColumn":"@Model.SortColumn","sortDirection":"@Model.SortDirection"}'
+                           href="#">&raquo;</a>
+                    </li>
+
+                </ul>
+            </nav>
+        </div>
+    }
+

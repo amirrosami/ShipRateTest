@@ -1,0 +1,51 @@
+﻿@using ShipRate.Application.ViewModels
+@model DemurrageRuleBatchFormVm
+
+<input type="hidden" asp-for="TariffBookId" />
+<input type="hidden" asp-for="ContainerSizeTypeId" />
+
+<table class="table table-sm align-middle">
+    <thead>
+        <tr>
+            <th>From</th>
+            <th>To</th>
+            <th>Amount</th>
+            <th class="text-end"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (var i = 0; i < Model.Steps.Count; i++)
+        {
+            <tr>
+                <td>
+                    <input asp-for="Steps[i].From" class="form-control form-control-sm" />
+                </td>
+                <td>
+                    <input asp-for="Steps[i].To" class="form-control form-control-sm" />
+                </td>
+                <td>
+                    <input asp-for="Steps[i].Amount" class="form-control form-control-sm" />
+                </td>
+                <td class="text-end">
+                    <button type="button"
+                            class="btn btn-sm btn-outline-danger"
+                            hx-post="@Url.Action("RemoveDemurrageRuleRow", "TariffBooks", new { index = i })"
+                            hx-target="#demurrageRulesGrid"
+                            hx-swap="innerHTML"
+                            hx-include="closest form">
+                        Remove
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<button type="button"
+        class="btn btn-sm btn-outline-secondary"
+        hx-post="@Url.Action("AddDemurrageRuleRow", "TariffBooks")"
+        hx-target="#demurrageRulesGrid"
+        hx-swap="innerHTML"
+        hx-include="closest form">
+    Add Row
+</button>

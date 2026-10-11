@@ -1,0 +1,101 @@
+﻿@using ShipRate.Application.DTOs.Messaging
+@model CreateInternalConversationViewModel
+
+
+<form method="post"
+      action="@Url.Action("CreateInternal", "Messaging")"
+      hx-post="@Url.Action("CreateInternal", "Messaging")"
+      hx-target="#messagingModalHost"
+      hx-swap="innerHTML"
+      dir="ltr">
+    @Html.AntiForgeryToken()
+
+    <div class="modal fade show d-block"
+         tabindex="-1"
+         role="dialog"
+         style="z-index: 2000;">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content text-start">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Internal Conversation</h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            aria-label="Close"
+                            onclick="document.getElementById('messagingModalHost').innerHTML = ''">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Subject" class="form-label">Subject</label>
+                        <input asp-for="Subject" class="form-control" autocomplete="off" autofocus required />
+                        <span asp-validation-for="Subject" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="TypeId" class="form-label">Type</label>
+                        <select asp-for="TypeId" class="form-select">
+                            <option value="1">General</option>
+                            <option value="2">Shipment</option>
+                            <option value="3">Operation</option>
+                            <option value="4">Finance</option>
+                            <option value="5">Documentation</option>
+                            <option value="6">Claim</option>
+                            <option value="7">Support</option>
+                        </select>
+                        <span asp-validation-for="TypeId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="AssignedToUserId" class="form-label">Assigned To</label>
+                        <select asp-for="AssignedToUserId"
+                                asp-items="Model.InternalUsers"
+                                class="form-select">
+                            <option value="">Unassigned</option>
+                        </select>
+                        <span asp-validation-for="AssignedToUserId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ParticipantUserIds" class="form-label">Participants</label>
+                        <select asp-for="ParticipantUserIds"
+                                asp-items="Model.InternalUsers"
+                                class="form-select"
+                                multiple
+                                size="6">
+                        </select>
+                        <div class="form-text">
+                            Hold Ctrl/Cmd to select multiple users.
+                        </div>
+                        <span asp-validation-for="ParticipantUserIds" class="text-danger"></span>
+                    </div>
+
+
+
+                    <div class="mb-3">
+                        <label asp-for="InitialMessage" class="form-label">Message</label>
+                        <textarea asp-for="InitialMessage" class="form-control" rows="6" required></textarea>
+                        <span asp-validation-for="InitialMessage" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-light"
+                            onclick="document.getElementById('messagingModalHost').innerHTML = ''">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="btn btn-primary">
+                        Create Conversation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop fade show" style="z-index: 1990;"></div>
+</form>

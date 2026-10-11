@@ -1,0 +1,59 @@
+﻿@using ShipRate.WebAppCustomers.ViewModels
+@model List<AttachmentListItem>
+
+<!-- Upload button -->
+<div class="mb-1">
+    <form hx-post="/DocumentManager/UploadAttachment"
+          hx-target="#attachments-grid"
+          hx-swap="innerHTML"
+          hx-encoding="multipart/form-data"
+          class="d-flex gap-1 align-items-center">
+        <input type="hidden" name="documentId" value="@ViewBag.DocumentId" />
+        <input type="file" name="file" class="form-control " style="font-size:0.75rem;" required />
+        <button type="submit" class="btn  btn-outline-success py-0 px-2" style="white-space:nowrap;">
+            <i class="bi bi-upload"></i> Upload
+        </button>
+    </form>
+</div>
+
+<div class="table-responsive" style="max-height:180px; overflow-y:auto;">
+    <table class="table  table-hover table-bordered mb-0" style="font-size:0.75rem;">
+        <thead class="table-secondary sticky-top">
+            <tr>
+                <th>File Name</th>
+                <th style="width:50px;">Ext</th>
+                <th style="width:60px;">Size</th>
+                <th style="width:70px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr><td colspan="4" class="text-center text-muted">No attachments</td></tr>
+            }
+            @foreach (var att in Model)
+            {
+                <tr>
+                    <td class="text-truncate" style="max-width:150px;" title="@att.FileName">@att.FileName</td>
+                    <td>@att.FileExtension</td>
+                    <td>@att.FileSize.ToString("N0") KB</td>
+                    <td>
+                        <a href="/DocumentManager/DownloadAttachment?id=@att.Id"
+                           class="btn btn-outline-primary py-0 px-1" target="_blank">
+                            <i class="bi bi-download"></i>
+                        </a>
+                        <button class="btn btn-outline-danger  py-0 px-1"
+                                hx-post="/DocumentManager/DeleteAttachment?id=@att.Id&documentId=@ViewBag.DocumentId"
+                                hx-target="#attachments-grid"
+                                hx-swap="innerHTML"
+                                hx-confirm="Delete this file?">
+                            <i class="bi bi-trash"></i>
+                            <!-- Views/DocumentManager/_AttachmentsGrid.cshtml (ادامه) -->
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

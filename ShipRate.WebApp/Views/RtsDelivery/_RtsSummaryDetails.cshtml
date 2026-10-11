@@ -1,0 +1,132 @@
+﻿@using ShipRate.Application.ViewModels
+@model RtsDeliverySummaryVm
+
+<div class="card shadow-sm border-0"
+     dir="ltr"
+     hx-get="@Url.Action("SearchRts", "RtsDelivery", new { rtsNo = Model.RTSInstructionNo })"
+     hx-trigger="rtsUpdated from:body"
+     hx-target="#rts-summary-container"
+     hx-swap="innerHTML">
+
+    <div class="card-header bg-white py-2">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <span class="fw-bold">RTS:</span>
+                <span class="fw-bold text-primary">@Model.RTSInstructionNo</span>
+                <span class="text-muted small">• @Model.ShipperName • @Model.DepotName</span>
+                <span class="text-muted small">
+                    • Valid:
+                    @(Model.ValidDateTo.HasValue ? Model.ValidDateTo.Value.ToString("yyyy-MM-dd") : "Unlimited")
+                </span>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <span class="small text-muted">Remaining:</span>
+                <span class="badge bg-primary">
+                    @Model.AllowedContainers.Sum(x => x.RemainingCount)
+                </span>
+
+                @if (Model.IsExpired)
+                {
+                    <span class="badge bg-danger">Expired</span>
+                }
+                else
+                {
+                    <span class="badge bg-success">Active</span>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body py-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0 text-secondary fw-bold">Delivery Permissions</h6>
+        </div>
+
+        <div class="table-responsive mb-3">
+            <table class="table table-sm table-bordered table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Type</th>
+                        <th class="text-center" style="width: 90px;">Allowed</th>
+                        <th class="text-center" style="width: 90px;">Issued</th>
+                        <th class="text-center" style="width: 110px;">Remaining</th>
+                        <th class="text-center" style="width: 120px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.AllowedContainers)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@item.ContainerSizeTypeName</td>
+                            <td class="text-center">@item.AllowedCount</td>
+                            <td class="text-center text-success">@item.DeliveredCount</td>
+                            <td class="text-center fw-bold @(item.RemainingCount > 0 ? "text-danger" : "text-muted")">
+                                @item.RemainingCount
+                            </td>
+                            <td class="text-center">
+                                @if (!Model.IsExpired && item.RemainingCount > 0)
+                                {
+                                    <button type="button"
+                                            class="btn btn-sm btn-primary"
+                                            hx-get="@Url.Action("LoadIssueModal", "RtsDelivery", new { rtsId = Model.RTSInstructionId, sizeTypeId = item.ContainerSizeTypeId })"
+                                            hx-target="#modal-content-target"
+                                            hx-swap="innerHTML"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#rtsIssueModal">
+                                        Issue
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-sm btn-outline-secondary" disabled>Closed</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0 text-secondary fw-bold">Issued Log</h6>
+            <span class="text-muted small">Count: @Model.AlreadyDelivered.Count</span>
+        </div>
+
+        @if (!Model.AlreadyDelivered.Any())
+        {
+            <div class="alert alert-light border py-2 mb-0 small">
+                No containers have been issued for this RTS yet.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive" style="max-height: 260px; overflow: auto;">
+                <table class="table table-sm table-bordered table-striped align-middle mb-0">
+                    <thead class="table-light position-sticky top-0">
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th style="width: 140px;">Container</th>
+                            <th style="width: 120px;">Seal</th>
+                            <th>Type</th>
+                            <th style="width: 160px;">Issued At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.AlreadyDelivered.Count; i++)
+                        {
+                            var row = Model.AlreadyDelivered[i];
+                            <tr>
+                                <td>@(i + 1)</td>
+                                <td class="fw-semibold text-primary">@row.ContainerNumber</td>
+                                <td>@row.SealNumber</td>
+                                <td>@row.ContainerSizeTypeName</td>
+                                <td class="text-nowrap">@row.ActionDateTime.ToString("yyyy-MM-dd HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

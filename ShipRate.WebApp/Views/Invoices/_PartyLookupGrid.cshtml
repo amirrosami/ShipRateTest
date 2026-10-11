@@ -1,0 +1,86 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model PagedResultVm<PartyLookupRowVm>
+
+@{
+    var filter = ViewBag.Filter as PartyLookupFilterVm ?? new PartyLookupFilterVm();
+    var jobId = ViewBag.JobId as Guid?;
+
+    string BuildUrl(int page) =>
+        Url.Action("PartyLookupList", "Invoices", new
+        {
+            Search = filter.Search,
+            PageNumber = page,
+            PageSize = filter.PageSize,
+            JobId = jobId
+        }) ?? "";
+}
+
+<!-- اعمال کلاس small و table-sm برای سایز جمع‌وجور فونت و فواصل -->
+<div class="table-responsive small">
+    <table class="table table-sm table-bordered table-striped table-hover align-middle mb-2">
+        <thead class="table-light">
+            <tr>
+                <th class="py-1">Party Name</th>
+                <th class="text-center py-1" style="width: 90px;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Items.Any())
+            {
+                foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td class="py-1">@item.PersonName</td>
+                        <td class="text-center py-1">
+                            <button type="button"
+                                    class="btn btn-xs btn-outline-primary py-0 px-2 party-select-btn"
+                                    style="font-size: 0.8rem;"
+                                    data-party-id="@item.Id"
+                                    data-party-name="@item.PersonName">
+                                Select
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="2" class="text-center text-muted py-3">No data found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="d-flex justify-content-center mt-2">
+        <!-- pagination-sm برای کوچک‌تر شدن کلیدهای صفحات -->
+        <ul class="pagination pagination-sm mb-0">
+            <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
+                <a class="page-link"
+                   hx-get="@BuildUrl(Model.PageNumber - 1)"
+                   hx-target="#party-lookup-grid-container"
+                   hx-swap="innerHTML">Previous</a>
+            </li>
+
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                    <a class="page-link"
+                       hx-get="@BuildUrl(i)"
+                       hx-target="#party-lookup-grid-container"
+                       hx-swap="innerHTML">@i</a>
+                </li>
+            }
+
+            <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")">
+                <a class="page-link"
+                   hx-get="@BuildUrl(Model.PageNumber + 1)"
+                   hx-target="#party-lookup-grid-container"
+                   hx-swap="innerHTML">Next</a>
+            </li>
+        </ul>
+    </nav>
+}

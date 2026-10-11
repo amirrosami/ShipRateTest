@@ -1,0 +1,191 @@
+﻿@using ShipRate.Application.DTOs
+@model VaultCockpitVm
+@{
+    ViewData["Title"] = "Vault & Treasury Management";
+}
+
+<style>
+    .vault-cockpit, .vault-modal {
+        font-size: 0.85rem;
+    }
+
+    .excel-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 0.4rem 0.6rem;
+        font-size: 0.85rem;
+    }
+
+    .excel-field {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ced4da;
+        border-radius: 3px;
+        background-color: #ffffff;
+        overflow: hidden;
+        height: 31px;
+    }
+
+        .excel-field label {
+            margin: 0;
+            padding: 0.25rem 0.5rem;
+            background-color: #f1f3f5;
+            border-right: 1px solid #ced4da;
+            font-weight: 600;
+            color: #495057;
+            white-space: nowrap;
+            min-width: 120px;
+            max-width: 120px;
+            font-size: 0.85rem;
+            line-height: 1.2;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        .excel-field .form-control,
+        .excel-field .form-select {
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            font-size: 0.85rem;
+            padding: 0.2rem 0.45rem;
+            height: 100%;
+        }
+
+            .excel-field .form-control:focus,
+            .excel-field .form-select:focus {
+                background-color: #fff9c4 !important; /* زرد ملایم */
+                box-shadow: none;
+            }
+
+    .vault-table {
+        font-size: 0.85rem;
+    }
+
+        .vault-table th {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+            white-space: nowrap;
+            padding: 0.4rem 0.6rem;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .vault-table td {
+            padding: 0.35rem 0.6rem;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+</style>
+<div class="container-fluid p-3 vault-cockpit">
+    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+        <div class="d-flex align-items-center gap-3">
+            <h5 class="m-0 fw-bold text-primary"><i class="bi bi-safe2 me-2"></i>Vault Management</h5>
+            <div class="excel-field" style="width: 400px;">
+                <label>Active Vault</label>
+                <select id="vaultSelector" class="form-select" onchange="switchVault(this.value)">
+                    @foreach (var v in Model.Vaults)
+                    {
+                        <!option value="@v.Id" @(v.Id == Model.SelectedVaultId ? "selected" : "")>@v.VaultName</!option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-success" hx-get="/Vaults/CreateMovementModal?vaultId=@Model.SelectedVaultId" hx-target="#modalContainer" data-bs-toggle="modal" data-bs-target="#appModal">
+                <i class="bi bi-plus-circle me-1"></i>New Movement
+            </button>
+            <button class="btn btn-outline-primary" hx-get="/Vaults/CreatePaymentRequestModal?vaultId=@Model.SelectedVaultId" hx-target="#modalContainer" data-bs-toggle="modal" data-bs-target="#appModal">
+                <i class="bi bi-cash-stack me-1"></i>New Cash Request
+            </button>
+            <button class="btn btn-outline-dark" hx-get="/Vaults/UpsertItemModal?vaultId=@Model.SelectedVaultId" hx-target="#modalContainer" data-bs-toggle="modal" data-bs-target="#appModal">
+                <i class="bi bi-file-earmark-lock me-1"></i>Deposit Item
+            </button>
+            <button class="btn btn-outline-dark" hx-get="/Vaults/UpsertVaultModal" hx-target="#modalContainer" data-bs-toggle="modal" data-bs-target="#appModal">
+                <i class="bi bi-plus-lg me-1"></i>New Vault
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-3" id="vaultTabs" role="tablist">
+
+        <li class="nav-item">
+            <button class="nav-link active" id="vaults-list-tab" data-bs-toggle="tab" data-bs-target="#vaultsListPane" type="button"
+                    hx-get="/Vaults/GetVaultsTab" hx-target="#vaultsListPane" hx-trigger="click, load, reloadVaultList from:body">
+                <i class="bi bi-shield-shaded me-1"></i>Vaults Registry
+            </button>
+        </li>
+
+        <li class="nav-item">
+            <button class="nav-link" id="assets-tab" data-bs-toggle="tab" data-bs-target="#assetsPane" type="button">
+                <i class="bi bi-wallet2 me-1"></i>Liquid Assets
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="movements-tab" data-bs-toggle="tab" data-bs-target="#movementsPane" type="button"
+                    hx-get="/Vaults/GetMovementsTab?vaultId=@Model.SelectedVaultId" hx-target="#movementsPane" hx-trigger="click, reloadVaultCockpit from:body">
+                <i class="bi bi-arrow-left-right me-1"></i>Movements Cardex
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="requests-tab" data-bs-toggle="tab" data-bs-target="#requestsPane" type="button"
+                    hx-get="/Vaults/GetPaymentRequestsTab?vaultId=@Model.SelectedVaultId" hx-target="#requestsPane" hx-trigger="click, reloadPaymentRequests from:body">
+                <i class="bi bi-receipt me-1"></i>Payment Requests
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="items-tab" data-bs-toggle="tab" data-bs-target="#itemsPane" type="button"
+                    hx-get="/Vaults/GetItemsTab?vaultId=@Model.SelectedVaultId" hx-target="#itemsPane" hx-trigger="click, reloadVaultItems from:body">
+                <i class="bi bi-archive me-1"></i>Custody Items
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="base-tab" data-bs-toggle="tab" data-bs-target="#basePane" type="button"
+                    hx-get="/Vaults/GetBaseTablesTab?entityType=category" hx-target="#basePane" hx-trigger="click">
+                <i class="bi bi-gear me-1"></i>Configuration
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Contents -->
+    <div class="tab-content" id="vaultTabsContent">
+        <div class="tab-pane fade show active" id="vaultsListPane" role="tabpanel"></div>
+        <div class="tab-pane fade" id="assetsPane" role="tabpanel"
+             hx-get="/Vaults/GetAssetsTab?vaultId=@Model.SelectedVaultId" hx-trigger="load, reloadVaultCockpit from:body">
+        </div>
+        <div class="tab-pane fade" id="movementsPane" role="tabpanel"></div>
+        <div class="tab-pane fade" id="requestsPane" role="tabpanel"></div>
+        <div class="tab-pane fade" id="itemsPane" role="tabpanel"></div>
+        <div class="tab-pane fade" id="basePane" role="tabpanel"></div>
+    </div>
+</div>
+
+<!-- Global Dynamic Modal -->
+<div class="modal fade" id="appModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" id="modalContainer"></div>
+</div>
+
+<div class="modal fade" id="documentManagerModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="document-manager-content">
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    function switchVault(id) {
+        window.location.href = '/Vaults/Index?vaultId=' + id;
+    }
+    document.body.addEventListener('htmx:afterOnLoad', function (evt) {
+        if (evt.detail.xhr.status === 200 && (evt.detail.target.id === "" || evt.detail.target.id === "modalContainer")) {
+            const modalEl = document.getElementById('appModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal && evt.detail.requestConfig.verb === 'post') {
+                modal.hide();
+            }
+        }
+    });
+</script>

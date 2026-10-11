@@ -1,0 +1,97 @@
+﻿@using ShipRate.WebApp.ViewModels.FlightVms
+@model FlightDateFormViewModel
+
+<div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.1);">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="card-header text-white py-2 px-3 d-flex justify-content-between align-items-center bg-success">
+                <div class="fw-semibold small mb-0">
+                    <i class="bi bi-calendar-event me-1"></i>
+                    @(Model.Id == Guid.Empty ? "Add Flight Date" : "Edit Flight Date")
+                </div>
+                <button type="button" class="btn-close btn-close-white" onclick="closeModal()"></button>
+            </div>
+
+            <form asp-action="@(Model.Id == Guid.Empty ? "CreateFlightDate" : "EditFlightDate")"
+                  asp-controller="Flight"
+                  method="post"
+                  hx-post="@Url.Action(Model.Id == Guid.Empty ? "CreateFlightDate" : "EditFlightDate", "Flight")"
+                  hx-target="#modal-container"
+                  hx-swap="innerHTML">
+
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="FlightId" />
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="ETD" class="form-label fw-semibold">
+                                <i class="bi bi-clock text-primary me-1"></i>Estimated Departure (ETD)
+                            </label>
+                            <input asp-for="ETD" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="ETD" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ETA" class="form-label fw-semibold">
+                                <i class="bi bi-clock text-success me-1"></i>Estimated Arrival (ETA)
+                            </label>
+                            <input asp-for="ETA" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="ETA" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="ActualDeparture" class="form-label fw-semibold">
+                                <i class="bi bi-check-circle text-primary me-1"></i>Actual Departure
+                            </label>
+                            <input asp-for="ActualDeparture" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="ActualDeparture" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ActualArrival" class="form-label fw-semibold">
+                                <i class="bi bi-check-circle-fill text-success me-1"></i>Actual Arrival
+                            </label>
+                            <input asp-for="ActualArrival" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="ActualArrival" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="DelayHours" class="form-label fw-semibold">
+                            <i class="bi bi-hourglass-split text-warning me-1"></i>Delay Hours
+                        </label>
+                        <input asp-for="DelayHours" class="form-control" type="number" step="0.01" min="0" />
+                        <span asp-validation-for="DelayHours" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label fw-semibold">
+                            <i class="bi bi-card-text me-1"></i>Description <span class="text-danger">*</span>
+                        </label>
+                        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Enter flight date details..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-check form-switch">
+                        <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" />
+                        <label asp-for="IsActive" class="form-check-label fw-semibold">Active</label>
+                    </div>
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small mt-3"></div>
+                </div>
+
+                <div class="modal-footer bg-light py-2">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="closeModal()">
+                        <i class="bi bi-x-lg me-1"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn btn-success btn-sm">
+                        <i class="bi bi-check-lg me-1"></i>
+                        @(Model.Id == Guid.Empty ? "Create" : "Save Changes")
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

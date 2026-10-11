@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "User Teams";
+}
+<button class="btn btn-primary"
+        hx-get="/UserTeams/CreateTeam"
+        hx-target="#app-modal-content"
+        hx-trigger="click"
+        hx-swap="innerHTML">
+    Create Team
+</button>
+<div class="container-fluid">
+
+    <div class="row">
+
+        <div class="col-md-7">
+
+            <h4>Teams</h4>
+
+            <div id="teamsGrid"
+                 hx-get="/UserTeams/TeamsGrid"
+                 hx-trigger="load, teamListChanged from:body"
+                 hx-swap="innerHTML">
+            </div>
+
+        </div>
+
+        <div class="col-md-5">
+
+            <h4>Team Members</h4>
+
+            <div id="membersGrid">
+                <div class="text-muted">Select a team</div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

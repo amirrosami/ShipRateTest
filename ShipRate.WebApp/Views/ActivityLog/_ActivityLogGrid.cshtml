@@ -1,0 +1,93 @@
+﻿@using ShipRate.Application.ViewModels
+@model ActivityLogGridVm
+
+<div class="table-responsive text-start" dir="ltr">
+    <table class="table table-hover table-bordered align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th style="width: 13%">Date / Time</th>
+                <th style="width: 17%">Event Type</th>
+                <th style="width: 20%">Title</th>
+                <th style="width: 20%">Description</th>
+                <th style="width: 13%" class="text-center">Visibility</th>
+                <th style="width: 17%" class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Items == null || !Model.Items.Any())
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">
+                        No activity logs found for this entity.
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td class="text-nowrap">
+                            @item.ActivityDateTime.ToString("yyyy-MM-dd HH:mm")
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">@item.EventTypeName</span>
+                        </td>
+                        <td class="text-break fw-semibold">@item.Title</td>
+                        <td class="text-break text-muted small">@item.Description</td>
+
+                        <!-- ستون وضعیت نمایش -->
+                        <td class="text-center text-nowrap">
+                            @if (item.VisibleForCustomers)
+                            {
+                                <span class="badge bg-success" title="Visible to customers">
+                                    @* آیکن چشم *@
+                                    <i class="bi bi-eye-fill me-1"></i> Visible
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary" title="Hidden from customers">
+                                    @* آیکن چشم بسته *@
+                                    <i class="bi bi-eye-slash-fill me-1"></i> Hidden
+                                </span>
+                            }
+                        </td>
+                        <td class="text-center text-nowrap">
+                            @if (!item.IsSystemGenerated)
+                            {
+                                <button class="btn btn-sm btn-outline-primary me-1"
+                                hx-get="@Url.Action("Edit", "ActivityLog", new { id = item.Id })"
+                                hx-target="#activityLogEditorContainer"
+                                hx-swap="innerHTML"
+                                title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger"
+                                hx-post="@Url.Action("Delete", "ActivityLog", new { id = item.Id })"
+                                hx-confirm="Are you sure you want to delete this event?"
+                                hx-swap="none"
+                                title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            }
+                            <button type="button" class="btn btn-sm btn-outline-primary btn-info"
+                                    hx-get="/DocumentManager/Index?objectId=@item.Id&objectTypeId=400"
+                                    hx-target="#document-manager-content"
+                                    hx-swap="innerHTML"
+                                    title="Attachments"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#documentManagerModal">
+                                <i class="bi bi-folder2-open me-1"></i>
+                            </button>
+
+
+
+
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

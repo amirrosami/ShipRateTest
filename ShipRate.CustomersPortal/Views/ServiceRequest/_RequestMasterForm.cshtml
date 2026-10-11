@@ -1,0 +1,92 @@
+﻿@using ShipRate.Application.DTOs
+@model ServiceRequestFormDto
+@{
+    var isEdit = Model.Model.Id.HasValue;
+    var actionName = isEdit ? "EditMaster" : "CreateMaster";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h4>
+            Request Info
+        </h4>
+    </div>
+
+<div class="card-body">
+<form method="post"
+      hx-post="@Url.Action(actionName, "ServiceRequest")"
+      hx-target="#master-form"
+      hx-swap="innerHTML"
+      dir="ltr">
+
+    @Html.AntiForgeryToken()
+
+    @if (isEdit)
+    {
+        <input type="hidden" name="ServiceRequestId" id="ServiceRequestId" value="@Model.Model.Id" />
+        <input type="hidden" asp-for="Model.Id" />
+    }
+    <input type="hidden" asp-for="Model.RequestTypeId" />
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="row g-3">
+
+        <div class="col-md-4">
+            <label asp-for="Model.CompanyId" class="form-label">Company</label>
+            <select asp-for="Model.CompanyId" class="form-select"
+                    asp-items="@(new SelectList(Model.Companies, "Id", "Name"))">
+                <option value="">Select...</option>
+            </select>
+            <span asp-validation-for="Model.CompanyId" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Model.PartyDetailName" class="form-label">Party Detail Name</label>
+            <input asp-for="Model.PartyDetailName" class="form-control" readonly />
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Model.RequestNo" class="form-label">Request No</label>
+            <input asp-for="Model.RequestNo" class="form-control" />
+            <span asp-validation-for="Model.RequestNo" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Model.PriorityId" class="form-label">Priority</label>
+            <select asp-for="Model.PriorityId" class="form-select"
+                    asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))">
+                <option value="">Select...</option>
+            </select>
+            <span asp-validation-for="Model.PriorityId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-8">
+            <label asp-for="Model.Subject" class="form-label">Subject</label>
+            <input asp-for="Model.Subject" class="form-control" />
+            <span asp-validation-for="Model.Subject" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-12">
+            <label asp-for="Model.Description" class="form-label">Description</label>
+            <textarea asp-for="Model.Description" class="form-control" rows="3"></textarea>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Model.RequestDate" class="form-label">Request Date</label>
+            <input asp-for="Model.RequestDate" type="datetime-local" class="form-control" />
+            <span asp-validation-for="Model.RequestDate" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Model.DueDate" class="form-label">Due Date</label>
+            <input asp-for="Model.DueDate" type="datetime-local" class="form-control" />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Model.Remarks" class="form-label">Remarks</label>
+            <input asp-for="Model.Remarks" class="form-control" />
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-end gap-2">
+        <button type="submit" class="btn btn-outline-success">Save</button>
+    </div>
+</form>
+</div>
+</div>

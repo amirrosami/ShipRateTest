@@ -1,0 +1,138 @@
+﻿@using ShipRate.Application.DTOs
+@model GuaranteePlanCreateOrUpdateDto
+@{
+    bool isBlFixed = ViewBag.IsBlFixed != null && (bool)ViewBag.IsBlFixed;
+}
+
+<div class="modal-content border-0 shadow">
+    <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+            <i class="bi bi-file-earmark-check me-2"></i>
+            @(Model.Id.HasValue ? "Edit Guarantee Plan" : "Create Guarantee Plan")
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <form hx-post="@Url.Action("Save")" hx-target="#modal-container" class="needs-validation">
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.Id)
+
+        <div class="modal-body bg-light">
+            <div class="row g-3">
+
+                <!-- BL Lookup Section -->
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">B/L Number</label>
+                    @if (isBlFixed || Model.Id.HasValue)
+                    {
+                        @Html.HiddenFor(m => m.BLId)
+                        @Html.HiddenFor(m => m.BLNo)
+                        <input type="text" class="form-control" value="@Model.BLNo" disabled style="background-color: #e9ecef; font-weight: bold;" />
+                    }
+                    else
+                    {
+                        <!-- Multi-modal search logic for Auto-Complete -->
+                        <div class="position-relative">
+                            <input type="text" id="blSearchInput" class="form-control" autocomplete="off" placeholder="Type to search BL..." />
+                            @Html.HiddenFor(m => m.BLId)
+                            @Html.HiddenFor(m => m.BLNo)
+                            <div id="blSearchResults" class="list-group position-absolute w-100 shadow-sm d-none" style="z-index: 1050; max-height: 200px; overflow-y: auto;"></div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Letter Info -->
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Letter No</label>
+                    @Html.TextBoxFor(m => m.LetterNo, new { @class = "form-control", required = "required" })
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Letter Date</label>
+                    <input type="date" name="LetterDate" class="form-control" required value="@(Model.LetterDate != DateTime.MinValue ? Model.LetterDate.ToString("yyyy-MM-dd") : DateTime.Today.ToString("yyyy-MM-dd"))" />
+                </div>
+
+                <!-- Lookups -->
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Company</label>
+                    @Html.DropDownListFor(m => m.CompanyId, (List<SelectListItem>)ViewBag.Companies, "Select Company", new { @class = "form-select", required = "required" })
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Direction (In/Out)</label>
+                    @Html.DropDownListFor(m => m.InOutId, (List<SelectListItem>)ViewBag.InOuts, "Select Direction", new { @class = "form-select", required = "required" })
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Shipping Line</label>
+                    @Html.DropDownListFor(m => m.ShippingLineId, (List<SelectListItem>)ViewBag.ShippingLines, "Select Shipping Line (Optional)", new { @class = "form-select" })
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Customer</label>
+                    @Html.DropDownListFor(m => m.CustomerId, (List<SelectListItem>)ViewBag.Customers, "Select Customer (Optional)", new { @class = "form-select" })
+                </div>
+
+                <!-- Remarks -->
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Remarks</label>
+                    @Html.TextAreaFor(m => m.Remarks, new { @class = "form-control", rows = 2 })
+                </div>
+
+            </div>
+        </div>
+        <div class="modal-footer bg-white">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+        </div>
+    </form>
+</div>
+
+<!-- Inline Helper JS logic for Select List / BL AutoComplete (Clean, non-intrusive) -->
+<script>
+    (function () {
+        var input = document.getElementById('blSearchInput');
+        if (!input) return;
+
+        var resultsDiv = document.getElementById('blSearchResults');
+        var hiddenId = document.getElementById('BLId');
+        var hiddenNo = document.getElementById('BLNo');
+
+        input.addEventListener('input', function () {
+            var val = this.value;
+            if (val.length < 2) {
+                resultsDiv.classList.add('d-none');
+                return;
+            }
+
+            fetch('/GuaranteePlans/SearchBL?term=' + encodeURIComponent(val))
+                .then(response => response.json())
+                .then(data => {
+                    resultsDiv.innerHTML = '';
+                    if (data.length > 0) {
+                        data.forEach(item => {
+                            var btn = document.createElement('button');
+                            btn.type = 'button';
+                            btn.classList.add('list-group-item', 'list-group-item-action', 'text-start');
+                            btn.innerText = item.text;
+                            btn.addEventListener('click', function () {
+                                input.value = item.text;
+                                hiddenId.value = item.id;
+                                hiddenNo.value = item.text;
+                                resultsDiv.classList.add('d-none');
+                            });
+                            resultsDiv.appendChild(btn);
+                        });
+                        resultsDiv.classList.remove('d-none');
+                    } else {
+                        resultsDiv.classList.add('d-none');
+                    }
+                });
+        });
+
+        document.addEventListener('click', function (e) {
+            if (e.target !== input && e.target !== resultsDiv) {
+                resultsDiv.classList.add('d-none');
+            }
+        });
+    })();
+</script>

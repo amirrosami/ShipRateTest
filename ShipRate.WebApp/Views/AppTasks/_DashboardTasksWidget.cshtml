@@ -1,0 +1,260 @@
+﻿@using ShipRate.Application.DTOs.AppTasks
+@model AppTaskDashboardWidgetViewModel
+
+
+<style>
+
+    .task-widget {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .task-widget-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 16px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .task-widget-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .task-widget-subtitle {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .task-widget-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .task-widget-search {
+        padding: 12px 16px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .task-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 16px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .task-title-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 8px;
+    }
+
+    .task-title {
+        color: #111827;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .task-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        color: #6b7280;
+        font-size: 13px;
+        margin-bottom: 8px;
+    }
+
+    .task-related {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .task-item-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .task-widget-footer {
+        padding: 12px 16px;
+        text-align: center;
+        background: #f9fafb;
+    }
+
+    .task-empty {
+        padding: 24px 16px;
+        color: #6b7280;
+        text-align: center;
+    }
+
+</style>
+
+
+
+<section class="task-widget" id="app-tasks-widget">
+    <div class="task-widget-header">
+        <div>
+            <h3 class="task-widget-title">Tasks</h3>
+            <div class="task-widget-subtitle">Quick follow-ups for current operations</div>
+        </div>
+
+        <div class="task-widget-actions">
+            <select class="form-select form-select-sm"
+                    name="filter"
+                    hx-get="@Url.Action("DashboardWidget", "AppTasks")"
+                    hx-target="#app-tasks-widget"
+                    hx-swap="outerHTML"
+                    hx-include="#app-task-dashboard-search">
+                <option value="my" selected="@(Model.Filter == "my")">My Tasks</option>
+                <option value="all-active" selected="@(Model.Filter == "all-active")">All Active</option>
+            </select>
+
+            <button type="button"
+                    class="btn btn-primary btn-sm"
+                    hx-get="@Url.Action("Create", "AppTasks")"
+                    hx-target="#modal-content"
+                    hx-swap="innerHTML">
+                + New
+            </button>
+        </div>
+    </div>
+
+    <div class="task-widget-search">
+        <input id="app-task-dashboard-search"
+               type="text"
+               name="keyword"
+               value="@Model.Keyword"
+               class="form-control"
+               placeholder="Search tasks..."
+               hx-get="@Url.Action("DashboardWidget", "AppTasks")"
+               hx-target="#app-tasks-widget"
+               hx-swap="outerHTML"
+               hx-trigger="keyup changed delay:400ms"
+               hx-include="[name='filter']" />
+    </div>
+
+    <div class="task-list">
+        @if (!Model.Items.Any())
+        {
+            <div class="task-empty">
+                No tasks found.
+            </div>
+        }
+        else
+        {
+            foreach (var item in Model.Items)
+            {
+                var statusBadgeClass = item.TaskStatusId switch
+                {
+                    1 => "bg-warning-subtle text-warning-emphasis",
+                    2 => "bg-primary-subtle text-primary-emphasis",
+                    3 => "bg-success-subtle text-success-emphasis",
+                    4 => "bg-secondary-subtle text-secondary-emphasis",
+                    5 => "bg-danger-subtle text-danger-emphasis",
+                    _ => "bg-light text-dark"
+                };
+
+                var priorityClass = item.PriorityName?.ToLower() switch
+                {
+                    "critical" => "text-danger fw-semibold",
+                    "high" => "text-danger fw-semibold",
+                    "medium" => "text-primary fw-semibold",
+                    "low" => "text-muted fw-semibold",
+                    _ => "text-muted fw-semibold"
+                };
+
+                <article class="task-item">
+                    <div class="task-item-main">
+                        <div class="task-title-row">
+                            <a href="javascript:void(0)"
+                               class="task-title"
+                               hx-get="@Url.Action("Details", "AppTasks", new { id = item.Id })"
+                               hx-target="#app-drawer-container"
+                               hx-swap="innerHTML">
+                                @item.TaskTitle
+                            </a>
+
+                            <span class="@priorityClass">
+                                @item.PriorityName
+                            </span>
+                        </div>
+
+                        <div class="task-meta">
+                            <span>@(item.AssignedToUserName ?? "Unassigned")</span>
+                            <span class="badge @statusBadgeClass">@item.TaskStatusName</span>
+                            <span>
+                                @(item.DueDate.HasValue
+                                                        ? $"Due {item.DueDate.Value:MMM dd}"
+                                                        : "No due date")
+                            </span>
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(item.RelatedEntityTitle))
+                        {
+                            <div class="task-related">
+                                Related to:
+                                <strong>@item.RelatedEntityTitle</strong>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="task-item-actions">
+                        <button type="button"
+                                class="btn btn-light btn-sm"
+                                hx-get="@Url.Action("AssignModal", "AppTasks", new { id = item.Id })"
+                                hx-target="#app-modal-container"
+                                hx-swap="innerHTML">
+                            Assign
+                        </button>
+
+                        @if (item.TaskStatusId == 1)
+                        {
+                            <button type="button"
+                                    class="btn btn-light btn-sm"
+                                    hx-post="@Url.Action("Start", "AppTasks", new { id = item.Id })"
+                                    hx-target="#app-tasks-widget"
+                                    hx-swap="outerHTML">
+                                Start
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button"
+                                    class="btn btn-light btn-sm"
+                                    hx-post="@Url.Action("Complete", "AppTasks", new { AppTaskId = item.Id })"
+                                    hx-target="#app-tasks-widget"
+                                    hx-swap="outerHTML">
+                                Complete
+                            </button>
+                        }
+
+                        <button type="button"
+                                class="btn btn-primary btn-sm"
+                                hx-get="@Url.Action("Details", "AppTasks", new { id = item.Id })"
+                                hx-target="#appTaskDrawerContent"
+                                hx-swap="innerHTML"
+                                data-bs-toggle="offcanvas"
+                                data-bs-target="#appTaskDrawer">
+                        
+                            Open
+                        </button>
+                    </div>
+                </article>
+            }
+        }
+    </div>
+
+    <div class="task-widget-footer">
+        <a asp-controller="AppTasks" asp-action="Index">
+            View all tasks
+        </a>
+    </div>
+</section>

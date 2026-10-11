@@ -1,0 +1,243 @@
+﻿@using ShipRate.Application.DTOs
+@model NOAPrintDto
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NOA - @Model.NOANumber</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 12px;
+            color: #111;
+            margin: 0;
+            padding: 20px;
+            background: #fff;
+        }
+
+        .print-container {
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #0d6efd;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .company-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+
+        .doc-title {
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .section {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 14px;
+            overflow: hidden;
+        }
+
+        .section-title {
+            background: #f2f4f7;
+            padding: 8px 12px;
+            font-weight: bold;
+            border-bottom: 1px solid #ccc;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .section-body {
+            padding: 12px;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -8px;
+        }
+
+        .col {
+            flex: 1;
+            min-width: 200px;
+            padding: 0 8px;
+        }
+
+        .field {
+            margin-bottom: 10px;
+        }
+
+        .field-label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 2px;
+        }
+
+        .field-value {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        table.info {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            table.info td {
+                padding: 6px 8px;
+                border: 1px solid #ddd;
+                vertical-align: top;
+            }
+
+                table.info td.label {
+                    background: #fafafa;
+                    width: 35%;
+                    font-size: 10px;
+                    color: #666;
+                    text-transform: uppercase;
+                }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 16px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #555;
+        }
+
+        .signature-box {
+            border-top: 1px dashed #999;
+            margin-top: 40px;
+            padding-top: 6px;
+            text-align: center;
+            width: 200px;
+        }
+
+        @@media print {
+            body {
+                padding: 0;
+            }
+
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="print-container">
+        <div class="header">
+            <div class="company-name">@Model.CompanyName</div>
+            <div class="doc-title">Notice of Arrival</div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <div class="field">
+                    <div class="field-label">NOA Number</div>
+                    <div class="field-value">@Model.NOANumber</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="field">
+                    <div class="field-label">Issue Date</div>
+                    <div class="field-value">@Model.IssuedDate?.ToString("yyyy-MM-dd")</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Vessel &amp; Voyage Information</div>
+            <div class="section-body">
+                <table class="info">
+                    <tr>
+                        <td class="label">Vessel Name</td>
+                        <td>@Model.VesselName</td>
+                        <td class="label">Voyage No</td>
+                        <td>@Model.VoyageNo</td>
+                    </tr>
+                    <tr>
+                        <td class="label">ETA</td>
+                        <td>@Model.ETA?.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="label">ETD</td>
+                        <td>@Model.ETD?.ToString("yyyy-MM-dd HH:mm")</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Port of Loading</td>
+                        <td>@Model.LoadingPort</td>
+                        <td class="label">Port of Discharge</td>
+                        <td>@Model.DischargePort</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Cargo Information</div>
+            <div class="section-body">
+                <table class="info">
+                    <tr>
+                        <td class="label">BL Number</td>
+                        <td>@Model.BLNumber</td>
+                        <td class="label">Container Count</td>
+                        <td>@Model.ContainerCount</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Cargo Description</td>
+                        <td colspan="3">@Model.CargoDescription</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Available for Pickup</td>
+                        <td colspan="3">@Model.AvailableForPickupDate?.ToString("yyyy-MM-dd HH:mm")</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Consignee / Notify</div>
+            <div class="section-body">
+                <table class="info">
+                    <tr>
+                        <td class="label">Consignee</td>
+                        <td>@Model.ConsigneeName</td>
+                        <td class="label">Notify Party</td>
+                        <td>@Model.NotifyPartyName</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Address</td>
+                        <td colspan="3">@Model.ConsigneeAddress</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>Generated by ShipRate System</div>
+            <div>@DateTime.Now.ToString("yyyy-MM-dd HH:mm")</div>
+        </div>
+
+        <div class="signature-box">Authorized Signature</div>
+
+        <div class="no-print" style="margin-top:20px;">
+            <button class="btn btn-primary" onclick="window.print()">Print</button>
+            <button class="btn btn-secondary" onclick="window.close()">Close</button>
+        </div>
+    </div>
+</body>
+</html>

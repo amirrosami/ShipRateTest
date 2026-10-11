@@ -1,0 +1,24 @@
+﻿@using ShipRate.Application.DTOs
+@model VoyagePortSelectorDto
+
+<div id="@Model.TargetPrefix">
+    <label class="form-label">Voyage / Vessel / Port</label>
+
+    <div class="input-group">
+        <input type="text"
+               class="form-control"
+               value="@Model.VoyageDisplayText"
+               readonly />
+
+        <button type="button"
+                class="btn btn-outline-secondary"
+                title="Lookup Voyage / Vessel / Port"
+                hx-get="@Url.Action("LookupVoyagePort", "TIP", new { targetPrefix = Model.TargetPrefix })"
+                hx-target="#lookup-modal-placeholder"
+                hx-swap="innerHTML">
+            <i class="bi bi-search"></i>
+        </button>
+    </div>
+
+    <input type="hidden" name="VoyagePortId" value="@Model.VoyagePortId" />
+</div>

@@ -1,0 +1,47 @@
+﻿@model List<ShipRate.Application.ViewModels.LocationLookupVm>
+
+
+@if (Model != null && Model.Any())
+{
+    <ul class="list-group position-absolute w-100 shadow-sm mt-1" style="z-index: 1055; max-height: 200px; overflow-y: auto;">
+        @foreach (var item in Model)
+        {
+            <li class="list-group-item list-group-item-action py-1 small cursor-pointer"
+                onclick="selectThcLocation('@item.Id', '@item.Code - @item.Name')">
+                <span class="fw-bold">@item.Code</span> - @item.Name
+            </li>
+        }
+    </ul>
+
+    <script>
+        function selectThcLocation(id, text) {
+            var hiddenInput = document.getElementById('ThcLocationId');
+            var searchInput = document.getElementById('thcLocationSearchInput');
+            var resultsContainer = document.getElementById('thcLocationSearchResults');
+
+            if (hiddenInput) hiddenInput.value = id;
+            if (searchInput) searchInput.value = text;
+            if (resultsContainer) resultsContainer.innerHTML = '';
+        }
+    </script>
+}
+
+
+
+@* @if (Model != null && Model.Any())
+{
+    <ul class="list-group position-absolute w-100 shadow-sm mt-1" style="z-index: 1055; max-height: 200px; overflow-y: auto;">
+        @foreach (var item in Model)
+        {
+            <li class="list-group-item list-group-item-action py-1 small cursor-pointer"
+                onclick="
+                            document.getElementById('ThcLocationId').value = '@item.Id';
+                            document.getElementById('thcLocationSearchInput').value = '@item.Code - @item.Name';
+                            document.getElementById('thcLocationSearchResults').innerHTML = '';
+                        ">
+                <span class="fw-bold">@item.Code</span> - @item.Name
+            </li>
+        }
+    </ul>
+}
+ *@

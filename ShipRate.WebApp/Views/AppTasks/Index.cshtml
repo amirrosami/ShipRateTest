@@ -1,0 +1,68 @@
+﻿@using ShipRate.Application.DTOs.AppTasks
+@model AppTaskIndexViewModel
+
+@{
+    ViewData["Title"] = "Tasks";
+}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="mb-0">Tasks</h4>
+            <small class="text-muted">Manage operational tasks</small>
+        </div>
+
+        <button type="button"
+                class="btn btn-primary"
+                hx-get="@Url.Action("Create", "AppTasks")"
+                hx-target="#appTaskModalContent"
+                hx-swap="innerHTML"
+                data-bs-toggle="modal"
+                data-bs-target="#appTaskModal">
+            New Task
+        </button>
+    </div>
+
+    <div id="appTaskSearchPanel">
+        @await Html.PartialAsync("_SearchPanel", Model.Search)
+    </div>
+
+    <div id="appTaskList"
+         hx-get="@Url.Action("List", "AppTasks")"
+         hx-trigger="appTaskListChanged from:body"
+         hx-include="#appTaskSearchForm"
+         hx-target="#appTaskList"
+         hx-swap="innerHTML">
+        @await Html.PartialAsync("_TaskList", Model.Result)
+    </div>
+
+</div>
+
+<div class="modal fade" id="appTaskModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content" id="appTaskModalContent"></div>
+    </div>
+</div>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="appTaskDrawer" style="width: 720px;">
+    <div class="offcanvas-body p-0" id="appTaskDrawerContent"></div>
+</div>
+
+@section Scripts {
+    <script>
+        document.body.addEventListener('closeAppTaskModal', function () {
+            const modalEl = document.getElementById('appTaskModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) {
+                modal.hide();
+            }
+        });
+
+        document.body.addEventListener('htmx:afterSwap', function (event) {
+            if (window.jQuery && $.validator && $.validator.unobtrusive) {
+                $.validator.unobtrusive.parse(event.target);
+            }
+        });
+    </script>
+}

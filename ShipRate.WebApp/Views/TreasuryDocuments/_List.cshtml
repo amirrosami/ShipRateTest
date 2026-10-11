@@ -1,0 +1,206 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.Finance
+
+@model PagedResultDto<TreasuryDocumentListItemDto>
+
+
+@{
+    var totalPages = (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize);
+    var currentPage = Model.PageNumber;
+
+    var startPage = Math.Max(1, currentPage - 2);
+    var endPage = Math.Min(totalPages, currentPage + 2);
+}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle mb-0">
+        <thead>
+            <tr>
+                <th>Receipt No</th>
+                <th>Date</th>
+                <th>Company</th>
+                <th>Party</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th class="text-end">Total</th>
+                <th>Currency</th>
+                <th style="width: 100px;">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model.Items.Any())
+            {
+                foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.DocumentNo</td>
+                        <td>@item.DocumentDate.ToString("yyyy-MM-dd")</td>
+                        <td>@item.CompanyName</td>
+                        <td>@item.PartyName</td>
+                        <td>@item.TreasuryDocumentTypeName</td>
+                        <td>@item.TreasuryDocumentStatusName</td>
+                        <td class="text-end">@item.TotalAmount.ToString("N2")</td>
+                        <td>@item.CurrencyCode</td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-sm btn-warning"
+                                    hx-get="@Url.Action("Edit", "TreasuryDocuments", new { id = item.Id })"
+                                    hx-target="#modalBody"
+                                    hx-swap="innerHTML"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#mainModal">
+                                Edit
+                            </button>
+                            @if (item.TreasuryDocumentStatusId == 1)
+                            {
+                                <button type="button"
+                                        class="btn btn-sm btn-danger"
+                                        hx-post="@Url.Action("Delete", "TreasuryDocuments", new { id = item.Id })"
+                                        hx-include="#treasuryDocumentsSearchForm"
+                                        hx-target="#treasuryDocumentsList"
+                                        hx-swap="innerHTML"
+                                        hx-confirm="Are you sure to delete ؟">
+                                    حذف
+                                </button>
+                            }
+
+                            @if (item.TreasuryDocumentStatusId == 1)
+                            {
+                                <form hx-post="@Url.Action("Confirm", "TreasuryDocuments")"
+                                      hx-target="#listContainer"
+                                      hx-swap="innerHTML"
+                                      class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@item.Id" />
+
+@*                                     <input type="hidden" name="DocumentNo" value="@Model." />
+                                    <input type="hidden" name="FromDocumentDate" value="@Model.Search.FromDocumentDate?.ToString("yyyy-MM-dd")" />
+                                    <input type="hidden" name="ToDocumentDate" value="@Model.Search.ToDocumentDate?.ToString("yyyy-MM-dd")" />
+                                    <input type="hidden" name="PartyName" value="@Model.Search.PartyName" />
+                                    <input type="hidden" name="TreasuryDocumentStatusId" value="@Model.Search.TreasuryDocumentStatusId" />
+                                    <input type="hidden" name="PageNumber" value="@Model.Search.PageNumber" />
+                                    <input type="hidden" name="PageSize" value="@Model.Search.PageSize" />
+ *@
+                                    <button type="submit" class="btn btn-sm btn-success">
+                                        Confirm
+                                    </button>
+                                </form>
+                            }
+
+
+
+
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="9" class="text-center py-4">No data found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <div>
+        Total: @Model.TotalCount
+    </div>
+
+    @if (totalPages > 1)
+    {
+        <nav>
+            <ul class="pagination mb-0">
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <button class="page-link"
+                            hx-get="@Url.Action("Index", "TreasuryDocuments")?PageNumber=@(currentPage - 1)&PageSize=@Model.PageSize"
+                            hx-include="#searchForm"
+                            hx-target="#listContainer"
+                            hx-swap="innerHTML">
+                        Prev
+                    </button>
+                </li>
+
+                @if (startPage > 1)
+                {
+                    <li class="page-item">
+                        <button class="page-link"
+                                hx-get="@Url.Action("Index", "TreasuryDocuments")?PageNumber=1&PageSize=@Model.PageSize"
+                                hx-include="#searchForm"
+                                hx-target="#listContainer"
+                                hx-swap="innerHTML">
+                            1
+                        </button>
+                    </li>
+
+                    @if (startPage > 2)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+                }
+
+                @for (var pageNo = startPage; pageNo <= endPage; pageNo++)
+                {
+                    <li class="page-item @(pageNo == currentPage ? "active" : "")">
+                        <button class="page-link"
+                                hx-get="@Url.Action("Index", "TreasuryDocuments")?PageNumber=@pageNo&PageSize=@Model.PageSize"
+                                hx-include="#searchForm"
+                                hx-target="#listContainer"
+                                hx-swap="innerHTML">
+                        </button>
+                    </li>
+                }
+
+                @if (endPage < totalPages)
+                {
+                    @if (endPage < totalPages - 1)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+
+                    <li class="page-item">
+                        <button class="page-link"
+                                hx-get="@Url.Action("Index", "TreasuryDocuments")?PageNumber=@totalPages&PageSize=@Model.PageSize"
+                                hx-include="#searchForm"
+                                hx-target="#listContainer"
+                                hx-swap="innerHTML">
+                            @totalPages
+                        </button>
+                    </li>
+                }
+
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <button class="page-link"
+                            hx-get="@Url.Action("Index", "TreasuryDocuments")?PageNumber=@(currentPage + 1)&PageSize=@Model.PageSize"
+                            hx-include="#searchForm"
+                            hx-target="#listContainer"
+                            hx-swap="innerHTML">
+                        Next
+                    </button>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+<script>
+    document.body.addEventListener("showMessage", function (evt) {
+        if (typeof evt.detail === "string") {
+            alert(evt.detail);
+            return;
+        }
+
+        if (evt.detail && evt.detail.value) {
+            alert(evt.detail.value);
+            return;
+        }
+
+        alert("Done.");
+    });
+</script>

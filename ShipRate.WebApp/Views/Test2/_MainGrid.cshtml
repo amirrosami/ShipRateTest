@@ -1,0 +1,35 @@
+﻿@using ShipRate.WebApp.Controllers
+@using ShipRate.WebApp.ViewModels
+@model GridViewModel
+<input type="hidden" name="masterId" id="selected-master-id" />
+
+@foreach (var item in Model.Data.Items)
+    {
+        var vm = (TestCreateEditVM)item;
+        <tr id="@($"tr-master-{vm.Id}")">
+                    <td>@vm.Id</td>
+                    <td>@vm.Name</td>
+                    <td>@vm.Description</td>
+                    <td class="text-center">
+                        <div class="btn-group btn-group-sm">
+
+                            <button type="button"
+                                    class="btn btn-outline-info"
+                                    title="Details"
+                                    hx-get="@Url.Action("Detail", "Test2")"
+                                    hx-target="#detail-container"
+                                    hx-swap="innerHTML"
+                                    hx-vals='js:{ masterId: "@vm.Id"}'
+                                    hx-on:htmx:before-request="
+                                                console.log('beforeRequest');
+                                        document.getElementById('selected-master-id').value='@vm.Id'
+                                        "
+                                    >
+                                <i class="bi bi-card-list"></i>
+                            </button>
+                       </div>
+                    </td>
+        </tr>
+        }
+
+

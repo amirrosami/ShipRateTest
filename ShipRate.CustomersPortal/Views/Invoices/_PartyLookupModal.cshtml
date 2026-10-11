@@ -1,0 +1,29 @@
+﻿<div class="modal-header">
+    <h5 class="modal-title">Select Party</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <form hx-get="@Url.Action("PartyLookupList", "Invoices")"
+          hx-target="#party-lookup-grid-container"
+          hx-swap="innerHTML"
+          class="row g-2 mb-3">
+
+        <div class="col-md-10">
+            <label class="form-label">Search</label>
+            <input name="Search" class="form-control" />
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <input type="hidden" name="PageNumber" value="1" />
+            <input type="hidden" name="PageSize" value="10" />
+            <button type="submit" class="btn btn-primary w-100">Search</button>
+        </div>
+    </form>
+
+    <div id="party-lookup-grid-container"
+         hx-get="@Url.Action("PartyLookupList", "Invoices", new { PageNumber = 1, PageSize = 10 })"
+         hx-trigger="load"
+         hx-swap="innerHTML">
+    </div>
+</div>

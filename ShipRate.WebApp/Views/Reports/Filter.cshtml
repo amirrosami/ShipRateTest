@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "Report Filter";
+    var reportKey = ViewBag.ReportKey as string;
+    var companyId = ViewBag.CompanyId;
+}
+
+<div class="container mt-4">
+    <h2>Report Filter</h2>
+    <hr />
+
+    <div class="card">
+        <div class="card-body">
+            <p><strong>Report Key:</strong> @reportKey</p>
+            <p><strong>Company ID:</strong> @companyId</p>
+
+            <div class="alert alert-info">
+                This is the generic filter page.
+                Next step: load dynamic filter form based on reportKey.
+            </div>
+        </div>
+    </div>
+</div>

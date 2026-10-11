@@ -1,0 +1,250 @@
+﻿@using Microsoft.Extensions.Localization
+@using ShipRate.Application.DTOs.Finance
+@using ShipRate.WebAppCustomers
+@using System.Globalization
+@model InvoiceListPageVm
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isFa = culture == "fa";
+    var lang = isFa ? "fa" : "en";
+    var dir = isFa ? "rtl" : "ltr";
+}
+
+<style>
+    .btn-xs {
+        padding: 0.15rem 0.4rem;
+        font-size: 1rem;
+        line-height: 1;
+    }
+
+    .invoice-check,
+    #selectAllInvoices {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    .table-responsive {
+        overflow-x: scroll !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* ... Keep your existing scrollbar styles ... */
+</style>
+
+<div class="card" dir="@dir">
+    <div class="table-responsive">
+        <table class="table table-hover table-striped mb-0" id="invoiceTable">
+            <thead class="table-primary">
+                <tr>
+                    <th>
+                       
+                    </th>
+                    <th>@Localizer["InvoiceNo"]</th>
+                    <th>@Localizer["InvoicePNo"]</th>
+                    <th>@Localizer["Date"]</th>
+                    <th>@Localizer["DueDate"]</th>
+                    <th>@Localizer["Party"]</th>
+                    <th>@Localizer["Type"]</th>
+                    <th>@Localizer["Status"]</th>
+                    <th>@Localizer["Currency"]</th>
+                    <th class="text-end">@Localizer["TotalAmount"]</th>
+                    <th class="text-end">@(isFa ? "پرداخت شده" : "Total Paid")</th>
+                    <th class="text-end">@(isFa ? "مانده" : "Remain Payment")</th>
+                    <th>@Localizer["CreateDate"]</th>
+                    <th style="width:120px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Result.Items.Any())
+                {
+                    foreach (var item in Model.Result.Items)
+                    {
+                        <tr>
+                            <td>
+                                <input type="checkbox"
+                                       class="invoice-check"
+                                       name="selectedInvoiceIds"
+                                       value="@item.Id"
+                                       @(item.PaymentStatusId == 1 ? "disabled" : null) />
+                            </td >
+                            <td>@item.InvoiceNo</td>
+                            <td>@item.InvoicePNo</td>
+                            <td>@item.InvoiceDate.Value.ToString("yyyy-MM-dd")</td>
+                            <td>@item.DueDate?.ToString("yyyy-MM-dd")</td>
+                            <td>@item.PartyName</td>
+                            <td>@item.InvoiceTypeName</td>
+                            <td>@item.InvoiceStatusName</td>
+                            <td>@item.CurrencyCode</td>
+                            <td class="text-end">@item.TotalAmount</td>
+                            <td class="text-end">@item.TotalPaid</td>
+                            <td class="text-end">@item.RemainPayment</td>
+                            <td>@item.CreateDateTime</td>
+                            <td class="text-end text-nowrap">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button"
+                                            class="btn btn-outline-primary px-2"
+                                            hx-get="@Url.Action("ItemsGrid2", "Invoices", new { invoiceId = item.Id })"
+                                            hx-target="#invoiceitems-list-container"
+                                            hx-swap="innerHTML"
+                                            title="@Localizer["Items"]">
+                                        <i class="bi bi-list-ul"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="15" class="text-center text-muted">@Localizer["NoDataFound"]</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-footer">
+        @await Html.PartialAsync("~/Views/Invoices/_InvoicePager.cshtml", Model)
+
+        <button type="button"
+                class="btn btn-outline-success mt-3"
+                id="btnPaySelected"
+                hx-post="@Url.Action("LoadPayModal", "Invoices")"
+                hx-target="#app-modal-content"
+                hx-swap="innerHTML"
+                hx-include="#invoiceTable input.invoice-check:checked"
+                hx-on::before-request="if (document.querySelectorAll('#invoiceTable input.invoice-check:checked').length === 0) { createToast('select at least one invoice to pay', 'error'); event.preventDefault(); }">
+            @(isFa ? "پرداخت موارد انتخاب شده" : "Pay Selected Items")
+        </button>
+    </div>
+
+
+</div>
+
+
+
+@* @using Microsoft.Extensions.Localization
+@using ShipRate.Application.DTOs.Finance
+@using ShipRate.WebAppCustomers
+@using System.Globalization
+@model InvoiceListPageVm
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isFa = culture == "fa";
+    var lang = isFa ? "fa" : "en";
+    var dir = isFa ? "rtl" : "ltr";
+}
+
+<style>
+    .btn-xs {
+        padding: 0.15rem 0.4rem;
+        font-size: 1rem;
+        line-height: 1;
+    }
+
+    .table-responsive {
+        overflow-x: scroll !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+        .table-responsive::-webkit-scrollbar {
+            height: 12px;
+            -webkit-appearance: none;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background-color: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background-color: #888;
+            border-radius: 10px;
+        }
+
+            .table-responsive::-webkit-scrollbar-thumb:hover {
+                background-color: #555;
+            }
+
+    .table-responsive {
+        scrollbar-width: thin;
+        scrollbar-color: #888 #f1f1f1;
+    }
+</style>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover table-striped mb-0">
+            <thead class="table-primary">
+                <tr>
+                    <th>Invoice No</th>
+                    <th>Invoice PNo</th>
+                    <th>Date</th>
+                    <th>Due Date</th>
+                    <th>Party</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Direction</th>
+                    <th>Currency</th>
+                    <th class="text-end">Total</th>
+                    <th>Create Date</th>
+                   
+                    
+                    <th style="width:120px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Result.Items.Any())
+                {
+                    foreach (var item in Model.Result.Items)
+                    {
+                        <tr>
+                            <td>@item.InvoiceNo</td>
+                            <td>@item.InvoicePNo</td>
+                            <td>@item.InvoiceDate.ToString("yyyy-MM-dd")</td>
+                            <td>@item.DueDate?.ToString("yyyy-MM-dd")</td>
+                            <td>@item.PartyName</td>
+                            <td>@item.InvoiceTypeName</td>
+                            <td>@item.InvoiceStatusName</td>
+                            <td>@item.FinanceDirectionName</td>
+                            <td>@item.CurrencyCode</td>
+                            <td class="text-end">@item.TotalAmount.ToString("N2")</td>
+                            <td>@item.CreateDateTime</td>
+                           
+                            <td class="text-end text-nowrap">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button"
+                                            class="btn btn-outline-primary px-2"
+                                            hx-get="@Url.Action("ItemsGrid2", "Invoices", new { invoiceId = item.Id })"
+                                            hx-target="#invoiceitems-list-container"
+                                            hx-swap="innerHTML"
+                                            title="Items">
+                                        <i class="bi bi-list-ul"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="15" class="text-center text-muted">No data found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-footer">
+        @await Html.PartialAsync("~/Views/Invoices/_InvoicePager.cshtml", Model)
+    </div>
+</div>
+
+ *@

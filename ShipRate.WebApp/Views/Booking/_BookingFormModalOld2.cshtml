@@ -1,0 +1,652 @@
+﻿@using ShipRate.Application.DTOs
+@model BookingFormVm
+
+<style>
+    /* تنظیم ارتفاع کل مودال روی ۹۰ درصد ارتفاع صفحه نمایش */
+    #booking-modal-container {
+        max-height: 90vh;
+        margin-top: 0px;
+    }
+
+        #booking-modal-container .modal-content {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #booking-modal-container .modal-body {
+            flex: 1 1 auto;
+            overflow-y: auto;
+        }
+
+    /* تامین حداقل ارتفاع برای تب‌ها جهت جلوگیری از تغییر سایز مودال */
+    #bookingTabContent {
+        min-height: 520px;
+    }
+</style>
+
+<div class="modal-dialog modal-xl modal-dialog-scrollable" id="booking-modal-container">
+    <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">
+                <i class="bi bi-journal-bookmark-fill me-2"></i>
+                @(Model.Id.HasValue ? $"Edit Booking [ {Model.BookingNo} ]" : "Create New Booking")
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <!-- Single Form for Transaction Integrity -->
+        <form id="bookingForm"
+              hx-post="@Url.Action("Save", "Booking")"
+              hx-target="#booking-modal-container"
+              hx-swap="outerHTML"
+              class="d-flex flex-column h-100">
+
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="JobId" />
+            <div class="modal-body p-0">
+                <!-- Navigation Tabs & Tab Contents (d-flex حذف شد تا المان‌های داخلی stretch شوند) -->
+                <div class="w-100">
+                    <ul class="nav nav-tabs border-bottom px-3 pt-2 bg-light" id="bookingTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab" aria-controls="general" aria-selected="true">General Info</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="cargo-tab" data-bs-toggle="tab" data-bs-target="#cargo" type="button" role="tab" aria-controls="cargo" aria-selected="false">Cargo Details</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="cutoffs-tab" data-bs-toggle="tab" data-bs-target="#cutoffs" type="button" role="tab" aria-controls="cutoffs" aria-selected="false">Milestones & Cut-offs</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content p-4" id="bookingTabContent">
+
+                        <!-- 1. GENERAL TAB -->
+                        <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label asp-for="CompanyId" class="form-label">Company</label>
+                                    <select asp-for="CompanyId" asp-items="ViewBag.Companies" class="form-select"></select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label asp-for="CompanyRoleTypeId" class="form-label">Company Role</label>
+                                    <select asp-for="CompanyRoleTypeId" asp-items="ViewBag.CompanyRoleTypes" class="form-select"></select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label asp-for="BookingNo" class="form-label ">Booking No</label>
+                                    <input asp-for="BookingNo" class="form-control" placeholder="Generated automatically if blank" />
+                                    <span asp-validation-for="BookingNo" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-3">
+                                    <label asp-for="LineBookingNo" class="form-label">Line Booking No</label>
+                                    <input asp-for="LineBookingNo" class="form-control" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label asp-for="TransportTypeId" class="form-label">Transport Mode</label>
+                                    <select asp-for="TransportTypeId" asp-items="ViewBag.TransportTypes"
+                                            class="form-select"
+                                            hx-get="@Url.Action("GetTransportDetailsForm", "Booking")"
+                                            hx-target="#transport-mode-container"
+                                            hx-include="[name='Id']"
+                                            hx-trigger="change">
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label asp-for="LoadTypeId" class="form-label">Load Type</label>
+                                    <select asp-for="LoadTypeId" asp-items="ViewBag.LoadTypes" class="form-select"></select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label asp-for="ServiceTypeId" class="form-label">Service Type</label>
+                                    <select asp-for="ServiceTypeId" asp-items="ViewBag.ServiceTypes" class="form-select"></select>
+                                </div>
+                                <div class="col-12 mt-1">
+                                    <label asp-for="Remarks" class="form-label">General Remarks</label>
+                                    <textarea asp-for="Remarks" class="form-control" rows="2" placeholder="Enter general booking notes..."></textarea>
+                                </div>
+
+                                <div class="col-12 mt-2">
+                                    <h6 class="border-bottom pb-2">Booking Parties</h6>
+                                    <div id="booking-parties-container">
+                                        <partial name="~/Views/Booking/_BookingPartiesList.cshtml" model="Model" />
+                                    </div>
+                                </div>
+                                <div class="row g-3 border-bottom pb-4 mb-4">
+                                    <h6 class="border-bottom pb-2 text-danger">Routing</h6>
+                                    <div class="col-md-4">
+                                        <label asp-for="OriginId" class="form-label">Place Of Receipt(Origin)</label>
+                                        <input type="hidden" asp-for="OriginId" id="OriginId" />
+                                        <input type="text"
+                                               id="OriginSearchText"
+                                               name="OriginId"
+                                               value="@Model.OriginName"
+                                               class="form-control"
+                                               placeholder="Search Origin..."
+                                               autocomplete="off"
+                                               hx-get="@Url.Action("SearchLocations", "Locations")"
+                                               hx-trigger="keyup changed delay:400ms"
+                                               hx-target="#originSearchResults"
+                                               hx-swap="innerHTML"
+                                               hx-vals='js:{
+                                                term: document.getElementById("OriginSearchText").value,
+                                                targetHiddenInputId: "OriginId",
+                                                targetTextInputId: "OriginSearchText"
+                                               }' />
+
+                                        <div id="originSearchResults"
+                                             class="position-relative">
+                                        </div>
+
+                                        <span asp-validation-for="OriginId" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label asp-for="POLId" class="form-label">Port Of Loading</label>
+                                        <input type="hidden" asp-for="POLId" id="POLId" />
+                                        <input type="text"
+                                               id="POLSearchText"
+                                               name="POLId"
+                                               value="@Model.POLName"
+                                               class="form-control"
+                                               placeholder="Search POL..."
+                                               autocomplete="off"
+                                               hx-get="@Url.Action("SearchLocations", "Locations")"
+                                               hx-trigger="keyup changed delay:400ms"
+                                               hx-target="#polSearchResults"
+                                               hx-swap="innerHTML"
+                                               hx-vals='js:{
+                                                term: document.getElementById("POLSearchText").value,
+                                                targetHiddenInputId: "POLId",
+                                                targetTextInputId: "POLSearchText"
+                                               }' />
+
+                                        <div id="polSearchResults"
+                                             class="position-relative">
+                                        </div>
+
+                                        <span asp-validation-for="POLId" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label asp-for="TranshipPortId" class="form-label">Transhipment Port</label>
+                                        <input type="hidden" asp-for="TranshipPortId" id="TranshipPortId" />
+                                        <input type="text"
+                                               id="TranshipPortSearchText"
+                                               name="TranshipPortId"
+                                               value="@Model.TranshipPortName"
+                                               class="form-control"
+                                               placeholder="Search Tranship Port..."
+                                               autocomplete="off"
+                                               hx-get="@Url.Action("SearchLocations", "Locations")"
+                                               hx-trigger="keyup changed delay:400ms"
+                                               hx-target="#transhipSearchResults"
+                                               hx-swap="innerHTML"
+                                               hx-vals='js:{
+                                                term: document.getElementById("TranshipPortSearchText").value,
+                                                targetHiddenInputId: "TranshipPortId",
+                                                targetTextInputId: "TranshipPortSearchText"
+                                               }' />
+
+                                        <div id="transhipSearchResults"
+                                             class="position-relative">
+                                        </div>
+                                        <span asp-validation-for="TranshipPortId" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label asp-for="PODId" class="form-label">Port Of Discharge</label>
+                                        <input type="hidden" asp-for="PODId" id="PODId" />
+                                        <input type="text"
+                                               id="PODSearchText"
+                                               name="PODId"
+                                               value="@Model.PODName"
+                                               class="form-control"
+                                               placeholder="Search POD..."
+                                               autocomplete="off"
+                                               hx-get="@Url.Action("SearchLocations", "Locations")"
+                                               hx-trigger="keyup changed delay:400ms"
+                                               hx-target="#podSearchResults"
+                                               hx-swap="innerHTML"
+                                               hx-vals='js:{
+                                                term: document.getElementById("PODSearchText").value,
+                                                targetHiddenInputId: "PODId",
+                                                targetTextInputId: "PODSearchText"
+                                               }' />
+
+                                        <div id="podSearchResults"
+                                             class="position-relative">
+                                        </div>
+
+                                        <span asp-validation-for="PODId" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label asp-for="DestId" class="form-label">Final Destination</label>
+                                        <input type="hidden" asp-for="DestId" id="DestId" />
+                                        <input type="text"
+                                               id="DestSearchText"
+                                               name="DestId"
+                                               value="@Model.DestName"
+                                               class="form-control"
+                                               placeholder="Search Destination..."
+                                               autocomplete="off"
+                                               hx-get="@Url.Action("SearchLocations", "Locations")"
+                                               hx-trigger="keyup changed delay:400ms"
+                                               hx-target="#destSearchResults"
+                                               hx-swap="innerHTML"
+                                               hx-vals='js:{
+                                                term: document.getElementById("DestSearchText").value,
+                                                targetHiddenInputId: "DestId",
+                                                targetTextInputId: "DestSearchText"
+                                               }' />
+
+                                        <div id="destSearchResults"
+                                             class="position-relative">
+                                        </div>
+
+                                        <span asp-validation-for="DestId" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="card border-0 shadow-sm mb-2">
+                                    <h6 class="border-bottom pb-2 text-danger ">Sea Voyage & Vessel Specifications</h6>
+                                    <div class="card-body bg-light">
+                                        <div class="row g-3">
+                                            <input type="hidden" asp-for="SeaDetail.Id" />
+
+                                            <div class="col-md-3">
+                                                <label class="form-label">Shipping Line</label>
+                                                <select asp-for="SeaDetail.ShippingLineId" asp-items="ViewBag.Carriers" class="form-select">
+                                                    <option value="">-- Select Line --</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label">Service Name</label>
+                                                <input asp-for="SeaDetail.ServiceName" class="form-control" placeholder="" />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">Empty Container Pickup Depot</label>
+                                                <select asp-for="SeaDetail.EmptyPickupDepotId" asp-items="ViewBag.Depots" class="form-select">
+                                                    <option value="">-- Select Depot --</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">Empty Container Return Depot</label>
+                                                <select asp-for="SeaDetail.EmptyReturnDepotId" asp-items="ViewBag.Depots" class="form-select">
+                                                    <option value="">-- Select Depot --</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">Receiving Terminal</label>
+                                                <select asp-for="SeaDetail.ReceivingTerminalId" asp-items="ViewBag.Terminals" class="form-select">
+                                                    <option value="">-- Select Terminal --</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="border-bottom pb-2 text-danger">Booking Containers Allocation</h6>
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary"
+                                                hx-get="@Url.Action("AddContainerRow", "Booking")"
+                                                hx-target="#container-rows-container"
+                                                hx-swap="beforeend">
+                                            <i class="bi bi-plus-lg me-1"></i> Add Container
+                                        </button>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover border">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th style="width: 30%;">Container Size Type</th>
+                                                    <th style="width: 25%;">Ownership Type</th>
+                                                    <th style="width: 10%;">Count</th>
+                                                    <th style="width: 10%;">Over Length (CM)</th>
+                                                    <th style="width: 10%;">Over Width (CM)</th>
+                                                    <th style="width: 10%;">Over Height (CM)</th>
+                                                    <th style="width: 5%;"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="container-rows-container">
+                                                <partial name="~/Views/Booking/_BookingContainersList.cshtml" model="Model" />
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+                            </div>
+                        </div>
+
+
+                        <!-- 6. MILESTONES & CUT-OFFS TAB -->
+                        <div class="tab-pane fade" id="cutoffs" role="tabpanel" aria-labelledby="cutoffs-tab">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label asp-for="CargoReadyDate" class="form-label">Cargo Ready Date</label>
+                                    <input asp-for="CargoReadyDate" class="form-control" type="date" />
+                                </div>
+                                <div class="col-md-8">
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="CutOffDate" class="form-label">Cargo Cut-Off Date</label>
+                                    <input asp-for="CutOffDate" class="form-control" type="date" />
+                                </div>
+                                <div class="col-md-8">
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="SICutOffDate" class="form-label">Shipping Instructions (SI) Cut-Off</label>
+                                    <input asp-for="SICutOffDate" class="form-control" type="date" />
+                                </div>
+                                <div class="col-md-8">
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="VGMCutOffDate" class="form-label">VGM Cut-Off Date</label>
+                                    <input asp-for="VGMCutOffDate" class="form-control" type="date" />
+                                </div>
+                                <div class="col-md-8">
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="DocumentCutOffDate" class="form-label">Documentation Cut-Off</label>
+                                    <input asp-for="DocumentCutOffDate" class="form-control" type="date" />
+                                </div>
+                                <div class="col-md-8">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 8. CARGO DETAILS TAB -->
+                        <div class="tab-pane fade" id="cargo" role="tabpanel" aria-labelledby="cargo-tab">
+                            <partial name="~/Views/CargoDetails/_CargoDetailsPanel.cshtml" model="Model.CargoItems" />
+                        </div>
+                        @* <div id="global-port-search-popup" class="global-port-search-popup d-none"></div> *@
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer bg-light border-top mt-auto">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="bi bi-save me-1"></i> Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        const container = evt.detail.target;
+        const dynamicContainers = [
+            'legs-table-body',
+            'container-rows-container',
+            'booking-parties-container',
+            'charge-rows-container',
+            'cargo-rows-container'
+        ];
+        if (!dynamicContainers.includes(container.id)) return;
+
+        const newRow = container.lastElementChild;
+        if (!newRow) return;
+
+        const rowIndex = container.children.length - 1;
+
+        const elements = newRow.querySelectorAll('[name],[id],[for],[data-valmsg-for]');
+        elements.forEach(el => {
+            if (el.name) el.name = el.name.replace(/__INDEX__/g, rowIndex);
+            if (el.id) el.id = el.id.replace(/__INDEX__/g, rowIndex);
+            if (el.htmlFor) el.htmlFor = el.htmlFor.replace(/__INDEX__/g, rowIndex);
+
+            const valmsg = el.getAttribute('data-valmsg-for');
+            if (valmsg) {
+                el.setAttribute('data-valmsg-for', valmsg.replace(/__INDEX__/g, rowIndex));
+            }
+        });
+    });
+</script>
+
+
+<script>
+        document.addEventListener('htmx:afterSwap', function (evt) {
+        if (evt.detail.target.id === "voyage-rows") {
+            const rows = document.querySelectorAll("#voyage-rows .voyage-row");
+            const newRow = rows[rows.length - 1];
+            if (newRow && newRow.innerHTML.includes("__INDEX__")) {
+                const index = rows.length - 1;
+                newRow.innerHTML = newRow.innerHTML
+                    .replace(/__INDEX_PLUS_1__/g, index + 1)
+                    .replace(/__INDEX__/g, index);
+            }
+        }
+    });
+
+    function removeVoyageRow(button) {
+        const row = button.closest('tr');
+        row.remove();
+        reIndexVoyages();
+    }
+
+    function reIndexVoyages() {
+        const rows = document.querySelectorAll("#voyage-rows .voyage-row");
+        rows.forEach((row, index) => {
+            // ۱. بروزرسانی شماره سطر
+            row.querySelector('.seq-no').innerText = index + 1;
+
+            // ۲. تصحیح تمام nameهای فیلدها با ایندکس جدید
+            const inputs = row.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                if (input.name) {
+                    // تبدیل SeaDetail.Voyages[OldIndex].FieldName به SeaDetail.Voyages[NewIndex].FieldName
+                    input.name = input.name.replace(/SeaDetail\.Voyages\[\d+\]/, `SeaDetail.Voyages[${index}]`);
+                }
+            });
+        });
+    }
+
+
+
+
+    document.addEventListener('htmx:afterSwap', function (evt) {
+        if (evt.detail.target.id === "road-rows") {
+            const rows = document.querySelectorAll("#road-rows .road-row");
+            const newRow = rows[rows.length - 1];
+            if (newRow && newRow.innerHTML.includes("__INDEX__")) {
+                const index = rows.length - 1;
+                newRow.innerHTML = newRow.innerHTML.replace(/__INDEX__/g, index);
+            }
+        }
+    });
+
+    function removeRoadRow(button) {
+        const row = button.closest('tr');
+        row.remove();
+        reIndexRoad();
+    }
+
+    function reIndexRoad() {
+        const rows = document.querySelectorAll("#road-rows .road-row");
+        rows.forEach((row, index) => {
+            const inputs = row.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                if (input.name) {
+                    // تصحیح ساختار RoadDetails[OldIndex] به RoadDetails[NewIndex]
+                    input.name = input.name.replace(/RoadDetails\[\d+\]/, `RoadDetails[${index}]`);
+                }
+            });
+        });
+    }
+
+
+
+    document.addEventListener('htmx:afterSwap', function (evt) {
+        if (evt.detail.target.id === "rail-rows") {
+            const rows = document.querySelectorAll("#rail-rows .rail-row");
+            const newRow = rows[rows.length - 1];
+            if (newRow && newRow.innerHTML.includes("__INDEX__")) {
+                const index = rows.length - 1;
+                newRow.innerHTML = newRow.innerHTML.replace(/__INDEX__/g, index);
+            }
+        }
+    });
+
+    function removeRailRow(button) {
+        const row = button.closest('tr');
+        row.remove();
+        reIndexRail();
+    }
+
+    function reIndexRail() {
+        const rows = document.querySelectorAll("#rail-rows .rail-row");
+        rows.forEach((row, index) => {
+            const inputs = row.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                if (input.name) {
+                    // جایگزینی ایندکس قدیمی با جدید
+                    input.name = input.name.replace(/RailDetails\[\d+\]/, `RailDetails[${index}]`);
+                }
+            });
+        });
+    }
+
+
+
+
+    document.addEventListener('htmx:afterSwap', function (evt) {
+        if (evt.detail.target.id === "flight-rows") {
+            const rows = document.querySelectorAll("#flight-rows .flight-row");
+            const newRow = rows[rows.length - 1];
+            if (newRow && newRow.innerHTML.includes("__INDEX__")) {
+                const index = rows.length - 1;
+                newRow.innerHTML = newRow.innerHTML
+                    .replace(/__INDEX_PLUS_1__/g, index + 1)
+                    .replace(/__INDEX__/g, index);
+            }
+        }
+    });
+
+    function removeFlightRow(button) {
+        const row = button.closest('tr');
+        row.remove();
+        reIndexFlights();
+    }
+
+    function reIndexFlights() {
+        const rows = document.querySelectorAll("#flight-rows .flight-row");
+        rows.forEach((row, index) => {
+            // ۱. به‌روزرسانی شماره توالی بصری
+            row.querySelector('.seq-no').innerText = index + 1;
+
+            // ۲. بازنشانی فیلدهای ورودی آرایه
+            const inputs = row.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                if (input.name) {
+                    input.name = input.name.replace(/AirDetail\.Flights\[\d+\]/, `AirDetail.Flights[${index}]`);
+                }
+            });
+        });
+    }
+
+    function selectVoyagePort(index, portType, portId, portName) {
+        // مقداردهی فیلد مخفی (ثبت شناسه گاید در فرم ارسالی)
+        const idInput = document.getElementById(`port-${portType}-id-${index}`);
+        if (idInput) {
+            idInput.value = portId;
+        }
+
+        // مقداردهی اینپوت نمایشی
+        const textInput = document.getElementById(`port-${portType}-text-${index}`);
+        if (textInput) {
+            textInput.value = portName;
+        }
+
+        // بستن لیست پیشنهادی
+        const resultsContainer = document.getElementById(`port-${portType}-results-${index}`);
+        if (resultsContainer) {
+            resultsContainer.innerHTML = '';
+        }
+    }
+
+    // بستن نتایج با کلیک در خارج از محدوده جدول
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.position-relative')) {
+            document.querySelectorAll('[id^="port-from-results-"], [id^="port-to-results-"]').forEach(el => {
+                el.innerHTML = '';
+            });
+        }
+    });
+</script>
+
+<script>
+    (() => {
+        let activePortInput = null;
+
+        document.addEventListener("focusin", function (event) {
+            const input = event.target.closest(".port-search-input");
+
+            if (input) {
+                activePortInput = input;
+            }
+        });
+
+        document.addEventListener("htmx:beforeRequest", function (event) {
+            const input = event.target.closest(".port-search-input");
+
+            if (input) {
+                activePortInput = input;
+            }
+        });
+
+        document.addEventListener("htmx:afterSwap", function (event) {
+            const popup = document.getElementById("global-port-search-popup");
+
+            if (!popup || event.target !== popup || !activePortInput) {
+                return;
+            }
+
+            const rect = activePortInput.getBoundingClientRect();
+
+            popup.style.position = "fixed";
+            popup.style.left = `${rect.left}px`;
+            popup.style.top = `${rect.bottom + 2}px`;
+            popup.style.width = `${Math.max(rect.width, 280)}px`;
+            popup.style.zIndex = "2000";
+            popup.classList.remove("d-none");
+        });
+
+        document.addEventListener("click", function (event) {
+            const popup = document.getElementById("global-port-search-popup");
+
+            if (!popup) {
+                return;
+            }
+
+            const clickedInput =
+                event.target.closest(".port-search-input");
+
+            const clickedPopup =
+                popup.contains(event.target);
+
+            if (!clickedInput && !clickedPopup) {
+                popup.classList.add("d-none");
+                popup.innerHTML = "";
+            }
+        });
+
+        window.addEventListener("scroll", function () {
+            const popup = document.getElementById("global-port-search-popup");
+
+            if (popup) {
+                popup.classList.add("d-none");
+            }
+        }, true);
+    })();
+</script>

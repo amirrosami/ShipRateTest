@@ -1,0 +1,59 @@
+﻿@using ShipRate.Application.DTOs
+@model BLAmendmentRequestLineFormDto
+@{
+    // اگر ایندکس مشخصی نیامده بود، یک شناسه یکتا تولید می‌کنیم
+    var indexKey = Guid.NewGuid().ToString();  
+}
+
+<div class="border rounded p-3 mb-2 bl-amendment-line" id="line-row-@indexKey">
+    <!-- کلید اصلی برای Model Binder که مشخص می‌کند این سطر چه ایندکسی دارد -->
+    <input type="hidden" name="Lines.Index" value="@indexKey" />
+
+    <div class="row">
+
+        <input type="hidden" name="Lines[@indexKey].Id" value="@Model.Id"/>
+        <div class="col-md-4">
+            <label class="form-label">Field Type <span class="text-danger">*</span></label>
+            <select name="Lines[@indexKey].FieldTypeId" class="form-select" required>
+                <option value="">-- Select Field Type --</option>
+                @if (Model.FieldTypes != null)
+                {
+                    foreach (var item in Model.FieldTypes)
+                    {
+                        var isSelected = Model.FieldTypeId.ToString() == item.Value ? "selected" : null;
+                        <option value="@item.Value" selected="@isSelected">@item.Text</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Current Value</label>
+            <input type="text" name="Lines[@indexKey].CurrentValue"
+                      class="form-control"
+                      rows="2">@Model?.CurrentValue</input>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Requested Value <span class="text-danger">*</span></label>
+            <input type="text" name="Lines[@indexKey].RequestedValue"
+                      class="form-control"
+                      rows="2" required>@Model?.RequestedValue</input>
+        </div>
+        <div class="col-md-9">
+            <label class="form-label">Remarks</label>
+            <textarea name="Lines[@indexKey].Remarks"
+                      class="form-control"
+                      rows="1">@Model?.Remarks</textarea>
+        </div>
+
+        <div class="col-md-1 d-flex align-items-end">
+            <button type="button"
+                    class="btn btn-sm btn-outline-danger w-70"
+                    onclick="this.closest('.bl-amendment-line').remove()">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+
+    </div>
+</div>

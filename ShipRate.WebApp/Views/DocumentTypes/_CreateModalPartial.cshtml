@@ -1,0 +1,50 @@
+﻿@using ShipRate.Application.DTOs.Documents
+@model DocumentTypeInputDto
+
+<div class="modal-content text-start" dir="ltr">
+    <div class="modal-header">
+        <h5 class="modal-title fw-bold" id="actionModalLabel">Create Document Type</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <form hx-post="@Url.Action("Create")" hx-target="#modal-container" method="post" autocomplete="off">
+        @Html.AntiForgeryToken()
+        <div class="modal-body">
+
+            <div class="mb-3">
+                <label asp-for="DocumentTypeName" class="form-label fw-semibold">Document Name</label>
+                <input asp-for="DocumentTypeName" class="form-control" placeholder="" />
+                <span asp-validation-for="DocumentTypeName" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="DocumentTypeLocalName" class="form-label fw-semibold">Document Local Name</label>
+                <input asp-for="DocumentTypeLocalName" class="form-control" placeholder="" />
+                <span asp-validation-for="DocumentTypeLocalName" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="DocumentTypeCategoryId" class="form-label fw-semibold">Category</label>
+                <select asp-for="DocumentTypeCategoryId" asp-items="@ViewBag.Categories" class="form-select">
+                    <option value="">-- Select Category --</option>
+                </select>
+                <span asp-validation-for="DocumentTypeCategoryId" class="text-danger small"></span>
+            </div>
+
+            <div class="form-check form-switch mb-3">
+                <input asp-for="HasExpiryDate" class="form-check-input" type="checkbox" role="switch" id="hasExpiryCheck">
+                <label class="form-check-label fw-semibold" for="hasExpiryCheck">Has Expiry Date & Alarm</label>
+            </div>
+
+            <div class="mb-3" id="alarmDaysGroup">
+                <label asp-for="AlarmDaysBeforeExpire" class="form-label fw-semibold">Alarm Days Before Expiry</label>
+                <input asp-for="AlarmDaysBeforeExpire" type="number" class="form-control" min="0" max="365" />
+                <span asp-validation-for="AlarmDaysBeforeExpire" class="text-danger small"></span>
+            </div>
+
+        </div>
+        <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+        </div>
+    </form>
+</div>

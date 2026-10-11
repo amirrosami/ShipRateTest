@@ -1,0 +1,230 @@
+﻿@using ShipRate.Application.ViewModels
+@model CustomsInspectionCreateEditVm
+
+<div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content shadow-sm">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    @(Model.IsEdit ? "Edit Inspection" : "Add Inspection")
+                </h5>
+                <button type="button" class="btn-close" aria-label="Close" onclick="closeHtmxModal()"></button>
+            </div>
+
+            <form hx-post="@(Model.IsEdit ? Url.Action("EditInspection", "CustomsClearance") : Url.Action("CreateInspection", "CustomsClearance"))"
+                  hx-target="#modal-container"
+                  hx-swap="innerHTML">
+                
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="CustomsClearanceId" />
+                <input type="hidden" asp-for="IsEdit" />
+                <input type="hidden" asp-for="CanEdit" />
+
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 mb-3"></div>
+
+                    @if (!Model.CanEdit)
+                    {
+                        <div class="alert alert-warning py-2">
+                            This inspection cannot be modified because the customs clearance is not in Draft status.
+                        </div>
+                    }
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="InspectionTypeId" class="form-label small fw-bold">Inspection Type</label>
+                            <select asp-for="InspectionTypeId"
+                                    asp-items="Model.InspectionTypeLookup"
+                                    class="form-select form-select-sm"
+                                    disabled="@(!Model.CanEdit)">
+                                <option value="">Select Type...</option>
+                            </select>
+                            <span asp-validation-for="InspectionTypeId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="InspectionMethodId" class="form-label small fw-bold">Inspection Method</label>
+                            <select asp-for="InspectionMethodId"
+                                    asp-items="Model.InspectionMethodLookup"
+                                    class="form-select form-select-sm"
+                                    disabled="@(!Model.CanEdit)">
+                                <option value="">Select Method...</option>
+                            </select>
+                            <span asp-validation-for="InspectionMethodId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="InspectionResultId" class="form-label small fw-bold">Inspection Result</label>
+                            <select asp-for="InspectionResultId"
+                                    asp-items="Model.InspectionResultLookup"
+                                    class="form-select form-select-sm"
+                                    disabled="@(!Model.CanEdit)">
+                                <option value="">Select Result...</option>
+                            </select>
+                            <span asp-validation-for="InspectionResultId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="InspectionDate" class="form-label small fw-bold">Inspection Date</label>
+                            <input asp-for="InspectionDate"
+                                   type="date"
+                                   class="form-control form-control-sm"
+                                   disabled="@(!Model.CanEdit)" />
+                            <span asp-validation-for="InspectionDate" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="InspectorName" class="form-label small fw-bold">Inspector Name</label>
+                            <input asp-for="InspectorName"
+                                   class="form-control form-control-sm"
+                                   placeholder="Enter inspector name"
+                                   disabled="@(!Model.CanEdit)" />
+                            <span asp-validation-for="InspectorName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="Location" class="form-label small fw-bold">Location</label>
+                            <input asp-for="Location"
+                                   class="form-control form-control-sm"
+                                   placeholder="Enter inspection location"
+                                   disabled="@(!Model.CanEdit)" />
+                            <span asp-validation-for="Location" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Findings" class="form-label small fw-bold">Findings</label>
+                            <textarea asp-for="Findings"
+                                      class="form-control form-control-sm"
+                                      rows="3"
+                                      placeholder="Enter inspection findings"
+                                      disabled="@(!Model.CanEdit)"></textarea>
+                            <span asp-validation-for="Findings" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 h-100 bg-light-subtle">
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           asp-for="DiscrepancyFound"
+                                           id="discrepancyToggle"
+                                           disabled="@(!Model.CanEdit)">
+                                    <label class="form-check-label fw-bold text-danger" for="discrepancyToggle">
+                                        Discrepancy Found
+                                    </label>
+                                </div>
+
+                                <div id="discrepancyBox" style="display:@(Model.DiscrepancyFound ? "block" : "none")">
+                                    <label asp-for="DiscrepancyDescription" class="form-label small fw-bold">Discrepancy Description</label>
+                                    <textarea asp-for="DiscrepancyDescription"
+                                              class="form-control form-control-sm"
+                                              rows="4"
+                                              placeholder="Describe the discrepancy..."
+                                              disabled="@(!Model.CanEdit)"></textarea>
+                                    <span asp-validation-for="DiscrepancyDescription" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 h-100 bg-light-subtle">
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           asp-for="CorrectionsRequired"
+                                           id="correctionsToggle"
+                                           disabled="@(!Model.CanEdit)">
+                                    <label class="form-check-label fw-bold text-warning" for="correctionsToggle">
+                                        Corrections Required
+                                    </label>
+                                </div>
+
+                                <div id="correctionsBox" style="display:@(Model.CorrectionsRequired ? "block" : "none")">
+                                    <label asp-for="CorrectionsDescription" class="form-label small fw-bold">Corrections Description</label>
+                                    <textarea asp-for="CorrectionsDescription"
+                                              class="form-control form-control-sm"
+                                              rows="4"
+                                              placeholder="Describe required corrections..."
+                                              disabled="@(!Model.CanEdit)"></textarea>
+                                    <span asp-validation-for="CorrectionsDescription" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Remarks" class="form-label small fw-bold">Remarks</label>
+                            <textarea asp-for="Remarks"
+                                      class="form-control form-control-sm"
+                                      rows="3"
+                                      placeholder="Enter additional remarks"
+                                      disabled="@(!Model.CanEdit)"></textarea>
+                            <span asp-validation-for="Remarks" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-sm"
+                            onclick="closeHtmxModal()">
+                        Cancel
+                    </button>
+
+                    @if (Model.CanEdit)
+                    {
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="bi bi-check2-circle me-1"></i>
+                            Save
+                        </button>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var discrepancyToggle = document.getElementById('discrepancyToggle');
+        var discrepancyBox = document.getElementById('discrepancyBox');
+        var discrepancyDescription = document.getElementById('DiscrepancyDescription');
+
+        var correctionsToggle = document.getElementById('correctionsToggle');
+        var correctionsBox = document.getElementById('correctionsBox');
+        var correctionsDescription = document.getElementById('CorrectionsDescription');
+
+        function syncDiscrepancy() {
+            if (!discrepancyToggle || !discrepancyBox) return;
+
+            var isChecked = discrepancyToggle.checked;
+            discrepancyBox.style.display = isChecked ? 'block' : 'none';
+
+            if (!isChecked && discrepancyDescription) {
+                discrepancyDescription.value = '';
+            }
+        }
+
+        function syncCorrections() {
+            if (!correctionsToggle || !correctionsBox) return;
+
+            var isChecked = correctionsToggle.checked;
+            correctionsBox.style.display = isChecked ? 'block' : 'none';
+
+            if (!isChecked && correctionsDescription) {
+                correctionsDescription.value = '';
+            }
+        }
+
+        if (discrepancyToggle) {
+            discrepancyToggle.addEventListener('change', syncDiscrepancy);
+            syncDiscrepancy();
+        }
+
+        if (correctionsToggle) {
+            correctionsToggle.addEventListener('change', syncCorrections);
+            syncCorrections();
+        }
+    })();
+</script>

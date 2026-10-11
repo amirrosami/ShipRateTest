@@ -1,0 +1,431 @@
+﻿@using ShipRate.WebApp.ViewModels
+@model RateRequestListViewModel
+
+@{
+    ViewData["Title"] = "Rate Requests";
+}
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="mb-0"><i class="bi bi-globe me-2"></i>Rate Requests</h2>
+            <small class="text-muted">Manage All Rate Requests and Related Actions</small>
+        </div>
+        <button class="btn btn-primary"
+                hx-get="/RateRequests/Create"
+                hx-target="#modalContent"
+                hx-swap="innerHTML"
+                data-bs-toggle="modal"
+                data-bs-target="#rateRequestModal">
+            <i class="bi bi-plus-lg me-1"></i> Add New Rate Request
+        </button>
+    </div>
+
+
+
+
+
+
+
+    <div class="card mb-3 border-0 shadow-sm" style="background-color: #f8f9fa;">
+        <div class="card-body p-2">
+            <form id="rateRequestSearchForm"
+                  hx-get="/RateRequests/Index"
+                  hx-target="#tableContainer"
+                  hx-push-url="true">
+
+                <div class="row g-2 align-items-end">
+                    <!-- Row 1: اصلی‌ترین فیلدها -->
+                    <div class="col-md-2 col-lg-1">
+                        <label class="form-label small fw-bold mb-0">Customer</label>
+                        <input type="text" class="form-control form-control-sm" name="CustomerName" value="@Model.Search.CustomerName">
+                    </div>
+                    <div class="col-md-2 col-lg-1">
+                        <label class="form-label small fw-bold mb-0">Contact</label>
+                        <input type="text" class="form-control form-control-sm" name="ContactName" value="@Model.Search.ContactName">
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label small fw-bold mb-0">Mobile</label>
+                        <input type="text" class="form-control form-control-sm" name="MobileNo" value="@Model.Search.MobileNo">
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label small fw-bold mb-0">Email</label>
+                        <input type="text" class="form-control form-control-sm" name="EmailAddress" value="@Model.Search.EmailAddress">
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label small fw-bold mb-0">Origin</label>
+                        <input type="text" class="form-control form-control-sm" name="OriginName" value="@Model.Search.OriginName">
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label small fw-bold mb-0">Dest.</label>
+                        <input type="text" class="form-control form-control-sm" name="DestinationName" value="@Model.Search.DestinationName">
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label small fw-bold mb-0">Status</label>
+                        <select class="form-select form-select-sm" name="StatusId">
+                            <option value="">All</option>
+                            @foreach (var s in ViewBag.Statuses)
+                            {
+                                <option value="@s.Value" selected="@(s.Value == Model.Search.StatusId?.ToString())">@s.Text</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Row 2: آپشن‌های بله/خیر -->
+                    <div class="col-md-auto d-flex flex-wrap gap-2 pt-2">
+                        <div class="form-check form-check-inline m-0">
+                            <input class="form-check-input" type="checkbox" name="PickupRequired" value="true" id="chkPickup" @(Model.Search.PickupRequired == true ? "checked" : "")>
+                            <label class="form-label small mb-0" for="chkPickup">Pickup</label>
+                        </div>
+                        <div class="form-check form-check-inline m-0">
+                            <input class="form-check-input" type="checkbox" name="DeliveryRequired" value="true" id="chkDel" @(Model.Search.DeliveryRequired == true ? "checked" : "")>
+                            <label class="form-label small mb-0" for="chkDel">Del.</label>
+                        </div>
+                        <div class="form-check form-check-inline m-0">
+                            <input class="form-check-input" type="checkbox" name="CustomsClearanceRequired" value="true" id="chkCust" @(Model.Search.CustomsClearanceRequired == true ? "checked" : "")>
+                            <label class="form-label small mb-0" for="chkCust">Cust.</label>
+                        </div>
+                        <div class="form-check form-check-inline m-0">
+                            <input class="form-check-input" type="checkbox" name="InsuranceRequired" value="true" id="chkIns" @(Model.Search.InsuranceRequired == true ? "checked" : "")>
+                            <label class="form-label small mb-0" for="chkIns">Ins.</label>
+                        </div>
+                        <div class="form-check form-check-inline m-0">
+                            <input class="form-check-input" type="checkbox" name="WarehousingRequired" value="true" id="chkWare" @(Model.Search.WarehousingRequired == true ? "checked" : "")>
+                            <label class="form-label small mb-0" for="chkWare">Ware.</label>
+                        </div>
+                        <div class="form-check form-check-inline m-0">
+                            <input class="form-check-input" type="checkbox" name="StuffingRequired" value="true" id="chkStuff" @(Model.Search.StuffingRequired == true ? "checked" : "")>
+                            <label class="form-label small mb-0" for="chkStuff">Stuff.</label>
+                        </div>
+                    </div>
+
+                    <!-- دکمه‌ها -->
+                    <div class="col-md-auto ms-auto">
+                        <button class="btn btn-sm btn-primary px-3" type="submit">Search</button>
+                        <a href="/RateRequests/Index" class="btn btn-sm btn-outline-secondary px-3">Clear</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="tableContainer">
+        @await Html.PartialAsync("_RateRequestTable", Model)
+    </div>
+
+</div>
+
+<div id="modalContainer"></div>
+
+
+
+<div class="modal fade"
+     id="rateRequestModal"
+     tabindex="-1"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div id="modalContent"></div>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="inquiryListContainer" class="mt-4"></div>
+
+
+<div id="respondsListContainer" class="mt-4"></div>
+<div id="respondItemsListContainer" class="mt-4"></div>
+<div id="SellQuotesListContainer" class="mt-4"></div>
+<div id="sellQuoteItemsListContainer" class="mt-4"></div>
+
+<!-- Modal -->
+<div class="modal fade" id="inquiryModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content" id="inquiryContent">
+            <div class="p-5 text-center">
+                <div class="spinner-border"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="documentManagerModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="document-manager-content">
+        </div>
+    </div>
+</div>
+<div id="activityLogModalContainer"></div>
+
+
+<script>
+    document.body.addEventListener("closeAssignSalesUserModal", function () {
+        const modalElement = document.getElementById("secondModal");
+        if (!modalElement) return;
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        if (modal) {
+            modal.hide();
+        }
+    });
+
+    // پس از بسته‌شدن کامل مودال توسط Bootstrap
+        document.addEventListener("hidden.bs.modal", function (event) {
+            if (event.target.id !== "secondModal") return;
+            const modalContent = document.getElementById("modal-content2");
+            if (modalContent) {
+                modalContent.innerHTML = "";
+            }
+            document.querySelectorAll(".modal-backdrop").forEach(function (backdrop) {
+                backdrop.remove();
+            });
+            document.body.classList.remove("modal-open");
+            document.body.style.removeProperty("padding-right");
+        });
+</script>
+
+
+
+
+<script>
+
+
+
+
+
+    document.body.addEventListener('Step1Saved', function () {
+            const searchForm = document.querySelector('#rateRequestSearchForm');
+            const tableContainer = document.querySelector('#tableContainer');
+
+            if (!searchForm || !tableContainer) {
+                htmx.ajax('GET', '/RateRequests/Index', {
+                    target: '#tableContainer'
+                });
+                return;
+            }
+
+            const formData = new FormData(searchForm);
+            const params = new URLSearchParams(formData);
+
+            const currentPageInput = tableContainer.querySelector('[name="PageNumber"]');
+            if (currentPageInput?.value) {
+                params.set('PageNumber', currentPageInput.value);
+            }
+
+            htmx.ajax('GET', `/RateRequests/Index?${params.toString()}`, {
+                target: '#tableContainer',
+                swap: 'innerHTML'
+            });
+        });
+
+
+
+
+    document.body.addEventListener('rateRequestChanged', function () {
+            const searchForm = document.querySelector('#rateRequestSearchForm');
+            const tableContainer = document.querySelector('#tableContainer');
+
+            if (!searchForm || !tableContainer) {
+                htmx.ajax('GET', '/RateRequests/Index', {
+                    target: '#tableContainer'
+                });
+                return;
+            }
+
+            const formData = new FormData(searchForm);
+            const params = new URLSearchParams(formData);
+
+            const currentPageInput = tableContainer.querySelector('[name="PageNumber"]');
+            if (currentPageInput?.value) {
+                params.set('PageNumber', currentPageInput.value);
+            }
+
+            htmx.ajax('GET', `/RateRequests/Index?${params.toString()}`, {
+                target: '#tableContainer',
+                swap: 'innerHTML'
+            });
+
+            var modal = bootstrap.Modal.getInstance(document.getElementById('rateRequestModal'));
+            if(modal) modal.hide();
+
+            var modal2 = bootstrap.Modal.getInstance(document.getElementById('appModal'));
+            if(modal2) modal2.hide();
+
+        });
+
+        function openInquiryModal(rateRequestId) {
+        const modalElement = document.getElementById('inquiryModal');
+        const contentElement = document.getElementById('inquiryContent');
+
+        if (!modalElement || !contentElement) {
+            console.error('inquiryModal یا inquiryContent پیدا نشد.');
+            return;
+        }
+
+        contentElement.innerHTML = `
+            <div class="p-5 text-center">
+                <div class="spinner-border"></div>
+            </div>`;
+
+        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+        modal.show();
+
+        htmx.ajax('GET', `/RateRequests/Inquiry?id=${rateRequestId}`, {
+            target: '#inquiryContent',
+            swap: 'innerHTML'
+        });
+    }
+
+    function openInquiryEmailModal(inquiryId) {
+        const modalElement = document.getElementById('inquiryModal');
+        const contentElement = document.getElementById('inquiryContent');
+
+        if (!modalElement || !contentElement) {
+            console.error('inquiryModal یا inquiryContent پیدا نشد.');
+            return;
+        }
+
+        contentElement.innerHTML = `
+            <div class="p-5 text-center">
+                <div class="spinner-border"></div>
+            </div>`;
+
+        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+        modal.show();
+
+        htmx.ajax('GET', `/RateRequests/PreviewEmail?id=${inquiryId}`, {
+            target: '#inquiryContent',
+            swap: 'innerHTML'
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            document.body.addEventListener('htmx:afterSwap', function (e) {
+            if (e.detail.target.id === 'modalContainer') {
+                const modalEl = document.querySelector('#cargoDetailModal');
+                if (modalEl) {
+                                const modal = bootstrap.Modal.getOrCreateInstance(modalEl, {
+                                backdrop: 'static',
+                                keyboard: false
+                             });
+                    modal.show();
+                }
+            }
+        });
+            document.body.addEventListener('htmx:afterSwap', function (evt) {
+                if (evt.target.id === 'activityLogModalContainer') {
+                    const mainModalEl = document.getElementById('activityLogModal');
+                    if (mainModalEl) {
+                        const existingInstance = bootstrap.Modal.getInstance(mainModalEl);
+                        if (existingInstance) {
+                            existingInstance.dispose();
+                        }
+                        const mainModal = new bootstrap.Modal(mainModalEl);
+                        mainModal.show();
+                    }
+                }
+            });
+        document.body.addEventListener('cargoDetailsChanged', function () {
+            const modalElement = document.getElementById('cargoDetailModal');
+
+            if (modalElement) {
+                const modal = bootstrap.Modal.getInstance(modalElement);
+
+                if (modal) {
+                    modal.hide();
+                }
+            }
+
+            const modalContainer = document.getElementById('modalContainer');
+
+            if (modalContainer) {
+                modalContainer.innerHTML = '';
+            }
+        });
+
+</script>
+<script>
+    document.body.addEventListener("inquirySaved", function (event) {
+        const rateRequestId = event.detail.rateRequestId;
+        const modalElement = document.getElementById('inquiryModal');
+
+        if (modalElement) {
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+        }
+
+        document.querySelectorAll(".modal-backdrop").forEach(x => x.remove());
+        document.body.classList.remove("modal-open");
+        document.body.style.removeProperty("padding-right");
+
+        if (rateRequestId) {
+            htmx.ajax("GET", `/RateRequests/GetInquiries/${rateRequestId}`, {
+                target: "#inquiryListContainer",
+                swap: "innerHTML"
+            });
+        }
+    });
+</script>
+<script>
+    document.body.addEventListener("sellQuoteSaved", function (event) {
+        // دریافت شناسه از detail رویداد
+        const rateRequestId = event.detail ? event.detail.rateRequestId : null;
+
+        // بستن اصولی مودال بوت‌استرپ
+        const modalElement = document.getElementById('appModal');
+        if (modalElement && typeof bootstrap !== 'undefined') {
+            const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+        }
+
+        // تمیزکاری اطمینان‌بخش backdrop
+        setTimeout(() => {
+            document.querySelectorAll(".modal-backdrop").forEach(x => x.remove());
+            document.body.classList.remove("modal-open");
+            document.body.style.removeProperty("padding-right");
+        }, 150);
+
+        // بروزرسانی لیست با HTMX
+        if (rateRequestId) {
+            htmx.ajax("GET", `/RateRequests/GetSellQuotes/?rateRequestId=${rateRequestId}`, {
+                target: "#SellQuotesListContainer",
+                swap: "innerHTML"
+            });
+        }
+    });
+</script>
+
+

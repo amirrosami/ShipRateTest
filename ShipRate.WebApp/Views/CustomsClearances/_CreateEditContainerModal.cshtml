@@ -1,0 +1,180 @@
+﻿@using ShipRate.Application.ViewModels
+@model CustomsClearanceContainerCreateEditVm
+
+
+@{
+    var isEdit = Model.Id.HasValue;
+    var postUrl = isEdit
+        ? Url.Action("EditContainer", "CustomsClearance")
+        : Url.Action("CreateContainer", "CustomsClearance");
+}
+
+<div class="modal fade show d-block"
+     id="customs-clearance-container-modal"
+     tabindex="-1"
+     aria-modal="true"
+     role="dialog"
+     style="background-color: rgba(0,0,0,.5);">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title mb-1">@(isEdit ? "Edit Container" : "Add Container")</h5>
+                    <div class="text-muted small">Capture container information for this customs clearance.</div>
+                </div>
+                <button type="button"
+                        class="btn-close"
+                        aria-label="Close"
+                        onclick="closeHtmxModal()"></button>
+            </div>
+
+            <form method="post"
+                  hx-post="@postUrl"
+                  hx-target="#modal-container"
+                  hx-swap="innerHTML">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="CustomsClearanceId" />
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="ContainerId" class="form-label"></label>
+                            <select asp-for="ContainerId"
+                                    asp-items="Model.Containers"
+                                    class="form-select"
+                                    id="ContainerId">
+                                <option value="">Select container</option>
+                            </select>
+                            <span asp-validation-for="ContainerId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="ContainerNo" class="form-label"></label>
+                            <input asp-for="ContainerNo" class="form-control" id="ContainerNo" />
+                            <span asp-validation-for="ContainerNo" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="ContainerSizeTypeId" class="form-label"></label>
+                            <select asp-for="ContainerSizeTypeId"
+                                    asp-items="Model.ContainerSizeTypes"
+                                    class="form-select">
+                                <option value="">Select size / type</option>
+                            </select>
+                            <span asp-validation-for="ContainerSizeTypeId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="FullGateInContainerId" class="form-label"></label>
+                            <select asp-for="FullGateInContainerId"
+                                    asp-items="Model.FullGateInContainers"
+                                    class="form-select">
+                                <option value="">Select full gate-in ref</option>
+                            </select>
+                            <span asp-validation-for="FullGateInContainerId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="VGMContainerId" class="form-label"></label>
+                            <select asp-for="VGMContainerId"
+                                    asp-items="Model.VgmContainers"
+                                    class="form-select">
+                                <option value="">Select VGM ref</option>
+                            </select>
+                            <span asp-validation-for="VGMContainerId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="SealNo" class="form-label"></label>
+                            <input asp-for="SealNo" class="form-control" />
+                            <span asp-validation-for="SealNo" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="PackageTypeId" class="form-label"></label>
+                            <select asp-for="PackageTypeId"
+                                    asp-items="Model.PackageTypes"
+                                    class="form-select">
+                                <option value="">Select package type</option>
+                            </select>
+                            <span asp-validation-for="PackageTypeId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="GrossWeightKg" class="form-label"></label>
+                            <input asp-for="GrossWeightKg" class="form-control js-gross-weight" />
+                            <span asp-validation-for="GrossWeightKg" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="NetWeightKg" class="form-label"></label>
+                            <input asp-for="NetWeightKg" class="form-control js-net-weight" />
+                            <span asp-validation-for="NetWeightKg" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label asp-for="Remarks" class="form-label"></label>
+                            <textarea asp-for="Remarks" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Remarks" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-light"
+                            onclick="closeHtmxModal()">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i>
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var containerSelect = document.getElementById("ContainerId");
+        var containerNoInput = document.getElementById("ContainerNo");
+        var grossInput = document.querySelector(".js-gross-weight");
+        var netInput = document.querySelector(".js-net-weight");
+
+        if (containerSelect && containerNoInput) {
+            containerSelect.addEventListener("change", function () {
+                var selectedOption = containerSelect.options[containerSelect.selectedIndex];
+                if (!selectedOption || !selectedOption.text) {
+                    return;
+                }
+
+                if (!containerNoInput.value.trim()) {
+                    containerNoInput.value = selectedOption.text.trim().toUpperCase();
+                }
+            });
+        }
+
+        function validateWeights() {
+            if (!grossInput || !netInput) return;
+
+            var gross = parseFloat(grossInput.value);
+            var net = parseFloat(netInput.value);
+
+            if (!isNaN(gross) && !isNaN(net) && net > gross) {
+                netInput.setCustomValidity("Net weight cannot be greater than gross weight.");
+            } else {
+                netInput.setCustomValidity("");
+            }
+        }
+
+        if (grossInput) grossInput.addEventListener("input", validateWeights);
+        if (netInput) netInput.addEventListener("input", validateWeights);
+    })();
+</script>

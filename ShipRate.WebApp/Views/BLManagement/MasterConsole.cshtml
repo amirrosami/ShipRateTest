@@ -1,0 +1,337 @@
+﻿@using ShipRate.Application.ViewModels
+@model MasterConsoleVm
+@{
+    ViewData["Title"] = "B/L Master Console";
+}
+<div class="container-fluid py-3">
+    <!-- Page Header & Main Actions -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <div>
+            <h4 class="mb-1 text-dark fw-bold">Unified B/L Console</h4>
+            <div class="text-muted small">
+                B/L No: <span class="fw-semibold text-dark">@(string.IsNullOrWhiteSpace(Model?.Summary?.BLNo) ? "N/A" : Model.Summary.BLNo)</span>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+
+            <a href="@Url.Action("Index", "Voyage")"
+               class="btn btn-sm btn-outline-primary"
+               target="_blank"
+               rel="noopener noreferrer">
+                <i class="bi bi-compass"></i>
+                Voyages
+            </a>
+
+            <a href="@Url.Action("Index", "Settlements")"
+               class="btn btn-sm btn-outline-primary"
+               target="_blank"
+               rel="noopener noreferrer">
+                <i class="bi bi-water me-1"></i>
+                Settlements
+            </a>
+            <button type="button"
+                    class="btn btn-outline-primary btn-sm"
+                    hx-get="/Settlements/OpenBLSettlementModal?blId=@Model.BLId"
+                    hx-target="#settlementModalContainer"
+                    hx-swap="innerHTML"
+                    hx-indicator="#settlementLoadingIndicator">
+                <i class="bi bi-wallet2 me-1"></i> Settle B/L
+            </button>
+            <!-- Optional Spinner Indicator -->
+            <span id="settlementLoadingIndicator" class="htmx-indicator spinner-border spinner-border-sm text-warning align-middle ms-1" role="status"></span>
+            <!-- DO Price Preview Button -->
+            <button type="button"
+                    class="btn btn-sm btn-outline-primary "
+                    hx-get="@Url.Action("PreviewDoPrices", "BLManagement", new { blId = Model.BLId })"
+                    hx-target="#globalModalContainer"
+                    hx-swap="innerHTML">
+                <i class="bi bi-calculator me-1"></i> Preview DO Prices
+            </button>
+            <button class="btn btn-outline-primary btn-sm"
+                    hx-get="@Url.Action("Create", "TelexRelease", new { blId = Model.BLId, blNo = Model.Summary.BLNo })"
+                    hx-target="#modalBody"
+                    hx-swap="innerHTML"
+                    data-bs-toggle="modal"
+                    data-bs-target="#mainModal">
+                <i class="bi bi-plus-lg"></i>New Telex Release
+            </button>
+            <!-- Create NOA Button -->
+            <button type="button"
+                    class="btn btn-outline-primary btn-sm"
+                    hx-get="@Url.Action("NewNOA", "BLManagement", new { blId = Model.BLId })"
+                    hx-target="#noaModalBody"
+                    hx-swap="innerHTML"
+                    onclick="showNoaModal()">
+                <i class="bi bi-plus-circle me-1"></i> Issue New NOA
+            </button>
+
+            <!-- Issue Delivery Order Button -->
+            <button type="button"
+                    class="btn btn-outline-primary btn-sm"
+                    hx-get="@Url.Action("CreatePartial", "DeliveryOrders", new { blId = Model.BLId })"
+                    hx-target="#noaModalBody"
+                    hx-swap="innerHTML"
+                    onclick="showNoaModal()">
+                <i class="bi bi-plus-circle me-1"></i> Issue Delivery Order
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-primary"
+                    hx-get="/DocumentManager/Index?objectId=@Model.BLId&objectTypeId=5"
+                    hx-target="#document-manager-content"
+                    hx-swap="innerHTML"
+                    data-bs-toggle="modal"
+                    data-bs-target="#documentManagerModal">
+                <i class="bi bi-folder2-open me-1"></i>Attachments
+            </button>
+            <!-- Back to Index -->
+            <a asp-action="Index"
+               class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>
+                Back
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-lg-9">
+            @await Html.PartialAsync("_BLSummaryCard", Model.Summary)
+        </div>
+@*         <div class="col-12 col-lg-3">
+            @await Html.PartialAsync("_BLStatusSummaryCard", Model.StatusSummary)
+        </div>
+ *@
+
+        <div class="col-12 col-lg-3" 
+             hx-get="@Url.Action("GetFinalVoyageSummary", "BLManagement", new { blId = Model.BLId })"
+             hx-trigger="load"
+             hx-swap="innerHTML">
+            <div class="text-muted small py-2"><span class="spinner-border spinner-border-sm me-1"></span> Loading Final Voyage Status...</div>
+        </div>
+
+</div>
+    <!-- Invoices Container (HTMX) -->
+    <div id="bl-invoices-container" class="mt-3 mb-3">
+        <div hx-get="@Url.Action("GetBlInvoices", "BLManagement", new { blId = Model.BLId, jobId = Model.JobId })"
+             hx-trigger="load, refreshInvoicesGrid from:body"
+             hx-swap="innerHTML">
+            <div class="text-center py-2 text-muted small">
+                <span class="spinner-border spinner-border-sm"></span> Loading invoices...
+            </div>
+        </div>
+    </div>
+    <div id="bl-detentions-container" class="mt-3 mb-3">
+        <div hx-get="@Url.Action("GetDetentionsGrid", "BLManagement", new { Id = Model.BLId })"
+             hx-trigger="load ,refreshDetentionsGrid from:body"
+             hx-swap="innerHTML">
+            <div class="text-center py-2 text-muted small">
+                <span class="spinner-border spinner-border-sm"></span> Loading detentions...
+            </div>
+        </div>
+    </div>
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-lg-9">
+            <div id="bl-dos-container" class="mt-3 mb-3">
+                <div hx-get="@Url.Action("GetDOsGrid", "BLManagement", new { Id = Model.BLId })"
+                     hx-trigger="load , refreshDOGrid from:body"
+                     hx-swap="innerHTML">
+                    <div class="text-center py-2 text-muted small">
+                        <span class="spinner-border spinner-border-sm"></span> Loading Delivery Orders...
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-3">
+            <div id="bl-noas-container" class="mt-3 mb-3">
+                <div hx-get="@Url.Action("GetNOAsGrid", "BLManagement", new { Id = Model.BLId })"
+                     hx-trigger="load, refreshNOAGrid from:body"
+                     hx-swap="innerHTML">
+                    <div class="text-center py-2 text-muted small">
+                        <span class="spinner-border spinner-border-sm"></span> Loading Notice Of Arrivals...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*     <div class="row g-3 mb-3">
+        <div class="col-12 col-lg-9">
+            <div id="document-manager-content"
+                 hx-get="@Url.Action("Index", "DocumentManager", new { objectId = Model.BLId, objectTypeId = 5 })"
+                 hx-trigger="load"
+                 hx-swap="innerHTML">
+                <div class="p-4 text-center text-muted">
+                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                    <span>Loading Documents...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+ *@
+
+    <!-- ===== Principal Issue NOA Modal ===== -->
+    <div class="modal fade" id="noaModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-body p-0 pb-3" id="noaModalBody">
+                    <!-- Form layout & Price Grid populated dynamically via HTMX -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="invoiceModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content" id="invoice-modal-content"></div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="partyLookupModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content" id="party-lookup-modal-content"></div>
+        </div>
+    </div>
+
+@*     <!-- ===== Principal Issue NOA Modal ===== -->
+    <div class="modal fade" id="noaModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-body p-0 pb-3" id="noaModalBody">
+                    <!-- Form layout & Price Grid populated dynamically via HTMX -->
+                </div>
+            </div>
+        </div>
+    </div>
+ *@
+
+    <div class="modal fade" id="mainModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Telex Release</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="settlementModalContainer"></div>
+    <div id="globalModalContainer"></div>
+</div>
+<div class="modal fade" id="documentManagerModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="document-manager-content">
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="sendModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow">
+            <div class="modal-header py-2 px-3 bg-light border-bottom border-secondary-subtle">
+                <h5 class="modal-title fs-6 fw-bold font-monospace text-dark mb-0">
+                    <i class="bi bi-broadcast me-1 text-primary"></i> Dispatch Hub & History
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0" id="sendModalBody">
+                <!-- Sent SMS/Email Logs rendered here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="detention-modal-container"></div>
+<div id="freightLetterModalHost"></div>
+
+<div class="modal fade"
+     id="paymentDocumentModal"
+     tabindex="-1"
+     aria-hidden="true"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false">
+
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="paymentDocumentModalContent">
+            <!-- _CreateEditModal is loaded here -->
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    function showNoaModal() {
+        bootstrap.Modal.getOrCreateInstance('#noaModal').show();
+    }
+
+    function hideNoaModal() {
+        bootstrap.Modal.getOrCreateInstance('#noaModal').hide();
+    }
+
+    function showSendModal() {
+        bootstrap.Modal.getOrCreateInstance('#sendModal').show();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Trigger local auto-refresh on grid when the Issue Modal is closed
+        document.getElementById('noaModal')
+            ?.addEventListener('hidden.bs.modal', () => {
+                htmx.trigger('#noa-grid', 'refresh');
+            });
+
+        // Register custom event for external triggering
+        document.getElementById('noa-grid')
+            ?.addEventListener('refresh-htmx', () => {
+                htmx.trigger('#noa-grid', 'refresh');
+            });
+    });
+
+
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (evt.detail.target.id === 'settlementModalContainer') {
+            const modalEl = document.getElementById('blSettlementModal');
+            if (modalEl) {
+                const modalInstance = new bootstrap.Modal(modalEl, {
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                modalInstance.show();
+
+                // Auto-clean container when modal is dismissed
+                modalEl.addEventListener('hidden.bs.modal', function () {
+                    document.getElementById('settlementModalContainer').innerHTML = '';
+                });
+            }
+        }
+    });
+
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // گوش دادن به رویداد بسته شدن مودال بوت‌استرپ برای بازنشانی وضعیت بدنه‌ی صفحه
+        const invoiceModal = document.getElementById('invoice-modal'); // شناسه اصلی تگ مودال شما
+        if (invoiceModal) {
+            invoiceModal.addEventListener('hidden.bs.modal', function () {
+                // حذف دستی کلاس‌های قفل‌کننده از body در صورت وجود باگ
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+
+                // حذف لایه‌های تیره اضافه که در صفحه جا مانده‌اند
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                backdrops.forEach(backdrop => backdrop.remove());
+            });
+        }
+    });
+
+
+
+
+
+
+
+
+
+
+</script>
+<script src="~/js/invoices.js"></script>

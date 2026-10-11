@@ -1,0 +1,114 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model InvoiceItemEditVm
+
+<div class="card mb-3 shadow-sm">
+    <div class="card-header py-1 ps-2 pe-1 fw-semibold">
+        @(Model.Id.HasValue ? "Edit Item" : "New Item")
+        <div class="float-end">
+            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1"
+                    title="Close/Clear"
+                    onclick="document.getElementById('invoice-item-form-container').innerHTML = '';">
+                <i class="bi bi-x-circle"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body p-2">
+        <form hx-post="@Url.Action("SaveItem", "Invoices")"
+              hx-target="#invoice-item-form-container"
+              hx-swap="innerHTML">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="InvoiceId" />
+            <input type="hidden" asp-for="SequenceNumber" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- ردیف ۱: Charge Type (تمام‌عرض) -->
+            <div class="excel-grid excel-grid-3 mb-1">
+                <div class="excel-field span-2">
+                    <label asp-for="ChargeTypeId">Charge Type</label>
+                    <select asp-for="ChargeTypeId"
+                            class="form-select item-charge-filter"
+                            data-finance-direction-id="@ViewContext.ViewData["FinanceDirectionId"]"
+                            data-selected-charge-id="@Model.ChargeId">
+                        <option value="">Select...</option>
+                        @foreach (var item in Model.ChargeTypes)
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                    <span asp-validation-for="ChargeTypeId" class="text-danger"></span>
+                </div>
+                <div class="excel-field">
+                    <label asp-for="ChargeTypeSupplementRemarks">Supp. Remarks</label>
+                    <input asp-for="ChargeTypeSupplementRemarks" class="form-control" />
+                </div>
+            </div>
+
+            <!-- ردیف ۳: QTY | Unit Price | Discount -->
+            <div class="excel-grid excel-grid-3 mb-1">
+                <div class="excel-field">
+                    <label asp-for="QTY">QTY</label>
+                    <input asp-for="QTY" class="form-control item-calc" />
+                </div>
+                <div class="excel-field">
+                    <label asp-for="UnitPrice">Unit Price</label>
+                    <input asp-for="UnitPrice" class="form-control item-calc" />
+                </div>
+                <div class="excel-field">
+                    <label asp-for="Discount">Discount</label>
+                    <input asp-for="Discount" class="form-control item-calc" />
+                </div>
+            </div>
+
+            <!-- ردیف ۴: Tax Percent | Description (دو-ستونه) -->
+            <div class="excel-grid excel-grid-3 mb-1">
+                <div class="excel-field">
+                    <label asp-for="TaxPercent">VAT Percent</label>
+                    <input asp-for="TaxPercent" class="form-control item-calc" />
+                </div>
+                <div class="excel-field span-2">
+                    <label asp-for="Description">Description</label>
+                    <input asp-for="Description" class="form-control" />
+                </div>
+            </div>
+
+            <!-- ردیف ۵: چهار عدد محاسباتی (پیش‌نمایش) -->
+            <div class="excel-grid excel-grid-4 mb-2">
+                <div class="excel-cell">
+                    <label class="text-label">Amount Before Discount</label>
+                    <input id="amountBeforeDiscountPreview" class="form-control text-end" value="@Model.AmountBeforeDiscount.ToString("N2")" readonly />
+                </div>
+                <div class="excel-cell">
+                    <label class="text-label">Amount After Discount</label>
+                    <input id="amountAfterDiscountPreview" class="form-control text-end" value="@Model.AmountAfterDiscount.ToString("N2")" readonly />
+                </div>
+                <div class="excel-cell">
+                    <label class="text-label">Tax Amount</label>
+                    <input id="taxAmountPreview" class="form-control text-end" value="@Model.TaxAmount.ToString("N2")" readonly />
+                </div>
+                <div class="excel-cell">
+                    <label class="text-label">Total Amount</label>
+                    <input id="totalAmountPreview" class="form-control text-end fw-bold" value="@Model.TotalAmount.ToString("N2")" readonly />
+                </div>
+            </div>
+
+            <!-- دکمه‌ها -->
+            <div class="d-flex justify-content-end gap-2 mt-1">
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                        title="Clear"
+                        hx-get="@Url.Action("ItemForm", "Invoices", new { invoiceId = Model.InvoiceId })"
+                        hx-target="#invoice-item-form-container"
+                        hx-swap="innerHTML">
+                    <i class="bi bi-x-circle"></i> Clear
+                </button>
+                <button type="submit" class="btn btn-sm btn-primary">
+                    <i class="bi bi-save"></i> Save Item
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

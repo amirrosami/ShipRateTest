@@ -1,0 +1,60 @@
+﻿@using ShipRate.Application.DTOs.Finance
+@model PettyCashRechargeUpsertDto
+
+@{
+    var lookups = (PettyCashLookupDto)ViewBag.Lookups;
+}
+
+<form hx-post="@Url.Action("SaveRecharge", "PettyCash")"
+      hx-target="#pettyModalBody"
+      hx-swap="innerHTML"
+      dir="ltr">
+    @Html.AntiForgeryToken()
+
+    <div class="modal-header">
+        <h5 class="modal-title">@(Model.Id == null ? "Add Recharge" : "Edit Recharge")</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+
+    <div class="modal-body">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="CompanyId" />
+        <input type="hidden" asp-for="PettyCashId" />
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="row g-2">
+            <div class="col-md-4">
+                <label asp-for="RechargeDate" class="form-label">Recharge Date</label>
+                <input asp-for="RechargeDate" type="date" class="form-control" />
+                <span asp-validation-for="RechargeDate" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="RechargeAmount" class="form-label">Amount</label>
+                <input asp-for="RechargeAmount" class="form-control money-input" />
+                <span asp-validation-for="RechargeAmount" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="StatusId" class="form-label">Status</label>
+                <select asp-for="StatusId" asp-items="lookups.RechargeStatuses" class="form-select"></select>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="Description" class="form-label">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="alert alert-warning mt-3 mb-0">
+            Current balance will be increased only when status is Charged.
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="submit">Save</button>
+        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+    </div>
+</form>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="2025-01-01T00:00:00" ReportInfo.Modified="2025-01-01T00:00:00" ReportInfo.CreatorVersion="2024.1.0">
+  <Dictionary>
+    <BusinessObjectDataSource Name="BL" ReferenceName="BL" Enabled="true">
+      <Column Name="BLNo" DataType="System.String"/>
+      <Column Name="DocumentCaption" DataType="System.String"/>
+      <Column Name="IssuerName" DataType="System.String"/>
+      <Column Name="CarrierName" DataType="System.String"/>
+      <Column Name="ShipperName" DataType="System.String"/>
+      <Column Name="ShipperAddress" DataType="System.String"/>
+      <Column Name="ConsigneeName" DataType="System.String"/>
+      <Column Name="ConsigneeAddress" DataType="System.String"/>
+      <Column Name="NotifyPartyName" DataType="System.String"/>
+      <Column Name="NotifyPartyAddress" DataType="System.String"/>
+      <Column Name="AirportOfDeparture" DataType="System.String"/>
+      <Column Name="AirportOfDestination" DataType="System.String"/>
+      <Column Name="HandlingInformation" DataType="System.String"/>
+      <Column Name="DeclaredValueCarriage" DataType="System.String"/>
+      <Column Name="DeclaredValueCustoms" DataType="System.String"/>
+      <Column Name="CargoDescription" DataType="System.String"/>
+      <Column Name="GrossWeight" DataType="System.String"/>
+      <Column Name="ChargeableWeight" DataType="System.String"/>
+      <Column Name="Pieces" DataType="System.String"/>
+      <Column Name="IssuePlace" DataType="System.String"/>
+      <Column Name="IssueDate" DataType="System.String"/>
+      <Column Name="SignatureName" DataType="System.String"/>
+    </BusinessObjectDataSource>
+    <BusinessObjectDataSource Name="Flights" ReferenceName="Flights" Enabled="true">
+      <Column Name="FlightNo" DataType="System.String"/>
+      <Column Name="DepartureAirport" DataType="System.String"/>
+      <Column Name="ArrivalAirport" DataType="System.String"/>
+      <Column Name="DepartureDate" DataType="System.String"/>
+      <Column Name="ETA" DataType="System.String"/>
+    </BusinessObjectDataSource>
+    <ReportTitleBand Name="ReportTitle1" Top="0" Width="718.2" Height="56">
+        <TextObject Name="AirTitle" Left="0" Top="0" Width="718" Height="12" Text="[BL.DocumentCaption]" HorzAlign="Center" Font="Arial, 14, Bold"/>
+        <TextObject Name="AirNo" Left="0" Top="16" Width="718" Height="8" Text="AWB No: [BL.BLNo]" HorzAlign="Center" Font="Arial, 9"/>
+        <TextObject Name="AirIssuer" Left="0" Top="28" Width="718" Height="8" Text="Issuer: [BL.IssuerName] | Carrier: [BL.CarrierName]" HorzAlign="Center" Font="Arial, 9"/>
+        <LineObject Name="AirLine1" Left="0" Top="42" Width="718" Height="0.5"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="60" Width="718.2" Height="18">
+        <TextObject Name="AirHdr1" Left="0" Top="0" Width="80" Height="8" Text="Parties" HorzAlign="Left" Font="Arial, 10, Bold"/>
+        <TextObject Name="AirHdr2" Left="220" Top="0" Width="80" Height="8" Text="Routing" HorzAlign="Left" Font="Arial, 10, Bold"/>
+        <TextObject Name="AirHdr3" Left="430" Top="0" Width="120" Height="8" Text="Values / Handling" HorzAlign="Left" Font="Arial, 10, Bold"/>
+    </PageHeaderBand>
+    <DataBand Name="DataBandBL" Top="82" Width="718.2" Height="60" DataSource="BL">
+        <TextObject Name="AirShipper" Left="0" Top="0" Width="210" Height="20" Text="Shipper: [BL.ShipperName]
+[BL.ShipperAddress]" HorzAlign="Left" Font="Arial, 9"/>
+        <TextObject Name="AirConsignee" Left="0" Top="24" Width="210" Height="20" Text="Consignee: [BL.ConsigneeName]
+[BL.ConsigneeAddress]" HorzAlign="Left" Font="Arial, 9"/>
+        <TextObject Name="AirNotify" Left="220" Top="0" Width="210" Height="20" Text="Notify: [BL.NotifyPartyName]
+[BL.NotifyPartyAddress]" HorzAlign="Left" Font="Arial, 9"/>
+        <TextObject Name="AirRoute" Left="220" Top="24" Width="210" Height="20" Text="Departure: [BL.AirportOfDeparture]
+Destination: [BL.AirportOfDestination]" HorzAlign="Left" Font="Arial, 9"/>
+        <TextObject Name="AirValues" Left="430" Top="0" Width="288" Height="44" Text="Declared Carriage: [BL.DeclaredValueCarriage]
+Declared Customs: [BL.DeclaredValueCustoms]
+Handling: [BL.HandlingInformation]" HorzAlign="Left" Font="Arial, 9"/>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="148" Width="718.2" Height="24">
+        <TextObject Name="AirFlightSummary" Left="0" Top="0" Width="718" Height="8" Text="Flight Summary: [Flights.FlightNo] | [Flights.DepartureAirport] -> [Flights.ArrivalAirport] | [Flights.DepartureDate]" HorzAlign="Left" Font="Arial, 9"/>
+    </ReportSummaryBand>
+    <DataBand Name="DataBandFlights" Top="180" Width="718.2" Height="40" DataSource="Flights">
+        <TextObject Name="AirFlightRow" Left="0" Top="0" Width="160" Height="8" Text="Flight: [Flights.FlightNo]" HorzAlign="Left" Font="Arial, 9, Bold"/>
+        <TextObject Name="AirFlightRoute" Left="0" Top="12" Width="260" Height="8" Text="[Flights.DepartureAirport] -> [Flights.ArrivalAirport]" HorzAlign="Left" Font="Arial, 9"/>
+        <TextObject Name="AirFlightETA" Left="0" Top="24" Width="260" Height="8" Text="Depart: [Flights.DepartureDate]  ETA: [Flights.ETA]" HorzAlign="Left" Font="Arial, 9"/>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary2" Top="230" Width="718.2" Height="28">
+        <TextObject Name="AirCargo" Left="0" Top="0" Width="718" Height="16" Text="Pieces: [BL.Pieces]  Gross Weight: [BL.GrossWeight]  Chargeable Weight: [BL.ChargeableWeight]
+Cargo: [BL.CargoDescription]" HorzAlign="Left" Font="Arial, 9"/>
+        <TextObject Name="AirSignature" Left="0" Top="18" Width="260" Height="8" Text="Authorized Signature: [BL.SignatureName]" HorzAlign="Left" Font="Arial, 9"/>
+    </ReportSummaryBand>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="210" PaperHeight="297" LeftMargin="10" RightMargin="10" TopMargin="10" BottomMargin="10">
+  </ReportPage>
+</Report>

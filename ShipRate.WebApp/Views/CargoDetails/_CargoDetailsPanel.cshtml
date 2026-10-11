@@ -1,0 +1,72 @@
+﻿@model List<CargoDetailListItemVm>
+@using ShipRate.Application.ViewModels
+
+@{
+    var filter = ViewBag.Filter as CargoDetailFilterVm ?? new CargoDetailFilterVm();
+}
+
+
+<style>
+    #cargoDetailModal {
+        z-index: 1060;
+    }
+
+        #cargoDetailModal + .modal-backdrop {
+            z-index: 1055;
+        }
+</style>
+
+
+
+<div id="cargoDetailsPanel" class="card" dir="ltr">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">Cargo Details</h6>
+
+        @if (filter.RateRequestId != null)
+        {
+            <button type="button"
+            class="btn btn-sm btn-primary"
+            hx-get="@Url.Action("Recommend", "CargoDetails", filter)"
+            hx-target="#modalContainer"
+            hx-swap="innerHTML">
+                <i class="bi bi-calculator"></i>
+                Recommend
+            </button>
+        }
+        @if (filter.BookingId != null)
+        {
+            <button type="button"
+                    class="btn btn-sm btn-primary"
+                    hx-get="@Url.Action("PushDataFromJobToBooking", "CargoDetails", filter)"
+                    hx-confirm="Are you sure you want to pull data from Job File?">
+                <i class="bi bi-calculator"></i>
+                Copy From Job File
+            </button>
+        }
+        @if (filter.BLId != null && Model.Count==0)
+        {
+            <button type="button"
+                    class="btn btn-sm btn-primary"
+                    hx-get="@Url.Action("PushDataFromJobToBL", "CargoDetails", filter)"
+                    hx-confirm="Are you sure you want to pull data from Job File?">
+                <i class="bi bi-calculator"></i>
+                Copy From Job File
+            </button>
+        }
+        <button type="button"
+                class="btn btn-sm btn-primary"
+                hx-get="@Url.Action("Create", "CargoDetails", filter)"
+                hx-target="#modalContainer"
+                hx-swap="innerHTML">
+            <i class="bi bi-plus-lg"></i>
+            Add New Cargo
+        </button>
+    </div>
+
+    <div class="card-body">
+        @await Html.PartialAsync("~/Views/CargoDetails/_CargoDetailsList.cshtml", Model, new ViewDataDictionary(ViewData)
+        {
+        ["Filter"] = filter
+                })
+    </div>
+</div>

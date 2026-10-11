@@ -1,0 +1,84 @@
+﻿@{
+    ViewData["Title"] = "Export Docs Receipts";
+}
+
+<div class="container-fluid" dir="ltr">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Export Docs Receipts</h4>
+
+        <button type="button"
+                class="btn btn-primary"
+                hx-get="@Url.Action("Create", "ExportDocsReceipt")"
+                hx-target="#receiptModalBody"
+                hx-swap="innerHTML"
+                data-bs-toggle="modal"
+                data-bs-target="#receiptModal">
+            New Receipt
+        </button>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <form id="receiptFilterForm"
+                  hx-get="@Url.Action("List", "ExportDocsReceipt")"
+                  hx-target="#receiptListContainer"
+                  hx-swap="innerHTML">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Receipt No</label>
+                        <input type="text" name="ReceiptNo" class="form-control" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">From Date</label>
+                        <input type="date" name="FromDate" class="form-control" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">To Date</label>
+                        <input type="date" name="ToDate" class="form-control" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Page Size</label>
+                        <select name="PageSize" class="form-select">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-secondary w-100">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="receiptListContainer"
+         hx-get="@Url.Action("List", "ExportDocsReceipt")"
+         hx-trigger="load, receiptlistchanged from:body"
+         hx-include="#receiptFilterForm"
+         hx-swap="innerHTML">
+    </div>
+</div>
+
+<div class="modal fade" id="receiptModal" tabindex="-1" aria-hidden="true" dir="ltr">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Export Docs Receipt</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body" id="receiptModalBody"></div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="documentManagerModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="document-manager-content">
+        </div>
+    </div>
+</div>

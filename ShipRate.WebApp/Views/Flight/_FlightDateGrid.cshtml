@@ -1,0 +1,75 @@
+﻿@using ShipRate.WebApp.ViewModels.FlightVms
+@model List<FlightDateListItem>
+
+<div class="table-responsive">
+    <table class="table table-hover table-striped align-middle">
+        <thead class="table-light">
+            <tr>
+                <th style="width: 15%">ETD</th>
+                <th style="width: 15%">ETA</th>
+                <th style="width: 15%">Actual Departure</th>
+                <th style="width: 15%">Actual Arrival</th>
+                <th style="width: 10%" class="text-center">Delay (hrs)</th>
+                <th style="width: 20%">Description</th>
+                <th style="width: 10%" class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Any())
+            {
+                @foreach (var fd in Model)
+                {
+                    <tr>
+                        <td>@(fd.ETD?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                        <td>@(fd.ETA?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                        <td>@(fd.ActualDeparture?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                        <td>@(fd.ActualArrival?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                        <td class="text-center">
+                            @if (fd.DelayHours > 0)
+                            {
+                                <span class="badge bg-warning text-dark">@fd.DelayHours.ToString("0.00")</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td>
+                            <small>@fd.Description</small>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button class="btn btn-outline-warning"
+                                        hx-get="@Url.Action("EditFlightDate", new { id = fd.Id })"
+                                        hx-target="#modal-container"
+                                        onclick="showModal()"
+                                        title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-outline-danger"
+                                        onclick="deleteFlightDate('@fd.Id')"
+                                        title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                        <i class="bi bi-calendar-x fs-1 d-block mb-2"></i>
+                        No flight dates found
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="card-footer text-end">
+        <button class="btn btn-sm btn-secondary" onclick="document.getElementById('flight-dates-section').innerHTML = ''">
+            <i class="bi bi-x-circle"></i> Close
+        </button>
+    </div>
+</div>

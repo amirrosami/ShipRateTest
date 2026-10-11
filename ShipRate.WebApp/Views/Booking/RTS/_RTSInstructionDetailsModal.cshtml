@@ -1,0 +1,90 @@
+﻿@using ShipRate.Application.JobsViewModels
+@model RTSInstructionDetailsVm
+
+<div class="modal-header">
+    <h5 class="modal-title">RTS Instruction Details</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label fw-bold">RTS No</label>
+            <div>@Model.RTSInstructionNo</div>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-bold">RTS Date</label>
+            <div>@Model.RTSInstructionDate?.ToString("yyyy/MM/dd")</div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label fw-bold">Shipper</label>
+            <div>@Model.ShipperName</div>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-bold">Carrier</label>
+            <div>@Model.CarrierName</div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label fw-bold">Depot</label>
+            <div>@Model.DepotName</div>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-bold">Status</label>
+            <div>@Model.StatusName</div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label fw-bold">Valid From</label>
+            <div>@Model.ValidDateFrom?.ToString("yyyy/MM/dd")</div>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-bold">Valid To</label>
+            <div>@Model.ValidDateTo?.ToString("yyyy/MM/dd")</div>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label fw-bold">Remarks</label>
+            <div>@Model.Remarks</div>
+        </div>
+    </div>
+
+    <hr />
+
+    <h6>Containers</h6>
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered">
+            <thead>
+                <tr>
+                    <th>Size Type</th>
+                    <th>Counts</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Containers != null && Model.Containers.Any())
+                {
+                    foreach (var item in Model.Containers)
+                    {
+                        <tr>
+                            <td>@item.ContainerSizeTypeName</td>
+                            <td>@item.ContainerCounts</td>
+                            <td>@item.Remarks</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">No container items found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>

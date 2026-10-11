@@ -1,0 +1,436 @@
+﻿@model ShipRate.Application.ViewModels.ShipmentLegFormVm
+
+<div class="modal-body text-start shipment-leg-form" dir="ltr">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="ShipmentId" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+    <style>
+        .shipment-leg-form {
+            font-size: .85rem;
+        }
+
+            .shipment-leg-form .section-box {
+                border: 1px solid #dee2e6;
+                border-radius: .4rem;
+                padding: .6rem;
+                margin-bottom: .5rem;
+                background: #fff;
+            }
+
+            .shipment-leg-form .section-title {
+                font-size: .72rem;
+                font-weight: 700;
+                color: #6c757d;
+                text-transform: uppercase;
+                margin-bottom: .4rem;
+                letter-spacing: .04em;
+            }
+
+            .shipment-leg-form .form-control,
+            .shipment-leg-form .form-select {
+                font-size: .82rem;
+                padding-top: .25rem;
+                padding-bottom: .25rem;
+            }
+
+            .shipment-leg-form .text-danger {
+                font-size: .72rem;
+            }
+
+        .transport-block {
+            display: none;
+        }
+
+            .transport-block.active {
+                display: block;
+            }
+    </style>
+
+    <!-- Basic + Route -->
+    <div class="section-box">
+        <div class="section-title">Basic / Route</div>
+
+        <div class="row g-2">
+            <div class="col-md-2">
+                <input asp-for="SequenceNo"
+                       class="form-control form-control-sm"
+                       placeholder="Seq" />
+                <span asp-validation-for="SequenceNo" class="text-danger"></span>
+            </div>
+
+
+            <div class="mb-3 col-md-4">
+                <label>From Location</label>
+                <input type="hidden" asp-for="FromLocationId" id="FromLocationId" />
+                <input type="text"
+                       id="FromLocationSearchText"
+                       name="FromLocation"
+                       value="@Model.FromLocationName"
+                       class="form-control"
+                       placeholder="Search Location..."
+                       autocomplete="off"
+                       hx-get="@Url.Action("SearchLocations", "Locations")"
+                       hx-trigger="keyup changed delay:400ms"
+                       hx-target="#originSearchResults"
+                       hx-swap="innerHTML"
+                       hx-vals='js:{
+                            term: document.getElementById("FromLocationSearchText").value,
+                            targetHiddenInputId: "FromLocationId",
+                            targetTextInputId: "FromLocationSearchText"
+                       }' />
+
+                <div id="originSearchResults"
+                     class="position-relative">
+                </div>
+                <span asp-validation-for="FromLocationId" class="text-danger small"></span>
+            </div>
+            <div class="mb-3 col-md-4">
+                <label>To Location</label>
+                <input type="hidden" asp-for="ToLocationId" id="ToLocationId" />
+                <input type="text"
+                       id="ToLocationSearchText"
+                       name="ToLocation"
+                       value="@Model.ToLocationName"
+                       class="form-control"
+                       placeholder="Search Destination..."
+                       autocomplete="off"
+                       hx-get="@Url.Action("SearchLocations", "Locations")"
+                       hx-trigger="keyup changed delay:400ms"
+                       hx-target="#destinationSearchResults"
+                       hx-swap="innerHTML"
+                       hx-vals='js:{
+                            term: document.getElementById("ToLocationSearchText").value,
+                            targetHiddenInputId: "ToLocationId",
+                            targetTextInputId: "ToLocationSearchText"
+                       }' />
+
+                <div id="destinationSearchResults"
+                     class="position-relative">
+                </div>
+                <span asp-validation-for="ToLocationId" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-3">
+                <select asp-for="LegTypeId"
+                        asp-items="Model.LegTypes"
+                        class="form-select form-select-sm">
+                    <option value="">Leg Type</option>
+                </select>
+                <span asp-validation-for="LegTypeId" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <select asp-for="TransportTypeId"
+                        asp-items="Model.TransportTypes"
+                        class="form-select form-select-sm"
+                        id="transportTypeSelect">
+                    <option value="">Transport Type</option>
+                </select>
+                <span asp-validation-for="TransportTypeId" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <select asp-for="CarrierId"
+                        asp-items="Model.Carriers"
+                        class="form-select form-select-sm">
+                    <option value="">Carrier</option>
+                </select>
+                <span asp-validation-for="CarrierId" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule -->
+    <div class="section-box">
+        <div class="section-title">Schedule</div>
+
+        <div class="row g-2">
+            <div class="col-md-3">
+                <label>Planned Departure Date</label>
+                <input asp-for="PlannedDepartureDate"
+                       type="date"
+                       class="form-control form-control-sm"
+                       title="Planned Departure" />
+                <span asp-validation-for="PlannedDepartureDate" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label>Planned Arrival Date</label>
+                <input asp-for="PlannedArrivalDate"
+                       type="date"
+                       class="form-control form-control-sm"
+                       title="Planned Arrival" />
+                <span asp-validation-for="PlannedArrivalDate" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label>Actual Departure Date</label>
+                <input asp-for="ActualDepartureDate"
+                       type="datetime-local"
+                       class="form-control form-control-sm"
+                       title="Actual Departure" />
+                <span asp-validation-for="ActualDepartureDate" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label>Actual Arrival Date</label>
+                <input asp-for="ActualArrivalDate"
+                       type="datetime-local"
+                       class="form-control form-control-sm"
+                       title="Actual Arrival" />
+                <span asp-validation-for="ActualArrivalDate" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transport Specific -->
+    <div class="section-box">
+        <div class="section-title">Transport Details</div>
+        <!-- Air -->
+        <div class="transport-block air-block">
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <select asp-for="FlightId"
+                            asp-items="Model.Flights"
+                            class="form-select form-select-sm air-input">
+                        <option value="">Flight</option>
+                    </select>
+                    <span asp-validation-for="FlightId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <select asp-for="FlightDateId"
+                            asp-items="Model.FlightDates"
+                            class="form-select form-select-sm air-input">
+                        <option value="">Flight Date</option>
+                    </select>
+                    <span asp-validation-for="FlightDateId" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sea -->
+        <div class="transport-block sea-block">
+            <input type="hidden"
+                   asp-for="VoyageId"
+                   class="voyage-id-input" />
+
+            <div class="input-group input-group-sm">
+                <input type="text"
+                       asp-for="SelectedVoyageText"
+                       class="form-control voyage-search-input"
+                       placeholder="Search voyage..."
+                       autocomplete="off"
+                       readonly />
+                <button type="button"
+                        class="btn btn-outline-secondary btn-select-voyage"
+                        title="Search and select voyage">
+                    <i class="bi bi-search"></i>
+                </button>
+                <button type="button"
+                        class="btn btn-outline-danger btn-clear-voyage"
+                        title="Clear selected voyage">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+
+
+        <!-- Road -->
+        <div class="transport-block road-block">
+            <input type="hidden"
+                   asp-for="TripId"
+                   class="trip-id-input" />
+
+            <div class="input-group input-group-sm">
+                <input type="text"
+                       asp-for="SelectedTripText"
+                       class="form-control trip-search-input"
+                       placeholder="Search Trip..."
+                       autocomplete="off"
+                       readonly />
+                <button type="button"
+                        class="btn btn-outline-secondary btn-select-trip"
+                        title="Search and select trip">
+                    <i class="bi bi-search"></i>
+                </button>
+                <button type="button"
+                        class="btn btn-outline-danger btn-clear-trip"
+                        title="Clear selected trip">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Empty state -->
+        <div class="transport-empty text-muted small">
+            Select Transport Type to show related fields.
+        </div>
+    </div>
+
+    <!-- Cargo -->
+    <div class="section-box">
+        <div class="section-title">Cargo Totals</div>
+
+        <div class="row g-2">
+            <div class="col-md-3">
+                <input asp-for="GrossWeightKg"
+                       class="form-control form-control-sm"
+                       placeholder="Gross Kg" />
+                <span asp-validation-for="GrossWeightKg" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <input asp-for="NetWeightKg"
+                       class="form-control form-control-sm"
+                       placeholder="Net Kg" />
+                <span asp-validation-for="NetWeightKg" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <input asp-for="ChargeableWeightKg"
+                       class="form-control form-control-sm"
+                       placeholder="Chargeable Kg" />
+                <span asp-validation-for="ChargeableWeightKg" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <input asp-for="VolumeCBM"
+                       class="form-control form-control-sm"
+                       placeholder="CBM" />
+                <span asp-validation-for="VolumeCBM" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <input asp-for="TotalPackages"
+                       class="form-control form-control-sm"
+                       placeholder="Packages" />
+                <span asp-validation-for="TotalPackages" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <select asp-for="PackageTypeId"
+                        asp-items="Model.PackageTypes"
+                        class="form-select form-select-sm">
+                    <option value="">Package Type</option>
+                </select>
+                <span asp-validation-for="PackageTypeId" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <input asp-for="ReceiptPlaceText"
+                       class="form-control form-control-sm"
+                       placeholder="Receipt Place" />
+                <span asp-validation-for="ReceiptPlaceText" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <input asp-for="DeliveryPlaceText"
+                       class="form-control form-control-sm"
+                       placeholder="Delivery Place" />
+                <span asp-validation-for="DeliveryPlaceText" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remarks -->
+    <div class="section-box">
+        <div class="row g-2 align-items-start">
+            <div class="col-md-10">
+                <textarea asp-for="Remarks"
+                          rows="2"
+                          class="form-control form-control-sm"
+                          placeholder="Remarks"></textarea>
+                <span asp-validation-for="Remarks" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade"
+     id="voyageLookupModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Select Sea Voyage</h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <input id="voyageLookupSearch"
+                       name="search"
+                       type="search"
+                       class="form-control"
+                       placeholder="Search by vessel name or voyage number..."
+                       autocomplete="off"
+                       hx-get="@Url.Action("SearchVoyages", "TransportDocuments")"
+                       hx-trigger="keyup changed delay:350ms, search"
+                       hx-target="#voyageLookupResults"
+                       hx-include="this" />
+
+                <div id="voyageLookupResults" class="mt-3">
+                    <div class="text-muted small">
+                        Type at least 2 characters to search.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade"
+     id="tripLookupModal"
+     tabindex="-1"
+     aria-labelledby="tripLookupModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="tripLookupModalLabel">
+                    Select Road Trip
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <input id="tripLookupSearch"
+                       name="search"
+                       type="search"
+                       class="form-control"
+                       placeholder="Search by truck no, trailer no, driver name, CMR or TIR..."
+                       autocomplete="off"
+                       hx-get="@Url.Action("SearchTrips", "TransportDocuments")"
+                       hx-trigger="keyup changed delay:350ms, search"
+                       hx-target="#tripLookupResults"
+                       hx-include="this" />
+
+                <div id="tripLookupResults" class="mt-3">
+                    <div class="text-muted small">
+                        Type at least 2 characters to search.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

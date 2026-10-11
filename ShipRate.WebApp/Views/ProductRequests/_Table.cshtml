@@ -1,0 +1,142 @@
+﻿@using ShipRate.WebApp.ViewModels.InventoryViewModels
+@model List<ProductRequestListVM>
+
+<table class="table table-sm table-hover table-bordered mb-1">
+    <thead class="table-light">
+        <tr>
+            <th>No.</th>
+            <th>Date</th>
+            <th>Requested By</th>
+            <th>Remarks</th>
+            <th class="text-center">Items</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Approved By</th>
+            <th class="text-center">Delivered By</th>
+            <th class="text-center">Delivered At</th>
+            <th class="text-center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.RequestNo</td>
+                <td>@r.RequestDate</td>
+                <td>@r.RequestedBy</td>
+                <td>@r.Remarks</td>
+                <td class="text-center">@r.ItemCount</td>
+                <td class="text-center">
+                    @{
+                        var badge = r.StatusId switch
+                        {
+                            1 => "secondary",
+                            2 => "warning",
+                            3 => "success",
+                            9 => "danger",
+                            _ => "info"
+                        };
+                    }
+                    <span class="badge bg-@badge">@r.Status</span>
+                </td>
+                <td>@r.ApprovedBy</td>
+                <td>@r.DeliveredBy</td>
+                <td>@r.DeliveredAt</td>
+                <td class="text-center" style="white-space:nowrap;">
+                    <button class="btn btn-sm btn-outline-info py-0 px-1"
+                            hx-get="/inventory/product-requests/@r.Id/detail"
+                            hx-target="#modalContent"
+                            hx-on::after-request="showModal()"
+                            title="View">
+                        <i class="bi bi-eye"></i>
+                    </button>
+
+                    @if (r.StatusId == -1)
+                    {
+                        <button class="btn btn-sm btn-outline-primary py-0 px-1"
+                                hx-get="/inventory/product-requests/@r.Id/edit"
+                                hx-target="#modalContent"
+                                hx-on::after-request="showModal()"
+                                title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+
+
+                        <button class="btn btn-sm btn-outline-warning py-0 px-1"
+                                hx-post="/inventory/product-requests/@r.Id/sendrequest"
+                                hx-confirm="send this request?"
+                                hx-target="#toast"
+                                title="Send Request">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+
+
+
+
+                        <button class="btn btn-sm btn-outline-danger py-0 px-1"
+                                hx-delete="/inventory/product-requests/@r.Id"
+                                hx-confirm="Delete this request?"
+                                title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    }
+
+                    @if (r.StatusId==1)
+                    {
+                        <button class="btn btn-sm btn-outline-warning py-0 px-1"
+                                hx-post="/inventory/product-requests/@r.Id/approve"
+                                hx-confirm="Approve this request?"
+                                hx-target="#toast"
+                                title="Approve">
+                            <i class="bi bi-check2-all"></i>
+                        </button>
+
+                        <button class="btn btn-sm btn-outline-warning py-0 px-1"
+                                hx-post="/inventory/product-requests/@r.Id/reject"
+                                hx-confirm="Reject this request?"
+                                hx-target="#toast"
+                                title="Reject">
+                            <i class="bi bi-x-circle-fill text-danger"></i>
+                        </button>
+                    }
+
+                    @if (r.StatusId == 2)
+                    {
+@*                         <button class="btn btn-sm btn-outline-success py-0 px-1"
+                                hx-post="/inventory/product-requests/@r.Id/deliver"
+                                hx-confirm="Mark as delivered?"
+                                hx-target="#toast"
+                                title="Deliver">
+                            <i class="bi bi-box-arrow-left"></i>
+                        </button>
+ *@
+                        <button type="button"
+                                class="btn btn-sm btn-outline-success py-0 px-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#appModal"
+                                hx-get="@Url.Action("Deliver","ProductStockTransactions"   , new { id = r.Id })"
+                                hx-target="#modal-content"
+                                hx-swap="innerHTML">
+                            <i class="bi bi-box-arrow-left"></i>
+                        </button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (ViewBag.TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination pagination-sm justify-content-center mb-0">
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.Page ? "active" : "")">
+                    <a class="page-link"
+                       hx-get="/inventory/product-requests?page=@i&search=@ViewBag.Search&statusId=@ViewBag.StatusId"
+                       hx-target="#tableWrapper">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

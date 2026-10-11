@@ -1,0 +1,72 @@
+﻿@using ShipRate.Application.DTOs
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@using ShipRate.WebAppCustomers
+@inject IStringLocalizer<SharedResource> Localizer
+@model List<SellQuoteItemListDto>
+
+@{
+    var isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var direction = isRtl ? "rtl" : "ltr";
+    var textAlign = isRtl ? "text-end" : "text-start";
+}
+
+@Html.AntiForgeryToken()
+
+<div class="card" dir="@direction">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0 @textAlign">
+            <i class="bi bi-list-ul me-1"></i> @Localizer["SellQuotationDetails"]
+        </h5>
+    </div>
+
+    <div class="card-body @textAlign">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>@Localizer["ChargeCode"]</th>
+                            <th>@Localizer["ChargeName"]</th>
+                            <th>@Localizer["SizeType"]</th>
+                            <th>@Localizer["Quantity"]</th>
+                            <th>@Localizer["UnitRate"]</th>
+                            <th>@Localizer["TotalAmount"]</th>
+                            <th>@Localizer["Currency"]</th>
+                            <th>@Localizer["Remarks"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var q in Model)
+                        {
+                            <tr>
+                                <td>@q.ChargeTypeCode</td>
+                                <td>@q.ChargeTypeName</td>
+                                <td>@q.SizeTypeShortName</td>
+                                <td>@q.Quantity</td>
+                                <td>@q.UnitRate</td>
+                                <td>@q.TotalAmount</td>
+                                <td>@q.CurrencyCode (@q.CurrencyName)</td>
+                                <td>@q.Remarks</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info mb-0">
+                <i class="bi bi-info-circle me-1"></i> @Localizer["NoQuotationDetailsFound"]
+            </div>
+        }
+    </div>
+
+    <div class="card-footer @textAlign">
+        <button class="btn btn-sm btn-secondary"
+                onclick="document.getElementById('SellQuoteItemsListContainer').innerHTML = ''">
+            <i class="bi bi-x-circle me-1"></i> @Localizer["Close"]
+        </button>
+    </div>
+</div>

@@ -1,0 +1,63 @@
+﻿@using ShipRate.Application.DTOs
+@model BLSerialBatchAssignEditDto
+@{
+    var agents = (IEnumerable<SelectListItem>)ViewBag.Agents;
+}
+
+<div class="modal fade show" style="display:block;" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="EditBatchAssign"
+                  method="post"
+                  hx-post="@Url.Action("EditBatchAssign")"
+                  hx-target="body"
+                  hx-swap="none">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">@((Model.Id.HasValue ? "Edit Batch Assignment" : "New Batch Assignment"))</h5>
+                    <button type="button" class="btn-close" onclick="this.closest('.modal').remove();"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="BLSerialSeriesId" />
+                    <div class="mb-3">
+                        <label asp-for="AgentId" class="form-label"></label>
+                        <select asp-for="AgentId" class="form-select" asp-items="agents"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="FromNumber" class="form-label"></label>
+                        <input asp-for="FromNumber" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="ToNumber" class="form-label"></label>
+                        <input asp-for="ToNumber" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="AssignDate" class="form-label"></label>
+                        <input asp-for="AssignDate" class="form-control" type="date" />
+                    </div>
+                    <div class="form-check mb-3">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label"></label>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Remarks" class="form-label"></label>
+                        <textarea asp-for="Remarks" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit"
+                            class="btn btn-primary"
+                            hx-on::after-request="
+                                htmx.ajax('GET', '@Url.Action("BatchAssignGrid")?seriesId=@Model.BLSerialSeriesId', '#batchAssignGridContainer');
+                                htmx.ajax('GET', '@Url.Action("SerialGrid")?seriesId=@Model.BLSerialSeriesId', '#serialGridContainer');
+                                this.closest('.modal').remove();
+                            ">
+                        Save
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove();">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

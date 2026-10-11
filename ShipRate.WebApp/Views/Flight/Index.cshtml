@@ -1,0 +1,167 @@
+﻿@model PagedResult<FlightListItem>
+@using ShipRate.Application.DTOs
+@using ShipRate.WebApp.ViewModels
+@using ShipRate.WebApp.ViewModels.FlightVms
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0"><i class="bi bi-box-seam me-2"></i>Locations</h2>
+        <small class="text-muted"></small>
+    </div>
+    <button type="button"
+            class="btn btn-primary"
+            hx-get="@Url.Action("Create", "Flight")"
+            hx-target="#app-modal-content"
+            hx-swap="innerHTML">
+        <i class="bi bi-plus-lg me-1"></i>New
+    </button>
+</div>
+
+@await Html.PartialAsync(
+"_GridFilters",
+    new GridFilterViewModel
+    {
+        Page = Model.Page,
+        PageSize = Model.PageSize,
+        SearchTerm = Model.SearchTerm,
+        SortColumn = Model.SortColumn,
+        SortDirection = Model.SortDirection,
+        ListUrl = Url.Action("List", "Flight"),
+        CustomFilterPartial = "",
+        CustomFilterValues = Model.CustomFilterValues,
+    }
+)
+
+
+
+
+<div id="table-container"
+     hx-post="@Url.Action("List", "Flight")"
+     hx-trigger="load, GridChanged from:body"
+     hx-swap="innerHTML"
+     hx-include="#grid-filters, #table-sort-info">
+</div>
+
+<div class="card shadow-sm" id="flight-dates-section" style="display:none;">
+    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center py-2">
+        <h6 class="mb-0 fw-semibold">
+            <i class="bi bi-calendar-event me-2"></i>Flight Dates
+        </h6>
+        <button class="btn btn-light btn-sm" id="btn-new-flight-date" style="display:none;">
+            <i class="bi bi-plus-lg me-1"></i>New Flight Date
+        </button>
+    </div>
+
+    <div class="card-body">
+        <div id="flight-date-grid-container">
+            <p class="text-muted text-center py-4 mb-0">Select a flight to view dates</p>
+        </div>
+    </div>
+</div>
+
+<div id="modal-container"></div>
+
+@section Scripts {
+    <script src="~/js/flight.js"></script>
+}
+
+@* @using ShipRate.WebApp.ViewModels.FlightVms
+@model FlightIndexViewModel
+
+@{
+    ViewData["Title"] = "Flight Management";
+}
+
+<div class="container-fluid py-3">
+    <div class="mb-3">
+        <h4 class="fw-semibold text-primary mb-0">
+            <i class="bi bi-airplane-fill me-2"></i>Flight Management
+        </h4>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-2">
+            <h6 class="mb-0 fw-semibold">
+                <i class="bi bi-list-ul me-2"></i>Flights
+            </h6>
+            <button class="btn btn-light btn-sm"
+                    hx-get="@Url.Action("CreateFlight")"
+                    hx-target="#modal-container"
+                    hx-swap="innerHTML"
+                    onclick="showModal()">
+                <i class="bi bi-plus-lg me-1"></i>New Flight
+            </button>
+        </div>
+
+        <div class="card-body">
+            <form class="row g-3 mb-3"
+                  hx-get="@Url.Action("LoadFlightGrid")"
+                  hx-target="#flight-grid-container"
+                  hx-trigger="submit">
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Flight Number</label>
+                    <input type="text"
+                           name="searchFlightNumber"
+                           class="form-control"
+                           value="@Model.SearchFlightNumber"
+                           placeholder="Search by flight number..." />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Airline</label>
+                    <select name="searchAirLineId" class="form-select" asp-items="Model.AirLines">
+                        <option value="">-- All Airlines --</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search me-1"></i>Search
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            hx-get="@Url.Action("LoadFlightGrid")"
+                            hx-target="#flight-grid-container">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Reset
+                    </button>
+                </div>
+            </form>
+
+            <div id="flight-grid-container"
+                 hx-get="@Url.Action("LoadFlightGrid")"
+                 hx-trigger="load, flightChanged from:body"
+                 hx-swap="innerHTML">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm" id="flight-dates-section" style="display:none;">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center py-2">
+            <h6 class="mb-0 fw-semibold">
+                <i class="bi bi-calendar-event me-2"></i>Flight Dates
+            </h6>
+            <button class="btn btn-light btn-sm" id="btn-new-flight-date" style="display:none;">
+                <i class="bi bi-plus-lg me-1"></i>New Flight Date
+            </button>
+        </div>
+
+        <div class="card-body">
+            <div id="flight-date-grid-container">
+                <p class="text-muted text-center py-4 mb-0">Select a flight to view dates</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal-container"></div>
+
+@section Scripts {
+    <script src="~/js/flight.js"></script>
+} *@

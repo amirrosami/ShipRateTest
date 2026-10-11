@@ -1,0 +1,93 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.Documents
+@model PagedResultDto<SystemObjectTypeDto>
+@{
+    ViewData["Title"] = "System Object Document Mappings";
+}
+
+<div class="container-fluid py-4 text-start" dir="ltr">
+
+    <!-- CARD 1: Master List (System Objects) -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white py-1 px-3 d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 text-dark fw-semibold">System Objects (Master)</h6>
+            <div style="width: 220px;">
+                <input type="text" id="searchTerm" name="searchTerm"
+                       value="@ViewData["SearchTerm"]"
+                       class="form-control form-control-sm"
+                       placeholder="Search objects..."
+                       hx-get="@Url.Action("Index")"
+                       hx-target="#master-list-container"
+                       hx-trigger="keyup changed delay:400ms">
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div id="master-list-container">
+                @await Html.PartialAsync("_SystemObjectsListPartial", Model)
+            </div>
+        </div>
+    </div>
+
+    <!-- CARD 2: Detail List (Mapped Document Types) -->
+    <div class="card shadow-sm border-top border-primary border-3">
+        <div class="card-header bg-white py-2 d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 text-dark fw-bold">
+                Mapped Document Types for: <span id="selected-object-title" class="text-primary">None Selected</span>
+            </h6>
+            <div id="action-btn-container">
+                <!-- دکمه افزودن فقط بعد از انتخاب شیء از گرید بالا ظاهر خواهد شد -->
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div id="detail-list-container" class="text-center py-5 text-muted">
+                <i class="bi bi-arrow-up-circle fs-3 d-block mb-2"></i>
+                Please select a System Object from the master list above to view or manage document mapping.
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal Container -->
+<div class="modal fade" id="actionModal" tabindex="-1" aria-hidden="true" dir="ltr">
+    <div class="modal-dialog modal-dialog-centered" id="modal-container">
+        <!-- Load Dynamic Form -->
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.body.addEventListener('htmx:afterOnLoad', function (evt) {
+            // بستن خودکار مودال در زمان دریافت کانتنت خالی موفقیت‌آمیز
+            if (evt.detail.xhr.status === 200 && evt.detail.xhr.responseText === "") {
+                const modalEl = document.getElementById('actionModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+            }
+        });
+    </script>
+}
+
+
+<style>
+    .grid-scroll-wrapper {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .grid-scroll-table {
+        width: max-content;
+        min-width: 100%;
+        white-space: nowrap;
+    }
+
+        .grid-scroll-table th,
+        .grid-scroll-table td {
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+</style>
+

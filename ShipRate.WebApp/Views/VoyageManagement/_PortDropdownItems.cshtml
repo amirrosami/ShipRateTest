@@ -1,0 +1,29 @@
+﻿@model IEnumerable<ShipRate.Application.DTOs.NLookupDto>
+
+<ul class="list-group list-group-flush mb-0 small">
+    <li class="list-group-item list-group-item-action text-muted py-1 border-bottom"
+        style="cursor: pointer;"
+        onclick="selectPort('', 'All Ports')">
+        <em>-- All Ports --</em>
+    </li>
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var item in Model)
+        {
+            <li class="list-group-item list-group-item-action py-1"
+                style="cursor: pointer;"
+                onclick="selectPort('@item.Value', '@item.Text')">
+                <i class="bi bi-geo-alt me-1 text-primary"></i> @item.Text
+            </li>
+        }
+    }
+    else
+    {
+        <li class="list-group-item disabled text-muted py-1">No port found.</li>
+    }
+</ul>
+
+<script>
+    // فعال کردن نمایش منو
+    document.getElementById('port-dropdown-results').classList.add('show');
+</script>

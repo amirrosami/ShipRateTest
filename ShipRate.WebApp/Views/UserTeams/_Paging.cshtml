@@ -1,0 +1,27 @@
+﻿@model dynamic
+
+@if (Model.TotalCount > 10)
+{
+    <nav>
+
+        <ul class="pagination pagination-sm">
+
+            @for (int i = 1; i <= Math.Ceiling((double)Model.TotalCount / 10); i++)
+            {
+                <li class="page-item">
+
+                    <a class="page-link"
+                       hx-get="/UserTeams/TeamsGrid?page=@i"
+                       hx-target="#teamsGrid">
+
+                        @i
+
+                    </a>
+
+                </li>
+            }
+
+        </ul>
+
+    </nav>
+}

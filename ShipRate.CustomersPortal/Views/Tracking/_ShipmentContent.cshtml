@@ -1,0 +1,167 @@
+@using ShipRate.Application.JobsViewModels
+@model JobDetailTrackingVM
+
+<div class="container p-1">
+    <div class="card mb-2" id="route">
+        <div class="card-header">Route Info</div>
+        <div class="route4">
+            <div class="node"><div class="line"></div><div class="dot"></div><div class="tag">POR</div><div class="place">@Model.JobDetails.OriginName</div><div class="date">Received Aug 09</div></div>
+            <div class="node"><div class="line"></div><div class="dot"></div><div class="tag">POL</div><div class="place">@Model.JobDetails.DestinationName</div><div class="date">On board Aug 12</div></div>
+            @* <div class="node pending"><div class="line"></div><div class="dot"></div><div class="tag">POD</div><div class="place">@Model.PortOfDischarge</div><div class="date">ETA Sep 04</div></div>
+            <div class="node pending"><div class="line"></div><div class="dot"></div><div class="tag">PODel</div><div class="place">@Model.FinalDestination</div><div class="date">Est. Sep 06</div></div> *@
+        </div>
+    </div>
+
+    <div class="card mb-2" id="overview">
+        <div class="card-header mb-1">Overview</div>
+            @await Html.PartialAsync("_Overview", Model.JobDetails)
+    </div>
+
+    <div class="card mb-2" id="containers" style="max-height: 350px;overflow-y: auto">
+        <div class="card-header mb-1">BL Info</div>
+        @await Html.PartialAsync("_BillOfLading", Model.BlInfos)
+    </div>
+    <div class="card mb-2" style="max-height: 350px;overflow-y: auto" id="bls">
+        <div class="card-header mb-1">Container</div>
+        @await Html.PartialAsync("_Containers", Model.Containers)
+    </div>
+    @* <div class="card" id="invoices">
+        @await Html.PartialAsync("_Invoices", Model)
+    </div>
+    <div class="card" id="milestones">
+        @await Html.PartialAsync("_Milestones", Model)
+    </div> *@
+</div>
+
+
+@* 
+<div class="layout">
+    <div class="main-column">
+        <div class="card card-pad">
+            <!-- Shipment Header & Route -->
+            <div class="ship-head">
+                <div>
+                    <h2>Job @Model.JobNumber</h2>
+                    <div class="meta">File no. <b>@Model.FileNumber</b> &nbsp;·&nbsp; Job date <b>@Model.JobDate</b> &nbsp;·&nbsp; @Model.TradeType &nbsp;·&nbsp; @Model.TransportMode @Model.LoadType</div>
+                </div>
+                <div class="badges">
+                    <span class="badge @(Model.Status == "Completed" ? "status-done" : Model.Status == "On hold" ? "status-hold" : "status-progress")">
+                        <i class="ti ti-truck-delivery"></i>@Model.Status
+                    </span>
+                    <span class="badge muted">BL @Model.BlStatus.ToLowerInvariant()</span>
+                </div>
+            </div>
+
+            <div class="route4">
+                <div class="node"><div class="line"></div><div class="dot"></div><div class="tag">POR</div><div class="place">@Model.Origin</div><div class="date">Received Aug 09</div></div>
+                <div class="node"><div class="line"></div><div class="dot"></div><div class="tag">POL</div><div class="place">@Model.PortOfLoading</div><div class="date">On board Aug 12</div></div>
+                <div class="node pending"><div class="line"></div><div class="dot"></div><div class="tag">POD</div><div class="place">@Model.PortOfDischarge</div><div class="date">ETA Sep 04</div></div>
+                <div class="node pending"><div class="line"></div><div class="dot"></div><div class="tag">PODel</div><div class="place">@Model.FinalDestination</div><div class="date">Est. Sep 06</div></div>
+            </div>
+
+            <div class="voyage-wrap">
+                <div class="voyage-tag"><i class="ti ti-ship voyage-icon"></i>@Model.Voyage · Carrier @Model.Carrier</div>
+            </div>
+
+            <!-- ================= 1. Overview (همیشه در بالا) ================= -->
+            <div class="overview-block">
+                @await Html.PartialAsync("_Overview", Model)
+            </div>
+
+            <!-- ================= 2. لیست‌های کشویی (Accordion) ================= -->
+            <div class="accordion" id="shipment-accordion">
+
+                <!-- List 1 : Containers -->
+                <details class="acc-item" open>
+                    <summary>
+                        <span class="acc-title"><i class="ti ti-box"></i> List 1: Containers (@Model.Containers.Count)</span>
+                        <span class="acc-toggle" aria-hidden="true"></span>
+                    </summary>
+                    <div class="acc-body">
+                        @await Html.PartialAsync("_Containers", Model)
+                    </div>
+                </details>
+
+                <!-- List 2 : Parties -->
+                <details class="acc-item">
+                    <summary>
+                        <span class="acc-title"><i class="ti ti-users"></i> List 2: Parties (@Model.Parties.Count)</span>
+                        <span class="acc-toggle" aria-hidden="true"></span>
+                    </summary>
+                    <div class="acc-body">
+                        @await Html.PartialAsync("_Parties", Model)
+                    </div>
+                </details>
+
+                <!-- List 3 : BLs (Bill of Lading) -->
+                <details class="acc-item">
+                    <summary>
+                        <span class="acc-title"><i class="ti ti-file-text"></i> List 3: Bill of Lading (BLs)</span>
+                        <span class="acc-toggle" aria-hidden="true"></span>
+                    </summary>
+                    <div class="acc-body">
+                        @await Html.PartialAsync("_BillOfLading", Model)
+                    </div>
+                </details>
+
+                <!-- List 4 : Milestones -->
+                <details class="acc-item">
+                    <summary>
+                        <span class="acc-title"><i class="ti ti-route"></i> List 4: Milestones (@Model.Milestones.Count)</span>
+                        <span class="acc-toggle" aria-hidden="true"></span>
+                    </summary>
+                    <div class="acc-body">
+                        @await Html.PartialAsync("_Milestones", Model)
+                    </div>
+                </details>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Side Column : لیست انتخاب Shipment -->
+    <div class="side-column">
+        <div class="card card-pad" style="max-height: 420px; overflow-y: auto">
+            <div class="section-title">
+                <i class="ti ti-list-details"></i>My shipments
+                <span class="n">@(ViewBag.Shipments is IReadOnlyList<Shipment> list ? $"{list.Count} jobs" : "")</span>
+            </div>
+            @if (ViewBag.Shipments is IReadOnlyList<Shipment> shipments)
+            {
+                @foreach (var item in shipments)
+                {
+                    var selected = item.JobNumber == Model.JobNumber;
+                    var statusClass = item.Status == "Completed" ? "green" : item.Status == "On hold" ? "amber" : "blue";
+                    var badgeClass = item.Status == "Completed" ? "status-done" : item.Status == "On hold" ? "status-hold" : "status-progress";
+
+                    <button class="list-item @(selected ? "selected" : "")"
+                            hx-get="@Url.Action("Select", "Shipment")?id=@item.JobNumber"
+                            hx-target="#shipment-content"
+                            hx-swap="innerHTML">
+                        <span>
+                            <span class="num">
+                                <span class="dot-status @statusClass"></span>
+                                Job @item.JobNumber
+                            </span>
+                            <span class="route">@item.PortOfLoading &rarr; @item.PortOfDischarge</span>
+                        </span>
+                        <span class="badge @badgeClass">@item.Status</span>
+                    </button>
+                }
+            }
+        </div>
+
+        <div class="card card-pad">
+            <div class="section-title"><i class="ti ti-clipboard-list"></i>Job status</div>
+            <div class="status-row"><span>Job status</span><b>@Model.Status</b></div>
+            <div class="status-row"><span>BL status</span><b>@Model.BlStatus</b></div>
+            <div class="status-row last"><span>Movement type</span><b>@Model.MovementType</b></div>
+        </div>
+
+        <div class="card card-pad help-card">
+            <div class="section-title"><i class="ti ti-headset"></i>Need help?</div>
+            <p>Message your forwarder directly for updates on customs or delivery.</p>
+            <button class="btn-ghost"><i class="ti ti-message-circle"></i>Contact Support</button>
+        </div> 
+    </div>
+</div> *@

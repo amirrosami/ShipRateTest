@@ -1,0 +1,135 @@
+﻿@using ShipRate.WebApp.ViewModels.FinanceVms
+@model CostCenterFormVM
+
+@{
+    var isEdit = Model.Id != null && Model.Id != Guid.Empty;
+    var companies = ViewBag.Companies as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>;
+}
+
+<form hx-post="/CostCenter/Save"
+      hx-target="#modalBody"
+      hx-swap="innerHTML"
+      novalidate>
+
+    @if (isEdit)
+    {
+        <input type="hidden" name="Id" value="@Model.Id" />
+    }
+
+    <!-- amamamamam Validation Summary amamamamam -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger py-2 mb-3">
+            <ul class="mb-0 small">
+                @foreach (var state in ViewData.ModelState.Values)
+                {
+                    @foreach (var error in state.Errors)
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                }
+            </ul>
+        </div>
+    }
+
+    <!-- amamamamam Code amamamamam -->
+    <div class="mb-3">
+        <label class="form-label fw-semibold">
+            Code <span class="text-danger">*</span>
+        </label>
+        <input type="text"
+               name="Code"
+               value="@Model.Code"
+               class="form-control @(ViewData.ModelState.ContainsKey("Code") && ViewData.ModelState["Code"]!.Errors.Any() ? "is-invalid" : "")"
+               maxlength="20"
+               required
+               placeholder="" />
+        @if (ViewData.ModelState.ContainsKey("Code") && ViewData.ModelState["Code"]!.Errors.Any())
+        {
+            <div class="invalid-feedback">
+                @ViewData.ModelState["Code"]!.Errors.First().ErrorMessage
+            </div>
+        }
+    </div>
+
+    <!-- amamamamam Title amamamamam -->
+    <div class="mb-3">
+        <label class="form-label fw-semibold">
+            Title <span class="text-danger">*</span>
+        </label>
+        <input type="text"
+               name="Title"
+               value="@Model.Title"
+               class="form-control @(ViewData.ModelState.ContainsKey("Title") && ViewData.ModelState["Title"]!.Errors.Any() ? "is-invalid" : "")"
+               maxlength="50"
+               required
+               placeholder="" />
+        @if (ViewData.ModelState.ContainsKey("Title") && ViewData.ModelState["Title"]!.Errors.Any())
+        {
+            <div class="invalid-feedback">
+                @ViewData.ModelState["Title"]!.Errors.First().ErrorMessage
+            </div>
+        }
+    </div>
+
+    <!-- amamamamam Company amamamamam -->
+    <div class="mb-3">
+        <label class="form-label fw-semibold">
+            Company <span class="text-danger">*</span>
+        </label>
+        <select name="CompanyId"
+                class="form-select @(ViewData.ModelState.ContainsKey("CompanyId") && ViewData.ModelState["CompanyId"]!.Errors.Any() ? "is-invalid" : "")"
+                required>
+            <option value="">-- Select Company --</option>
+            @if (companies != null)
+            {
+                @foreach (var item in companies)
+                {
+                    if (item.Value == Model.CompanyId.ToString())
+                    {
+                        @:
+                        <option value="@item.Value" selected="selected">@item.Text</option>
+                    }
+                    else
+                    {
+                        @:
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                }
+            }
+        </select>
+        @if (ViewData.ModelState.ContainsKey("CompanyId") && ViewData.ModelState["CompanyId"]!.Errors.Any())
+        {
+            <div class="invalid-feedback">
+                @ViewData.ModelState["CompanyId"]!.Errors.First().ErrorMessage
+            </div>
+        }
+    </div>
+
+    <!-- amamamamam IsActive Toggle amamamamam -->
+    <div class="mb-4">
+        <div class="form-check form-switch">
+            <input type="checkbox"
+                   class="form-check-input"
+                   id="isActiveSwitch"
+                   name="IsActive"
+                   value="true"
+                   @(Model.IsActive ? "checked" : "") />
+            <label class="form-check-label fw-semibold" for="isActiveSwitch">
+                Active
+            </label>
+        </div>
+    </div>
+
+    <hr />
+
+    <!-- amamamamam Buttons amamamamam -->
+    <div class="d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-lg me-1"></i> Cancel
+        </button>
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-check-lg me-1"></i> @(isEdit ? "Update" : "Save")
+        </button>
+    </div>
+</form>

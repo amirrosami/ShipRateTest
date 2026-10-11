@@ -1,0 +1,232 @@
+﻿@using ShipRate.Application.JobsViewModels
+@model JobIndexVm
+
+@{
+    ViewData["Title"] = "Jobs";
+}
+
+<style>
+    input:focus,
+    select:focus,
+    textarea:focus {
+        background-color: #fff9c4 !important; /* زرد ملایم */
+    }
+</style>
+
+
+<div class="container-fluid" dir="ltr">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="mb-0">Jobs Management</h2>
+        </div>
+
+        <button type="button"
+                class="btn btn-primary"
+                hx-get="@Url.Action("Create", "Jobs")"
+                hx-target="#modal-content"
+                hx-swap="innerHTML">
+           + New Job
+        </button>
+    </div>
+
+<div hx-get="/Jobs/Stats"
+     hx-trigger="load"
+     hx-target="#stats-container"
+     hx-swap="innerHTML"></div>
+<div id="stats-container"></div>
+
+
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <partial name="_JobSearchBar" model="Model" />
+        </div>
+    </div>
+
+    <div id="jobs-table-container"
+         hx-get="@Url.Action("List", "Jobs", new {
+             JobNumber = Model.Search.JobNumber,
+             CompanyId = Model.Search.CompanyId,
+             CustomerId = Model.Search.CustomerId,
+             TransportTypeId = Model.Search.TransportTypeId,
+             JobStatusId = Model.Search.JobStatusId,
+             Page = Model.Search.Page,
+             PageSize = Model.Search.PageSize
+         })"
+         hx-trigger="load, jobCreated from:body, jobDeleted from:body"
+         hx-swap="innerHTML">
+
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary"></div>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade"
+     id="appModal"
+     tabindex="-1"
+     aria-labelledby="appModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modal-title">@ViewBag.DialogTitle</h4>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body" id="modal-content">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+@if (TempData["ToastFail"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            createToast('@TempData["ToastFail"]', "danger");
+        });
+    </script>
+}
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+
+
+        document.body.addEventListener("jobCreated", function () {
+            var modalEl = document.getElementById('appModal');
+            var modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) {
+                modal.hide();
+            }
+
+            document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+            document.body.classList.remove('modal-open');
+
+        });
+
+
+
+
+
+        document.getElementById("appModal")
+            .addEventListener("hidden.bs.modal", function () {
+                document.getElementById("modal-content").innerHTML = "";
+
+                cleanupModal();
+            });
+
+        document.body.addEventListener("htmx:afterSwap", function (evt) {
+            if (evt.target.id === "modal-content") {
+                const forms = evt.target.getElementsByTagName("form");
+
+                for (let i = 0; i < forms.length; i++) {
+                    $(forms[i]).removeData("validator");
+                    $(forms[i]).removeData("unobtrusiveValidation");
+                    $.validator.unobtrusive.parse(forms[i]);
+                }
+            }
+        });
+
+    function cleanupModal() {
+        setTimeout(function () {
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('overflow');
+            document.body.style.removeProperty('padding-right');
+
+            document.querySelectorAll('.modal-backdrop').forEach(function (el) {
+                el.remove();
+            });
+        }, 150);
+    }
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
+            function initDynamicSelect2(options) {
+                var $select = $(options.selectId);
+                var $targetInput = options.targetTextId ? $(options.targetTextId) : null;
+
+                $select.select2({
+                    theme: 'bootstrap-5',
+                    placeholder: options.placeholder || 'Select...',
+                    allowClear: true,
+                    minimumInputLength: options.minInput || 1,
+                    width: '100%',
+                    ajax: {
+                        url: options.url,
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            return { q: params.term };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data.results || $.map(data, function (item) {
+                                    return { id: item.id, text: item.text };
+                                })
+                            };
+                        }
+                    }
+                });
+
+                // اگر فیلد متنی هدف داشت، مقداردهی خودکار انجام شود
+                if ($targetInput && $targetInput.length) {
+                    $select.on('select2:select', function (e) {
+                        var fullText = (e.params.data.text || '').trim();
+
+                        // اگر تابع تبدیل متن (مثل حذف ۸ کاراکتر) پاس داده شده بود، اجرا شود؛ در غیر این صورت کل متن
+                        var finalText = options.textTransform ? options.textTransform(fullText) : fullText;
+
+                        if (!$targetInput.val().trim()) {
+                            $targetInput.val(finalText).trigger('change');
+                        }
+                    });
+                }
+            }
+
+            // -------------------------------------------------------------
+            // ۱. استفاده برای پورت‌ها (با حذف ۸ کاراکتر اول)
+            // -------------------------------------------------------------
+            var stripPortCode = function(t) { return t.length > 8 ? t.substring(8).trim() : t; };
+
+            initDynamicSelect2({
+                selectId: '#OriginSelect2',
+                placeholder: 'Search Origin...',
+                url: '/Locations/GetPortsJson',
+                textTransform: stripPortCode
+            });
+            initDynamicSelect2({
+                selectId: '#DestinationSelect2',
+                placeholder: 'Search Destination...',
+                url: '/Locations/GetPortsJson',
+                textTransform: stripPortCode
+            });
+
+            initDynamicSelect2({
+                selectId: '#CustomerSelect2',
+                placeholder: 'Search Customer...',
+                url: '/Persons/GetPersonsJson'
+            });
+        });
+    </script>
+
+
+
+}
+
+
+
+

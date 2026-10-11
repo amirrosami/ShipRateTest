@@ -1,0 +1,118 @@
+﻿@using ShipRate.Application.DTOs
+@using ShipRate.Application.DTOs.Base_Info
+@using ShipRate.Domain.Entities.BaseInfo.Cargos
+@model PagedResultDto<PortDistanceDto>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Row</th>
+                    <th>From Location</th>
+                    <th>To Location</th>
+                    <th>Transport Type</th>
+                    <th>Distance(KM)</th>
+                    <th>Distance(NM)</th>
+                    <th>Transit(Days)</th>
+                    <th>Transit(Hours)</th>
+                    <th>Source</th>
+                    <th class="text-center" style="width:160px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Items.Any())
+                {
+                    <tr>
+                        <td colspan="10" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                            No Records found.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    int counter = (Model.PageNumber - 1) * Model.PageSize;
+                    @foreach (var item in Model.Items)
+                    {
+                        counter++;
+                        <tr>
+                            <td>@counter</td>
+                            <td class="fw-medium">@item.FromPortName</td>
+                            <td class="fw-medium">@item.ToPortName</td>
+                            <td class="fw-medium">@item.TransPortTypeName</td>
+                            <td class="fw-medium">@item.DistanceKM</td>
+                            <td class="fw-medium">@item.DistanceNM</td>
+                            <td class="fw-medium">@item.AvgDays</td>
+                            <td class="fw-medium">@item.AvgHours</td>
+                            <td class="fw-medium">@item.Source</td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button"
+                                            class="btn btn-outline-primary"
+                                            title="Edit"
+                                            hx-get="@Url.Action("Edit", "PortDistance", new { id = item.Id })"
+                                            hx-target="#modal-content"
+                                            hx-swap="innerHTML"
+                                            onclick="showModal()">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button type="button"
+                                            class="btn btn-outline-danger"
+                                            title="Delete"
+                                            hx-get="@Url.Action("Delete", "PortDistances", new { id = item.Id })"
+                                            hx-target="#modal-content"
+                                            hx-swap="innerHTML"
+                                            onclick="showModal()">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @* ── Pagination Footer ── *@
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+                Showing @((Model.PageNumber - 1) * Model.PageSize + 1)–@Math.Min(Model.PageNumber * Model.PageSize, Model.TotalCount) of @Model.TotalCount
+            </small>
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                        <a class="page-link"
+                           hx-get="@Url.Action("List", "PortDistance")"
+                           hx-target="#table-container"
+                           hx-swap="innerHTML"
+                           hx-vals='{"pagenumber":"@(Model.PageNumber - 1)","pageSize":"@Model.PageSize","searchterm":"@Model.SearchTerm","sortColumn":"@Model.SortColumn","sortDirection":"@Model.SortDirection"}'
+                           href="#">&laquo;</a>
+                    </li>
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                            <a class="page-link"
+                               hx-get="@Url.Action("List", "PortDistance")"
+                               hx-target="#table-container"
+                               hx-swap="innerHTML"
+                               hx-vals='{"pagenumber":"@i","pageSize":"@Model.PageSize","searchterm":"@Model.SearchTerm","sortColumn":"@Model.SortColumn","sortDirection":"@Model.SortDirection"}'
+                               href="#">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                        <a class="page-link"
+                           hx-get="@Url.Action("List", "PortDistance")"
+                           hx-target="#table-container"
+                           hx-swap="innerHTML"
+                           hx-vals='{"pagenumber":"@(Model.PageNumber + 1)","pageSize":"@Model.PageSize","searchterm":"@Model.SearchTerm","sortColumn":"@Model.SortColumn","sortDirection":"@Model.SortDirection"}'
+                           href="#">&raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>

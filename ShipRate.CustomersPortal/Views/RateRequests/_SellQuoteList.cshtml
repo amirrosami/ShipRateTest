@@ -1,0 +1,136 @@
+﻿@using ShipRate.Application.DTOs
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@using ShipRate.WebAppCustomers
+@model SellQuoteListIndexDto
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    var isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var direction = isRtl ? "rtl" : "ltr";
+    var textAlign = isRtl ? "text-end" : "text-start";
+    var textAlignOpposite = isRtl ? "text-start" : "text-end";
+}
+
+@Html.AntiForgeryToken()
+
+<div class="card" dir="@direction">
+    <div class="card-header bg-info text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="bi bi-list-ul"></i> @Localizer["QuotationsSentToCustomer"]
+            </h5>
+
+            <input type="hidden" id="RateRequestId" value="@Model.RateRequestId" name="RateRequestId" />
+        </div>
+    </div>
+
+    <div class="card-body @textAlign">
+        @if (Model.SellQuotesList.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>@Localizer["QuotationNo"]</th>
+                            <th>@Localizer["QuotationDate"]</th>
+                            <th>@Localizer["TransportationBy"]</th>
+                            <th>@Localizer["ETA"]</th>
+                            <th>@Localizer["ETD"]</th>
+                            <th>@Localizer["ValidUntil"]</th>
+                            <th>@Localizer["Status"]</th>
+                            <th>@Localizer["CreateUser"]</th>
+                            <th>@Localizer["LastEditUser"]</th>
+                            <th>@Localizer["Actions"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var q in Model.SellQuotesList)
+                        {
+                            var badgeClass = q.StatusId switch
+                            {
+                                1 => "bg-secondary",
+                                2 => "bg-primary",
+                                3 => "bg-success",
+                                4 => "bg-danger",
+                                _ => "bg-secondary"
+                            };
+
+                            <tr>
+                                <td>@q.QuotationNo</td>
+                                <td>@q.QuotationDate?.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>@q.TransportMovementNo</td>
+                                <td>@q.ETA</td>
+                                <td>@q.ETD</td>
+                                <td>@q.ValidUntil</td>
+                                <td>
+                                    <span class="badge @badgeClass">
+                                        @q.Status
+                                    </span>
+                                </td>
+                                <td>@q.CreateUserName</td>
+                                <td>@q.UpdateUserName</td>
+                                <td>
+                                    <div class="d-flex gap-1 flex-nowrap">
+                                        <button class="btn btn-sm btn-outline-primary"
+                                                hx-get="/RateRequests/GetSellQuoteItems?quoteId=@q.Id"
+                                                hx-target="#sellQuoteItemsListContainer"
+                                                hx-swap="innerHTML"
+                                                title="@Localizer["ChargesList"]">
+                                            <i class="bi bi-dollar"></i> @Localizer["ChargesList"]
+                                        </button>
+
+                                        <button class="btn btn-sm btn-outline-primary"
+                                                hx-get="/RateRequests/GetSellQuoteDetails?quoteId=@q.Id"
+                                                hx-target="#app-modal-content"
+                                                hx-swap="innerHTML"
+                                                title="@Localizer["Details"]">
+                                            <i class="bi bi-list-ul"></i> @Localizer["Details"]
+                                        </button>
+
+                                        @if (q.StatusId == 2 || q.StatusId == 4 || q.StatusId == 7)
+                                        {
+                                            <button class="btn btn-sm btn-primary"
+                                                    hx-get="/RateRequests/AcceptSellQuoteInApp?quoteId=@q.Id"
+                                                    hx-target="#app-modal-content"
+                                                    hx-swap="innerHTML"
+                                                    title="@Localizer["Accept"]">
+                                                @Localizer["Accept"]
+                                            </button>
+                                        }
+
+                                        @if (q.StatusId == 2 || q.StatusId == 3 || q.StatusId == 7)
+                                        {
+                                            <button class="btn btn-sm btn-primary"
+                                                    hx-get="/RateRequests/RejectSellQuoteInApp?quoteId=@q.Id"
+                                                    hx-target="#app-modal-content"
+                                                    hx-swap="innerHTML"
+                                                    title="@Localizer["Reject"]">
+                                                @Localizer["Reject"]
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info mb-0">
+                <i class="bi bi-info-circle"></i> @Localizer["NoResponsesFoundForCustomerQuote"]
+            </div>
+        }
+    </div>
+
+    <div class="card-footer @textAlignOpposite">
+        <button class="btn btn-sm btn-secondary" onclick="document.getElementById('SellQuotesListContainer').innerHTML = ''">
+            <i class="bi bi-x-circle"></i> @Localizer["Close"]
+        </button>
+    </div>
+</div>
+
+<script>
+</script>

@@ -1,0 +1,89 @@
+﻿@using ShipRate.Application.DTOs
+@model BookingFormVm
+@if (Model.BookingLegs != null && Model.BookingLegs.Any())
+{
+    for (int i = 0; i < Model.BookingLegs.Count; i++)
+    {
+        var uniqueId = Model.BookingLegs[i].Id.ToString();
+        <tr class="leg-row">
+            <td>
+                <input type="hidden" name="BookingLegs.Index" value="@uniqueId" />
+                <input type="hidden" name="BookingLegs[@uniqueId].Id" value="@Model.BookingLegs[i].Id" />
+                <input type="number" name="BookingLegs[@uniqueId].SequenceNo" value="@Model.BookingLegs[i].SequenceNo" class="form-control form-control-sm text-center" readonly />
+            </td>
+            <td>
+                <select name="BookingLegs[@uniqueId].TransportTypeId" class="form-select form-select-sm" asp-for="@Model.BookingLegs[i].TransportTypeId" asp-items="ViewBag.TransportTypes">
+                    <option value="">-- Select --</option>
+                </select>
+            </td>
+
+            @* در اینجا هم می‌توانید مانند ردیف‌های جدید از Input جستجو استفاده کنید *@
+            @*             <td>
+                <select name="BookingLegs[@uniqueId].FromLocationId" class="form-select form-select-sm" asp-for="@Model.BookingLegs[i].FromLocationId" asp-items="ViewBag.Locations">
+                    <option value="">-- Select --</option>
+                </select>
+            </td>
+            <td>
+                <select name="BookingLegs[@uniqueId].ToLocationId" class="form-select form-select-sm" asp-for="@Model.BookingLegs[i].ToLocationId" asp-items="ViewBag.Locations">
+                    <option value="">-- Select --</option>
+                </select>
+            </td>
+ *@
+            <td>
+                <input type="text"
+                       id="road-port-from-id-@i"
+                       name="BookingLegs[@i].FromLocationId"
+                       value="@Model.BookingLegs[@i].FromLocationId" />
+
+                <input type="text"
+                       id="road-port-from-text-@i"
+                       name="search"
+                       class="form-control form-control-sm port-search-input"
+                       placeholder="Type to search from location..."
+                       value="@Model.BookingLegs[@i].FromLocationName"
+                       autocomplete="off"
+                       data-index="@i"
+                       data-port-type="from"
+                       data-transporttype="road-"
+                       hx-get="@Url.Action("SearchPorts", "Locations")"
+                       hx-trigger="keyup changed delay:300ms"
+                       hx-vals='{"index":"@i","portType":"from"}'
+                       hx-target="#global-port-search-popup"
+                       hx-swap="innerHTML" />
+            </td>
+            <td>
+                <input type="text"
+                       id="road-port-to-id-@i"
+                       name="BookingLegs[@i].ToLocationId"
+                       value="@Model.BookingLegs[@i].ToLocationId" />
+
+                <input type="text"
+                       id="road-port-to-text-@i"
+                       name="search"
+                       class="form-control form-control-sm port-search-input"
+                       placeholder="Type to search to location..."
+                       value="@Model.BookingLegs[@i].FromLocationName"
+                       autocomplete="off"
+                       data-index="@i"
+                       data-port-type="to"
+                       data-transporttype="road-"
+                       hx-get="@Url.Action("SearchPorts", "Locations")"
+                       hx-trigger="keyup changed delay:300ms"
+                       hx-vals='{"index":"@i","portType":"to"}'
+                       hx-target="#global-port-search-popup"
+                       hx-swap="innerHTML" />
+            </td>
+            <td>
+                <input type="datetime-local" name="BookingLegs[@uniqueId].PlannedETD" value="@(Model.BookingLegs[i].PlannedETD?.ToString("yyyy-MM-ddTHH:mm"))" class="form-control form-control-sm" />
+            </td>
+            <td>
+                <input type="datetime-local" name="BookingLegs[@uniqueId].PlannedETA" value="@(Model.BookingLegs[i].PlannedETA?.ToString("yyyy-MM-ddTHH:mm"))" class="form-control form-control-sm" />
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove();">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        </tr>
+    }
+}

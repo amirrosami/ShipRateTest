@@ -1,0 +1,15 @@
+﻿<div class="p-3 text-center" dir="ltr">
+    <div class="text-success mb-2">Operation completed successfully.</div>
+</div>
+
+<script>
+    (function () {
+        const modalEl = document.getElementById('globalModal');
+        if (modalEl) {
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) {
+                modal.hide();
+            }
+        }
+    })();
+</script>

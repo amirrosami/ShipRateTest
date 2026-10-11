@@ -1,0 +1,76 @@
+﻿@using ShipRate.Application.DTOs
+@model LeadSearchDto
+
+@{
+    var statuses = ViewBag.Statuses as List<SelectListItem>;
+    var sources = ViewBag.Sources as List<SelectListItem>;
+    var users = ViewBag.Users as List<SelectListItem>;
+    var industries = ViewBag.Industries as List<SelectListItem>;
+}
+
+<div class="card">
+    <div class="card-header">
+        Search
+    </div>
+    <div class="card-body">
+        <form hx-get="@Url.Action("Grid","Leads")"
+              hx-target="#lead-grid"
+              hx-swap="innerHTML"
+              class="row g-2">
+
+            <div class="col-2">
+                <input type="text" name="SearchTerm" class="form-control form-control-sm"
+                       placeholder="Company / Contact / Email / Phone" />
+            </div>
+
+            <div class="col-2">
+                <select name="LeadStatusId" class="form-select form-select-sm">
+                    <option value="">-- Status --</option>
+                    @foreach (var s in statuses)
+                    {
+                        <option value="@s.Value">@s.Text</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-2">
+                <select name="LeadSourceId" class="form-select form-select-sm">
+                    <option value="">-- Source --</option>
+                    @foreach (var s in sources)
+                    {
+                        <option value="@s.Value">@s.Text</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-2">
+                <select name="AssignedToUserId" class="form-select form-select-sm">
+                    <option value="">-- Assigned User --</option>
+                    @foreach (var s in users)
+                    {
+                        <option value="@s.Value">@s.Text</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-2">
+                <select name="IndustryId" class="form-select form-select-sm">
+                    <option value="">-- Industry --</option>
+                    @foreach (var s in industries)
+                    {
+                        <option value="@s.Value">@s.Text</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-1">
+                <input type="number" name="MinLeadScore" class="form-control form-control-sm"
+                       placeholder="Min Score" />
+            </div>
+
+            <div class="col-1 d-flex justify-content-end mt-2">
+                <button type="submit" class="btn btn-sm btn-primary">Search</button>
+            </div>
+        </form>
+    </div>
+</div>

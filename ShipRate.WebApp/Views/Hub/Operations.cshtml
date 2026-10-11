@@ -1,0 +1,103 @@
+﻿@{
+    ViewData["Title"] = "Operations Hub";
+}
+
+<div class="container-fluid py-3">
+    <div class="hub-page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="fw-bold mb-1"><i class="bi bi-clipboard-data text-primary me-2"></i>Shipment & Cargo Operations</h5>
+            <span class="text-muted small">Manage freight quotes, bookings, job legs, BL issuance, and receipts</span>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <auth-policy policy="Operations.RateRequests.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="RateRequests" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-currency-exchange"></i></div>
+                    <div>
+                        <div class="hub-title">Rate Requests</div>
+                        <p class="hub-desc">Manage quotes, carrier buy rates, and quotation offers to clients.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Operations.Jobs.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Jobs" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-briefcase"></i></div>
+                    <div>
+                        <div class="hub-title">Jobs Management</div>
+                        <p class="hub-desc">Operational job files, legs tracking, milestones, and status monitor.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Operations.ServiceRequests.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="ServiceRequests" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-inbox"></i></div>
+                    <div>
+                        <div class="hub-title">Requests Management</div>
+                        <p class="hub-desc">Handle customer operational requests, amendments, and instructions.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Operations.BLManagement.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="BLManagement" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-file-earmark-spreadsheet"></i></div>
+                    <div>
+                        <div class="hub-title">BL(s) Management</div>
+                        <p class="hub-desc">Drafting, printing, and tracking Master & House Bills of Lading.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Operations.ExportDocsReceipts.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="ExportDocsReceipt" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-receipt-cutoff"></i></div>
+                    <div>
+                        <div class="hub-title">Export Docs Receipts</div>
+                        <p class="hub-desc">Manage document handovers, original release receipts, and acknowledgements.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <div class="col-md-6 col-xl-4">
+            <a asp-controller="System" asp-action="UnderConstruction" class="hub-card">
+                <div class="hub-icon"><i class="bi bi-card-checklist"></i></div>
+                <div>
+                    <div class="hub-title">Cargo Manifest</div>
+                    <p class="hub-desc">Customs cargo manifest generation and outward clearance.</p>
+                </div>
+                <i class="bi bi-chevron-right hub-arrow"></i>
+            </a>
+        </div>
+
+        <auth-policy policy="Operations.TelexReleases.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="TelexRelease" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-send-check"></i></div>
+                    <div>
+                        <div class="hub-title">Telex Release</div>
+                        <p class="hub-desc">Process and monitor surrender messages and electronic release authorizations.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+    </div>
+</div>

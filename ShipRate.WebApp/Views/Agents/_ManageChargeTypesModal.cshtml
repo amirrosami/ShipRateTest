@@ -1,0 +1,65 @@
+﻿@using ShipRate.WebApp.ViewModels.AgentVms
+@model AgentChargeTypeViewModel
+
+
+<div class="modal-header">
+    <h5 class="modal-title">Manage Charge Types - @Model.AgentName</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<form hx-post="/Agents/SaveChargeTypes">
+    <div class="modal-body">
+
+
+        <input type="hidden" name="AgentId" value="@Model.AgentId" />
+        @Html.AntiForgeryToken()
+
+
+        <div class="row">
+
+            @foreach (var category in Model.ChargeTypesByCategory)
+            {
+                <div class="col-md-4 mb-3">
+
+                    <div class="card h-100">
+                        <div class="card-header fw-bold">
+                            @category.Key
+                        </div>
+
+                        <div class="card-body">
+
+                            @foreach (var item in category.Value)
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           name="SelectedChargeTypeIds"
+                                           value="@item.ChargeTypeId"
+                                           @(item.IsSelected ? "checked" : "") />
+
+                                    <label class="form-check-label">
+                                        @item.ChargeTypeName
+                                    </label>
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-success">
+                Save
+            </button>
+        </div>
+    </div>
+</form>
+@* <script>
+    var modal = new bootstrap.Modal(document.getElementById('chargeTypesModal'));
+    modal.show();
+</script>
+ *@

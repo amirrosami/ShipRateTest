@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="2026-08-31" ReportInfo.Modified="09/19/2026 13:12:07" ReportInfo.CreatorVersion="2026.1.0.0">
+  <Styles>
+    <Style Name="ZebraEvenRow" Fill.Color="248, 250, 253" Font="Tahoma, 8pt"/>
+  </Styles>
+  <Dictionary>
+    <TableDataSource Name="Master" ReferenceName="DetentionData.Master" DataType="System.Int32" Enabled="true">
+      <Column Name="BLNo" DataType="System.String"/>
+      <Column Name="BookingNo" DataType="System.String"/>
+      <Column Name="CompanyName" DataType="System.String"/>
+      <Column Name="IssuerPartyName" DataType="System.String"/>
+      <Column Name="IssuedToPartyName" DataType="System.String"/>
+      <Column Name="TariffBookName" DataType="System.String"/>
+      <Column Name="TradeTypeName" DataType="System.String"/>
+      <Column Name="DetentionToDate" DataType="System.DateTime"/>
+      <Column Name="GrossAmount" DataType="System.Decimal"/>
+      <Column Name="VATAmount" DataType="System.Decimal"/>
+      <Column Name="Amount" DataType="System.Decimal"/>
+      <Column Name="CurrencyCode" DataType="System.String"/>
+      <Column Name="Remarks" DataType="System.String"/>
+      <Column Name="LogoData" DataType="System.Byte[]"/>
+      <Column Name="PrintDate" DataType="System.DateTime"/>
+      <Column Name="PreviousPaid" DataType="System.Decimal"/>
+      <Column Name="FinalPayable" DataType="System.Decimal"/>
+      <Column Name="FinalCurrencyCode" DataType="System.String"/>
+      <Column Name="DetentionNo" DataType="System.Int64"/>
+    </TableDataSource>
+    <TableDataSource Name="Items" ReferenceName="DetentionData.Items" DataType="System.Int32" Enabled="true">
+      <Column Name="ContainerNumber" DataType="System.String"/>
+      <Column Name="ContainerSizeTypeName" DataType="System.String"/>
+      <Column Name="StartDate" DataType="System.DateTime"/>
+      <Column Name="ReturnDate" DataType="System.DateTime"/>
+      <Column Name="EndDate" DataType="System.DateTime"/>
+      <Column Name="TotalDays" DataType="System.Int32"/>
+      <Column Name="FreeDays" DataType="System.Int32"/>
+      <Column Name="LateDays" DataType="System.Int32"/>
+      <Column Name="Amount" DataType="System.Decimal"/>
+    </TableDataSource>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" Watermark.Font="Tahoma, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="158">
+      <ShapeObject Name="ShapeTopBar" Width="718.2" Height="4" Fill.Color="18, 52, 86"/>
+      <ShapeObject Name="ShapePrintBadge" Left="2" Top="10" Width="176.35" Height="42" Border.Color="210, 220, 230" Fill.Color="243, 246, 250" Shape="RoundRectangle"/>
+      <TextObject Name="TextPrintDateTitle" Left="101.5" Top="32.9" Width="71.85" Height="14" Text="تاریخ گزارش:" RightToLeft="true" Font="Tahoma, 7.2pt, style=Bold" TextFill.Color="100, 115, 130"/>
+      <TextObject Name="TextPrintDate" Left="-2.45" Top="28" Width="109.65" Height="18" Text="[FormatDateTime([Master.PrintDate], &quot;yyyy/MM/dd HH:mm&quot;)]" HorzAlign="Center" Font="Tahoma, 8pt, style=Bold" TextFill.Color="128, 0, 128"/>
+      <TextObject Name="TextTitle" Left="188.35" Top="8" Width="382.2" Height="24" Text="گزارش وضعیت دیرکرد کانتینرها" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 12pt, style=Bold" TextFill.Color="18, 52, 86"/>
+      <TextObject Name="TextCompany" Left="188.35" Top="32" Width="382.2" Height="18" Text="[Master.CompanyName]" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 9pt, style=Bold" TextFill.Color="80, 95, 110"/>
+      <PictureObject Name="PictureLogo" Left="596" Top="10" Width="120" Height="46" DataColumn="Master.LogoData"/>
+      <ShapeObject Name="ShapeMasterBox" Top="62" Width="718.2" Height="86" Border.Color="215, 225, 235" Fill.Color="248, 250, 253" Shape="RoundRectangle"/>
+      <ShapeObject Name="ShapeMasterHeader" Top="62" Width="718.2" Height="22" Border.Color="215, 225, 235" Fill.Color="233, 240, 248"/>
+      <TextObject Name="TextCardTitle" Left="508.2" Top="65" Width="200" Height="16" Text="اطلاعات بارنامه و محاسبه دیتنشن" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 8pt, style=Bold" TextFill.Color="18, 52, 86"/>
+      <TextObject Name="L_BLNo" Left="628.2" Top="88" Width="80" Height="15" Text="شماره بارنامه:" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 7.8pt, style=Bold" TextFill.Color="80, 90, 100"/>
+      <TextObject Name="V_BLNo" Left="478.2" Top="88" Width="150" Height="15" Text="[Master.BLNo]" HorzAlign="Right" Font="Tahoma, 8.2pt, style=Bold" TextFill.Color="15, 23, 42"/>
+      <TextObject Name="L_Booking" Left="388.2" Top="88" Width="80" Height="15" Text="شماره بوکینگ:" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 7.8pt, style=Bold" TextFill.Color="80, 90, 100"/>
+      <TextObject Name="V_Booking" Left="238.2" Top="88" Width="150" Height="15" Text="[Master.BookingNo]" HorzAlign="Right" Font="Tahoma, 8.2pt" TextFill.Color="15, 23, 42"/>
+      <TextObject Name="L_ToDate" Left="148.2" Top="88" Width="80" Height="15" Text="محاسبه تا تاریخ:" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 7.8pt, style=Bold" TextFill.Color="80, 90, 100"/>
+      <TextObject Name="V_ToDate" Left="8" Top="88" Width="140" Height="15" Text="[FormatDateTime([Master.DetentionToDate], &quot;yyyy/MM/dd&quot;)]" HorzAlign="Right" Font="Tahoma, 8.2pt, style=Bold" TextFill.Color="18, 52, 86"/>
+      <TextObject Name="L_Issuer" Left="628.2" Top="107" Width="80" Height="15" Text="صادرکننده:" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 7.8pt, style=Bold" TextFill.Color="80, 90, 100"/>
+      <TextObject Name="V_Issuer" Left="478.2" Top="107" Width="150" Height="15" Text="[Master.IssuerPartyName]" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 8pt" TextFill.Color="15, 23, 42"/>
+      <TextObject Name="L_IssuedTo" Left="388.2" Top="107" Width="80" Height="15" Text="صاحب کالا / طرف حساب:" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 7.8pt, style=Bold" TextFill.Color="80, 90, 100"/>
+      <TextObject Name="V_IssuedTo" Left="238.2" Top="107" Width="150" Height="15" Text="[Master.IssuedToPartyName]" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 8pt" TextFill.Color="15, 23, 42"/>
+      <TextObject Name="L_Tariff" Left="148.2" Top="107" Width="80" Height="15" Text="کتابچه تعرفه:" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 7.8pt, style=Bold" TextFill.Color="80, 90, 100"/>
+      <TextObject Name="V_Tariff" Left="8" Top="107" Width="140" Height="15" Text="[Master.TariffBookName]" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 8pt" TextFill.Color="15, 23, 42"/>
+      <TextObject Name="L_TradeType" Left="628.2" Top="126" Width="80" Height="15" Text="نوع عملیات:" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 7.8pt, style=Bold" TextFill.Color="80, 90, 100"/>
+      <TextObject Name="V_TradeType" Left="478.2" Top="126" Width="150" Height="15" Text="[Master.TradeTypeName]" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 8pt" TextFill.Color="15, 23, 42"/>
+      <TextObject Name="Text1" Left="113.4" Top="9.45" Width="61.1" Height="15" Text="شماره :" RightToLeft="true" Font="Tahoma, 7.8pt, style=Bold" TextFill.Color="80, 90, 100"/>
+      <TextObject Name="Text2" Top="9.45" Width="103.95" Height="18.9" Text="[Master.DetentionNo]" HorzAlign="Center" Font="Tahoma, 8pt, style=Bold" TextFill.Color="128, 0, 128"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="162" Width="718.2" Height="24">
+      <TextObject Name="H_RowNo" Left="690.2" Width="28" Height="24" Border.Lines="All" Border.Color="200, 210, 225" Border.Width="0.8" Fill.Color="18, 52, 86" Text="#" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.5pt, style=Bold" TextFill.Color="White"/>
+      <TextObject Name="H_CNo" Left="588.2" Width="102" Height="24" Border.Lines="All" Border.Color="200, 210, 225" Border.Width="0.8" Fill.Color="18, 52, 86" Text="شماره کانتینر" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.5pt, style=Bold" TextFill.Color="White"/>
+      <TextObject Name="H_Type" Left="520.2" Width="68" Height="24" Border.Lines="All" Border.Color="200, 210, 225" Border.Width="0.8" Fill.Color="18, 52, 86" Text="نوع / سایز" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.5pt, style=Bold" TextFill.Color="White"/>
+      <TextObject Name="H_Start" Left="452.2" Width="68" Height="24" Border.Lines="All" Border.Color="200, 210, 225" Border.Width="0.8" Fill.Color="18, 52, 86" Text="شروع محاسبه" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.2pt, style=Bold" TextFill.Color="White"/>
+      <TextObject Name="H_Return" Left="384.2" Width="68" Height="24" Border.Lines="All" Border.Color="200, 210, 225" Border.Width="0.8" Fill.Color="18, 52, 86" Text="تاریخ برگشت" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.2pt, style=Bold" TextFill.Color="White"/>
+      <TextObject Name="H_End" Left="316.2" Width="68" Height="24" Border.Lines="All" Border.Color="200, 210, 225" Border.Width="0.8" Fill.Color="18, 52, 86" Text="پایان محاسبه" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.2pt, style=Bold" TextFill.Color="White"/>
+      <TextObject Name="H_Total" Left="270.2" Width="46" Height="24" Border.Lines="All" Border.Color="200, 210, 225" Border.Width="0.8" Fill.Color="18, 52, 86" Text="کل روزها" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.2pt, style=Bold" TextFill.Color="White"/>
+      <TextObject Name="H_Free" Left="226.2" Width="44" Height="24" Border.Lines="All" Border.Color="200, 210, 225" Border.Width="0.8" Fill.Color="18, 52, 86" Text="معاف" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.2pt, style=Bold" TextFill.Color="White"/>
+      <TextObject Name="H_Late" Left="178.2" Width="48" Height="24" Border.Lines="All" Border.Color="200, 210, 225" Border.Width="0.8" Fill.Color="18, 52, 86" Text="مازاد" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.2pt, style=Bold" TextFill.Color="White"/>
+      <TextObject Name="H_Amount" Width="178.2" Height="24" Border.Lines="All" Border.Color="200, 210, 225" Border.Width="0.8" Fill.Color="18, 52, 86" Text="مبلغ دیتنشن" HorzAlign="Center" VertAlign="Center" RightToLeft="true" Font="Tahoma, 7.5pt, style=Bold" TextFill.Color="White"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="190" Width="718.2" Height="22" EvenStyle="ZebraEvenRow" DataSource="Items">
+      <TextObject Name="D_RowNo" Left="690.2" Width="28" Height="22" Border.Lines="All" Border.Color="210, 220, 230" Border.Width="0.7" Text="[Row#]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7.5pt" TextFill.Color="100, 110, 125"/>
+      <TextObject Name="D_CNo" Left="588.2" Width="102" Height="22" Border.Lines="All" Border.Color="210, 220, 230" Border.Width="0.7" Text="[Items.ContainerNumber]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 8pt, style=Bold" TextFill.Color="18, 52, 86"/>
+      <TextObject Name="D_Type" Left="520.2" Width="68" Height="22" Border.Lines="All" Border.Color="210, 220, 230" Border.Width="0.7" Text="[Items.ContainerSizeTypeName]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7.8pt"/>
+      <TextObject Name="D_Start" Left="452.2" Width="68" Height="22" Border.Lines="All" Border.Color="210, 220, 230" Border.Width="0.7" Text="[FormatDateTime([Items.StartDate], &quot;yyyy/MM/dd&quot;)]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7.5pt"/>
+      <TextObject Name="D_Return" Left="384.2" Width="68" Height="22" Border.Lines="All" Border.Color="210, 220, 230" Border.Width="0.7" Text="[IIf([Items.ReturnDate] == DateTime.MinValue || [Items.ReturnDate] == null, &quot;-&quot;, FormatDateTime([Items.ReturnDate], &quot;yyyy/MM/dd&quot;))]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7.5pt"/>
+      <TextObject Name="D_End" Left="316.2" Width="68" Height="22" Border.Lines="All" Border.Color="210, 220, 230" Border.Width="0.7" Text="[FormatDateTime([Items.EndDate], &quot;yyyy/MM/dd&quot;)]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7.5pt"/>
+      <TextObject Name="D_Total" Left="270.2" Width="46" Height="22" Border.Lines="All" Border.Color="210, 220, 230" Border.Width="0.7" Text="[Items.TotalDays]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7.8pt"/>
+      <TextObject Name="D_Free" Left="226.2" Width="44" Height="22" Border.Lines="All" Border.Color="210, 220, 230" Border.Width="0.7" Text="[Items.FreeDays]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7.8pt" TextFill.Color="46, 125, 50"/>
+      <TextObject Name="D_Late" Left="178.2" Width="48" Height="22" Border.Lines="All" Border.Color="210, 220, 230" Border.Width="0.7" Text="[Items.LateDays]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 7.8pt, style=Bold" TextFill.Color="198, 40, 40"/>
+      <TextObject Name="D_Amount" Width="178.2" Height="22" Border.Lines="All" Border.Color="210, 220, 230" Border.Width="0.7" Text="[FormatNumber([Items.Amount], 2)]" Padding="4, 0, 4, 0" HorzAlign="Right" VertAlign="Center" Font="Tahoma, 8pt, style=Bold"/>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="216" Width="718.2" Height="165">
+      <LineObject Name="LineSummaryTop" Top="6" Width="718.2" Border.Color="18, 52, 86" Border.Width="1.5"/>
+      <ShapeObject Name="ShapeFinancialBox" Top="14" Width="330" Height="140" Border.Color="210, 220, 230" Fill.Color="248, 250, 253" Shape="RoundRectangle"/>
+      <TextObject Name="T_GrossL" Left="210" Top="20" Width="110" Height="15" Text="مبلغ ناخالص:" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 8pt" TextFill.Color="70, 80, 95"/>
+      <TextObject Name="T_Gross" Left="10" Top="20" Width="200" Height="15" Text="[FormatNumber([Master.GrossAmount], 2)] [Master.CurrencyCode]" Font="Tahoma, 8pt, style=Bold" TextFill.Color="30, 41, 59"/>
+      <TextObject Name="T_TotalL" Left="210" Top="38" Width="110" Height="15" Text="مبلغ محاسبه شده:" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 8pt" TextFill.Color="70, 80, 95"/>
+      <TextObject Name="T_Total" Left="10" Top="38" Width="200" Height="15" Text="[FormatNumber([Master.Amount], 2)] [Master.CurrencyCode]" Font="Tahoma, 8pt, style=Bold" TextFill.Color="30, 41, 59"/>
+      <TextObject Name="T_PrevPaidL" Left="210" Top="56" Width="110" Height="15" Text="علی‌الحساب پرداخت شده:" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 8pt" TextFill.Color="70, 80, 95"/>
+      <TextObject Name="T_PrevPaid" Left="10" Top="56" Width="200" Height="15" Text="[FormatNumber([Master.PreviousPaid], 2)] [Master.CurrencyCode]" Font="Tahoma, 8pt, style=Bold" TextFill.Color="46, 125, 50"/>
+      <ShapeObject Name="ShapeTotalBadge" Left="5" Top="78" Width="320" Height="68" Border.Color="18, 52, 86" Fill.Color="235, 242, 250" Shape="RoundRectangle"/>
+      <TextObject Name="T_FinalPayableL" Left="180" Top="86" Width="135" Height="18" Text="مانده قابل پرداخت:" HorzAlign="Right" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8.5pt, style=Bold" TextFill.Color="18, 52, 86"/>
+      <TextObject Name="T_FinalPayable" Left="10" Top="86" Width="170" Height="18" Text="[FormatNumber([Master.FinalPayable], 2)]" VertAlign="Center" Font="Tahoma, 10.5pt, style=Bold" TextFill.Color="198, 40, 40"/>
+      <TextObject Name="T_FinalCurrencyL" Left="180" Top="106" Width="135" Height="18" Text="ارز پرداخت:" HorzAlign="Right" VertAlign="Center" RightToLeft="true" Font="Tahoma, 8pt, style=Bold" TextFill.Color="100, 115, 130"/>
+      <TextObject Name="T_FinalCurrency" Left="10" Top="106" Width="170" Height="18" Text="[Master.FinalCurrencyCode]" VertAlign="Center" Font="Tahoma, 9pt, style=Bold" TextFill.Color="18, 52, 86"/>
+      <ShapeObject Name="ShapeRemarks" Left="345" Top="14" Width="373.2" Height="140" Border.Color="220, 228, 236" Fill.Color="250, 251, 253" Shape="RoundRectangle"/>
+      <TextObject Name="T_RemarksTitle" Left="608.2" Top="18" Width="100" Height="14" Text="توضیحات و شرایط:" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 7.5pt, style=Bold" TextFill.Color="80, 95, 110"/>
+      <TextObject Name="T_Remarks" Left="355" Top="34" Width="353.2" Height="110" Text="[Master.Remarks]" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 7.8pt" TextFill.Color="50, 60, 70"/>
+    </ReportSummaryBand>
+    <PageFooterBand Name="PageFooter1" Top="385" Width="718.2" Height="24">
+      <LineObject Name="LineFooter" Top="4" Width="718.2" Border.Color="220, 228, 235" Border.Width="0.8"/>
+      <TextObject Name="TextSystem" Left="418.2" Top="8" Width="300" Height="14" Text="ShipRate" HorzAlign="Right" RightToLeft="true" Font="Tahoma, 7.2pt" TextFill.Color="120, 130, 140"/>
+      <TextObject Name="TextPage" Top="8" Width="180" Height="14" Text="صفحه [Page#] از [TotalPages#]" RightToLeft="true" Font="Tahoma, 7.2pt, style=Bold" TextFill.Color="100, 110, 125"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

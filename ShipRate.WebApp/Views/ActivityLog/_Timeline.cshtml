@@ -1,0 +1,109 @@
+﻿@using ShipRate.Application.ViewModels
+@model List<ActivityLogListItemVm>
+
+
+    <style>
+    .job-timeline-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 16px 18px;
+    }
+
+    .timeline-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 14px;
+    }
+
+    .timeline {
+        position: relative;
+    }
+
+    .timeline-item {
+        position: relative;
+        display: flex;
+        gap: 14px;
+        padding-bottom: 18px;
+    }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-item::before {
+            content: "";
+            position: absolute;
+            left: 7px;
+            top: 18px;
+            bottom: -2px;
+            width: 2px;
+            background-color: #e5e7eb;
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+
+    .timeline-marker {
+        width: 16px;
+        height: 16px;
+        min-width: 16px;
+        border-radius: 50%;
+        background-color: #2563eb;
+        border: 3px solid #dbeafe;
+        margin-top: 3px;
+        z-index: 1;
+    }
+
+    .timeline-content {
+        line-height: 1.25;
+    }
+
+    .timeline-item-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .timeline-item-subtitle {
+        font-size: 14px;
+        color: #6b7280;
+        margin-top: 2px;
+    }
+    </style>
+
+
+<div class="job-timeline-card">
+    <h6 class="timeline-title">Timeline</h6>
+
+    <div class="timeline">
+        @foreach (var item in Model)
+        {
+            <div class="timeline-item">
+                <div class="timeline-marker"></div>
+
+                <div class="timeline-content">
+                    <div class="timeline-item-title">
+                        @item.Title
+                    </div>
+                    <div class="timeline-item-subtitle">
+                        @item.ActivityDateTime.ToString("yyyy-MM-dd HH:mm") ·  @item.ActivityDateLocal .   @item.Description
+                    </div>
+                    <div class="timeline-item-subtitle">
+                        <span class="text-warning">Entity Type :</span> @item.EntityType 
+                        @if (!string.IsNullOrEmpty(item.ExternalReferenceNo))
+                        {
+                            <span class="text-info ms-2">ref:</span>
+                            <span class="text-primary ms-1">@item.ExternalReferenceNo</span>
+                        }
+                    </div>
+                    <div class="timeline-item-subtitle">
+                        <span class="text-info" >Performed By :</span> @item.PerformedByUserName
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

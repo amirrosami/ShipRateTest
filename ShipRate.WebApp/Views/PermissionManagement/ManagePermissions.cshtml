@@ -1,0 +1,297 @@
+﻿@using ShipRate.Web.ViewModels.PermissionManagement
+@model AssignPermissionsViewModel
+@{
+    ViewData["Title"] = Model.PageTitle;
+}
+<div class="container-fluid" dir="ltr">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2>@Model.PageTitle</h2>
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-envelope-fill me-2"></i>@Model.Email
+                    </p>
+                </div>
+                <div>
+                    <span class="@Model.StatusBadgeClass fs-5">
+                        <i class="bi bi-shield-check me-1"></i>
+                        @Model.StatusText
+                    </span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="fw-bold">Permissions Assign Progress</span>
+                        <span class="text-muted">@Model.AssignedPermissions From @Model.TotalPermissions</span>
+                    </div>
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar bg-success"
+                             role="progressbar"
+                             style="width: @Model.ProgressPercentage"
+                             aria-valuenow="@Model.AssignedPermissions"
+                             aria-valuemin="0"
+                             aria-valuemax="@Model.TotalPermissions">
+                            @Model.ProgressPercentage
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <form asp-action="AssignPermissions" method="post" id="permissionForm">
+                <input type="hidden" asp-for="UserId" />
+                <input type="hidden" asp-for="UserName" />
+                <input type="hidden" asp-for="Email" />
+
+
+
+
+
+                <!-- Permission Groups -->
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-light py-2">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-collection me-2"></i>
+                            <span class="fw-bold">Permission Groups</span>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 70px;" class="text-center">Select</th>
+                                    <th>Group Name</th>
+                                    <th>Remarks</th>
+                                    <th style="width: 110px;" class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (!Model.UserPermissionGroups.Any())
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-3">
+                                            No permission groups found.
+                                        </td>
+                                    </tr>
+                                }
+
+                                @foreach (var permissionGroup in Model.UserPermissionGroups)
+                                {
+                                    <tr class="@(permissionGroup.IsAssigned ? "table-success" : "")">
+                                        <td class="text-center">
+                                            <div class="form-check d-inline-block">
+                                                <input class="form-check-input permission-group-checkbox"
+                                                       type="checkbox"
+                                                       id="@permissionGroup.CheckboxId"
+                                                       name="SelectedPermissionGroupIds"
+                                                       value="@permissionGroup.PermissionGroupId"
+                                                       @(permissionGroup.IsAssigned ? "checked" : "") />
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <label class="form-check-label fw-bold"
+                                                   for="@permissionGroup.CheckboxId">
+                                                <i class="bi bi-folder2-open me-1"></i>
+                                                @permissionGroup.GroupName
+                                            </label>
+                                        </td>
+
+                                        <td>
+                                            <small class="text-muted">
+                                                @(permissionGroup.Description ?? "Without Remarks")
+                                            </small>
+                                        </td>
+
+                                        <td class="text-center">
+                                            @if (permissionGroup.IsAssigned)
+                                            {
+                                                <span class="badge bg-success">
+                                                    <i class="bi bi-check-circle me-1"></i>Assigned
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">
+                                                    <i class="bi bi-x-circle me-1"></i>Not Assigned
+                                                </span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <div class="accordion" id="permissionAccordion">
+                    @foreach (var group in Model.PermissionGroups)
+                    {
+                        var groupId = $"group_{Model.PermissionGroups.IndexOf(group)}";
+
+                        <div class="accordion-item mb-3 border rounded">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button @(group.HasAssignedPermissions ? "" : "collapsed")"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#@groupId">
+                                    <div class="d-flex justify-content-between w-100 me-3">
+                                        <span class="fw-bold">
+                                            <i class="bi bi-folder2-open me-2"></i>
+                                            @group.GroupName
+                                        </span>
+                                        <span class="@group.BadgeClass">
+                                            @group.StatusText
+                                        </span>
+                                    </div>
+                                </button>
+                            </h2>
+                            <div id="@groupId"
+                                 class="accordion-collapse collapse @(group.HasAssignedPermissions ? "show" : "")"
+                                 data-bs-parent="#permissionAccordion">
+                                <div class="accordion-body">
+                                    <div class="mb-3">
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary me-2 select-all-btn"
+                                                data-group="@groupId">
+                                            <i class="bi bi-check-all me-1"></i>
+                                            select all
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-secondary deselect-all-btn"
+                                                data-group="@groupId">
+                                            <i class="bi bi-x-circle me-1"></i>
+                                            deselect All
+                                        </button>
+                                    </div>
+
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th width="50">Select</th>
+                                                <th>Permission Name</th>
+                                                <th>Remarks</th>
+                                                <th width="100" class="text-center">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var permission in group.Permissions)
+                                            {
+                                                <tr class="@permission.RowClass">
+                                                    <td>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input permission-checkbox"
+                                                                   type="checkbox"
+                                                                   id="@permission.CheckboxId"
+                                                                   name="SelectedPermissionIds"
+                                                                   value="@permission.PermissionId"
+                                                                   @(permission.IsAssigned ? "checked" : "")
+                                                                   data-group="@groupId">
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <label class="form-check-label fw-bold" for="@permission.CheckboxId">
+                                                            @permission.DisplayName
+                                                        </label>
+                                                        <br>
+                                                        <small class="text-muted">@permission.Name</small>
+                                                    </td>
+                                                    <td>
+                                                        <small class="text-muted">
+                                                            @(permission.Description ?? "Without Remarks")
+                                                        </small>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <i class="@permission.IconClass fs-5"></i>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Actions -->
+                <div class="card mt-4 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    Save Changes
+                                </button>
+                                <a  asp-controller="UserManagement"  asp-action="Index" class="btn btn-secondary btn-lg">
+                                    <i class="bi bi-x-circle me-2"></i>
+                                    Cancel
+                                </a>
+                            </div>
+                            <div class="text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Assigned Permissions : @Model.AssignedPermissions
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Select All
+            $('.select-all-btn').click(function() {
+                var groupId = $(this).data('group');
+                $('#' + groupId + ' .permission-checkbox').prop('checked', true);
+                updateCounters();
+            });
+
+            // Deselect All
+            $('.deselect-all-btn').click(function() {
+                var groupId = $(this).data('group');
+                $('#' + groupId + ' .permission-checkbox').prop('checked', false);
+                updateCounters();
+            });
+
+            // Update counters on change
+            $('.permission-checkbox').change(function() {
+                updateCounters();
+            });
+
+            function updateCounters() {
+                var selectedCount = $('.permission-checkbox:checked').length;
+                $('.text-muted i.bi-info-circle').parent().html(
+                    '<i class="bi bi-info-circle me-1"></i>' +
+                    selectedCount + ' Assigned Permissions'
+                );
+            }
+        });
+    </script>
+}

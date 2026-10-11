@@ -1,0 +1,111 @@
+﻿@model ShipRate.Application.ViewModels.TariffThcRuleBatchFormVm
+
+<div class="table-responsive border rounded">
+    <table class="table table-sm table-hover align-middle mb-0">
+        <thead class="table-light small text-muted">
+            <tr>
+                <th style="width: 23%;">Sh.Type</th>
+                <th style="width: 16%;">Size/Type</th>
+                <th style="width: 16%;">F/E</th>
+                <th class="text-center" style="width: 7%;">DG</th>
+                <th class="text-center" style="width: 7%;">OOG</th>
+                <th class="text-center" style="width: 7%;">O/W</th>
+                <th style="width: 17%;">Amount</th>
+                <th style="width: 6%;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Rows != null && Model.Rows.Any())
+            {
+                for (int i = 0; i < Model.Rows.Count; i++)
+                {
+                    <tr>
+                        <!-- Trade Type Dropdown -->
+                        <td>
+                            <input type="hidden" name="Rows[@i].Id" value="@Model.Rows[i].Id" />
+                            <select name="Rows[@i].TradeTypeId" class="form-select form-select-sm" required>
+                                <option value="">Select...</option>
+                                @foreach (var item in Model.TradeTypes)
+                                {
+                                    <option value="@item.Value" selected="@(Model.Rows[i].TradeTypeId?.ToString() == item.Value)">
+                                        @item.Text
+                                    </option>
+                                }
+                            </select>
+                        </td>
+
+                        <!-- Container Size/Type Dropdown -->
+                        <td>
+                            <select name="Rows[@i].ContainerSizeTypeId" class="form-select form-select-sm" required>
+                                <option value="">Select Size/Type...</option>
+                                @foreach (var item in Model.ContainerSizeTypes)
+                                {
+                                    <option value="@item.Value" selected="@(Model.Rows[i].ContainerSizeTypeId?.ToString() == item.Value)">
+                                        @item.Text
+                                    </option>
+                                }
+                            </select>
+                        </td>
+
+                        <!-- Full/MT Dropdown -->
+                        <td>
+                            <select name="Rows[@i].FullMTId" class="form-select form-select-sm" required>
+                                <option value="">F/E...</option>
+                                @foreach (var item in Model.FullMTs)
+                                {
+                                    <option value="@item.Value" selected="@(Model.Rows[i].FullMTId?.ToString() == item.Value)">
+                                        @item.Text
+                                    </option>
+                                }
+                            </select>
+                        </td>
+
+
+
+                        <!-- DG Checkbox -->
+                        <td class="text-center">
+                            <input class="form-check-input" type="checkbox" name="Rows[@i].IsDG" value="true" @(Model.Rows[i].IsDG ? "checked" : "") />
+                        </td>
+
+                        <!-- OOG Checkbox -->
+                        <td class="text-center">
+                            <input class="form-check-input" type="checkbox" name="Rows[@i].IsOverSized" value="true" @(Model.Rows[i].IsOverSized ? "checked" : "") />
+                        </td>
+
+                        <!-- OW Checkbox -->
+                        <td class="text-center">
+                            <input class="form-check-input" type="checkbox" name="Rows[@i].IsOverWeight" value="true" @(Model.Rows[i].IsOverWeight ? "checked" : "") />
+                        </td>
+
+                        <!-- Amount -->
+                        <td>
+                            <input type="number" step="0.01" min="0" name="Rows[@i].Amount" class="form-control form-control-sm text-end" value="@Model.Rows[i].Amount" />
+                        </td>
+
+                        <!-- Remarks -->
+@*                         <td>
+                            <input type="text" name="Rows[@i].Remarks" class="form-control form-control-sm" value="@Model.Rows[i].Remarks" placeholder="Remarks..." />
+                        </td>
+ *@
+
+                        <!-- Delete Button -->
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-link text-danger p-0"
+                                    hx-post="@Url.Action("RemoveThcRuleRow", "TariffBooks", new { rowIndex = i })"
+                                    hx-include="closest form"
+                                    hx-target="#thcRateRowsContainer">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-3">No THC rates added yet. Click "+ Add Row" to begin.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

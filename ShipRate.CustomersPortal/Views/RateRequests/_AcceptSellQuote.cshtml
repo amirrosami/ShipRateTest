@@ -1,0 +1,50 @@
+﻿@using ShipRate.Application.ViewModels
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@using ShipRate.WebAppCustomers
+@inject IStringLocalizer<SharedResource> Localizer
+@model AcceptSellQuoteVm
+
+@{
+    var isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var direction = isRtl ? "rtl" : "ltr";
+    var textAlign = isRtl ? "text-end" : "text-start";
+}
+
+<form asp-action="AcceptSellQuoteInApp"
+      method="post"
+      hx-post="@Url.Action("AcceptSellQuoteInApp")"
+      hx-target="#modal-content"
+      hx-swap="innerHTML"
+      dir="@direction"
+      class="@textAlign">
+
+    @Html.AntiForgeryToken()
+    <input asp-for="SellQuoteId" type="hidden" />
+
+    <div class="modal-header">
+        <h5 class="modal-title text-success fw-bold">@Localizer["AcceptQuotationResponse"]</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["Close"]"></button>
+    </div>
+
+    <div class="modal-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="alert alert-success">
+            <i class="bi bi-info-circle me-1"></i> @Localizer["AcceptQuotationConfirmMessage"]
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Comments" class="form-label">@Localizer["Comments"]</label>
+            <textarea asp-for="Comments" class="form-control" rows="5" placeholder="@Localizer["EnterCommentsPlaceholder"]"></textarea>
+            <span asp-validation-for="Comments" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light border" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-check-circle me-1"></i> @Localizer["AcceptResponse"]
+        </button>
+    </div>
+</form>

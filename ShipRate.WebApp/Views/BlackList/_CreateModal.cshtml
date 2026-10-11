@@ -1,0 +1,41 @@
+﻿@using ShipRate.Application.DTOs
+@model CreateBlackListDto
+
+<div class="modal-content text-start text-dark" dir="ltr">
+    <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="actionModalLabel"><i class="bi bi-person-slash"></i> Place in Black List</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <form hx-post="@Url.Action("Create", "BlackList")" hx-target="#modal-container" hx-swap="innerHTML">
+        @Html.AntiForgeryToken()
+        <div class="modal-body">
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Select Person</label>
+                <select asp-for="PersonId" class="form-select" asp-items="ViewBag.People" required>
+                    <option value="">-- Choose Person --</option>
+                </select>
+                <span asp-validation-for="PersonId" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Black List Reason</label>
+                <select asp-for="BlackListReasonId" class="form-select" asp-items="ViewBag.Reasons" required>
+                    <option value="">-- Choose Reason --</option>
+                </select>
+                <span asp-validation-for="BlackListReasonId" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Enter Remarks / Description</label>
+                <textarea asp-for="BlackListEnterRemarks" class="form-control" rows="3" placeholder="State the reason details..." required></textarea>
+                <span asp-validation-for="BlackListEnterRemarks" class="text-danger small"></span>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-danger"><i class="bi bi-exclamation-octagon"></i> Confirm Blacklist</button>
+        </div>
+    </form>
+</div>

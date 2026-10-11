@@ -1,0 +1,823 @@
+﻿@* Views/Shared/_LocationStyles.cshtml *@
+
+<style>
+    /* ═══════════════════════════════════════════════════════════
+           LOCATION PAGES — UNIFIED THEME
+           ═══════════════════════════════════════════════════════════ */
+
+    :root {
+        --loc-primary: #4f46e5;
+        --loc-primary-hover: #4338ca;
+        --loc-primary-light: #eef2ff;
+        --loc-success: #059669;
+        --loc-success-light: #ecfdf5;
+        --loc-danger: #dc2626;
+        --loc-danger-light: #fef2f2;
+        --loc-danger-hover: #b91c1c;
+        --loc-warning: #d97706;
+        --loc-warning-light: #fffbeb;
+        --loc-gray-50: #f9fafb;
+        --loc-gray-100: #f3f4f6;
+        --loc-gray-200: #e5e7eb;
+        --loc-gray-300: #d1d5db;
+        --loc-gray-400: #9ca3af;
+        --loc-gray-500: #6b7280;
+        --loc-gray-600: #4b5563;
+        --loc-gray-700: #374151;
+        --loc-gray-800: #1f2937;
+        --loc-gray-900: #111827;
+        --loc-radius: 10px;
+        --loc-radius-sm: 6px;
+        --loc-shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+        --loc-shadow-md: 0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+        --loc-shadow-lg: 0 10px 15px rgba(0,0,0,.1), 0 4px 6px rgba(0,0,0,.05);
+        --loc-transition: all .2s ease;
+        }
+        
+
+
+        [data-theme="dark"] {
+            --loc-primary: #6366f1;
+            --loc-primary-hover: #818cf8;
+            --loc-primary-light: rgba(99, 102, 241, 0.15);
+            --loc-success: #10b981;
+            --loc-success-light: rgba(16, 185, 129, 0.15);
+            --loc-danger: #ef4444;
+            --loc-danger-light: rgba(239, 68, 68, 0.15);
+            --loc-danger-hover: #f87171;
+            --loc-warning: #f59e0b;
+            --loc-warning-light: rgba(245, 158, 11, 0.15);
+            --loc-gray-50: #374151;
+            --loc-gray-100: #4b5563;
+            --loc-gray-200: #6b7280;
+            --loc-gray-300: #9ca3af;
+            --loc-gray-400: #d1d5db;
+            --loc-gray-500: #e5e7eb;
+            --loc-gray-600: #f3f4f6;
+            --loc-gray-700: #f9fafb;
+            --loc-gray-800: #ffffff;
+            --loc-gray-900: #ffffff;
+        }
+
+    /* ── Page Container ─────────────────────────────────── */
+    .loc-page {
+        max-width: 1280px;
+        margin: 0 ;
+        padding: 24px 16px;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        color: var(--loc-gray-800);
+        direction: ltr;
+    }
+
+    .loc-page {
+        background: var(--sneat-bg);
+        min-height: 100vh;
+        padding: 1.5rem;
+    }
+
+
+    /* ── Page Header ────────────────────────────────────── */
+    .loc-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .loc-header-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .loc-header-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, var(--loc-primary), #7c3aed);
+        border-radius: var(--loc-radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 22px;
+        box-shadow: var(--loc-shadow);
+    }
+
+    .loc-header h1 {
+        font-size: 1.65rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--loc-gray-900);
+    }
+
+    .loc-header p {
+        margin: 2px 0 0;
+        font-size: .875rem;
+        color: var(--loc-gray-500);
+    }
+
+    .loc-header-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    /* ── Card ───────────────────────────────────────────── */
+    .loc-card {
+        background: #fff;
+        border: 1px solid var(--loc-gray-200);
+        border-radius: var(--loc-radius);
+        box-shadow: var(--loc-shadow);
+        overflow: hidden;
+    }
+
+    .loc-card {
+        background: var(--sneat-card-bg);
+        border: 1px solid var(--sneat-border-color);
+        border-radius: 0.375rem;
+        box-shadow: var(--sneat-card-shadow);
+        margin-bottom: 1.5rem;
+    }
+
+
+
+    .loc-card-header {
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--loc-gray-200);
+        background: var(--loc-gray-50);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+        .loc-card-header h2 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--loc-gray-800);
+        }
+
+    .loc-card-body {
+        padding: 24px;
+    }
+
+    /* ── Buttons ────────────────────────────────────────── */
+    .loc-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 18px;
+        font-size: .875rem;
+        font-weight: 500;
+        border: none;
+        border-radius: var(--loc-radius-sm);
+        cursor: pointer;
+        transition: var(--loc-transition);
+        text-decoration: none;
+        line-height: 1.4;
+        white-space: nowrap;
+    }
+
+        .loc-btn:focus-visible {
+            outline: 2px solid var(--loc-primary);
+            outline-offset: 2px;
+        }
+
+    .loc-btn-primary {
+        background: var(--loc-primary);
+        color: #fff;
+    }
+
+        .loc-btn-primary:hover {
+            background: var(--loc-primary-hover);
+            color: #fff;
+        }
+
+    .loc-btn-success {
+        background: var(--loc-success);
+        color: #fff;
+    }
+
+        .loc-btn-success:hover {
+            background: #047857;
+            color: #fff;
+        }
+
+    .loc-btn-danger {
+        background: var(--loc-danger);
+        color: #fff;
+    }
+
+        .loc-btn-danger:hover {
+            background: var(--loc-danger-hover);
+            color: #fff;
+        }
+
+    .loc-btn-outline {
+        background: #fff;
+        color: var(--loc-gray-700);
+        border: 1px solid var(--loc-gray-300);
+    }
+
+        .loc-btn-outline:hover {
+            background: var(--loc-gray-50);
+            border-color: var(--loc-gray-400);
+            color: var(--loc-gray-700);
+        }
+
+    .loc-btn-sm {
+        padding: 6px 12px;
+        font-size: .8125rem;
+    }
+
+    .loc-btn-lg {
+        padding: 12px 28px;
+        font-size: .95rem;
+    }
+
+    /* ── Form Controls ──────────────────────────────────── */
+    .loc-form-group {
+        margin-bottom: 20px;
+    }
+
+        .loc-form-group label {
+            display: block;
+            font-size: .8125rem;
+            font-weight: 600;
+            color: var(--loc-gray-700);
+            margin-bottom: 6px;
+        }
+
+            .loc-form-group label .required {
+                color: var(--loc-danger);
+                margin-left: 2px;
+            }
+
+    .loc-form-control {
+        width: 100%;
+        padding: 10px 14px;
+        font-size: .875rem;
+        border: 1px solid var(--loc-gray-300);
+        border-radius: var(--loc-radius-sm);
+        background: #fff;
+        color: var(--loc-gray-800);
+        transition: var(--loc-transition);
+        box-sizing: border-box;
+    }
+
+        .loc-form-control:focus {
+            outline: none;
+            border-color: var(--loc-primary);
+            box-shadow: 0 0 0 3px rgba(79,70,229,.15);
+        }
+
+        .loc-form-control.input-validation-error,
+        .loc-form-control.is-invalid {
+            border-color: var(--loc-danger);
+        }
+
+            .loc-form-control.input-validation-error:focus {
+                box-shadow: 0 0 0 3px rgba(220,38,38,.15);
+            }
+
+    select.loc-form-control {
+        appearance: auto;
+    }
+
+    textarea.loc-form-control {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    .field-validation-error {
+        display: block;
+        font-size: .75rem;
+        color: var(--loc-danger);
+        margin-top: 4px;
+    }
+
+    /* ── Grid ───────────────────────────────────────────── */
+    .loc-grid {
+        display: grid;
+        gap: 0 24px;
+    }
+
+    .loc-grid-2 {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .loc-grid-3 {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .loc-grid-4 {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+
+    @@media (max-width: 768px) {
+        .loc-grid-2, .loc-grid-3, .loc-grid-4 {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (min-width: 769px) and (max-width: 1024px) {
+        .loc-grid-3, .loc-grid-4 {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    /* ── Table ──────────────────────────────────────────── */
+    .loc-table-wrap {
+        overflow-x: auto;
+    }
+
+    .loc-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .875rem;
+    }
+
+        .loc-table thead th {
+            padding: 12px 16px;
+            background: var(--loc-gray-50);
+            border-bottom: 2px solid var(--loc-gray-200);
+            text-align: left;
+            font-weight: 600;
+            color: var(--loc-gray-600);
+            white-space: nowrap;
+            font-size: .8125rem;
+            text-transform: uppercase;
+            letter-spacing: .03em;
+        }
+
+            .loc-table thead th a {
+                color: var(--loc-gray-600);
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+            }
+
+                .loc-table thead th a:hover {
+                    color: var(--loc-primary);
+                }
+
+        .loc-table tbody td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--loc-gray-100);
+            color: var(--loc-gray-700);
+            vertical-align: middle;
+        }
+
+        .loc-table tbody tr:hover {
+            background: var(--loc-primary-light);
+        }
+
+        .loc-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+    /* ── Badges ─────────────────────────────────────────── */
+    .loc-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: .75rem;
+        font-weight: 600;
+        line-height: 1.5;
+    }
+
+    .loc-badge-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .loc-badge-success {
+        background: var(--loc-success-light);
+        color: var(--loc-success);
+    }
+
+        .loc-badge-success .loc-badge-dot {
+            background: var(--loc-success);
+        }
+
+    .loc-badge-danger {
+        background: var(--loc-danger-light);
+        color: var(--loc-danger);
+    }
+
+        .loc-badge-danger .loc-badge-dot {
+            background: var(--loc-danger);
+        }
+
+    .loc-badge-warning {
+        background: var(--loc-warning-light);
+        color: var(--loc-warning);
+    }
+
+    .loc-badge-primary {
+        background: var(--loc-primary-light);
+        color: var(--loc-primary);
+    }
+
+    /* ── Pagination ─────────────────────────────────────── */
+    .loc-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 16px 24px;
+        border-top: 1px solid var(--loc-gray-200);
+        background: var(--loc-gray-50);
+        font-size: .8125rem;
+    }
+
+    .loc-pagination-info {
+        color: var(--loc-gray-500);
+    }
+
+    .loc-pagination-pages {
+        display: flex;
+        gap: 4px;
+    }
+
+        .loc-pagination-pages a,
+        .loc-pagination-pages span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 36px;
+            padding: 0 10px;
+            border: 1px solid var(--loc-gray-300);
+            border-radius: var(--loc-radius-sm);
+            text-decoration: none;
+            font-size: .8125rem;
+            font-weight: 500;
+            color: var(--loc-gray-700);
+            background: #fff;
+            transition: var(--loc-transition);
+        }
+
+            .loc-pagination-pages a:hover {
+                background: var(--loc-primary-light);
+                border-color: var(--loc-primary);
+                color: var(--loc-primary);
+            }
+
+        .loc-pagination-pages .active {
+            background: var(--loc-primary);
+            border-color: var(--loc-primary);
+            color: #fff;
+        }
+
+        .loc-pagination-pages .disabled {
+            opacity: .4;
+            pointer-events: none;
+        }
+
+    /* ── Alerts ─────────────────────────────────────────── */
+    .loc-alert {
+        padding: 14px 20px;
+        border-radius: var(--loc-radius-sm);
+        margin-bottom: 20px;
+        font-size: .875rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-left: 4px solid;
+    }
+
+    .loc-alert-success {
+        background: var(--loc-success-light);
+        color: #065f46;
+        border-color: var(--loc-success);
+    }
+
+    .loc-alert-danger {
+        background: var(--loc-danger-light);
+        color: #991b1b;
+        border-color: var(--loc-danger);
+    }
+
+    .loc-alert-warning {
+        background: var(--loc-warning-light);
+        color: #92400e;
+        border-color: var(--loc-warning);
+    }
+
+    /* ── Detail Grid ────────────────────────────────────── */
+    .loc-detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+    }
+
+    @@media (max-width: 768px) {
+        .loc-detail-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .loc-detail-item {
+        display: flex;
+        flex-direction: column;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--loc-gray-100);
+    }
+
+        .loc-detail-item:nth-child(odd) {
+            padding-right: 24px;
+        }
+
+        .loc-detail-item:nth-child(even) {
+            padding-left: 24px;
+            border-left: 1px solid var(--loc-gray-100);
+        }
+
+    .loc-detail-label {
+        font-size: .75rem;
+        font-weight: 600;
+        color: var(--loc-gray-500);
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        margin-bottom: 4px;
+    }
+
+    .loc-detail-value {
+        font-size: .9375rem;
+        color: var(--loc-gray-800);
+        font-weight: 500;
+    }
+
+        .loc-detail-value.empty {
+            color: var(--loc-gray-400);
+            font-style: italic;
+            font-weight: 400;
+        }
+
+    /* ── Checkbox Toggle ────────────────────────────────── */
+    .loc-toggle {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+    }
+
+        .loc-toggle input[type="checkbox"] {
+            width: 44px;
+            height: 24px;
+            appearance: none;
+            background: var(--loc-gray-300);
+            border-radius: 999px;
+            cursor: pointer;
+            transition: var(--loc-transition);
+            position: relative;
+        }
+
+            .loc-toggle input[type="checkbox"]::after {
+                content: '';
+                position: absolute;
+                width: 18px;
+                height: 18px;
+                background: #fff;
+                border-radius: 50%;
+                top: 3px;
+                left: 3px;
+                transition: var(--loc-transition);
+                box-shadow: 0 1px 3px rgba(0,0,0,.2);
+            }
+
+            .loc-toggle input[type="checkbox"]:checked {
+                background: var(--loc-primary);
+            }
+
+                .loc-toggle input[type="checkbox"]:checked::after {
+                    left: 23px;
+                }
+
+    .loc-toggle-text {
+        font-size: .875rem;
+        color: var(--loc-gray-700);
+    }
+
+    /* ── Filter Bar ─────────────────────────────────────── */
+    .loc-filters {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+    }
+
+    .loc-filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+        .loc-filter-group label {
+            font-size: .75rem;
+            font-weight: 600;
+            color: var(--loc-gray-500);
+        }
+
+        .loc-filter-group .loc-form-control {
+            min-width: 160px;
+            padding: 8px 12px;
+            font-size: .8125rem;
+        }
+
+    .loc-search-box {
+        position: relative;
+        flex: 1;
+        min-width: 220px;
+    }
+
+        .loc-search-box input {
+            padding-left: 38px;
+        }
+
+        .loc-search-box .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--loc-gray-400);
+            pointer-events: none;
+            font-size: .9rem;
+        }
+
+    /* ── Delete Danger Zone ─────────────────────────────── */
+    .loc-danger-zone {
+        border: 2px solid var(--loc-danger);
+        border-radius: var(--loc-radius);
+        padding: 28px;
+        text-align: center;
+    }
+
+    .loc-danger-icon {
+        width: 64px;
+        height: 64px;
+        background: var(--loc-danger-light);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        font-size: 28px;
+        color: var(--loc-danger);
+    }
+
+    /* ── Section Divider ────────────────────────────────── */
+    .loc-section-title {
+        font-size: .8125rem;
+        font-weight: 700;
+        color: var(--loc-primary);
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        margin: 28px 0 14px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--loc-primary-light);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .loc-section-title:first-child {
+            margin-top: 0;
+        }
+
+    /* ── Form Actions Bar ───────────────────────────────── */
+    .loc-form-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        padding-top: 24px;
+        margin-top: 24px;
+        border-top: 1px solid var(--loc-gray-200);
+    }
+
+    /* ── Conditional Fields Animation ───────────────────── */
+    .loc-conditional {
+        display: none;
+    }
+
+        .loc-conditional.show {
+            display: block;
+            animation: locFadeIn .3s ease;
+        }
+
+    @@keyframes locFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-6px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ── Empty State ────────────────────────────────────── */
+    .loc-empty {
+        text-align: center;
+        padding: 48px 24px;
+    }
+
+    .loc-empty-icon {
+        font-size: 48px;
+        color: var(--loc-gray-300);
+        margin-bottom: 12px;
+    }
+
+    .loc-empty h3 {
+        font-size: 1.1rem;
+        color: var(--loc-gray-600);
+        margin: 0 0 6px;
+    }
+
+    .loc-empty p {
+        font-size: .875rem;
+        color: var(--loc-gray-400);
+        margin: 0;
+    }
+
+    /* ── Table Row Actions ──────────────────────────────── */
+    .loc-row-actions {
+        display: flex;
+        gap: 6px;
+    }
+
+        .loc-row-actions a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--loc-radius-sm);
+            text-decoration: none;
+            font-size: .875rem;
+            transition: var(--loc-transition);
+        }
+
+        .loc-row-actions .action-view {
+            color: var(--loc-primary);
+            background: var(--loc-primary-light);
+        }
+
+            .loc-row-actions .action-view:hover {
+                background: var(--loc-primary);
+                color: #fff;
+            }
+
+        .loc-row-actions .action-edit {
+            color: var(--loc-warning);
+            background: var(--loc-warning-light);
+        }
+
+            .loc-row-actions .action-edit:hover {
+                background: var(--loc-warning);
+                color: #fff;
+            }
+
+        .loc-row-actions .action-delete {
+            color: var(--loc-danger);
+            background: var(--loc-danger-light);
+        }
+
+            .loc-row-actions .action-delete:hover {
+                background: var(--loc-danger);
+                color: #fff;
+            }
+
+    [data-theme="dark"] .loc-table thead {
+        background: rgba(105,108,255,0.12);
+    }
+
+    [data-theme="dark"] .loc-table tbody tr:hover {
+        background: rgba(255,255,255,0.04);
+    }
+
+    [data-theme="dark"] .loc-page-link:hover {
+        background: rgba(255,255,255,0.06);
+    }
+
+    [data-theme="dark"] .loc-form-control {
+        background: var(--sneat-card-bg);
+        color: var(--sneat-text-primary);
+        border-color: var(--sneat-border-color);
+    }
+
+</style>

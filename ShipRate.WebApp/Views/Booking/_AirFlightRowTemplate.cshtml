@@ -1,0 +1,41 @@
+﻿@using ShipRate.Application.DTOs
+@model BookingAirFlightVm
+
+<tr class="flight-row">
+    <td class="seq-no">__INDEX_PLUS_1__</td>
+    <td>
+        <input type="hidden" name="AirDetail.Flights[__INDEX__].Id" value="@Model.Id" />
+        <input type="text" name="AirDetail.Flights[__INDEX__].FlightNo" class="form-control form-control-sm text-center" placeholder="Flight No" />
+    </td>
+    <td>
+        <select name="AirDetail.Flights[__INDEX__].AirlineId" asp-items="ViewBag.Airlines" class="form-select form-select-sm">
+            <option value="">-- Carrier --</option>
+        </select>
+    </td>
+    <td>
+        <select name="AirDetail.Flights[__INDEX__].FromAirportId" asp-items="ViewBag.Airports" class="form-select form-select-sm">
+            <option value="">-- From --</option>
+        </select>
+    </td>
+    <td>
+        <select name="AirDetail.Flights[__INDEX__].ToAirportId" asp-items="ViewBag.Airports" class="form-select form-select-sm">
+            <option value="">-- To --</option>
+        </select>
+    </td>
+    <td>
+        <input type="datetime-local" name="AirDetail.Flights[__INDEX__].ETD" class="form-control form-control-sm mb-1" placeholder="ETD" />
+        <input type="datetime-local" name="AirDetail.Flights[__INDEX__].ATD" class="form-control form-control-sm" placeholder="ATD" />
+    </td>
+    <td>
+        <input type="datetime-local" name="AirDetail.Flights[__INDEX__].ETA" class="form-control form-control-sm mb-1" placeholder="ETA" />
+        <input type="datetime-local" name="AirDetail.Flights[__INDEX__].ATA" class="form-control form-control-sm" placeholder="ATA" />
+    </td>
+    <td>
+        <input type="text" name="AirDetail.Flights[__INDEX__].Remarks" class="form-control form-control-sm" />
+    </td>
+    <td>
+        <button type="button" class="btn btn-outline-danger btn-sm border-0" onclick="removeFlightRow(this)">
+            <i class="bi bi-trash-fill"></i>
+        </button>
+    </td>
+</tr>

@@ -1,0 +1,131 @@
+﻿@{
+    ViewData["Title"] = "Finance & Treasury Hub";
+}
+
+<div class="container-fluid py-3">
+    <div class="hub-page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="fw-bold mb-1"><i class="bi bi-cash-coin text-primary me-2"></i>Finance & Treasury</h5>
+            <span class="text-muted small">Invoicing, settlements, currency rates, account codes, and physical vaults</span>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <auth-policy policy="Finance.Invoices.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Invoices" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-receipt"></i></div>
+                    <div>
+                        <div class="hub-title">Invoices</div>
+                        <p class="hub-desc">Issue customer sales invoices, vendor bills, and credit notes.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Finance.Settlements.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Settlements" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-calculator"></i></div>
+                    <div>
+                        <div class="hub-title">Settlements</div>
+                        <p class="hub-desc">Reconciliation between invoices and incoming/outgoing treasury docs.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Finance.PaymentDocuments.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="PaymentDocuments" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-credit-card"></i></div>
+                    <div>
+                        <div class="hub-title">Payment Documents</div>
+                        <p class="hub-desc">Cheques, bank payment receipts, and digital remittance confirmations.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Finance.TreasuryDocuments.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="TreasuryDocuments" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-safe"></i></div>
+                    <div>
+                        <div class="hub-title">Treasury Documents</div>
+                        <p class="hub-desc">Financial entries, fund transfers, and accounting journal ties.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Finance.VaultMovements.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="Vaults" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-shield-check"></i></div>
+                    <div>
+                        <div class="hub-title">Vaults Management</div>
+                        <p class="hub-desc">Cash vault balances, physical asset custody, and multi-currency registers.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Finance.ExchangeRates.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="ExchangeRates" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                    <div>
+                        <div class="hub-title">Exchange Rates</div>
+                        <p class="hub-desc">Daily currency conversion tables (USD, EUR, AED, IRR).</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Finance.ChargeTypes.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="ChargeTypes" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-tag"></i></div>
+                    <div>
+                        <div class="hub-title">Charge Types</div>
+                        <p class="hub-desc">Freight items, THC, documentation fees, and demurrage charge lines.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Finance.AccountCodes.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="AccountCode" asp-action="Index" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-list-ol"></i></div>
+                    <div>
+                        <div class="hub-title">Account Codes</div>
+                        <p class="hub-desc">General ledger and subsidiary chart of accounts mapping.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+
+        <auth-policy policy="Finance.ReturnCash.View">
+            <div class="col-md-6 col-xl-4">
+                <a asp-controller="System" asp-action="UnderConstruction" class="hub-card">
+                    <div class="hub-icon"><i class="bi bi-arrow-counterclockwise"></i></div>
+                    <div>
+                        <div class="hub-title">Return Cash</div>
+                        <p class="hub-desc">Manage customer refunds, deposit paybacks, and credit balance releases.</p>
+                    </div>
+                    <i class="bi bi-chevron-right hub-arrow"></i>
+                </a>
+            </div>
+        </auth-policy>
+    </div>
+</div>

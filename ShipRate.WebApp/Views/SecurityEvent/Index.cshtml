@@ -1,0 +1,326 @@
+﻿@using ShipRate.Web.ViewModels
+@model SecurityEventIndexViewModel
+
+@{
+
+    ViewData["Title"] = "Security Events";
+}
+
+<div class="container-fluid">
+    <!-- کارت‌های آماری -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-shield-x"></i> Failed Logins
+                    </h5>
+                    <h2>@Model.TotalFailedLogins</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-lock"></i> Accounts Locked
+                    </h5>
+                    <h2>@Model.TotalLockouts</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-key"></i> Password Changes
+                    </h5>
+                    <h2>@Model.TotalPasswordChanges</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">
+                <i class="bi bi-shield-exclamation"></i> System's Security Events
+            </h4>
+        </div>
+        <div class="card-body">
+            <!-- فرم فیلتر -->
+            <form method="get" class="row g-3 mb-4">
+                <div class="col-md-2">
+                    <label class="form-label">User</label>
+                    <select name="UserId" class="form-select" asp-items="Model.Users">
+                        <option value="">All Users</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Email</label>
+                    <input type="text" name="Email" class="form-control" value="@Model.Email"
+                           placeholder="Search Emails..." />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">From Date</label>
+                    <input type="date" name="FromDate" class="form-control"
+                           value="@Model.FromDate?.ToString("yyyy-MM-dd")" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">To Date</label>
+                    <input type="date" name="ToDate" class="form-control"
+                           value="@Model.ToDate?.ToString("yyyy-MM-dd")" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Event Type</label>
+                    <select name="EventType" class="form-select">
+                        <option value="">All Events</option>
+                        <option value="FailedLogin" selected="@(Model.EventType == "FailedLogin")">Failed Login</option>
+                        <option value="SuccessfulLogin" selected="@(Model.EventType == "SuccessfulLogin")">Successful Login</option>
+                        <option value="AccountLockout" selected="@(Model.EventType == "AccountLockout")">Account Lockout</option>
+                        <option value="PasswordChange" selected="@(Model.EventType == "PasswordChange")">Password Change</option>
+                        <option value="PasswordReset" selected="@(Model.EventType == "PasswordReset")">Password Reset</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Status</label>
+                    <select name="IsSuccessful" class="form-select">
+                        <option value="">All</option>
+                        <option value="true" selected="@(Model.IsSuccessful == true)">Suiiccessful</option>
+                        <option value="false" selected="@(Model.IsSuccessful == false)">Failed</option>
+                    </select>
+                </div>
+                <div class="col-md-12 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="bi bi-funnel"></i> Apply Filter
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Clear Filter
+                    </a>
+                </div>
+            </form>
+
+            <!-- تعداد نتایج -->
+            <p class="text-muted">
+                Displaying @Model.Events.Count from  @Model.TotalRecords Events
+            </p>
+
+            <!-- جدول -->
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Date time</th>
+                            <th>User/Email</th>
+                            <th>Event Type</th>
+                            <th>Status</th>
+                            <th>Reason</th>
+                            <th>IP Address</th>
+                            <th>Browser</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Events.Any())
+                        {
+                            @foreach (var evt in Model.Events)
+                            {
+                                <tr class="@(!evt.IsSuccessful ? "table-danger" : "")">
+                                    <td style="direction: ltr; text-align: left;">
+                                        @evt.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(evt.UserEmail))
+                                        {
+                                            <span class="badge bg-primary">@evt.UserEmail</span>
+                                        }
+                                        else if (!string.IsNullOrEmpty(evt.AttemptedEmail))
+                                        {
+                                            <span class="badge bg-secondary">@evt.AttemptedEmail</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (evt.EventType == "FailedLogin")
+                                        {
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-shield-x"></i> Failed Logins
+                                            </span>
+                                        }
+                                        else if (evt.EventType == "SuccessfulLogin")
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-shield-check"></i> Successful Logins
+                                            </span>
+                                        }
+                                        else if (evt.EventType == "AccountLockout")
+                                        {
+                                            <span class="badge bg-warning">
+                                                <i class="bi bi-lock"></i> Account Lockout
+                                            </span>
+                                        }
+                                        else if (evt.EventType == "PasswordChange")
+                                        {
+                                            <span class="badge bg-info">
+                                                <i class="bi bi-key"></i> Password Change
+                                            </span>
+                                        }
+                                        else if (evt.EventType == "PasswordReset")
+                                        {
+                                            <span class="badge bg-warning">
+                                                <i class="bi bi-arrow-clockwise"></i> Password Reset
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@evt.EventType</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (evt.IsSuccessful)
+                                        {
+                                            <span class="badge bg-success">Successful</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Failed</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(evt.Reason))
+                                        {
+                                                @evt.Reason
+                                        }
+                                        else
+                                        {
+                                            <span>-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <small style="direction: ltr; display: block;">
+                                            @(evt.IpAddress ?? "-")
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted" style="direction: ltr; display: block;">
+                                            @if (!string.IsNullOrEmpty(evt.UserAgent))
+                                            {
+                                                @evt.UserAgent.Substring(0, Math.Min(50, evt.UserAgent.Length))
+                                                @if (evt.UserAgent.Length > 50)
+                                                {
+                                                    <text>...</text>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <text>-</text>
+                                            }
+                                        </small>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">
+                                    No Security event(s) found!!!!
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- صفحه‌بندی -->
+            @if (Model.TotalPages > 1)
+            {
+                <nav>
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-pageNumber="@(Model.PageNumber - 1)"
+                               asp-route-fromDate="@Model.FromDate"
+                               asp-route-toDate="@Model.ToDate"
+                               asp-route-userId="@Model.UserId"
+                               asp-route-email="@Model.Email"
+                               asp-route-eventType="@Model.EventType"
+                               asp-route-isSuccessful="@Model.IsSuccessful">
+                                قبلی
+                            </a>
+                        </li>
+
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-pageNumber="@i"
+                                   asp-route-fromDate="@Model.FromDate"
+                                   asp-route-toDate="@Model.ToDate"
+                                   asp-route-userId="@Model.UserId"
+                                   asp-route-email="@Model.Email"
+                                   asp-route-eventType="@Model.EventType"
+                                   asp-route-isSuccessful="@Model.IsSuccessful">
+                                    @i
+                                </a>
+                            </li>
+                        }
+
+                        <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-pageNumber="@(Model.PageNumber + 1)"
+                               asp-route-fromDate="@Model.FromDate"
+                               asp-route-toDate="@Model.ToDate"
+                               asp-route-userId="@Model.UserId"
+                               asp-route-email="@Model.Email"
+                               asp-route-eventType="@Model.EventType"
+                               asp-route-isSuccessful="@Model.IsSuccessful">
+                                بعدی
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        /* تنظیمات RTL */
+/*         body {
+            direction: ltr;
+            text-align: left;
+        }
+
+        .table {
+            direction: rtl;
+        }
+ */
+        /* استایل برای badge ها */
+   /*      .badge {
+            font-family: Tahoma, Arial, sans-serif;
+        }
+ */
+        /* کارت‌های آماری */
+        .card-body h2 {
+            font-weight: bold;
+            margin: 0;
+        }
+
+        /* رنگ‌بندی ردیف‌های خطرناک */
+        .table-danger {
+            background-color: #f8d7da !important;
+        }
+
+        /* فاصله‌گذاری دکمه‌ها */
+        .btn {
+            margin-left: 5px;
+        }
+    </style>
+}

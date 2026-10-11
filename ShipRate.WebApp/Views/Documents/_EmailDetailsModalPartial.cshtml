@@ -1,0 +1,50 @@
+﻿@using ShipRate.Application.DTOs.Documents
+@model DocumentEmailDto
+
+<div class="modal-header">
+    <h5 class="modal-title">Email Details</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body" dir="ltr">
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label class="form-label fw-bold">Subject</label>
+            <div>@Model.DocumentEmailSubject</div>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-bold">Direction</label>
+            <div>@Model.EmailDirectionName</div>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-bold">Send Date</label>
+            <div>@Model.DocumentEmailSendDate.ToString("yyyy-MM-dd HH:mm")</div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label fw-bold">From</label>
+            <div>@Model.DocumentEmailFrom</div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-bold">To</label>
+            <div>@Model.DocumentEmailTo</div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-bold">CC</label>
+            <div>@Model.DocumentEmailCC</div>
+        </div>
+
+        <div class="col-md-12">
+            <label class="form-label fw-bold">BCC</label>
+            <div>@Model.DocumentEmailBCC</div>
+        </div>
+    </div>
+
+    <div class="border rounded p-3 bg-light">
+        @Html.Raw(Model.DocumentEmailBody)
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>

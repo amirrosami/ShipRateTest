@@ -1,0 +1,80 @@
+﻿@using ShipRate.Application.DTOs
+@model BLAmendmentRequestFormDto
+
+
+<div class="card">
+
+<div class="card-header">
+    <h4>BL Amendment</h4>
+</div>
+<div class="card-body">
+
+<form hx-post="@Url.Action("SaveBLAmendment", "ServiceRequest")"
+      hx-target="#detail-form"
+      hx-swap="innerHTML"
+      class="sr-form"
+      hx-include="#ServiceRequestId"
+      hx-on::config-request="
+          const srvReqId = document.getElementById('ServiceRequestId')?.value;
+          if (!srvReqId || srvReqId.trim() === '' || srvReqId === '00000000-0000-0000-0000-000000000000') {
+              event.preventDefault();
+              createToast('First Save Request Master Info', 'danger');
+          }
+      ">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <div class="form-field mb-3">
+        <label asp-for="BLId" class="form-label">B/L Number <span aria-hidden="true" class="form-required text-danger">*</span></label>
+        <select asp-for="BLId" class="form-select" required>
+            <option value="">— Select a B/L —</option>
+            @if (Model.BLs != null)
+            {
+                foreach (var opt in Model.BLs)
+                {
+                    <option value="@opt.Value">@opt.Text</option>
+                }
+            }
+        </select>
+        <span asp-validation-for="BLId" class="form-error text-danger" role="alert"></span>
+    </div>
+
+    <div class="form-field mb-3">
+        <label asp-for="Reason" class="form-label">Description / Instructions <span aria-hidden="true" class="form-required text-danger">*</span></label>
+        <textarea asp-for="Reason" class="form-control" rows="3"
+                  placeholder="Describe the changes reason..." required></textarea>
+        <span asp-validation-for="Reason" class="form-error text-danger" role="alert"></span>
+    </div>
+
+    <!-- خطوط درخواست اصلاحیه (Amendment Lines) -->
+    <div class="mb-4">
+        <div class="align-items-center mb-2">
+            <div class="fw-bold card-header  mb-1">Amendment Details / Fields</div>
+            <button type="button"
+                    class="btn btn-sm btn-outline-primary"
+                    hx-get="@Url.Action("AddAmendmentLine", "ServiceRequest")"
+                    hx-target="#amendment-lines-list"
+                    hx-swap="beforeend">
+                + Add Line
+            </button>
+        </div>
+
+        <div id="amendment-lines-list">
+            @if (Model.Lines != null && Model.Lines.Any())
+            {
+                for (int i = 0; i < Model.Lines.Count; i++)
+                {
+                        Model.Lines[i].Index = i;
+                        <partial name="_BLAmendmentRequestLine" model="Model.Lines[i]" />
+                }
+            }
+        </div>
+    </div>
+
+    <div class="form-actions d-flex justify-content-end gap-2">
+        <button type="submit" class="btn btn-outline-success">Save</button>
+    </div>
+</form>
+    </div>
+</div>
